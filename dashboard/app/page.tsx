@@ -341,8 +341,8 @@ export default function Dashboard() {
         <MetricCard
           value={activeAgents}
           label="Active Agents"
-          trend={`${((activeAgents / totalAgents) * 100).toFixed(0)}% healthy`}
-          trendUp={activeAgents / totalAgents >= 0.9}
+          trend={totalAgents > 0 ? `${((activeAgents / totalAgents) * 100).toFixed(0)}% healthy` : "—"}
+          trendUp={totalAgents > 0 && activeAgents / totalAgents >= 0.9}
         />
         <MetricCard
           value={eventStats.total.toLocaleString()}

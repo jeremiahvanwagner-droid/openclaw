@@ -88,6 +88,7 @@ const WEBHOOK_SECRET = process.env.OPENCLAW_GHL_WEBHOOK_SECRET || 'replace-with-
 const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
 const TEAMS_CHANNEL_ID = process.env.OPENCLAW_ALERT_TEAMS_CHANNEL_ID || '7737707872';
+const M365_EMAIL_OWNER = process.env.M365_EMAIL_OWNER || '';
 
 // Event handlers
 const eventHandlers = {
@@ -146,11 +147,23 @@ async function sendTeamsAlert(message) {
   }
 }
 
+// Send Email alert via OpenClaw (Microsoft 365)
+async function sendEmailAlert(message) {
+  if (!M365_EMAIL_OWNER) return;
+  const escapedMessage = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+  try {
+    await execAsync(`openclaw send --agent main --channel email --to "${M365_EMAIL_OWNER}" "${escapedMessage}"`);
+  } catch (error) {
+    console.error('Failed to send Email alert:', error.message);
+  }
+}
+
 // Send alert to all configured channels
 async function sendAlert(message) {
   await Promise.allSettled([
     sendTelegramAlert(message),
-    sendTeamsAlert(message)
+    sendTeamsAlert(message),
+    sendEmailAlert(message)
   ]);
 }
 

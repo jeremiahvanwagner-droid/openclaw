@@ -368,6 +368,22 @@
         "7737707872"
       ],
       "groupPolicy": "allowlist"
+    },
+    "email": {
+      "enabled": true,
+      "provider": "microsoft365",
+      "fromAddress": "${M365_EMAIL_FROM}",
+      "defaultTo": "${M365_EMAIL_OWNER}",
+      "auth": {
+        "tenantId": "${MSTEAMS_TENANT_ID}",
+        "clientId": "${M365_EMAIL_CLIENT_ID}",
+        "clientSecret": "${M365_EMAIL_CLIENT_SECRET}"
+      },
+      "graphApiEndpoint": "https://graph.microsoft.com/v1.0",
+      "dmPolicy": "allowlist",
+      "allowTo": [
+        "${M365_EMAIL_OWNER}"
+      ]
     }
   },
   "gateway": {

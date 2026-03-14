@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { ConnectionStatus } from "./connection-status";
 
 export const metadata: Metadata = {
   title: "OpenClaw Agent Dashboard",
@@ -21,8 +22,7 @@ function Nav() {
           <a href="/events" className="text-slate-400 hover:text-white transition">Events</a>
           <a href="/metrics" className="text-slate-400 hover:text-white transition">Metrics</a>
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-            <span className="text-slate-400">Connected</span>
+            <ConnectionStatus />
           </div>
         </div>
       </div>
