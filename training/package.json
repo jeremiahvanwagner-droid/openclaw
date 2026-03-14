@@ -1,0 +1,24 @@
+{
+  "name": "@openclaw/training-system",
+  "version": "1.0.0",
+  "description": "OpenClaw Agent Training System - Truth J Blue LLC",
+  "type": "module",
+  "scripts": {
+    "init-cards": "npx tsx scripts/initialize-training-cards.ts",
+    "dashboard": "npx tsx scripts/generate-dashboard.ts",
+    "assess": "npx tsx scripts/skill-assessment.ts",
+    "training:monday": "npx tsx -e \"import { trainingWeeklyReview } from '../inngest/functions/training-protocol.js'\"",
+    "training:tuesday": "npx tsx -e \"import { trainingSkillDevelopment } from '../inngest/functions/training-protocol.js'\"",
+    "training:full": "npm run init-cards && npm run assess && npm run dashboard"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "author": "Truth J Blue LLC",
+  "license": "PROPRIETARY"
+}

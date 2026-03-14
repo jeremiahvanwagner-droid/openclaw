@@ -1,0 +1,124 @@
+{
+  "name": "Truth J Blue",
+  "version": "1.0.0",
+  "updated": "2026-03-13",
+  
+  "colors": {
+    "primary": {
+      "imperialBlue": {
+        "hex": "#081F3A",
+        "rgb": "8, 31, 58",
+        "usage": "Primary backgrounds, headers, footers"
+      },
+      "solarGold": {
+        "hex": "#C9A24D",
+        "rgb": "201, 162, 77",
+        "usage": "Accents, CTAs, highlights, decorative elements"
+      }
+    },
+    "neutral": {
+      "sacredWhite": {
+        "hex": "#F5F7FA",
+        "rgb": "245, 247, 250",
+        "usage": "Text on dark backgrounds, light backgrounds"
+      },
+      "stoneGray": {
+        "hex": "#8A8F98",
+        "rgb": "138, 143, 152",
+        "usage": "Secondary text, captions, subtle UI elements"
+      },
+      "veilBlack": {
+        "hex": "#0A0D14",
+        "rgb": "10, 13, 20",
+        "usage": "Dark mode backgrounds, deep shadows"
+      }
+    }
+  },
+  
+  "typography": {
+    "title": {
+      "family": "Playfair Display",
+      "weight": "700",
+      "usage": "Headlines, book titles, hero text",
+      "fallback": "Times New Roman, serif"
+    },
+    "heading": {
+      "family": "Open Sans",
+      "weight": "600",
+      "usage": "Subheadings, navigation, UI elements",
+      "fallback": "Arial, sans-serif"
+    },
+    "body": {
+      "family": "Libre Baskerville",
+      "weight": "400",
+      "usage": "Body text, paragraphs, long-form content",
+      "fallback": "Georgia, serif"
+    }
+  },
+  
+  "logos": {
+    "primary": "logo.png",
+    "light": "logo-light.png",
+    "dark": "logo-dark.png",
+    "icon": "icon.png",
+    "favicon": "favicon.ico"
+  },
+  
+  "stylePresets": {
+    "spiritual-elegant": {
+      "background": "#081F3A",
+      "accent": "#C9A24D",
+      "text": "#F5F7FA",
+      "mood": "mystical, divine, transformative"
+    },
+    "tech-futuristic": {
+      "background": "#0A0D14",
+      "accent": "#C9A24D",
+      "text": "#F5F7FA",
+      "mood": "innovative, cutting-edge, AI-powered"
+    },
+    "clean-professional": {
+      "background": "#F5F7FA",
+      "accent": "#081F3A",
+      "text": "#081F3A",
+      "mood": "trustworthy, clear, business-focused"
+    },
+    "bold-impact": {
+      "background": "#C9A24D",
+      "accent": "#081F3A",
+      "text": "#0A0D14",
+      "mood": "attention-grabbing, energetic, motivational"
+    }
+  },
+  
+  "socialHandles": {
+    "tiktok": "@TruthJBlue",
+    "instagram": "@TruthJBlue",
+    "facebook": "TruthJBlue",
+    "twitter": "@TruthJBlue",
+    "linkedin": "vanwagnerjeremiah",
+    "youtube": ["@TruthJBlue", "@palaceofexcellence"]
+  },
+  
+  "products": {
+    "divinepathwalkers": {
+      "name": "Divine Path Walkers",
+      "type": "Skool Community",
+      "url": "https://skool.com/divine-path-walkers"
+    },
+    "beyondtheveil": {
+      "name": "Beyond the Veil",
+      "type": "12-Week Mentorship",
+      "description": "12-Week Journey to Divine Alignment"
+    },
+    "agenticmastery": {
+      "name": "Agentic AI Mastery",
+      "type": "Course/Academy",
+      "url": "https://agenticmastery.academy"
+    },
+    "mindsetshiftlabs": {
+      "name": "Mindset Shift Labs",
+      "type": "Educational Platform"
+    }
+  }
+}

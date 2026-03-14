@@ -1,0 +1,81 @@
+# ═══════════════════════════════════════════════════════════════
+# OpenClaw — .gitignore
+# ═══════════════════════════════════════════════════════════════
+
+# ── Secrets & Credentials ─────────────────────────────────────
+.env
+.env.local
+.env.prod
+.env.*.local
+!.env.example
+secrets/
+credentials/
+identity/
+devices/
+
+# ── Runtime Data (server-local, not version-controlled) ──────
+data/
+logs/
+backups/
+browser/
+media/
+delivery-queue/
+completions/
+memory/
+
+# ── Agent Session Data (ephemeral, per-instance) ─────────────
+agents/*/sessions/
+agents/*/agent/auth-profiles.json
+workspace/
+
+# ── OpenClaw Runtime Artifacts ────────────────────────────────
+/openclaw.json
+/agents_config.json
+/ghl-webhook-handler.mjs
+openclaw.json.bak*
+openclaw.pre-safe-fix-*.json
+test-pool-*.mjs
+test-pool-results.json
+update-check.json
+exec-approvals.json
+gateway.cmd
+subagents/runs.json
+
+# ── Cron Run History ──────────────────────────────────────────
+cron/
+telegram/
+
+# ── Legacy / Deprecated ──────────────────────────────────────
+open-claw/
+canvas/
+openclaw-prod/
+workspace-marketing/
+workspace-sales/
+workspace-support/
+workspaces/
+.openclaw-dev/
+
+# ── Node.js / Build ──────────────────────────────────────────
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+
+# ── OS Files ──────────────────────────────────────────────────
+Thumbs.db
+.DS_Store
+Desktop.ini
+ehthumbs.db
+
+# ── Editor ────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Temporary Files ───────────────────────────────────────────
+*.tmp
+*.log
+*.pid

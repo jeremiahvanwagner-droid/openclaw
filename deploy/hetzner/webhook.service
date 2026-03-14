@@ -1,0 +1,43 @@
+[Unit]
+Description=OpenClaw GHL Webhook Handler
+Documentation=https://github.com/truthjblue/openclaw
+After=network-online.target openclaw.service
+Wants=network-online.target
+BindsTo=openclaw.service
+
+[Service]
+Type=simple
+User=openclaw
+Group=openclaw
+WorkingDirectory=/opt/openclaw
+
+# Load environment variables
+EnvironmentFile=/etc/openclaw/.env
+
+# Start the webhook handler
+ExecStart=/usr/bin/node handlers/ghl-webhook-handler.mjs
+
+# Auto-restart on failure
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/openclaw/data /opt/openclaw/logs /opt/openclaw/delivery-queue
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=8192
+MemoryMax=512M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw-webhook
+
+[Install]
+WantedBy=multi-user.target

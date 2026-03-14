@@ -1,0 +1,1072 @@
+{
+  "meta": {
+    "lastTouchedVersion": "2026.3.13",
+    "lastTouchedAt": "2026-03-14T12:26:07.301Z"
+  },
+  "wizard": {
+    "lastRunAt": "2026-03-13T21:01:06.438Z",
+    "lastRunVersion": "2026.3.8",
+    "lastRunCommand": "configure",
+    "lastRunMode": "local"
+  },
+  "browser": {
+    "headless": true,
+    "defaultProfile": "openclaw",
+    "profiles": {
+      "chrome": {
+        "cdpPort": 9222,
+        "color": "#00AA00"
+      }
+    }
+  },
+  "secrets": {
+    "providers": {
+      "ghl_token_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_PRIVATE_INTEGRATION_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "ghl_location_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_LOCATION_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "telegram_token_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_TELEGRAM_BOT_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "user_env_exec": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "supabase_url_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_URL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "supabase_service_role_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_SERVICE_ROLE_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "canva_client_id_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "canva_client_secret_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_SECRET','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "canva_brand_kit_id_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('CANVA_BRAND_KIT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "ghl_email_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_EMAIL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "ghl_password_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_PASSWORD','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      },
+      "openai_embeddings_key_env": {
+        "source": "exec",
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('OPENAI_API_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "timeoutMs": 5000,
+        "noOutputTimeoutMs": 5000,
+        "maxOutputBytes": 65536,
+        "jsonOnly": false,
+        "allowInsecurePath": true
+      }
+    }
+  },
+  "auth": {
+    "profiles": {
+      "openai-codex:default": {
+        "provider": "openai-codex",
+        "mode": "oauth"
+      },
+      "openai-codex:manual": {
+        "provider": "openai-codex",
+        "mode": "token"
+      }
+    },
+    "order": {
+      "openai-codex": [
+        "openai-codex:default",
+        "openai-codex:manual"
+      ]
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "openai/gpt-5.3-codex"
+      },
+      "models": {
+        "openai-codex/gpt-5.3-codex": {},
+        "openai/gpt-5.3-codex": {}
+      },
+      "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace",
+      "contextTokens": 240000,
+      "memorySearch": {
+        "enabled": true,
+        "provider": "openai",
+        "model": "text-embedding-3-small"
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "reserveTokens": 24000,
+        "keepRecentTokens": 64000,
+        "maxHistoryShare": 0.8,
+        "recentTurnsPreserve": 5
+      },
+      "timeoutSeconds": 1800,
+      "maxConcurrent": 6,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    },
+    "list": [
+      {
+        "id": "main"
+      },
+      {
+        "id": "marketing",
+        "name": "marketing",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-marketing",
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\marketing\\agent",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "sales",
+        "name": "sales",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-sales",
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\sales\\agent",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "support",
+        "name": "support",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-support",
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\support\\agent",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d1_ceo",
+        "name": "CEO",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ceo",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d1_cto",
+        "name": "CTO",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cto",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d2_director",
+        "name": "eCommerce Director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_director",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d3_ceo",
+        "name": "Consulting CEO",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ceo",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d4_cvo",
+        "name": "Chief Visionary Officer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_cvo",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d5_publisher",
+        "name": "Publisher",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_publisher",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d6_executive_director",
+        "name": "Nonprofit Executive Director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_executive_director",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "shared_master_orchestrator",
+        "name": "Master Orchestrator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_master_orchestrator",
+        "model": "openai/gpt-5.3-codex"
+      }
+    ]
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true,
+    "ownerDisplay": "raw"
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "commands": {
+        "nativeSkills": false
+      },
+      "dmPolicy": "allowlist",
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "allowFrom": [
+        7737707872
+      ],
+      "groupPolicy": "allowlist",
+      "streaming": "off"
+    },
+    "msteams": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "groupAllowFrom": [
+        "7737707872"
+      ],
+      "groupPolicy": "allowlist"
+    }
+  },
+  "gateway": {
+    "port": 18789,
+    "mode": "local",
+    "bind": "loopback",
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "nodes": {
+      "denyCommands": []
+    }
+  },
+  "skills": {
+    "entries": {
+      "notion": {},
+      "openai-image-gen": {},
+      "sag": {},
+      "ghl": {
+        "enabled": true,
+        "config": {
+          "locationId": "$env:GHL_LOCATION_ID",
+          "apiToken": "$env:GHL_PRIVATE_INTEGRATION_TOKEN",
+          "apiVersion": "2021-07-28"
+        }
+      },
+      "browser-controller": {
+        "enabled": true,
+        "config": {
+          "headless": true,
+          "timeout": 30000
+        }
+      },
+      "google-drive-manager": {
+        "enabled": true,
+        "config": {
+          "baseFolderId": "$env:GDRIVE_BASE_FOLDER_ID"
+        }
+      },
+      "agent-coordinator": {
+        "enabled": true
+      },
+      "content-pipeline": {
+        "enabled": true
+      },
+      "social-poster": {
+        "enabled": true,
+        "config": {
+          "platforms": [
+            "facebook",
+            "instagram",
+            "tiktok"
+          ]
+        }
+      },
+      "youtube-manager": {
+        "enabled": true,
+        "config": {
+          "channelId": "$env:YOUTUBE_CHANNEL_ID"
+        }
+      },
+      "objection-handler": {
+        "enabled": true
+      },
+      "market-intel": {
+        "enabled": true,
+        "config": {
+          "dataSources": [
+            "google-trends",
+            "statista",
+            "semrush",
+            "social-blade"
+          ],
+          "industries": [
+            "digital-products",
+            "coaching",
+            "ecommerce",
+            "saas",
+            "content-creation"
+          ]
+        }
+      },
+      "competitor-watch": {
+        "enabled": true,
+        "config": {
+          "monitorCategories": [
+            "pricing",
+            "products",
+            "marketing",
+            "content",
+            "social"
+          ],
+          "alertThreshold": "medium"
+        }
+      },
+      "trend-spotter": {
+        "enabled": true,
+        "config": {
+          "platforms": [
+            "google-trends",
+            "youtube",
+            "twitter",
+            "tiktok",
+            "reddit"
+          ],
+          "scanFrequency": "daily"
+        }
+      },
+      "audience-analyzer": {
+        "enabled": true,
+        "config": {
+          "demographicCategories": [
+            "age",
+            "income",
+            "education"
+          ],
+          "personaCount": 4
+        }
+      },
+      "keyword-finder": {
+        "enabled": true,
+        "config": {
+          "maxDifficulty": 50,
+          "minVolume": 500,
+          "intentTypes": [
+            "informational",
+            "commercial",
+            "transactional"
+          ]
+        }
+      },
+      "niche-validator": {
+        "enabled": true,
+        "config": {
+          "criteria": [
+            "marketSize",
+            "demand",
+            "competition",
+            "profitability",
+            "accessibility",
+            "scalability"
+          ],
+          "minimumScore": 50
+        }
+      },
+      "price-researcher": {
+        "enabled": true,
+        "config": {
+          "pricingModels": [
+            "oneTime",
+            "subscription",
+            "paymentPlan",
+            "tiered"
+          ],
+          "charmPrices": true
+        }
+      },
+      "content-gap-finder": {
+        "enabled": true,
+        "config": {
+          "contentTypes": [
+            "blog-post",
+            "video",
+            "guide",
+            "template",
+            "case-study"
+          ],
+          "gapCategories": [
+            "topic-coverage",
+            "depth-gap",
+            "format-gap",
+            "freshness-gap"
+          ]
+        }
+      },
+      "content-writer": {
+        "enabled": true,
+        "config": {
+          "defaultTone": "professional",
+          "frameworks": [
+            "AIDA",
+            "PAS",
+            "storytelling"
+          ],
+          "contentTypes": [
+            "blog",
+            "article",
+            "guide",
+            "tutorial"
+          ]
+        }
+      },
+      "headline-generator": {
+        "enabled": true,
+        "config": {
+          "formulas": [
+            "how-to",
+            "listicle",
+            "question",
+            "curiosity"
+          ],
+          "emotionalTriggers": true,
+          "maxLength": 70
+        }
+      },
+      "copywriter": {
+        "enabled": true,
+        "config": {
+          "copyTypes": [
+            "sales-page",
+            "landing-page",
+            "ad-copy",
+            "cta"
+          ],
+          "persuasionFrameworks": [
+            "AIDA",
+            "PAS",
+            "BAB",
+            "4Ps"
+          ],
+          "guaranteeTypes": [
+            "money-back",
+            "results-based"
+          ]
+        }
+      },
+      "script-writer": {
+        "enabled": true,
+        "config": {
+          "scriptTypes": [
+            "youtube",
+            "podcast",
+            "vsl",
+            "webinar",
+            "shorts"
+          ],
+          "bRollCues": true,
+          "timestamps": true
+        }
+      },
+      "email-sequence": {
+        "enabled": true,
+        "config": {
+          "sequenceTypes": [
+            "welcome",
+            "launch",
+            "cart-abandonment",
+            "nurture"
+          ],
+          "defaultSequenceLength": 7,
+          "subjectLineFormulas": true
+        }
+      },
+      "social-content": {
+        "enabled": true,
+        "config": {
+          "platforms": [
+            "twitter",
+            "instagram",
+            "linkedin",
+            "facebook",
+            "tiktok"
+          ],
+          "postTypes": [
+            "single",
+            "thread",
+            "carousel",
+            "story"
+          ],
+          "hashtagOptimization": true
+        }
+      },
+      "lead-magnet-creator": {
+        "enabled": true,
+        "config": {
+          "magnetTypes": [
+            "checklist",
+            "guide",
+            "cheat-sheet",
+            "template",
+            "mini-course",
+            "swipe-file"
+          ],
+          "landingPageIntegration": true
+        }
+      },
+      "course-builder": {
+        "enabled": true,
+        "config": {
+          "courseTypes": [
+            "mini-course",
+            "signature",
+            "flagship",
+            "certification",
+            "bootcamp"
+          ],
+          "assessmentTypes": [
+            "quiz",
+            "assignment",
+            "project"
+          ],
+          "pricingStrategy": true
+        }
+      },
+      "content-repurposer": {
+        "enabled": true,
+        "config": {
+          "atomization": true,
+          "repurposeTypes": [
+            "blog-to-social",
+            "video-to-blog",
+            "thread-to-blog"
+          ],
+          "formatMatrix": true
+        }
+      },
+      "seo-optimizer": {
+        "enabled": true,
+        "config": {
+          "onPageFactors": true,
+          "technicalSEO": true,
+          "keywordIntentAnalysis": true,
+          "contentScoring": true
+        }
+      },
+      "content-scheduler": {
+        "enabled": true,
+        "config": {
+          "platforms": [
+            "blog",
+            "email",
+            "twitter",
+            "instagram",
+            "linkedin",
+            "youtube"
+          ],
+          "optimalTiming": true,
+          "batchPlanning": true,
+          "seasonalContent": true
+        }
+      },
+      "content-analyzer": {
+        "enabled": true,
+        "config": {
+          "metricsCategories": [
+            "awareness",
+            "engagement",
+            "conversion",
+            "roi"
+          ],
+          "qualityScoring": true,
+          "competitorAnalysis": true,
+          "performanceReporting": true
+        }
+      },
+      "social-distributor": {
+        "enabled": true,
+        "config": {
+          "platforms": [
+            "twitter",
+            "instagram",
+            "linkedin",
+            "facebook",
+            "tiktok",
+            "youtube",
+            "pinterest"
+          ],
+          "scheduledPosting": true,
+          "queueManagement": true,
+          "crossPosting": true
+        }
+      },
+      "email-broadcaster": {
+        "enabled": true,
+        "config": {
+          "broadcastTypes": [
+            "solo",
+            "newsletter",
+            "promotional",
+            "launch",
+            "reengagement"
+          ],
+          "segmentation": true,
+          "abTesting": true,
+          "warmupPlans": true
+        }
+      },
+      "landing-page-builder": {
+        "enabled": true,
+        "config": {
+          "pageTypes": [
+            "optin",
+            "sales",
+            "webinar",
+            "thank-you",
+            "coming-soon",
+            "waitlist"
+          ],
+          "sectionTemplates": true,
+          "headlineFormulas": true,
+          "conversionOptimization": true
+        }
+      },
+      "funnel-builder": {
+        "enabled": true,
+        "config": {
+          "funnelTypes": [
+            "lead-magnet",
+            "tripwire",
+            "webinar",
+            "product-launch",
+            "challenge",
+            "vsl",
+            "evergreen"
+          ],
+          "upsellSequences": true,
+          "automationMapping": true,
+          "conversionTracking": true
+        }
+      },
+      "checkout-integrator": {
+        "enabled": true,
+        "config": {
+          "gateways": [
+            "stripe",
+            "paypal",
+            "thrivecart",
+            "samcart",
+            "gumroad"
+          ],
+          "checkoutTypes": [
+            "one-time",
+            "subscription",
+            "payment-plan",
+            "order-bump"
+          ],
+          "abandonmentRecovery": true,
+          "revenueAnalytics": true
+        }
+      },
+      "delivery-system": {
+        "enabled": true,
+        "config": {
+          "deliveryMethods": [
+            "direct-download",
+            "email",
+            "member-area",
+            "drip",
+            "api",
+            "license"
+          ],
+          "accessManagement": true,
+          "dripScheduling": true,
+          "contentProtection": true
+        }
+      },
+      "affiliate-manager": {
+        "enabled": true,
+        "config": {
+          "platforms": [
+            "thrivecart",
+            "firstpromoter",
+            "refersion",
+            "rewardful",
+            "custom"
+          ],
+          "commissionStructures": [
+            "percentage",
+            "flat-rate",
+            "tiered",
+            "recurring",
+            "two-tier"
+          ],
+          "affiliateTiers": true,
+          "payoutManagement": true
+        }
+      },
+      "traffic-coordinator": {
+        "enabled": true,
+        "config": {
+          "trafficSources": [
+            "facebook",
+            "google",
+            "youtube",
+            "tiktok",
+            "organic",
+            "seo",
+            "email",
+            "affiliates"
+          ],
+          "budgetAllocation": true,
+          "roiTracking": true,
+          "scaleRecommendations": true,
+          "attributionModels": [
+            "last-click",
+            "first-click",
+            "linear",
+            "time-decay",
+            "position-based"
+          ]
+        }
+      },
+      "sales-page-optimizer": {
+        "enabled": true,
+        "config": {
+          "pageTypes": [
+            "long-form",
+            "short-form",
+            "hybrid",
+            "vsl"
+          ],
+          "conversionElements": [
+            "headline",
+            "subheadline",
+            "copy",
+            "cta",
+            "guarantee",
+            "testimonials"
+          ],
+          "mobileOptimization": true,
+          "abTesting": true,
+          "sectionAnalysis": true
+        }
+      },
+      "offer-architect": {
+        "enabled": true,
+        "config": {
+          "offerTypes": [
+            "standalone",
+            "bundle",
+            "valueStack",
+            "grandSlam",
+            "hybrid"
+          ],
+          "bonusCreation": true,
+          "urgencyStrategies": [
+            "deadline",
+            "quantity",
+            "bonusRemoval",
+            "priceIncrease",
+            "launchWindow"
+          ],
+          "valueEquation": true,
+          "positioning": true
+        }
+      },
+      "testimonial-collector": {
+        "enabled": true,
+        "config": {
+          "testimonialTypes": [
+            "text",
+            "video",
+            "audio",
+            "screenshot",
+            "casestudy",
+            "data"
+          ],
+          "collectionWorkflows": true,
+          "displayFormats": [
+            "card",
+            "featured",
+            "sidebar",
+            "inline",
+            "wall"
+          ],
+          "videoScripts": true,
+          "caseStudyBuilder": true
+        }
+      },
+      "proposal-generator": {
+        "enabled": true,
+        "config": {
+          "proposalTypes": [
+            "consulting",
+            "service",
+            "project",
+            "retainer",
+            "productized"
+          ],
+          "sectionTemplates": true,
+          "pricingFrameworks": [
+            "tiered",
+            "single",
+            "modular",
+            "value"
+          ],
+          "termsGeneration": true,
+          "followUpSequences": true
+        }
+      },
+      "deal-closer": {
+        "enabled": true,
+        "config": {
+          "closingTechniques": [
+            "assumptive",
+            "summary",
+            "urgency",
+            "alternative",
+            "question",
+            "puppy",
+            "takeaway",
+            "silence"
+          ],
+          "objectionHandlers": [
+            "price",
+            "time",
+            "spouse",
+            "competitor",
+            "trust",
+            "notReady"
+          ],
+          "followUpStages": [
+            "postDemo",
+            "postProposal",
+            "ghosted"
+          ],
+          "negotiationTactics": true,
+          "lostDealRecovery": true
+        }
+      },
+      "pricing-strategist": {
+        "enabled": true,
+        "config": {
+          "pricingModels": [
+            "oneTime",
+            "subscription",
+            "paymentPlan",
+            "tiered",
+            "valueBased",
+            "freemium"
+          ],
+          "psychologyPrinciples": [
+            "charm",
+            "prestige",
+            "anchoring",
+            "decoy",
+            "bundling",
+            "framing",
+            "scarcity"
+          ],
+          "tierDesign": true,
+          "priceTestingFramework": true,
+          "valuePricing": true
+        }
+      },
+      "guarantee-designer": {
+        "enabled": true,
+        "config": {
+          "guaranteeTypes": [
+            "moneyBack",
+            "conditional",
+            "results",
+            "betterThan",
+            "satisfaction",
+            "trial",
+            "lifetime",
+            "proRata"
+          ],
+          "riskReversalStrategies": true,
+          "copyTemplates": true,
+          "badgeGeneration": true,
+          "refundPolicyCreation": true
+        }
+      },
+      "webinar-engine": {
+        "enabled": true,
+        "config": {
+          "frameworks": [
+            "perfectWebinar",
+            "teaching",
+            "demo",
+            "interview"
+          ],
+          "pitchDesign": true,
+          "qaScripts": true,
+          "followUpSequences": [
+            "preWebinar",
+            "postWebinarAttended",
+            "postWebinarMissed"
+          ],
+          "registrationOptimization": true,
+          "replayStrategies": true
+        }
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      },
+      "msteams": {
+        "enabled": true
+      }
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "openclaw-skills",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "OpenClaw browser automation and content generation skills",
+  "main": "browser-automation.mjs",
+  "scripts": {
+    "test": "node browser-automation.mjs test",
+    "thumbnails": "node browser-automation.mjs thumbnails",
+    "post": "node browser-automation.mjs post",
+    "daemon": "node browser-automation.mjs daemon"
+  },
+  "keywords": [
+    "openclaw",
+    "automation",
+    "browser",
+    "social-media",
+    "gohighlevel"
+  ],
+  "author": "Truth J Blue LLC",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "playwright": "^1.48.0",
+    "puppeteer": "^24.39.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "sharp": "^0.33.5"
+  }
+}

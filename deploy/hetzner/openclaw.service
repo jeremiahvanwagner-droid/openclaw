@@ -1,0 +1,48 @@
+[Unit]
+Description=OpenClaw AI Agent Gateway
+Documentation=https://github.com/truthjblue/openclaw
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=openclaw
+Group=openclaw
+WorkingDirectory=/opt/openclaw
+
+# Load environment variables
+EnvironmentFile=/etc/openclaw/.env
+
+# Start the gateway
+ExecStart=/usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js gateway --port 18789
+
+# Auto-restart on failure
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+# Watchdog: restart if unresponsive for 5 minutes
+WatchdogSec=300
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/openclaw/data /opt/openclaw/logs /opt/openclaw/backups /opt/openclaw/media /opt/openclaw/memory /opt/openclaw/cron/runs /opt/openclaw/delivery-queue
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=2G
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw
+
+# Alert on failure
+OnFailure=openclaw-alert@%n.service
+
+[Install]
+WantedBy=multi-user.target

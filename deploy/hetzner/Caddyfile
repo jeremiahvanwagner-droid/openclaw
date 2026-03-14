@@ -1,0 +1,59 @@
+# ═══════════════════════════════════════════════════════════════
+# OpenClaw — Caddy Reverse Proxy (Auto-TLS via Let's Encrypt)
+# Place at /etc/caddy/Caddyfile on the Hetzner VPS
+# Replace YOUR_DOMAIN with your actual domain
+# ═══════════════════════════════════════════════════════════════
+
+# Gateway API — OpenClaw bot endpoint
+api.YOUR_DOMAIN {
+    reverse_proxy localhost:18789
+
+    # Rate limiting
+    @rateLimit {
+        path /
+    }
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+
+    log {
+        output file /var/log/caddy/api-access.log {
+            roll_size 50MiB
+            roll_keep 5
+        }
+    }
+}
+
+# Webhook endpoint — GHL inbound webhooks
+webhook.YOUR_DOMAIN {
+    reverse_proxy localhost:8788
+
+    # Only allow POST requests to webhook endpoint
+    @notPost {
+        not method POST
+    }
+    respond @notPost 405
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        -Server
+    }
+
+    log {
+        output file /var/log/caddy/webhook-access.log {
+            roll_size 20MiB
+            roll_keep 3
+        }
+    }
+}
+
+# Dashboard (optional — if self-hosting instead of Vercel)
+# dashboard.YOUR_DOMAIN {
+#     reverse_proxy localhost:3000
+# }

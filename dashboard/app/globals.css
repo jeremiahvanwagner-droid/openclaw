@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --border: #334155;
+  --muted: #475569;
+  --accent: #22c55e;
+  --accent-foreground: #f0fdf4;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+/* Status badges */
+.status-active {
+  @apply bg-green-500/20 text-green-400 border border-green-500/30;
+}
+.status-idle {
+  @apply bg-yellow-500/20 text-yellow-400 border border-yellow-500/30;
+}
+.status-error {
+  @apply bg-red-500/20 text-red-400 border border-red-500/30;
+}
+.status-paused {
+  @apply bg-gray-500/20 text-gray-400 border border-gray-500/30;
+}
+
+/* Division colors */
+.division-d1 { @apply border-l-4 border-l-blue-500; }
+.division-d2 { @apply border-l-4 border-l-purple-500; }
+.division-d3 { @apply border-l-4 border-l-orange-500; }
+.division-d4 { @apply border-l-4 border-l-pink-500; }
+.division-d5 { @apply border-l-4 border-l-emerald-500; }
+.division-d6 { @apply border-l-4 border-l-cyan-500; }
+.division-shared { @apply border-l-4 border-l-yellow-500; }
+
+/* Cards */
+.card {
+  @apply bg-slate-800/50 border border-slate-700/50 rounded-xl p-6;
+}
+
+.card-header {
+  @apply text-lg font-semibold text-white mb-4;
+}
+
+/* Metrics */
+.metric-value {
+  @apply text-3xl font-bold text-white;
+}
+.metric-label {
+  @apply text-sm text-slate-400 mt-1;
+}

@@ -1,0 +1,82 @@
+# ═══════════════════════════════════════════════════════════════
+# OpenClaw — Production Docker Compose (Hetzner VPS)
+# Usage: docker compose -f deploy/docker-compose.prod.yml up -d
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  bot:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        OPENCLAW_VERSION: "latest"
+    container_name: openclaw-bot
+    env_file: /etc/openclaw/.env
+    ports:
+      - "127.0.0.1:18789:18789"
+    volumes:
+      - openclaw-data:/opt/openclaw/data
+      - openclaw-logs:/opt/openclaw/logs
+      - openclaw-backups:/opt/openclaw/backups
+      - openclaw-media:/opt/openclaw/media
+      - openclaw-memory:/opt/openclaw/memory
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "2.0"
+        reservations:
+          memory: 512M
+          cpus: "0.5"
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  webhook:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    container_name: openclaw-webhook
+    env_file: /etc/openclaw/.env
+    command: ["node", "handlers/ghl-webhook-handler.mjs"]
+    ports:
+      - "127.0.0.1:8788:8788"
+    volumes:
+      - openclaw-data:/opt/openclaw/data
+      - openclaw-logs:/opt/openclaw/logs
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "1.0"
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8788/health"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      bot:
+        condition: service_healthy
+
+volumes:
+  openclaw-data:
+  openclaw-logs:
+  openclaw-backups:
+  openclaw-media:
+  openclaw-memory:

@@ -1,0 +1,37 @@
+# ═══════════════════════════════════════════════════════════════
+# OpenClaw — Local Development Docker Compose
+# Usage: docker compose up
+# ═══════════════════════════════════════════════════════════════
+
+services:
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openclaw-bot
+    env_file: .env
+    ports:
+      - "18789:18789"
+    volumes:
+      - ./data:/opt/openclaw/data
+      - ./logs:/opt/openclaw/logs
+      - ./backups:/opt/openclaw/backups
+      - ./media:/opt/openclaw/media
+      - ./memory:/opt/openclaw/memory
+    restart: unless-stopped
+
+  webhook:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openclaw-webhook
+    env_file: .env
+    command: ["node", "handlers/ghl-webhook-handler.mjs"]
+    ports:
+      - "8788:8788"
+    volumes:
+      - ./data:/opt/openclaw/data
+      - ./logs:/opt/openclaw/logs
+    restart: unless-stopped
+    depends_on:
+      - bot
