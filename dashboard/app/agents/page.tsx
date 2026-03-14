@@ -1,12 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
-);
+import { supabase } from "../supabase";
 
 interface Agent {
   id: string;
@@ -239,6 +234,7 @@ export default function AgentsPage() {
 
   useEffect(() => {
     async function fetchAgents() {
+      if (!supabase) { setLoading(false); return; }
       const { data, error } = await supabase
         .from("agents")
         .select("*")
