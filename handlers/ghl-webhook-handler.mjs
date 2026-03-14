@@ -17,6 +17,14 @@ import { fileURLToPath, pathToFileURL } from 'url';
 
 const execAsync = promisify(exec);
 
+// Prevent unhandled errors from crashing the process
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('⚠️ Unhandled Promise Rejection:', reason);
+});
+process.on('uncaughtException', (err) => {
+  console.error('⚠️ Uncaught Exception:', err);
+});
+
 // Import Phase 3 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -542,8 +550,12 @@ server.listen(PORT, HOST, async () => {
 ╚══════════════════════════════════════════════════════════════╝
   `);
   
-  // Load Phase 3 modules
-  await loadPhase3Modules();
+  // Load Phase 3 modules — non-fatal on failure
+  try {
+    await loadPhase3Modules();
+  } catch (err) {
+    console.error('⚠️ Phase 3 module loading failed (non-fatal):', err.message);
+  }
 });
 
 // Graceful shutdown

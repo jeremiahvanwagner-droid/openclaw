@@ -13,15 +13,18 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import fs from 'fs/promises';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 const execAsync = promisify(exec);
 
 // Configuration
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
-const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
+const GHL_API_KEY = process.env.GHL_TOKEN || process.env.GHL_PRIVATE_INTEGRATION_TOKEN || '';
+const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || process.env.GHL_LOCATION_ID_TJB || 'TW8JsPW5NMnA3tfK2XLn';
+const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || process.env.TELEGRAM_ALERT_CHAT_ID || '7737707872';
 const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
-  path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
+  (process.env.USERPROFILE || process.env.HOME 
+    ? path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data')
+    : '/opt/openclaw/data');
 
 // Value Ladder Configuration
 const VALUE_LADDER = {
@@ -537,7 +540,9 @@ async function getNurtureStatus(contactId) {
   };
 }
 
-// CLI Interface
+// CLI Interface — only run when executed directly, not when imported
+const __skillFilename = fileURLToPath(import.meta.url);
+if (process.argv[1] === __skillFilename) {
 const [,, command, ...args] = process.argv;
 
 switch (command) {
@@ -594,6 +599,7 @@ Usage:
   ebook-buyer-automation.mjs status <contactId>                      - Get nurture status
   ebook-buyer-automation.mjs ladder                                  - Show value ladder
 `);
+}
 }
 
 export { 

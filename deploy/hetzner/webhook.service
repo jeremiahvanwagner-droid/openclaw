@@ -20,7 +20,10 @@ ExecStart=/usr/bin/node handlers/ghl-webhook-handler.mjs
 Restart=always
 RestartSec=10
 StartLimitIntervalSec=300
-StartLimitBurst=5
+StartLimitBurst=10
+
+# Fail fast if .env is missing
+ExecStartPre=/usr/bin/test -f /etc/openclaw/.env
 
 # Security hardening
 NoNewPrivileges=true
