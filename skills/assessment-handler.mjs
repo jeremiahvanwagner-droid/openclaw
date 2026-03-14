@@ -338,9 +338,12 @@ async function batchRecalculate() {
 }
 
 // CLI Interface
-const [,, command, ...args] = process.argv;
+const isDirectRun = process.argv[1] && import.meta.url === (await import('url')).pathToFileURL(process.argv[1]).href;
+if (isDirectRun) {
+  const [,, command, ...args] = process.argv;
 
-switch (command) {
+  switch (command) {
+
   case 'process':
     if (args.length < 1) {
       console.log('Usage: assessment-handler.mjs process <contactId> [score]');
@@ -384,6 +387,7 @@ Usage:
   assessment-handler.mjs batch                        - Recalculate tiers for all contacts
   assessment-handler.mjs tiers                        - Show tier configuration
 `);
+ }
 }
 
 export { processAssessment, calculateTier, calculateWeightedScore, ALIGNMENT_TIERS };
