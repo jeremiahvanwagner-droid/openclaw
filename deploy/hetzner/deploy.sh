@@ -35,6 +35,11 @@ echo "[3/5] Syncing configuration..."
 cp config/cron/jobs.json cron/jobs.json 2>/dev/null || true
 cp config/cron/training-jobs.json cron/training-jobs.json 2>/dev/null || true
 
+# Compatibility path for legacy webhook skill imports
+mkdir -p handlers/workspace
+ln -sfn /opt/openclaw/skills /opt/openclaw/handlers/workspace/skills
+chown -h openclaw:openclaw /opt/openclaw/handlers/workspace/skills || true
+
 # Update systemd services if changed
 cp deploy/hetzner/openclaw.service /etc/systemd/system/
 cp deploy/hetzner/webhook.service /etc/systemd/system/openclaw-webhook.service

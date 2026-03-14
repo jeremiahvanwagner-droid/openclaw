@@ -3,7 +3,6 @@ Description=OpenClaw GHL Webhook Handler
 Documentation=https://github.com/truthjblue/openclaw
 After=network-online.target openclaw.service
 Wants=network-online.target
-BindsTo=openclaw.service
 
 [Service]
 Type=simple

@@ -96,6 +96,11 @@ echo "[9/10] Installing systemd services..."
 cp "$OPENCLAW_HOME/deploy/hetzner/openclaw.service" /etc/systemd/system/
 cp "$OPENCLAW_HOME/deploy/hetzner/webhook.service" /etc/systemd/system/openclaw-webhook.service
 
+# Compatibility path for legacy webhook skill imports
+mkdir -p "$OPENCLAW_HOME/handlers/workspace"
+ln -sfn "$OPENCLAW_HOME/skills" "$OPENCLAW_HOME/handlers/workspace/skills"
+chown -h "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME/handlers/workspace/skills" || true
+
 # Install Caddyfile
 cp "$OPENCLAW_HOME/deploy/hetzner/Caddyfile" /etc/caddy/Caddyfile
 

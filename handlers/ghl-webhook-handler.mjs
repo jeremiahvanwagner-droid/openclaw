@@ -11,15 +11,49 @@ import http from 'http';
 import crypto from 'crypto';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 const execAsync = promisify(exec);
 
 // Import Phase 3 modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const skillsDir = path.join(__dirname, 'workspace', 'skills');
+
+// Try multiple skills locations to support local and production layouts.
+const skillsSearchPaths = [
+  process.env.OPENCLAW_SKILLS_DIR,
+  path.join(__dirname, 'workspace', 'skills'),          // legacy layout
+  path.join(__dirname, '..', 'skills'),                 // current repo layout
+  path.join(process.cwd(), 'skills'),                   // service working dir
+  '/opt/openclaw/skills'                                // production fallback
+].filter(Boolean);
+
+function resolveSkillPath(fileName) {
+  for (const base of skillsSearchPaths) {
+    const candidate = path.join(base, fileName);
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
+
+async function importSkill(fileName, label) {
+  const resolved = resolveSkillPath(fileName);
+  if (!resolved) {
+    console.warn(`⚠️ ${label} not found. Looked in: ${skillsSearchPaths.join(', ')}`);
+    return null;
+  }
+
+  try {
+    return await import(pathToFileURL(resolved).href);
+  } catch (error) {
+    console.warn(`⚠️ Failed to load ${label} from ${resolved}:`, error.message);
+    return null;
+  }
+}
 
 // Dynamic imports for Phase 3 handlers (loaded on demand)
 let assessmentHandler = null;
@@ -27,13 +61,15 @@ let ebookAutomation = null;
 let cartRecovery = null;
 
 async function loadPhase3Modules() {
-  try {
-    assessmentHandler = await import(path.join(skillsDir, 'assessment-handler.mjs'));
-    ebookAutomation = await import(path.join(skillsDir, 'ebook-buyer-automation.mjs'));
-    cartRecovery = await import(path.join(skillsDir, 'abandoned-cart-recovery.mjs'));
-    console.log('✅ Phase 3 modules loaded');
-  } catch (error) {
-    console.warn('⚠️ Phase 3 modules not fully loaded:', error.message);
+  assessmentHandler = await importSkill('assessment-handler.mjs', 'assessment handler');
+  ebookAutomation = await importSkill('ebook-buyer-automation.mjs', 'ebook automation');
+  cartRecovery = await importSkill('abandoned-cart-recovery.mjs', 'abandoned cart recovery');
+
+  const loaded = [assessmentHandler, ebookAutomation, cartRecovery].filter(Boolean).length;
+  if (loaded === 3) {
+    console.log('✅ Phase 3 modules loaded (3/3)');
+  } else {
+    console.warn(`⚠️ Phase 3 modules partially loaded (${loaded}/3)`);
   }
 }
 
