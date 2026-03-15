@@ -355,6 +355,91 @@ type AgentEvents = {
       correlation_id?: string;
     };
   };
+
+  // ═══════════════════════════════════════════════════════════════
+  // Division 8 — SaaS Operations Events
+  // ═══════════════════════════════════════════════════════════════
+
+  "saas/client.signup": {
+    data: {
+      saas_instance_id: string;
+      client_name: string;
+      email: string;
+      phone?: string;
+      plan_tier: string;
+      niche?: string;
+      correlation_id?: string;
+    };
+  };
+
+  "saas/client.churn": {
+    data: {
+      saas_instance_id: string;
+      client_id: string;
+      location_id: string;
+      reason?: string;
+      mrr_lost: number;
+      correlation_id?: string;
+    };
+  };
+
+  "saas/payment.failed": {
+    data: {
+      saas_instance_id: string;
+      contact_id: string;
+      location_id: string;
+      amount: number;
+      failure_reason: string;
+      retry_count: number;
+      plan_name?: string;
+      correlation_id?: string;
+    };
+  };
+
+  "saas/payment.received": {
+    data: {
+      saas_instance_id: string;
+      contact_id: string;
+      location_id: string;
+      amount: number;
+      plan_name?: string;
+      correlation_id?: string;
+    };
+  };
+
+  "saas/usage.threshold": {
+    data: {
+      saas_instance_id: string;
+      location_id: string;
+      metric: string;
+      current_value: number;
+      threshold_value: number;
+      percent_used: number;
+      correlation_id?: string;
+    };
+  };
+
+  "saas/funnel.published": {
+    data: {
+      saas_instance_id: string;
+      location_id: string;
+      funnel_id: string;
+      funnel_name: string;
+      page_count: number;
+      correlation_id?: string;
+    };
+  };
+
+  "saas/subscription.cancelled": {
+    data: {
+      saas_instance_id: string;
+      contact_id: string;
+      location_id: string;
+      plan_name: string;
+      mrr_lost: number;
+      correlation_id?: string;
+    };
+  };
 };
 
 // Create and export the Inngest client
@@ -372,6 +457,7 @@ export const DIVISION_HEADS: Record<string, string> = {
   division_5_publishing: "d5_publisher",
   division_6_nonprofit: "d6_executive_director",
   division_7_shared_services: "shared_exec_orchestrator",
+  division_8_saas_operations: "d8_saas_director",
 };
 
 // Get division head for routing (legacy fallback)

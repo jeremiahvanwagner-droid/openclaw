@@ -27,3 +27,15 @@ export {
   trainingMemoryConsolidation,
   trainingHealthCheck,
 } from "./training-protocol";
+
+// Division 8 — SaaS Operations event handlers
+export {
+  saasClientSignup,
+  saasPaymentFailed,
+  saasPaymentReceived,
+  saasClientChurn,
+  saasSubscriptionCancelled,
+  saasUsageThreshold,
+  saasFunnelPublished,
+  d8Functions,
+} from "./d8-saas-operations";

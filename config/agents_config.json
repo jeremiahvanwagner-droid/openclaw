@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "generated_at": "2026-03-14T00:00:00Z",
   "organization": "Truth J Blue LLC",
-  "total_agents": 77,
+  "total_agents": 90,
   "runtime_model": "8-pod",
   "runtime": {
     "description": "11 always-on supervisors + on-demand workers. 77-agent roster preserved as template library.",
@@ -2977,6 +2977,552 @@
         "social-media-publisher",
         "design-generator"
       ],
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_saas_director",
+      "display_name": "SaaS Operations Director",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "executive",
+      "primary_responsibilities": [
+        "Lead multi-SaaS portfolio strategy across all GHL white-label brands",
+        "Oversee new SaaS brand launches, niche selection, and pricing architecture",
+        "Own SaaS P&L including MRR, churn, LTV, and expansion revenue",
+        "Coordinate 12 specialist agents across funnel, CRM, revenue, and compliance",
+        "Report portfolio performance and strategic recommendations to CEO"
+      ],
+      "tools_required": [
+        "campaign_analyst",
+        "executive_dashboarder",
+        "ghl_api",
+        "stripe_dashboard",
+        "saas_instance_registry"
+      ],
+      "input_triggers": [
+        "daily_saas_metrics_cron",
+        "saas_client_signup",
+        "saas_client_churn",
+        "revenue_milestone_alert",
+        "escalation_from_d8_specialist",
+        "quarterly_saas_review"
+      ],
+      "output_format": "decision",
+      "escalation_path": "shared_exec_orchestrator",
+      "llm_model": "claude-opus-4",
+      "memory_type": "long-term",
+      "queue_class": "P1",
+      "inter_agent_dependencies": [
+        "d1_ceo",
+        "d1_cto",
+        "d1_cmo",
+        "d1_sales_manager",
+        "d8_platform_architect",
+        "d8_revenue_ops",
+        "d8_compliance_auditor",
+        "shared_master_orchestrator",
+        "shared_exec_orchestrator"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_saas_director",
+      "cron_schedule": "0 7 * * *",
+      "telegram_delivery": true,
+      "teams_delivery": true
+    },
+    {
+      "agent_id": "d8_platform_architect",
+      "display_name": "GHL Platform & Auth Architect",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Manage GHL OAuth 2.0 flows, token lifecycle, and credential security",
+        "Provision and configure new GHL sub-accounts for SaaS clients",
+        "Deploy niche snapshots into sub-accounts automatically on signup",
+        "Manage Custom Values across sub-accounts for dynamic template injection",
+        "Validate GHL Agency Pro setup and SaaS Mode configuration"
+      ],
+      "tools_required": [
+        "ghl_oauth_manager",
+        "subaccount_provisioner",
+        "snapshot_deployer",
+        "custom_value_manager",
+        "ghl_setup_validator"
+      ],
+      "input_triggers": [
+        "saas_client_signup",
+        "oauth_token_expiry_alert",
+        "snapshot_deployment_request",
+        "subaccount_configuration_request"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "claude-sonnet-4.5",
+      "memory_type": "short-term",
+      "queue_class": "P1",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_automation_architect",
+        "d8_funnel_engineer",
+        "d1_cto"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_platform_architect",
+      "cron_schedule": null,
+      "telegram_delivery": true,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_funnel_engineer",
+      "display_name": "Funnel & Website Engineer",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Architect optimal funnel flows for each SaaS niche and offer",
+        "Clone and customize high-converting funnel templates across sub-accounts",
+        "Generate direct-response copy formatted for GHL text elements",
+        "Build custom forms, surveys, and data capture mechanisms via API",
+        "Connect custom domains to GHL funnels via DNS configuration"
+      ],
+      "tools_required": [
+        "funnel_blueprint_architect",
+        "ghl_funnel_cloner",
+        "copywriting_formatting_engine",
+        "form_and_survey_builder",
+        "domain_connector"
+      ],
+      "input_triggers": [
+        "new_saas_brand_launch",
+        "funnel_build_request",
+        "conversion_optimization_trigger",
+        "domain_connection_request"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "claude-sonnet-4.5",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_platform_architect",
+        "d8_automation_architect",
+        "d8_content_ops",
+        "d8_compliance_auditor"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_funnel_engineer",
+      "cron_schedule": null,
+      "telegram_delivery": false,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_automation_architect",
+      "display_name": "Workflow & Automation Architect",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Translate plain-English automation requests into structured workflow JSON",
+        "Build and update GHL workflows with triggers, actions, and conditions",
+        "Create and manage sales pipelines with custom stages per SaaS niche",
+        "Configure webhooks inside GHL workflows for real-time OpenClaw event routing",
+        "Ensure all workflows pass loop detection before deployment"
+      ],
+      "tools_required": [
+        "automation_logic_designer",
+        "ghl_workflow_builder",
+        "pipeline_manager",
+        "webhook_listener_config"
+      ],
+      "input_triggers": [
+        "workflow_build_request",
+        "pipeline_creation_request",
+        "webhook_configuration_request",
+        "automation_optimization_trigger"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "claude-sonnet-4.5",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_platform_architect",
+        "d8_crm_ops",
+        "d8_compliance_auditor"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_automation_architect",
+      "cron_schedule": null,
+      "telegram_delivery": false,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_membership_director",
+      "display_name": "Course & Membership Director",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Generate structured course curricula from topic briefs",
+        "Create Membership Products and Offers with tiered pricing in GHL",
+        "Upload and structure lesson content in the GHL Membership builder",
+        "Manage contact access to memberships based on payment and tag status",
+        "Coordinate with revenue ops for subscription and access lifecycle"
+      ],
+      "tools_required": [
+        "curriculum_generator",
+        "ghl_offer_creator",
+        "membership_content_uploader",
+        "access_control_manager"
+      ],
+      "input_triggers": [
+        "course_creation_request",
+        "membership_setup_request",
+        "access_grant_revoke_request",
+        "content_update_trigger"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_crm_ops",
+        "d8_revenue_ops",
+        "d8_content_ops"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_membership_director",
+      "cron_schedule": null,
+      "telegram_delivery": false,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_community_manager",
+      "display_name": "Community & Engagement Manager",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Set up and manage GHL Community groups, channels, and rules",
+        "Schedule and publish content to GHL Social Planner and Community groups",
+        "Moderate community posts — flag spam and generate contextual replies",
+        "Drive engagement through initiatives, challenges, and recognition programs",
+        "Report community health metrics and sentiment trends"
+      ],
+      "tools_required": [
+        "community_group_builder",
+        "content_scheduler",
+        "community_moderator"
+      ],
+      "input_triggers": [
+        "community_setup_request",
+        "content_scheduling_trigger",
+        "moderation_alert",
+        "engagement_report_cron"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_content_ops",
+        "d8_customer_success"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_community_manager",
+      "cron_schedule": null,
+      "telegram_delivery": false,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_crm_ops",
+      "display_name": "CRM & Conversational AI Ops",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Synchronize contacts across sub-accounts with deduplication and merge",
+        "Apply and manage behavioral tags to trigger downstream automations",
+        "Move opportunities through pipeline stages based on conversation outcomes",
+        "Negotiate calendar availability and book appointments via GHL API",
+        "Maintain CRM data hygiene across all SaaS instances"
+      ],
+      "tools_required": [
+        "contact_synchronizer",
+        "tagging_engine",
+        "opportunity_mover",
+        "calendar_booking_bot",
+        "ghl_api"
+      ],
+      "input_triggers": [
+        "contact_created_webhook",
+        "tag_request",
+        "pipeline_stage_change",
+        "booking_request",
+        "crm_sync_cron"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P1",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_automation_architect",
+        "d8_revenue_ops",
+        "d8_customer_success",
+        "d1_sales_manager"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_crm_ops",
+      "cron_schedule": null,
+      "telegram_delivery": false,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_revenue_ops",
+      "display_name": "E-Commerce & Revenue Ops Manager",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Generate and send GHL invoices on pipeline stage transitions",
+        "Detect failed payments and execute empathetic dunning recovery sequences",
+        "Create time-limited promo codes and manage flash sale lifecycles",
+        "Set up and manage GHL affiliate campaigns with partner onboarding",
+        "Generate proposals and contracts for high-ticket SaaS leads"
+      ],
+      "tools_required": [
+        "invoice_generator",
+        "subscription_dunning_manager",
+        "coupon_and_promo_creator",
+        "affiliate_campaign_manager",
+        "proposal_and_contract_sender"
+      ],
+      "input_triggers": [
+        "payment_received_webhook",
+        "payment_failed_webhook",
+        "subscription_cancelled_webhook",
+        "promo_campaign_request",
+        "affiliate_enrollment_request",
+        "proposal_request"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P1",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_crm_ops",
+        "d8_compliance_auditor",
+        "d1_sales_manager"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_revenue_ops",
+      "cron_schedule": null,
+      "telegram_delivery": true,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_marketing_automation",
+      "display_name": "Advanced Marketing & Lead Gen",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Sync GHL CRM segments to Facebook and Google Ads as custom audiences",
+        "Generate and manage uniform UTM parameters for multi-channel attribution",
+        "Score leads based on engagement signals with configurable weights per SaaS",
+        "Optimize SEO metadata for funnels and blogs and push via GHL API",
+        "Report on marketing channel performance and recommend budget allocation"
+      ],
+      "tools_required": [
+        "ad_audience_sync",
+        "utm_tracking_generator",
+        "lead_scoring_algorithm",
+        "seo_metadata_optimizer"
+      ],
+      "input_triggers": [
+        "audience_sync_request",
+        "utm_generation_request",
+        "lead_scoring_trigger",
+        "seo_audit_cron",
+        "campaign_optimization_request"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_crm_ops",
+        "d8_funnel_engineer",
+        "d8_content_ops",
+        "d1_cmo"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_marketing_automation",
+      "cron_schedule": null,
+      "telegram_delivery": false,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_content_ops",
+      "display_name": "Content & Asset Operations",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Publish blog posts to GHL platform from Markdown with full metadata",
+        "Design HTML email templates and schedule newsletter broadcasts in GHL",
+        "Write structured video scripts for VSLs, courses, and ad creatives",
+        "Manage asset uploads to GHL Media Library and retrieve CDN links",
+        "Maintain content calendar and ensure cross-channel consistency"
+      ],
+      "tools_required": [
+        "blog_post_publisher",
+        "email_newsletter_designer",
+        "video_script_writer",
+        "asset_library_manager"
+      ],
+      "input_triggers": [
+        "content_publish_request",
+        "newsletter_schedule_request",
+        "script_writing_request",
+        "asset_upload_request",
+        "content_calendar_cron"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_funnel_engineer",
+        "d8_marketing_automation",
+        "d8_community_manager",
+        "d5_publisher"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_content_ops",
+      "cron_schedule": null,
+      "telegram_delivery": false,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_customer_success",
+      "display_name": "Customer Support & Success",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Route incoming support requests by intent to correct pipeline or agent",
+        "Monitor community and DMs for negative sentiment with real-time alerts",
+        "Answer customer queries via RAG against SOPs and knowledge base",
+        "Trigger review requests at customer milestones via GHL automation",
+        "Execute win-back campaigns for churned clients"
+      ],
+      "tools_required": [
+        "support_ticket_router",
+        "sentiment_analyzer",
+        "faq_knowledge_retriever",
+        "review_request_engine"
+      ],
+      "input_triggers": [
+        "support_form_submitted",
+        "negative_sentiment_alert",
+        "customer_milestone_reached",
+        "subscription_cancelled_webhook",
+        "sentiment_scan_cron"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P1",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_crm_ops",
+        "d8_revenue_ops",
+        "d8_community_manager",
+        "d1_customer_success"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_customer_success",
+      "cron_schedule": "0 */4 * * *",
+      "telegram_delivery": true,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_compliance_auditor",
+      "display_name": "System Auditing & Compliance",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Crawl live GHL funnels and emails to identify broken links and missing assets",
+        "Monitor A/B test statistical significance and auto-promote winners",
+        "Audit email deliverability and suppress risky addresses to protect sender rep",
+        "Analyze workflow JSON for infinite loops before deployment",
+        "Merge duplicate CRM contacts to prevent double-texting",
+        "Review all SMS drafts for A2P 10DLC and opt-out compliance"
+      ],
+      "tools_required": [
+        "broken_link_checker",
+        "split_test_monitor",
+        "deliverability_auditor",
+        "workflow_loop_detector",
+        "duplicate_contact_merger",
+        "sms_compliance_checker"
+      ],
+      "input_triggers": [
+        "broken_link_scan_cron",
+        "deliverability_audit_cron",
+        "duplicate_merge_cron",
+        "workflow_deploy_precheck",
+        "sms_draft_review_request",
+        "split_test_check_cron"
+      ],
+      "output_format": "report",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "claude-sonnet-4.5",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_automation_architect",
+        "d8_funnel_engineer",
+        "d8_crm_ops",
+        "shared_legal_compliance"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_compliance_auditor",
+      "cron_schedule": "0 6 * * *",
+      "telegram_delivery": true,
+      "teams_delivery": false
+    },
+    {
+      "agent_id": "d8_integration_engineer",
+      "display_name": "External Orchestration & Integration",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "primary_responsibilities": [
+        "Format and send complex JSON payloads to Make.com, Zapier, and custom APIs",
+        "Compile daily metrics across all SaaS instances into executive summaries",
+        "Configure DNS records for custom domain connections to GHL funnels",
+        "Manage external webhook integrations and payload transformation",
+        "Monitor integration health and handle external API failures"
+      ],
+      "tools_required": [
+        "webhook_payload_formatter",
+        "executive_dashboarder",
+        "domain_connector"
+      ],
+      "input_triggers": [
+        "webhook_dispatch_request",
+        "daily_executive_summary_cron",
+        "domain_connection_request",
+        "integration_health_check_cron"
+      ],
+      "output_format": "action",
+      "escalation_path": "d8_saas_director",
+      "llm_model": "gpt-4o-mini",
+      "memory_type": "short-term",
+      "queue_class": "P2",
+      "inter_agent_dependencies": [
+        "d8_saas_director",
+        "d8_platform_architect",
+        "d8_funnel_engineer",
+        "d1_cto"
+      ],
+      "workspace_path": ".openclaw/workspaces/d8_integration_engineer",
+      "cron_schedule": "0 7 * * *",
+      "telegram_delivery": false,
       "teams_delivery": false
     }
   ]
