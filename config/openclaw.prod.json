@@ -268,8 +268,9 @@
   },
   "gateway": {
     "port": 18789,
-    "mode": "local",
+    "mode": "server",
     "bind": "loopback",
+    "externalUrl": "https://api.truthjblue.dev",
     "auth": {
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
