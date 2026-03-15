@@ -224,7 +224,7 @@
   "commands": {
     "native": "auto",
     "nativeSkills": "auto",
-    "restart": true,
+    "restart": false,
     "ownerDisplay": "raw"
   },
   "session": {
