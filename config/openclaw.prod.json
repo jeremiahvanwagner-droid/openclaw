@@ -261,14 +261,11 @@
         "7737707872"
       ],
       "groupPolicy": "allowlist"
-    },
-    "email": {
-      "enabled": false
     }
   },
   "gateway": {
     "port": 18789,
-    "mode": "remote",
+    "mode": "local",
     "bind": "loopback",
     "auth": {
       "mode": "token",
