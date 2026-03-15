@@ -1,0 +1,14 @@
+{
+  "run_utc": "2026-03-15T10:44:00+00:00",
+  "cutoff_utc": "2025-12-15T10:44:00+00:00",
+  "totals": {
+    "archived": 0,
+    "orphan_embeddings_pruned": 1,
+    "storage_reclaimed_bytes": 36864
+  },
+  "errors": [],
+  "notes": [
+    "No memories older than 90 days were present in local agent memory SQLite stores.",
+    "SQLite supports VACUUM at database scope; each memory DB was vacuumed."
+  ]
+}
