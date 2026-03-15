@@ -65,17 +65,17 @@ systemctl reload caddy
 
 # ── 5. Health check ──────────────────────────────────────────
 echo "[5/5] Running health check..."
-sleep 5
+sleep 15
 
 GATEWAY_OK=false
 WEBHOOK_OK=false
 
-for i in 1 2 3; do
+for i in 1 2 3 4 5 6; do
     if curl -sf http://localhost:18789/health >/dev/null 2>&1; then
         GATEWAY_OK=true
         break
     fi
-    sleep 3
+    sleep 5
 done
 
 for i in 1 2 3; do
