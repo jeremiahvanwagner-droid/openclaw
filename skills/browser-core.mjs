@@ -23,6 +23,7 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { pathToFileURL } from 'url';
 
 // Configuration
 const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
@@ -480,7 +481,11 @@ Platform Engine Mapping:
   }
 }
 
-main().catch(console.error);
+const isDirectRun = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isDirectRun) {
+  main().catch(console.error);
+}
 
 // Export for programmatic use
 export {

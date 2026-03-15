@@ -133,6 +133,35 @@ const DASHBOARDS = {
 let browserInstance = null;
 let currentPage = null;
 
+const GHL_BASE_URL = 'https://app.gohighlevel.com';
+
+const SURFACE_PRECHECKS = {
+  dashboard: {
+    path: '/dashboard',
+    selectors: [GHL_SELECTORS.dashboardReady, '.main-content', '.app-container']
+  },
+  workflows: {
+    path: '/automation/workflows',
+    selectors: [GHL_SELECTORS.workflowCard, '.workflow-list', '.main-content']
+  },
+  funnels: {
+    path: '/funnels',
+    selectors: [GHL_SELECTORS.funnelCard, '.funnels-list', '.main-content']
+  },
+  memberships: {
+    path: '/memberships',
+    selectors: [GHL_SELECTORS.membershipCard, '.memberships-list', '.main-content']
+  },
+  pages: {
+    path: '/sites',
+    selectors: ['.site-card, .website-card, .main-content', '.main-content']
+  },
+  communities: {
+    path: '/communities/groups',
+    selectors: ['.community-card, .group-card, .main-content', '.main-content']
+  }
+};
+
 /**
  * Initialize directories
  */
@@ -161,6 +190,35 @@ async function getPage() {
   const browserCore = await import('./browser-core.mjs');
   currentPage = await browserCore.getPage(instance);
   return currentPage;
+}
+
+async function getBrowserCore() {
+  return await import('./browser-core.mjs');
+}
+
+async function saveSessionCookies(page) {
+  const browserCore = await getBrowserCore();
+  return browserCore.saveCookies('ghl', page);
+}
+
+async function waitForAnySelector(page, selectors, timeout = 15000) {
+  for (const selector of selectors) {
+    if (!selector) continue;
+    try {
+      await page.waitForSelector(selector, { timeout });
+      return selector;
+    } catch {
+      // Continue trying alternate selectors.
+    }
+  }
+  return null;
+}
+
+async function saveDebugScreenshot(page, label) {
+  const filename = `ghl-${label}-${Date.now()}.png`;
+  const filepath = path.join(SCREENSHOTS_DIR, filename);
+  await page.screenshot({ path: filepath, fullPage: true });
+  return filepath;
 }
 
 /**
@@ -194,7 +252,7 @@ async function login() {
   const page = await getPage();
   
   try {
-    await page.goto('https://app.gohighlevel.com/login', { waitUntil: 'networkidle' });
+    await page.goto(`${GHL_BASE_URL}/login`, { waitUntil: 'networkidle' });
     
     // Wait for page to fully load and JS to execute
     await page.waitForTimeout(3000);
@@ -240,7 +298,7 @@ async function login() {
     if (initialUrl.includes('/dashboard') || initialUrl.includes('/locations') || initialUrl.includes('/v2/')) {
       console.log('Already logged in to GHL (redirected to dashboard)');
       // Save session
-      await saveCookies('ghl', page);
+      await saveSessionCookies(page);
       return { success: true, message: 'Already authenticated' };
     }
     
@@ -250,7 +308,7 @@ async function login() {
       const isLoggedIn = await page.$(GHL_SELECTORS.dashboardReady).catch(() => null);
       if (isLoggedIn) {
         console.log('Already logged in to GHL (dashboard visible)');
-        await saveCookies('ghl', page);
+        await saveSessionCookies(page);
         return { success: true, message: 'Already authenticated' };
       }
       
@@ -279,8 +337,7 @@ async function login() {
     
     if (success) {
       // Save session cookies
-      const browserCore = await import('./browser-core.mjs');
-      await browserCore.saveCookies('ghl', page);
+      await saveSessionCookies(page);
       
       console.log('GHL login successful');
       return { success: true, url: currentUrl };
@@ -290,6 +347,64 @@ async function login() {
   } catch (error) {
     console.error('GHL login failed:', error.message);
     return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Verify that the current browser session can reach an authenticated GHL surface.
+ */
+async function authCheck() {
+  const loginResult = await login();
+  if (!loginResult.success) return loginResult;
+
+  const page = await getPage();
+  const matchedSelector = await waitForAnySelector(page, [GHL_SELECTORS.dashboardReady, '.main-content', '.app-container'], 10000);
+
+  return {
+    success: Boolean(matchedSelector),
+    authenticated: Boolean(matchedSelector),
+    url: page.url(),
+    title: await page.title(),
+    matchedSelector,
+    account: GHL_ACCOUNT_NAME
+  };
+}
+
+/**
+ * Navigate to a target GHL surface and verify the page is reachable for unattended admin tasks.
+ */
+async function precheckSurface(surfaceOrPath) {
+  const loginResult = await login();
+  if (!loginResult.success) return loginResult;
+
+  const target = SURFACE_PRECHECKS[surfaceOrPath] || {
+    path: surfaceOrPath.startsWith('/') ? surfaceOrPath : `/${surfaceOrPath}`,
+    selectors: ['.main-content', '.app-container']
+  };
+  const page = await getPage();
+  const targetUrl = `${GHL_BASE_URL}${target.path}`;
+
+  try {
+    await page.goto(targetUrl, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1500);
+    const matchedSelector = await waitForAnySelector(page, target.selectors, 10000);
+    const screenshotPath = await saveDebugScreenshot(page, `precheck-${surfaceOrPath.replace(/[^a-z0-9-]+/gi, '-')}`);
+
+    return {
+      success: Boolean(matchedSelector),
+      surface: surfaceOrPath,
+      url: page.url(),
+      title: await page.title(),
+      matchedSelector,
+      screenshotPath
+    };
+  } catch (error) {
+    return {
+      success: false,
+      surface: surfaceOrPath,
+      url: targetUrl,
+      error: error.message
+    };
   }
 }
 
@@ -794,6 +909,17 @@ async function main() {
         const loginResult = await login();
         console.log(JSON.stringify(loginResult, null, 2));
         break;
+
+      case 'auth-check':
+        const authCheckResult = await authCheck();
+        console.log(JSON.stringify(authCheckResult, null, 2));
+        break;
+
+      case 'surface-precheck':
+        if (!args[0]) throw new Error('Surface name or path required');
+        const surfacePrecheckResult = await precheckSurface(args[0]);
+        console.log(JSON.stringify(surfacePrecheckResult, null, 2));
+        break;
         
       case 'switch-account':
         await login();
@@ -908,6 +1034,8 @@ OpenClaw GHL Browser Control
 
 Commands:
   login                                 Authenticate to GHL
+  auth-check                            Validate GHL session and dashboard access
+  surface-precheck <surface|/path>      Validate a UI surface for unattended admin work
   switch-account <name>                 Switch to sub-account
   screenshot <dashboard>                Screenshot dashboard → Telegram
   
@@ -930,6 +1058,7 @@ Commands:
   membership-publish <id>               Publish membership
 
 Dashboards: main, contacts, pipelines, opportunities, conversations, workflows, funnels, memberships, analytics
+Surface prechecks: dashboard, workflows, funnels, memberships, pages, communities
 
 Environment:
   GHL_EMAIL              GHL login email
@@ -949,6 +1078,8 @@ main().catch(console.error);
 // Export for programmatic use
 export {
   login,
+  authCheck,
+  precheckSurface,
   switchAccount,
   screenshotDashboard,
   readContact,

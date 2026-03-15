@@ -154,6 +154,7 @@ async function registerAgent(agent) {
       criticality: criticality,
       heartbeat_policy: heartbeatPolicy,
       queue_class: queueClass,
+      reports_to: agent.reports_to || null,
       primary_responsibilities: agent.primary_responsibilities,
       tools_required: agent.tools_required,
       input_triggers: agent.input_triggers,
