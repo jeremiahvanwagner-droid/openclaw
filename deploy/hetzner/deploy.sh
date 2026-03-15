@@ -11,14 +11,17 @@ set -euo pipefail
 OPENCLAW_HOME="/opt/openclaw"
 cd "$OPENCLAW_HOME"
 
+# Ensure git trusts this directory regardless of owner
+git config --global --add safe.directory "$OPENCLAW_HOME" 2>/dev/null || true
+
 echo "══════════════════════════════════════════════════════"
 echo " OpenClaw Deploy — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "══════════════════════════════════════════════════════"
 
 # ── 1. Pull latest code ──────────────────────────────────────
 echo "[1/5] Pulling latest code..."
-sudo -u openclaw git fetch origin main
-sudo -u openclaw git reset --hard origin/main
+git fetch origin main
+git reset --hard origin/main
 echo "  $(git log --oneline -1)"
 
 # ── 2. Optional: upgrade OpenClaw CLI ────────────────────────
