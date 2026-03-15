@@ -5,7 +5,7 @@
 # ═══════════════════════════════════════════════════════════════
 
 # Gateway API — OpenClaw bot endpoint
-api.YOUR_DOMAIN {
+api.truthjblue.dev {
     reverse_proxy localhost:18789
 
     # Rate limiting
@@ -30,7 +30,7 @@ api.YOUR_DOMAIN {
 }
 
 # Webhook endpoint — GHL inbound webhooks
-webhook.YOUR_DOMAIN {
+webhook.truthjblue.dev {
     reverse_proxy localhost:8788
 
     # Only allow POST requests to webhook endpoint
@@ -53,7 +53,12 @@ webhook.YOUR_DOMAIN {
     }
 }
 
+# Tailscale private gateway — accessible only from your Tailnet
+http://100.84.3.71:19789 {
+    reverse_proxy localhost:18789
+}
+
 # Dashboard (optional — if self-hosting instead of Vercel)
-# dashboard.YOUR_DOMAIN {
+# dashboard.truthjblue.dev {
 #     reverse_proxy localhost:3000
 # }
