@@ -35,6 +35,14 @@ echo "[3/5] Syncing configuration..."
 cp config/cron/jobs.json cron/jobs.json 2>/dev/null || true
 cp config/cron/training-jobs.json cron/training-jobs.json 2>/dev/null || true
 
+# Install production openclaw.json (Linux paths, env-based secrets)
+if [ -f config/openclaw.prod.json ]; then
+    echo "  Installing production config..."
+    mkdir -p /opt/openclaw/.openclaw
+    cp config/openclaw.prod.json /opt/openclaw/.openclaw/openclaw.json
+    chown openclaw:openclaw /opt/openclaw/.openclaw/openclaw.json
+fi
+
 # Compatibility path for legacy webhook skill imports
 mkdir -p handlers/workspace
 ln -sfn /opt/openclaw/skills /opt/openclaw/handlers/workspace/skills

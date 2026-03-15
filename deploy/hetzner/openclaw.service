@@ -17,7 +17,7 @@ EnvironmentFile=/etc/openclaw/.env
 
 # Point OpenClaw config to the right location
 Environment=HOME=/opt/openclaw
-Environment=OPENCLAW_CONFIG_DIR=/opt/openclaw/config
+Environment=OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw
 
 # Start the gateway
 ExecStart=/usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js gateway --port 18789 --allow-unconfigured
@@ -33,7 +33,7 @@ WatchdogSec=300
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/openclaw/data /opt/openclaw/logs /opt/openclaw/backups /opt/openclaw/media /opt/openclaw/memory /opt/openclaw/cron/runs /opt/openclaw/delivery-queue
+ReadWritePaths=/opt/openclaw/data /opt/openclaw/logs /opt/openclaw/backups /opt/openclaw/media /opt/openclaw/memory /opt/openclaw/cron/runs /opt/openclaw/delivery-queue /opt/openclaw/.openclaw /opt/openclaw/workspace /opt/openclaw/workspace-marketing /opt/openclaw/workspace-sales /opt/openclaw/workspace-support /opt/openclaw/workspaces /opt/openclaw/agents
 PrivateTmp=true
 
 # Resource limits

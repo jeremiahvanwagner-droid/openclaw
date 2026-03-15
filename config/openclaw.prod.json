@@ -1,11 +1,11 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.13",
-    "lastTouchedAt": "2026-03-14T12:26:07.301Z"
+    "lastTouchedAt": "2026-03-15T18:00:00.000Z"
   },
   "wizard": {
-    "lastRunAt": "2026-03-13T21:01:06.438Z",
-    "lastRunVersion": "2026.3.8",
+    "lastRunAt": "2026-03-15T18:00:00.000Z",
+    "lastRunVersion": "2026.3.13",
     "lastRunCommand": "configure",
     "lastRunMode": "local"
   },
@@ -22,184 +22,52 @@
   "secrets": {
     "providers": {
       "ghl_token_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_PRIVATE_INTEGRATION_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "GHL_PRIVATE_INTEGRATION_TOKEN"
       },
       "ghl_location_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_LOCATION_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "GHL_LOCATION_ID"
       },
       "telegram_token_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_TELEGRAM_BOT_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "OPENCLAW_TELEGRAM_BOT_TOKEN"
       },
       "user_env_exec": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN"
       },
       "supabase_url_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_URL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "SUPABASE_URL"
       },
       "supabase_service_role_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_SERVICE_ROLE_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "SUPABASE_SERVICE_ROLE_KEY"
       },
       "canva_client_id_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "CANVA_CLIENT_ID"
       },
       "canva_client_secret_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_SECRET','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "CANVA_CLIENT_SECRET"
       },
       "canva_brand_kit_id_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('CANVA_BRAND_KIT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "CANVA_BRAND_KIT_ID"
       },
       "ghl_email_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_EMAIL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "GHL_EMAIL"
       },
       "ghl_password_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_PASSWORD','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "GHL_PASSWORD"
       },
       "openai_embeddings_key_env": {
-        "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('OPENAI_API_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "source": "env",
+        "env": "OPENAI_API_KEY"
       }
     }
   },
@@ -230,7 +98,8 @@
         "openai-codex/gpt-5.3-codex": {},
         "openai/gpt-5.3-codex": {}
       },
-      "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace",
+      "workspace": "/opt/openclaw/workspace",
+      "timeFormat": "24",
       "contextTokens": 240000,
       "memorySearch": {
         "enabled": true,
@@ -257,70 +126,70 @@
       {
         "id": "marketing",
         "name": "marketing",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-marketing",
-        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\marketing\\agent",
+        "workspace": "/opt/openclaw/workspace-marketing",
+        "agentDir": "/opt/openclaw/agents/marketing/agent",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "sales",
         "name": "sales",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-sales",
-        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\sales\\agent",
+        "workspace": "/opt/openclaw/workspace-sales",
+        "agentDir": "/opt/openclaw/agents/sales/agent",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "support",
         "name": "support",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-support",
-        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\support\\agent",
+        "workspace": "/opt/openclaw/workspace-support",
+        "agentDir": "/opt/openclaw/agents/support/agent",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d1_ceo",
         "name": "CEO",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ceo",
+        "workspace": "/opt/openclaw/workspaces/d1_ceo",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d1_cto",
         "name": "CTO",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cto",
+        "workspace": "/opt/openclaw/workspaces/d1_cto",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d2_director",
         "name": "eCommerce Director",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_director",
+        "workspace": "/opt/openclaw/workspaces/d2_director",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d3_ceo",
         "name": "Consulting CEO",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ceo",
+        "workspace": "/opt/openclaw/workspaces/d3_ceo",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d4_cvo",
         "name": "Chief Visionary Officer",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_cvo",
+        "workspace": "/opt/openclaw/workspaces/d4_cvo",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d5_publisher",
         "name": "Publisher",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_publisher",
+        "workspace": "/opt/openclaw/workspaces/d5_publisher",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d6_executive_director",
         "name": "Nonprofit Executive Director",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_executive_director",
+        "workspace": "/opt/openclaw/workspaces/d6_executive_director",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "shared_master_orchestrator",
         "name": "Master Orchestrator",
-        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_master_orchestrator",
+        "workspace": "/opt/openclaw/workspaces/shared_master_orchestrator",
         "model": "openai/gpt-5.3-codex"
       }
     ]
@@ -370,7 +239,7 @@
       "groupPolicy": "allowlist"
     },
     "email": {
-      "enabled": true,
+      "enabled": false,
       "provider": "microsoft365",
       "fromAddress": "${M365_EMAIL_FROM}",
       "defaultTo": "${M365_EMAIL_OWNER}",

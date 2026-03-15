@@ -60,6 +60,9 @@ fi
 # ── 6. Create directory structure ────────────────────────────
 echo "[6/10] Creating directory structure..."
 mkdir -p "$OPENCLAW_HOME"/{data,logs,backups,media,memory,cron/runs,delivery-queue,browser}
+mkdir -p "$OPENCLAW_HOME"/{workspace,workspace-marketing,workspace-sales,workspace-support}
+mkdir -p "$OPENCLAW_HOME"/workspaces/{d1_ceo,d1_cto,d2_director,d3_ceo,d4_cvo,d5_publisher,d6_executive_director,shared_master_orchestrator}
+mkdir -p "$OPENCLAW_HOME"/.openclaw
 mkdir -p "$OPENCLAW_CONFIG"
 mkdir -p "$OPENCLAW_LOG"
 chown -R "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME"
@@ -81,6 +84,14 @@ fi
 
 # ── 8. Setup environment ────────────────────────────────────
 echo "[8/10] Setting up environment..."
+
+# Install production openclaw.json (Linux paths, env-based secrets)
+if [ -f "$OPENCLAW_HOME/config/openclaw.prod.json" ]; then
+    cp "$OPENCLAW_HOME/config/openclaw.prod.json" "$OPENCLAW_HOME/.openclaw/openclaw.json"
+    chown "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME/.openclaw/openclaw.json"
+    echo "  ✓ Production config installed"
+fi
+
 if [ ! -f "$OPENCLAW_CONFIG/.env" ]; then
     cp "$OPENCLAW_HOME/.env.example" "$OPENCLAW_CONFIG/.env"
     chmod 600 "$OPENCLAW_CONFIG/.env"

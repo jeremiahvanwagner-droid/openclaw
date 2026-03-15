@@ -35,13 +35,21 @@ COPY skills/ skills/
 COPY agents/ agents/
 COPY config/ config/
 
-# Create runtime data directories
-RUN mkdir -p data logs backups cron/runs delivery-queue media memory && \
+# Create runtime data directories and workspace dirs
+RUN mkdir -p data logs backups cron/runs delivery-queue media memory \
+    workspace workspace-marketing workspace-sales workspace-support \
+    workspaces/d1_ceo workspaces/d1_cto workspaces/d2_director \
+    workspaces/d3_ceo workspaces/d4_cvo workspaces/d5_publisher \
+    workspaces/d6_executive_director workspaces/shared_master_orchestrator \
+    .openclaw && \
     chown -R openclaw:openclaw /opt/openclaw
 
 # Copy cron config (needs to be writable at runtime)
 RUN cp config/cron/jobs.json cron/jobs.json 2>/dev/null || true && \
     cp config/cron/training-jobs.json cron/training-jobs.json 2>/dev/null || true
+
+# Install production config (Linux paths, env-based secrets)
+RUN cp config/openclaw.prod.json .openclaw/openclaw.json 2>/dev/null || true
 
 # Switch to non-root user
 USER openclaw

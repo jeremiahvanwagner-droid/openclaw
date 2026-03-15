@@ -17,7 +17,7 @@ if ! grep -q '.npm-global/bin' "$HOME/.profile" 2>/dev/null; then
   echo 'export PATH="$HOME/.npm-global/bin:$PATH"' >> "$HOME/.profile"
 fi
 
-npm i -g openclaw@2026.2.26
+npm i -g openclaw@latest
 openclaw --version
 
 openclaw onboard \
