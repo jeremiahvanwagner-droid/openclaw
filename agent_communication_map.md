@@ -1,4 +1,4 @@
-# Agent Communication Map — Open Claw 75-Agent Architecture
+# Agent Communication Map — Open Claw 90-Agent Architecture
 
 > **Truth J Blue LLC** | Multi-Agent System Inter-Agent Routing Specification
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-This document defines how 75 AI agents communicate across 7 organizational divisions. The architecture uses a **hybrid orchestration model**:
+This document defines how 90 AI agents communicate across 8 organizational divisions. The architecture uses a **hybrid orchestration model**:
 
 - **Inngest Events** for cross-division communication (scalable, event-sourced)
 - **OpenClaw Workspace Model** for within-division isolation (familiar, memory-isolated)
@@ -25,6 +25,7 @@ These agents serve as primary routing points with the highest number of connecti
 | `d1_cmo` | Core Operations | All marketing managers | CEO, Division marketing | Brand strategy |
 | `shared_data_analytics` | Shared Services | All divisions (metrics events) | Executive dashboards | Metrics aggregation |
 | `shared_knowledge_base` | Shared Services | All agents (queries) | All agents (context) | Institutional memory |
+| `d8_saas_director` | SaaS Operations | All D8 specialists + MO | D1_CEO, D1_CTO, MO | SaaS portfolio command |
 
 ---
 
@@ -128,6 +129,23 @@ graph TB
     MO --> D4_CVO
     MO --> D5_PUB
     MO --> D6_ED
+    MO --> D8_DIR
+
+    subgraph "Division 8 — SaaS Operations"
+        D8_DIR[d8_saas_director<br/>SaaS Operations Director]
+        D8_PA[d8_platform_architect<br/>Platform & Auth Architect]
+        D8_FE[d8_funnel_engineer<br/>Funnel & Website Engineer]
+        D8_AA[d8_automation_architect<br/>Workflow & Automation]
+        D8_MD[d8_membership_director<br/>Course & Membership]
+        D8_CM[d8_community_manager<br/>Community & Engagement]
+        D8_CRM[d8_crm_ops<br/>CRM & Conversational AI]
+        D8_REV[d8_revenue_ops<br/>E-Commerce & Revenue]
+        D8_MA[d8_marketing_automation<br/>Marketing & Lead Gen]
+        D8_CO[d8_content_ops<br/>Content & Assets]
+        D8_CS[d8_customer_success<br/>Customer Support]
+        D8_CA[d8_compliance_auditor<br/>System Auditing]
+        D8_IE[d8_integration_engineer<br/>Orchestration & Integration]
+    end
 
     %% Division 1 hierarchy
     D1_CEO --> D1_CTO
@@ -201,6 +219,29 @@ graph TB
     SH_LC --> D1_CEO
     SH_KB --> MO
 
+    %% Division 8 hierarchy
+    D8_DIR --> D8_PA
+    D8_DIR --> D8_REV
+    D8_DIR --> D8_CA
+    D8_DIR --> D8_IE
+    D8_PA --> D8_FE
+    D8_PA --> D8_AA
+    D8_PA --> D8_CRM
+    D8_REV --> D8_MA
+    D8_REV --> D8_MD
+    D8_CA --> D8_CS
+    D8_IE --> D8_CO
+    D8_IE --> D8_CM
+
+    %% Division 8 cross-division wiring
+    D8_DIR --> D1_CEO
+    D8_DIR --> D1_CTO
+    D8_REV --> D1_SM
+    D8_MA --> D1_CMO
+    D8_CS --> D1_CS
+    D8_CO --> D5_PUB
+    D8_CA --> SH_LC
+
     style MO fill:#ff6b6b,stroke:#333,stroke-width:3px
     style D1_CEO fill:#4ecdc4,stroke:#333,stroke-width:2px
     style D2_DIR fill:#45b7d1,stroke:#333,stroke-width:2px
@@ -208,6 +249,7 @@ graph TB
     style D4_CVO fill:#ffeaa7,stroke:#333,stroke-width:2px
     style D5_PUB fill:#dda0dd,stroke:#333,stroke-width:2px
     style D6_ED fill:#98d8c8,stroke:#333,stroke-width:2px
+    style D8_DIR fill:#ff9f43,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -269,6 +311,34 @@ sequenceDiagram
     D3_SC->>MO: opportunity.status_update
 ```
 
+```mermaid
+sequenceDiagram
+    participant GHL as GHL Webhook
+    participant WH as ghl-webhook-handler
+    participant D8_PA as d8_platform_architect<br/>(SaaS Ops)
+    participant D8_REV as d8_revenue_ops<br/>(SaaS Ops)
+    participant D8_CS as d8_customer_success<br/>(SaaS Ops)
+    participant D8_DIR as d8_saas_director<br/>(SaaS Ops)
+    
+    Note over GHL,D8_DIR: New SaaS Client Onboarding Flow
+    GHL->>WH: saas/client.signup
+    WH->>D8_PA: provision sub-account & snapshot
+    D8_PA->>D8_PA: configure domain, Stripe, workflows
+    D8_PA->>D8_REV: billing.configured
+    D8_REV->>D8_DIR: client.onboarded
+    
+    Note over GHL,D8_DIR: SaaS Payment Failure Recovery
+    GHL->>WH: saas/payment.failed
+    WH->>D8_REV: initiate dunning sequence
+    WH->>D8_CS: send recovery outreach
+    alt Recovered
+        D8_CS->>D8_REV: payment.recovered
+    else Churned
+        D8_CS->>D8_DIR: escalation.churn_risk
+        D8_DIR->>D8_DIR: review & decide
+    end
+```
+
 ---
 
 ## Event Types & Routing Rules
@@ -307,6 +377,13 @@ interface AgentEvent {
 | `grant.opportunity.identified` | D6 | D6 | Within-division | normal |
 | `coaching.session.scheduled` | D4 | D4 | Within-division | normal |
 | `product.listing.created` | D2 | D5 | Master Orchestrator | normal |
+| `saas/client.signup` | D8 | D8 | Webhook Handler | high |
+| `saas/payment.failed` | D8 | D8 | Webhook Handler | critical |
+| `saas/payment.received` | D8 | D8 | Webhook Handler | normal |
+| `saas/subscription.cancelled` | D8 | D8 + D1 | Webhook Handler | high |
+| `saas/usage.threshold` | D8 | D8 | Webhook Handler | normal |
+| `saas/funnel.published` | D8 | D8 | Inngest | normal |
+| `saas/client.churn` | D8 | D8 + D1 | Inngest | critical |
 
 ---
 
@@ -380,6 +457,19 @@ shared_legal_compliance → d1_ceo
 shared_master_orchestrator → d1_ceo
 ```
 
+### Division 8 — SaaS Operations
+```
+d8_customer_success → d8_compliance_auditor → d8_saas_director → d1_ceo
+d8_community_manager → d8_integration_engineer → d8_saas_director
+d8_content_ops → d8_integration_engineer → d8_saas_director
+d8_funnel_engineer → d8_platform_architect → d8_saas_director
+d8_automation_architect → d8_platform_architect → d8_saas_director
+d8_crm_ops → d8_platform_architect → d8_saas_director
+d8_marketing_automation → d8_revenue_ops → d8_saas_director
+d8_membership_director → d8_revenue_ops → d8_saas_director
+d8_compliance_auditor → shared_legal_compliance
+```
+
 ---
 
 ## Agent Connectivity Matrix
@@ -395,6 +485,7 @@ shared_master_orchestrator → d1_ceo
 | `shared_knowledge_base` | 75 | 75 | 150 | ⭐⭐⭐⭐⭐ |
 | `d4_cvo` | 5 | 4 | 9 | ⭐⭐⭐ |
 | `d2_director` | 5 | 3 | 8 | ⭐⭐⭐ |
+| `d8_saas_director` | 12 | 5 | 17 | ⭐⭐⭐⭐⭐ |
 
 ---
 
