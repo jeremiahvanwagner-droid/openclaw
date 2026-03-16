@@ -33,8 +33,16 @@ else
     echo "[2/5] Skipping CLI upgrade (use --upgrade to update)"
 fi
 
-# ── 3. Sync config files ────────────────────────────────────
-echo "[3/5] Syncing configuration..."
+# ── 3. Install dependencies ──────────────────────────────────
+echo "[3/6] Installing dependencies..."
+if command -v pnpm &>/dev/null; then
+    pnpm install --frozen-lockfile --prod 2>/dev/null || pnpm install --prod
+else
+    npm install --omit=dev
+fi
+
+# ── 4. Sync config files ────────────────────────────────────
+echo "[4/6] Syncing configuration..."
 cp config/cron/jobs.json cron/jobs.json 2>/dev/null || true
 cp config/cron/training-jobs.json cron/training-jobs.json 2>/dev/null || true
 
@@ -57,14 +65,14 @@ cp deploy/hetzner/webhook.service /etc/systemd/system/openclaw-webhook.service
 cp deploy/hetzner/Caddyfile /etc/caddy/Caddyfile
 systemctl daemon-reload
 
-# ── 4. Restart services ─────────────────────────────────────
-echo "[4/5] Restarting services..."
+# ── 5. Restart services ─────────────────────────────────────
+echo "[5/6] Restarting services..."
 systemctl restart openclaw
 systemctl restart openclaw-webhook
 systemctl reload caddy
 
-# ── 5. Health check ──────────────────────────────────────────
-echo "[5/5] Running health check..."
+# ── 6. Health check ──────────────────────────────────────────
+echo "[6/6] Running health check..."
 sleep 15
 
 GATEWAY_OK=false

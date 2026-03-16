@@ -21,6 +21,11 @@ RUN groupadd --gid 1001 openclaw && \
 
 WORKDIR /opt/openclaw
 
+# Install project dependencies
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN corepack enable && corepack prepare pnpm@latest --activate && \
+    pnpm install --frozen-lockfile --prod
+
 # Copy application files (order: least → most frequently changed)
 COPY templates/ templates/
 COPY docs/ docs/
