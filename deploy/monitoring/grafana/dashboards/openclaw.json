@@ -1,0 +1,140 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "LLM Request Rate & Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(openclaw_llm_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "p50 {{ provider }}/{{ model }}"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(openclaw_llm_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95 {{ provider }}/{{ model }}"
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(openclaw_llm_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "p99 {{ provider }}/{{ model }}"
+        }
+      ]
+    },
+    {
+      "title": "Event Throughput by Type",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "ops" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "rate(openclaw_event_processed_total[5m])",
+          "legendFormat": "{{ event_type }} ({{ status }})"
+        }
+      ]
+    },
+    {
+      "title": "Circuit Breaker State Timeline",
+      "type": "state-timeline",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "options": { "0": { "text": "CLOSED", "color": "green" } }, "type": "value" },
+            { "options": { "1": { "text": "HALF-OPEN", "color": "yellow" } }, "type": "value" },
+            { "options": { "2": { "text": "OPEN", "color": "red" } }, "type": "value" }
+          ]
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "openclaw_circuit_breaker_state",
+          "legendFormat": "{{ provider }}"
+        }
+      ]
+    },
+    {
+      "title": "Daily Cost Burn vs Budget",
+      "type": "timeseries",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "openclaw_budget_used_dollars",
+          "legendFormat": "Used — {{ provider }}"
+        },
+        {
+          "expr": "openclaw_budget_ceiling_dollars",
+          "legendFormat": "Ceiling — {{ provider }}"
+        }
+      ]
+    },
+    {
+      "title": "Agent Health Heatmap by Division",
+      "type": "heatmap",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "expr": "openclaw_agent_health",
+          "legendFormat": "{{ division }}/{{ agent_id }}"
+        }
+      ]
+    },
+    {
+      "title": "Memory Query Latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": {
+        "defaults": { "unit": "s" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(openclaw_memory_query_duration_seconds_bucket[5m]))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(openclaw_memory_query_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(openclaw_memory_query_duration_seconds_bucket[5m]))",
+          "legendFormat": "p99"
+        }
+      ]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["openclaw", "agents"],
+  "templating": { "list": [] },
+  "time": { "from": "now-6h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "OpenClaw Agent Network",
+  "uid": "openclaw-main",
+  "version": 1
+}

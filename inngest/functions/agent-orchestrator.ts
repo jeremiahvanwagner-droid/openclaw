@@ -11,7 +11,11 @@
 
 import { inngest, getDivisionHead, getPodLead } from "../client";
 import { createClient } from "@supabase/supabase-js";
+import { randomUUID } from "crypto";
 import { reportFailure as governorReportFailure } from "../../lib/api-rate-governor";
+import { logger } from "../../lib/logger";
+
+const log = logger.child({ module: "agent-orchestrator" });
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -40,6 +44,10 @@ export const agentInvoke = inngest.createFunction(
       correlation_id,
     } = event.data;
 
+    // Generate or inherit trace_id for cross-division tracing
+    const trace_id = (payload as Record<string, unknown>)?.trace_id as string || correlation_id || randomUUID();
+    const fnLog = log.child({ trace_id, source_agent, target_agent });
+
     // Step 1: Log the event
     const eventId = await step.run("log-event", async () => {
       const { data, error } = await supabase
@@ -52,12 +60,13 @@ export const agentInvoke = inngest.createFunction(
           payload,
           priority,
           correlation_id,
+          metadata: { trace_id },
         })
         .select("id")
         .single();
 
       if (error) {
-        console.error("Failed to log event:", error);
+        log.error({ err: error }, "Failed to log event");
         throw error;
       }
 
@@ -68,7 +77,7 @@ export const agentInvoke = inngest.createFunction(
     await step.run("update-heartbeat", async () => {
       const { error } = await supabase.rpc("update_agent_heartbeat", { p_agent_id: source_agent });
       if (error) {
-        console.error(`Failed to update heartbeat for ${source_agent}:`, error);
+        log.error({ agentId: source_agent, err: error }, "Failed to update heartbeat");
       }
     });
 
@@ -96,6 +105,7 @@ export const agentInvoke = inngest.createFunction(
             action_domain: actionDomain,
             original_target: target_agent,
             correlation_id: correlation_id || eventId,
+            trace_id,
             ...payload,
           },
         });
@@ -165,6 +175,7 @@ export const agentInvoke = inngest.createFunction(
             source: source_agent,
             queue_class: (priority === "critical" ? "P1" : "P2") as "P0" | "P1" | "P2" | "P3",
             correlation_id: correlation_id || eventId,
+            trace_id,
             payload: { ...payload, target_agent, routed_through: podLead },
           },
         });
@@ -185,6 +196,7 @@ export const agentInvoke = inngest.createFunction(
           type: "invoke",
           source: source_agent,
           correlation_id: correlation_id || eventId,
+          trace_id,
           ...payload,
         },
       });
@@ -207,6 +219,7 @@ export const agentInvoke = inngest.createFunction(
           source: source_agent,
           source_division: target_division,
           correlation_id: correlation_id || eventId,
+          trace_id,
           ...payload,
         },
       });
@@ -244,6 +257,8 @@ export const agentEscalate = inngest.createFunction(
     } = event.data;
 
     const MAX_RETRIES = 3;
+    const trace_id = (payload as Record<string, unknown>)?.trace_id as string || randomUUID();
+    const escLog = log.child({ trace_id, source_agent, escalation_path });
 
     // Step 1: Log escalation event
     await step.run("log-escalation", async () => {
@@ -253,6 +268,7 @@ export const agentEscalate = inngest.createFunction(
         target_agent: escalation_path,
         payload: { ...payload, reason, retry_count },
         priority: "high",
+        metadata: { trace_id },
       });
     });
 
@@ -518,7 +534,7 @@ export const telegramAlert = inngest.createFunction(
     const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-      console.error("Telegram credentials not configured");
+      log.error("Telegram credentials not configured");
       return { success: false, error: "Missing credentials" };
     }
 

@@ -12,11 +12,8 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import https from 'https';
-
-const execAsync = promisify(exec);
+import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
 const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
@@ -78,8 +75,7 @@ function ghlRequest(method, urlPath, body = null) {
  */
 async function sendNotification(message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
     return true;
   } catch {
     return false;

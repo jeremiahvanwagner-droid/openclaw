@@ -13,6 +13,16 @@
  * 5. Budget tracking with hard ceilings
  */
 
+import { logger } from "./logger";
+import {
+  circuitBreakerState,
+  budgetUsedDollars,
+  budgetCeilingDollars,
+  concurrencyActive,
+} from "./metrics";
+
+const log = logger.child({ module: "rate-governor" });
+
 // ═══════════════════════════════════════════════════════════════════
 // RATE LIMIT CONFIGURATION
 // ═══════════════════════════════════════════════════════════════════
@@ -125,6 +135,7 @@ function recordSuccess(provider: string): void {
   cb.state = "closed";
   cb.failures = 0;
   cb.halfOpenAttempts = 0;
+  circuitBreakerState.set({ provider }, 0);
 }
 
 function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: boolean = false): void {
@@ -135,19 +146,17 @@ function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: bo
   if (isAuthExpired) {
     cb.state = "open";
     cb.openedAt = Date.now();
+    circuitBreakerState.set({ provider }, 2);
     // Auth-expired circuits stay open longer — no point retrying until token is refreshed
-    console.error(
-      `[RateGovernor] Circuit OPEN for ${provider} — AUTH EXPIRED (401/403). All requests blocked until token refresh.`
-    );
+    log.error({ provider }, "Circuit OPEN — AUTH EXPIRED (401/403). All requests blocked until token refresh.");
     return;
   }
 
   if (isRateLimit || cb.failures >= CIRCUIT_BREAKER_CONFIG.failureThreshold) {
     cb.state = "open";
     cb.openedAt = Date.now();
-    console.warn(
-      `[RateGovernor] Circuit OPEN for ${provider} — ${cb.failures} failures, rate_limit=${isRateLimit}`
-    );
+    circuitBreakerState.set({ provider }, 2);
+    log.warn({ provider, failures: cb.failures, isRateLimit }, "Circuit OPEN");
   }
 }
 
@@ -162,6 +171,7 @@ function canAttempt(provider: string): { allowed: boolean; reason?: string } {
     if (elapsed >= CIRCUIT_BREAKER_CONFIG.maxOpenTimeMs || elapsed >= CIRCUIT_BREAKER_CONFIG.resetTimeoutMs) {
       cb.state = "half-open";
       cb.halfOpenAttempts = 0;
+      circuitBreakerState.set({ provider }, 1);
       return { allowed: true };
     }
     return { allowed: false, reason: `Circuit open for ${provider} — retry in ${Math.ceil((CIRCUIT_BREAKER_CONFIG.resetTimeoutMs - elapsed) / 1000)}s` };
@@ -246,12 +256,15 @@ function acquireConcurrency(provider: string): boolean {
   if (current >= limits.maxConcurrent) return false;
 
   activeCounts.set(provider, current + 1);
+  concurrencyActive.set({ provider }, current + 1);
   return true;
 }
 
 function releaseConcurrency(provider: string): void {
   const current = activeCounts.get(provider) || 0;
-  activeCounts.set(provider, Math.max(0, current - 1));
+  const newCount = Math.max(0, current - 1);
+  activeCounts.set(provider, newCount);
+  concurrencyActive.set({ provider }, newCount);
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -295,14 +308,16 @@ function trackSpend(provider: string, costCents: number): void {
   const budget = getBudget(provider);
   budget.spentCents += costCents;
   budget.requestCount++;
+  budgetUsedDollars.set({ provider }, budget.spentCents / 100);
+  if (limits && limits.dailyBudgetCents > 0) {
+    budgetCeilingDollars.set({ provider }, limits.dailyBudgetCents / 100);
+  }
 
   if (limits && limits.dailyBudgetCents > 0) {
     const pct = budget.spentCents / limits.dailyBudgetCents;
     if (pct >= limits.dailyBudgetWarningPct && !budget.warningEmitted) {
       budget.warningEmitted = true;
-      console.warn(
-        `[RateGovernor] BUDGET WARNING: ${provider} at ${(pct * 100).toFixed(1)}% — $${(budget.spentCents / 100).toFixed(2)} / $${(limits.dailyBudgetCents / 100).toFixed(2)}`
-      );
+      log.warn({ provider, pct: +(pct * 100).toFixed(1), spent: budget.spentCents, ceiling: limits.dailyBudgetCents }, "BUDGET WARNING");
     }
   }
 }
@@ -429,9 +444,7 @@ export async function withGovernor<T>(
       }
       const jitter = Math.random() * 1000;
       const delay = (guard.retryAfterMs || baseBackoff) * Math.pow(2, attempt) + jitter;
-      console.warn(
-        `[RateGovernor] ${provider} blocked (attempt ${attempt + 1}/${maxRetries + 1}): ${guard.reason} — waiting ${Math.ceil(delay)}ms`
-      );
+      log.warn({ provider, attempt: attempt + 1, maxAttempts: maxRetries + 1, reason: guard.reason, delayMs: Math.ceil(delay) }, "Request blocked, waiting");
       await sleep(delay);
       continue;
     }
@@ -446,9 +459,7 @@ export async function withGovernor<T>(
 
       // Auth-expired: open circuit immediately, no retry
       if (statusCode === 401 || statusCode === 403) {
-        console.error(
-          `[RateGovernor] ${provider} returned ${statusCode} — auth expired, circuit opened`
-        );
+        log.error({ provider, statusCode }, "Auth expired, circuit opened");
         throw error;
       }
 
@@ -461,9 +472,7 @@ export async function withGovernor<T>(
 
       const jitter = Math.random() * 1000;
       const delay = baseBackoff * Math.pow(2, attempt) + jitter;
-      console.warn(
-        `[RateGovernor] ${provider} error (attempt ${attempt + 1}/${maxRetries + 1}), status=${statusCode} — retrying in ${Math.ceil(delay)}ms`
-      );
+      log.warn({ provider, attempt: attempt + 1, maxAttempts: maxRetries + 1, statusCode, delayMs: Math.ceil(delay) }, "Request failed, retrying");
       await sleep(delay);
     }
   }

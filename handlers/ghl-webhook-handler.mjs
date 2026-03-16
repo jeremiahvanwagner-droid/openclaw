@@ -9,20 +9,21 @@
 
 import http from 'http';
 import crypto from 'crypto';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
+import { openclawSend, openclawMessage } from '../lib/safe-exec.mjs';
+import { childLogger } from '../lib/logger.mjs';
+import { registry, eventProcessedTotal, eventProcessingDuration } from '../lib/metrics.mjs';
 
-const execAsync = promisify(exec);
+const log = childLogger({ module: 'webhook-handler' });
 
 // Prevent unhandled errors from crashing the process
 process.on('unhandledRejection', (reason, promise) => {
-  console.error('⚠️ Unhandled Promise Rejection:', reason);
+  log.error({ err: reason }, 'Unhandled Promise Rejection');
 });
 process.on('uncaughtException', (err) => {
-  console.error('⚠️ Uncaught Exception:', err);
+  log.error({ err }, 'Uncaught Exception');
 });
 
 // Import Phase 3 modules
@@ -51,14 +52,14 @@ function resolveSkillPath(fileName) {
 async function importSkill(fileName, label) {
   const resolved = resolveSkillPath(fileName);
   if (!resolved) {
-    console.warn(`⚠️ ${label} not found. Looked in: ${skillsSearchPaths.join(', ')}`);
+    log.warn({ label, searchPaths: skillsSearchPaths }, 'Skill module not found');
     return null;
   }
 
   try {
     return await import(pathToFileURL(resolved).href);
   } catch (error) {
-    console.warn(`⚠️ Failed to load ${label} from ${resolved}:`, error.message);
+    log.warn({ label, path: resolved, err: error.message }, 'Failed to load skill module');
     return null;
   }
 }
@@ -75,20 +76,46 @@ async function loadPhase3Modules() {
 
   const loaded = [assessmentHandler, ebookAutomation, cartRecovery].filter(Boolean).length;
   if (loaded === 3) {
-    console.log('✅ Phase 3 modules loaded (3/3)');
+    log.info('Phase 3 modules loaded (3/3)');
   } else {
-    console.warn(`⚠️ Phase 3 modules partially loaded (${loaded}/3)`);
+    log.warn({ loaded }, 'Phase 3 modules partially loaded');
   }
 }
 
-// Configuration from environment
+// Configuration from environment — all secrets required at startup
 const PORT = process.env.OPENCLAW_GHL_WEBHOOK_PORT || 8788;
 const HOST = process.env.OPENCLAW_GHL_WEBHOOK_HOST || '127.0.0.1';
-const WEBHOOK_SECRET = process.env.OPENCLAW_GHL_WEBHOOK_SECRET || 'replace-with-32byte-random-secret';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
-const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
-const TEAMS_CHANNEL_ID = process.env.OPENCLAW_ALERT_TEAMS_CHANNEL_ID || '7737707872';
+
+// Required environment variables — fail fast if missing
+const REQUIRED_ENV = [
+  'OPENCLAW_GHL_WEBHOOK_SECRET',
+  'GHL_LOCATION_ID',
+  'OPENCLAW_ALERT_TELEGRAM_CHAT_ID',
+];
+const missingEnv = REQUIRED_ENV.filter(k => !process.env[k]);
+if (missingEnv.length > 0) {
+  log.fatal({ missing: missingEnv }, 'Missing required environment variables');
+  process.exit(1);
+}
+
+const WEBHOOK_SECRET = process.env.OPENCLAW_GHL_WEBHOOK_SECRET;
+const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID;
+const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID;
+const TEAMS_CHANNEL_ID = process.env.OPENCLAW_ALERT_TEAMS_CHANNEL_ID || '';
 const M365_EMAIL_OWNER = process.env.M365_EMAIL_OWNER || '';
+const GATEWAY_AUTH_TOKEN = process.env.OPENCLAW_GATEWAY_AUTH_TOKEN || '';
+
+// Request body size limit (1 MB)
+const MAX_BODY_SIZE = 1 * 1024 * 1024;
+
+// Allowed GHL event types (whitelist)
+const ALLOWED_EVENT_TYPES = new Set([
+  'contact.created', 'contact.updated', 'contact.tag.added',
+  'form.submitted', 'funnel.page.visited',
+  'payment.received', 'subscription.created', 'subscription.cancelled',
+  'appointment.created', 'appointment.cancelled', 'appointment.noshow',
+  'opportunity.created', 'opportunity.stage.changed', 'opportunity.status.changed',
+]);
 
 // Event handlers
 const eventHandlers = {
@@ -127,53 +154,54 @@ function verifySignature(payload, signature) {
   return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(computed));
 }
 
-// Send Telegram alert via OpenClaw
+// Send Telegram alert via OpenClaw (shell-injection safe)
 async function sendTelegramAlert(message) {
-  const escapedMessage = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
   try {
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escapedMessage}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
   } catch (error) {
-    console.error('Failed to send Telegram alert:', error.message);
+    log.error({ err: error.message }, 'Failed to send Telegram alert');
   }
 }
 
-// Send MS Teams alert via OpenClaw
+// Send MS Teams alert via OpenClaw (shell-injection safe)
 async function sendTeamsAlert(message) {
-  const escapedMessage = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+  if (!TEAMS_CHANNEL_ID) return;
   try {
-    await execAsync(`openclaw send --agent main --channel msteams --to ${TEAMS_CHANNEL_ID} "${escapedMessage}"`);
+    await openclawSend({ agent: 'main', channel: 'msteams', to: TEAMS_CHANNEL_ID, message });
   } catch (error) {
-    console.error('Failed to send Teams alert:', error.message);
+    log.error({ err: error.message }, 'Failed to send Teams alert');
   }
 }
 
 // Send Email alert via OpenClaw (Microsoft 365)
 async function sendEmailAlert(message) {
   if (!M365_EMAIL_OWNER) return;
-  const escapedMessage = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
   try {
-    await execAsync(`openclaw send --agent main --channel email --to "${M365_EMAIL_OWNER}" "${escapedMessage}"`);
+    await openclawSend({ agent: 'main', channel: 'email', to: M365_EMAIL_OWNER, message });
   } catch (error) {
-    console.error('Failed to send Email alert:', error.message);
+    log.error({ err: error.message }, 'Failed to send Email alert');
   }
 }
 
-// Send alert to all configured channels
+// Send alert to all configured channels, log failures
 async function sendAlert(message) {
-  await Promise.allSettled([
+  const results = await Promise.allSettled([
     sendTelegramAlert(message),
     sendTeamsAlert(message),
     sendEmailAlert(message)
   ]);
+  const failures = results.filter(r => r.status === 'rejected');
+  if (failures.length > 0) {
+    log.error({ succeeded: results.length - failures.length, total: results.length }, 'Partial alert delivery failure');
+  }
 }
 
-// Trigger OpenClaw agent action
+// Trigger OpenClaw agent action (shell-injection safe)
 async function triggerAgentAction(agentId, message) {
-  const escapedMessage = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
   try {
-    await execAsync(`openclaw message --agent ${agentId} "${escapedMessage}"`);
+    await openclawMessage({ agent: agentId, message });
   } catch (error) {
-    console.error(`Failed to trigger agent ${agentId}:`, error.message);
+    log.error({ agentId, err: error.message }, 'Failed to trigger agent');
   }
 }
 
@@ -185,7 +213,7 @@ async function handleNewContact(data) {
   const phone = contact.phone || '';
   const source = contact.source || 'direct';
   
-  console.log(`[NEW CONTACT] ${name} - ${email} - Source: ${source}`);
+  log.info({ name, email, source }, 'New contact');
   
   // Trigger marketing agent for speed-to-lead
   await triggerAgentAction('marketing', 
@@ -216,7 +244,7 @@ async function handleTagAdded(data) {
   const contact = data.contact || data;
   const tag = data.tag || '';
   
-  console.log(`[TAG ADDED] ${contact.firstName}: ${tag}`);
+  log.info({ contact: contact.firstName, tag }, 'Tag added');
   
   // High-alignment tag triggers accelerated nurture
   if (tag === 'high-alignment') {
@@ -241,17 +269,17 @@ async function handleFormSubmission(data) {
   const contact = data.contact || {};
   const fields = data.fields || data.formData || {};
   
-  console.log(`[FORM SUBMITTED] ${formName} by ${contact.firstName}`);
+  log.info({ formName, contact: contact.firstName }, 'Form submitted');
   
   // Divine Alignment Scorecard submission - Use Phase 3 Assessment Handler
   if (formName.toLowerCase().includes('scorecard') || formName.toLowerCase().includes('alignment')) {
     if (assessmentHandler && contact.id) {
       try {
         const result = await assessmentHandler.processAssessment(contact.id, fields);
-        console.log(`[ASSESSMENT] Processed: ${result.tier} (${result.score}/100)`);
+        log.info({ tier: result.tier, score: result.score }, 'Assessment processed');
         return;
       } catch (error) {
-        console.error('[ASSESSMENT ERROR]', error.message);
+        log.error({ err: error.message }, 'Assessment error');
       }
     }
     
@@ -293,7 +321,7 @@ async function handlePageVisit(data) {
   
   // Track checkout page visits for abandoned cart logic using Phase 3 Cart Recovery
   if (page.includes('/order') || page.includes('/checkout')) {
-    console.log(`[CHECKOUT VISIT] ${contact.firstName} viewing checkout`);
+    log.info({ contact: contact.firstName }, 'Checkout page visit');
     
     if (cartRecovery && contact.id) {
       try {
@@ -304,9 +332,9 @@ async function handlePageVisit(data) {
         
         const cartUrl = `https://truthjblue.com${page}`;
         await cartRecovery.trackCheckoutVisit(contact.id, product, cartUrl);
-        console.log(`[CART TRACKED] ${contact.firstName} - ${product}`);
+        log.info({ contact: contact.firstName, product }, 'Cart tracked');
       } catch (error) {
-        console.error('[CART TRACKING ERROR]', error.message);
+        log.error({ err: error.message }, 'Cart tracking error');
       }
     }
   }
@@ -317,13 +345,13 @@ async function handlePayment(data) {
   const product = data.product?.name || data.productName || 'Unknown';
   const contact = data.contact || {};
   
-  console.log(`[PAYMENT] $${amount} - ${product} - ${contact.firstName}`);
+  log.info({ amount, product, contact: contact.firstName }, 'Payment received');
   
   // Mark abandoned cart as completed if exists
   if (cartRecovery && contact.id) {
     try {
       await cartRecovery.markCartCompleted(contact.id);
-      console.log('[CART COMPLETED] Abandoned cart recovery stopped');
+      log.info({ contactId: contact.id }, 'Cart completed, abandoned recovery stopped');
     } catch (error) {
       // Cart may not exist, that's OK
     }
@@ -333,10 +361,10 @@ async function handlePayment(data) {
   if (amount >= 7 && amount <= 67 && ebookAutomation && contact.id) {
     try {
       const result = await ebookAutomation.processEbookPurchase(contact.id, product, amount);
-      console.log(`[EBOOK AUTOMATION] Processed: ${result.name} → ${result.ladder}`);
+      log.info({ name: result.name, ladder: result.ladder }, 'eBook automation processed');
       return;
     } catch (error) {
-      console.error('[EBOOK AUTOMATION ERROR]', error.message);
+      log.error({ err: error.message }, 'eBook automation error');
     }
   }
   
@@ -368,7 +396,7 @@ async function handleSubscription(data) {
   const amount = data.amount || data.subscription?.amount || 0;
   const contact = data.contact || {};
   
-  console.log(`[SUBSCRIPTION] ${plan} - ${contact.firstName}`);
+  log.info({ plan, contact: contact.firstName }, 'New subscription');
   
   await triggerAgentAction('marketing',
     `NEW SUBSCRIPTION: ${contact.firstName} joined ${plan} at $${amount}/mo. ` +
@@ -386,7 +414,7 @@ async function handleSubscriptionCancelled(data) {
   const contact = data.contact || {};
   const reason = data.reason || 'Not specified';
   
-  console.log(`[CANCELLATION] ${plan} - ${contact.firstName}`);
+  log.info({ plan, contact: contact.firstName }, 'Subscription cancelled');
   
   await triggerAgentAction('support',
     `SUBSCRIPTION CANCELLED: ${contact.firstName} cancelled ${plan}. ` +
@@ -404,7 +432,7 @@ async function handleAppointmentBooked(data) {
   const contact = data.contact || {};
   const calendarName = data.calendar?.name || 'Discovery Call';
   
-  console.log(`[APPOINTMENT BOOKED] ${calendarName} - ${contact.firstName}`);
+  log.info({ calendar: calendarName, contact: contact.firstName }, 'Appointment booked');
   
   // Schedule pre-call briefing
   await triggerAgentAction('sales',
@@ -422,7 +450,7 @@ async function handleAppointmentCancelled(data) {
   const contact = data.contact || {};
   const calendarName = data.calendar?.name || 'Appointment';
   
-  console.log(`[APPOINTMENT CANCELLED] ${calendarName} - ${contact.firstName}`);
+  log.info({ calendar: calendarName, contact: contact.firstName }, 'Appointment cancelled');
   
   await triggerAgentAction('sales',
     `APPOINTMENT CANCELLED: ${contact.firstName} cancelled ${calendarName}. ` +
@@ -435,7 +463,7 @@ async function handleNoShow(data) {
   const contact = data.contact || {};
   const calendarName = data.calendar?.name || 'Appointment';
   
-  console.log(`[NO-SHOW] ${calendarName} - ${contact.firstName}`);
+  log.info({ calendar: calendarName, contact: contact.firstName }, 'No-show detected');
   
   await triggerAgentAction('sales',
     `NO-SHOW DETECTED: ${contact.firstName} missed ${calendarName}. ` +
@@ -453,7 +481,7 @@ async function handleOpportunityCreated(data) {
   const contact = data.contact || {};
   const value = opportunity.monetaryValue || 0;
   
-  console.log(`[OPPORTUNITY] $${value} - ${contact.firstName}`);
+  log.info({ value, contact: contact.firstName }, 'Opportunity created');
   
   if (value >= 997) {
     await sendAlert(`💼 High-Value Opportunity\n👤 ${contact.firstName}\n💰 $${value}`);
@@ -465,7 +493,7 @@ async function handleStageChange(data) {
   const newStage = data.newStage || opportunity.pipelineStage || '';
   const contact = data.contact || {};
   
-  console.log(`[STAGE CHANGE] ${contact.firstName} → ${newStage}`);
+  log.info({ contact: contact.firstName, newStage }, 'Stage change');
   
   // Backend Prospect stage triggers high-ticket sequence
   if (newStage.toLowerCase().includes('backend') || newStage.toLowerCase().includes('prospect')) {
@@ -484,7 +512,7 @@ async function handleStatusChange(data) {
   const contact = data.contact || {};
   const value = opportunity.monetaryValue || 0;
   
-  console.log(`[STATUS CHANGE] ${contact.firstName} → ${newStatus}`);
+  log.info({ contact: contact.firstName, newStatus }, 'Status change');
   
   if (newStatus === 'won') {
     await sendAlert(`🎉 DEAL WON!\n👤 ${contact.firstName}\n💰 $${value}`);
@@ -500,11 +528,37 @@ async function handleStatusChange(data) {
 
 // HTTP Server
 const server = http.createServer(async (req, res) => {
-  // Health check
+  // Health check — public, no auth required
   if (req.method === 'GET' && req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }));
     return;
+  }
+
+  // Prometheus metrics — public for scraping
+  if (req.method === 'GET' && req.url === '/metrics') {
+    try {
+      const metrics = await registry.metrics();
+      res.writeHead(200, { 'Content-Type': registry.contentType });
+      res.end(metrics);
+    } catch (err) {
+      res.writeHead(500);
+      res.end('Error collecting metrics');
+    }
+    return;
+  }
+  
+  // Gateway API auth for non-webhook, non-health endpoints
+  if (!req.url.startsWith('/webhook') && req.url !== '/health' && req.url !== '/metrics') {
+    if (GATEWAY_AUTH_TOKEN) {
+      const authHeader = req.headers['authorization'] || '';
+      const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+      if (token !== GATEWAY_AUTH_TOKEN) {
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unauthorized' }));
+        return;
+      }
+    }
   }
   
   // Only accept POST to /webhook
@@ -514,39 +568,78 @@ const server = http.createServer(async (req, res) => {
     return;
   }
   
-  // Collect body
+  // Collect body with size limit
   let body = '';
-  req.on('data', chunk => { body += chunk; });
+  let bodySize = 0;
+  let sizeLimitExceeded = false;
+  
+  req.on('data', chunk => {
+    bodySize += chunk.length;
+    if (bodySize > MAX_BODY_SIZE) {
+      sizeLimitExceeded = true;
+      req.destroy();
+      return;
+    }
+    body += chunk;
+  });
   
   req.on('end', async () => {
-    // Verify signature
+    if (sizeLimitExceeded) {
+      res.writeHead(413, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Request body too large', maxBytes: MAX_BODY_SIZE }));
+      return;
+    }
+    
+    // Verify HMAC signature (always enforced)
     const signature = req.headers['x-ghl-signature'] || req.headers['x-openclaw-secret'];
-    if (WEBHOOK_SECRET !== 'replace-with-32byte-random-secret' && !verifySignature(body, signature)) {
-      console.warn('[WARN] Invalid webhook signature');
-      res.writeHead(401);
-      res.end('Unauthorized');
+    if (!verifySignature(body, signature)) {
+      log.warn('Invalid or missing webhook signature');
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid signature' }));
       return;
     }
     
     try {
       const payload = JSON.parse(body);
       const eventType = payload.type || payload.event || payload.eventType || 'unknown';
+      const traceId = crypto.randomUUID();
       
-      console.log(`[WEBHOOK] ${eventType} received at ${new Date().toISOString()}`);
+      // Validate event type against whitelist
+      if (!ALLOWED_EVENT_TYPES.has(eventType)) {
+        log.warn({ eventType, trace_id: traceId }, 'Rejected unknown event type');
+        res.writeHead(422, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Unknown event type', eventType }));
+        return;
+      }
+      
+      // Attach trace_id to payload for downstream propagation
+      payload.trace_id = traceId;
+      
+      const reqLog = log.child({ trace_id: traceId, eventType });
+      reqLog.info('Webhook received');
       
       // Route to handler
       const handler = eventHandlers[eventType];
       if (handler) {
-        await handler(payload);
-        res.writeHead(200);
-        res.end('OK');
+        const stopTimer = eventProcessingDuration.startTimer({ event_type: eventType });
+        try {
+          await handler(payload);
+          stopTimer();
+          eventProcessedTotal.inc({ event_type: eventType, status: 'success' });
+          res.writeHead(200);
+          res.end('OK');
+        } catch (handlerErr) {
+          stopTimer();
+          eventProcessedTotal.inc({ event_type: eventType, status: 'error' });
+          throw handlerErr;
+        }
       } else {
-        console.log(`[UNHANDLED] Event type: ${eventType}`);
+        log.warn({ eventType }, 'Unhandled event type');
         res.writeHead(200);
         res.end('Event received but no handler');
       }
     } catch (error) {
-      console.error('[ERROR]', error.message);
+      log.error({ err: error.message }, 'Webhook processing error');
       res.writeHead(500);
       res.end('Internal Server Error');
     }
@@ -554,25 +647,18 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, HOST, async () => {
-  console.log(`
-╔══════════════════════════════════════════════════════════════╗
-║     OpenClaw GHL Webhook Handler v2.0                        ║
-║     Phase 3 Assessment → eBook → Course Automation           ║
-║     Listening on http://${HOST}:${PORT}/webhook                 ║
-║     Location: ${GHL_LOCATION_ID}                        ║
-╚══════════════════════════════════════════════════════════════╝
-  `);
+  log.info({ host: HOST, port: PORT, locationId: GHL_LOCATION_ID }, 'OpenClaw GHL Webhook Handler v2.0 started');
   
   // Load Phase 3 modules — non-fatal on failure
   try {
     await loadPhase3Modules();
   } catch (err) {
-    console.error('⚠️ Phase 3 module loading failed (non-fatal):', err.message);
+    log.error({ err: err.message }, 'Phase 3 module loading failed (non-fatal)');
   }
 });
 
 // Graceful shutdown
 process.on('SIGINT', () => {
-  console.log('\nShutting down webhook handler...');
+  log.info('Shutting down webhook handler');
   server.close(() => process.exit(0));
 });

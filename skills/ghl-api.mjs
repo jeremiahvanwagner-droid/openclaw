@@ -77,10 +77,27 @@ async function apiCall(method, endpoint, body = null, _retryCount = 0) {
 
   // Rate limited — retry with backoff (max 2 retries)
   if (response.status === 429 && _retryCount < 2) {
-    const retryAfter = parseInt(response.headers.get('retry-after') || '10', 10);
-    const delay = (retryAfter * 1000) + Math.random() * 2000;
-    console.warn(`GHL 429 rate limited, retrying in ${Math.ceil(delay)}ms (attempt ${_retryCount + 1}/2)`);
-    await new Promise(r => setTimeout(r, delay));
+    const retryAfterRaw = response.headers.get('retry-after');
+    let waitMs;
+    if (retryAfterRaw) {
+      const parsed = Number(retryAfterRaw);
+      if (!Number.isNaN(parsed)) {
+        // Retry-After as seconds
+        waitMs = parsed * 1000;
+      } else {
+        // Retry-After as HTTP-date
+        const date = new Date(retryAfterRaw);
+        waitMs = Math.max(0, date.getTime() - Date.now());
+      }
+    }
+    // Fall back to exponential backoff if header is absent or invalid
+    if (!waitMs || waitMs <= 0) {
+      waitMs = Math.pow(2, _retryCount) * 3000; // 3s, 6s
+    }
+    // Add small jitter
+    waitMs += Math.random() * 2000;
+    console.warn(`GHL 429 rate limited, retrying in ${Math.ceil(waitMs)}ms (attempt ${_retryCount + 1}/2)`);
+    await new Promise(r => setTimeout(r, waitMs));
     return apiCall(method, endpoint, body, _retryCount + 1);
   }
 

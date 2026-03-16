@@ -15,10 +15,7 @@
 import https from 'https';
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
-
-const execAsync = promisify(exec);
+import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
 const GHL_API_KEY = process.env.GHL_TOKEN || '';
@@ -405,8 +402,7 @@ async function alertHotLeads() {
   
   // Send Telegram alert
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
     console.log('\n✅ Alert sent to Telegram');
   } catch (error) {
     console.log('\n⚠️ Failed to send Telegram alert');

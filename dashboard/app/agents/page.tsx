@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "../supabase";
 
 interface Agent {
@@ -58,15 +59,16 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-function AgentCard({ agent, onSelect }: { agent: Agent; onSelect: (agent: Agent) => void }) {
+function AgentCard({ agent, isUpdated }: { agent: Agent; isUpdated?: boolean }) {
+  const router = useRouter();
   const timeSinceHeartbeat = agent.last_heartbeat_at
     ? formatTimeAgo(new Date(agent.last_heartbeat_at))
     : "Never";
 
   return (
     <div
-      className="card cursor-pointer hover:border-claw-500/50 transition-colors"
-      onClick={() => onSelect(agent)}
+      className={`card cursor-pointer hover:border-claw-500/50 transition-colors ${isUpdated ? "ring-2 ring-green-400/60 animate-pulse" : ""}`}
+      onClick={() => router.push(`/agents/${agent.agent_id}`)}
     >
       <div className="flex items-start justify-between mb-3">
         <div>
@@ -120,101 +122,6 @@ function AgentCard({ agent, onSelect }: { agent: Agent; onSelect: (agent: Agent)
   );
 }
 
-function AgentDetail({ agent, onClose }: { agent: Agent; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-xl border border-slate-700 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-slate-700 flex items-start justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-white">{agent.agent_id}</h2>
-            <p className="text-slate-400">{agent.config?.role || "Agent"}</p>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-white text-2xl"
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="p-6 space-y-6">
-          {/* Status */}
-          <div className="flex items-center gap-4">
-            <StatusBadge status={agent.status} />
-            <span className="text-slate-400 text-sm">
-              Last heartbeat: {agent.last_heartbeat_at ? new Date(agent.last_heartbeat_at).toLocaleString() : "Never"}
-            </span>
-          </div>
-
-          {/* Info grid */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <div className="text-slate-500 text-sm">Division</div>
-              <div className="text-white">{agent.org_unit?.replace(/_/g, " ")}</div>
-            </div>
-            <div>
-              <div className="text-slate-500 text-sm">Escalation Path</div>
-              <div className="text-white">{agent.config?.escalation_path || "None"}</div>
-            </div>
-            <div>
-              <div className="text-slate-500 text-sm">Events Processed</div>
-              <div className="text-white">{agent.config?.metrics?.events_processed || 0}</div>
-            </div>
-            <div>
-              <div className="text-slate-500 text-sm">Avg Latency</div>
-              <div className="text-white">
-                {agent.config?.metrics?.avg_latency_ms
-                  ? `${agent.config.metrics.avg_latency_ms}ms`
-                  : "—"}
-              </div>
-            </div>
-          </div>
-
-          {/* Tools */}
-          {agent.config?.tools_required && agent.config.tools_required.length > 0 && (
-            <div>
-              <div className="text-slate-500 text-sm mb-2">Available Tools</div>
-              <div className="flex flex-wrap gap-2">
-                {agent.config.tools_required.map((tool: string) => (
-                  <span
-                    key={tool}
-                    className="px-2 py-1 bg-claw-500/20 text-claw-400 text-sm rounded border border-claw-500/30"
-                  >
-                    {tool}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Last Error */}
-          {agent.config?.metrics?.last_error && (
-            <div>
-              <div className="text-slate-500 text-sm mb-2">Last Error</div>
-              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm font-mono">
-                {agent.config.metrics.last_error}
-              </div>
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-slate-700">
-            <button className="px-4 py-2 bg-claw-500 hover:bg-claw-600 text-white rounded-lg transition">
-              Restart Agent
-            </button>
-            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">
-              View Logs
-            </button>
-            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">
-              Send Test Event
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function formatTimeAgo(date: Date): string {
   const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
   
@@ -230,7 +137,7 @@ export default function AgentsPage() {
   const [selectedDivision, setSelectedDivision] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedAgent, setSelectedAgent] = useState<Agent | null>(null);
+  const [recentlyUpdated, setRecentlyUpdated] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     async function fetchAgents() {
@@ -250,6 +157,35 @@ export default function AgentsPage() {
     }
 
     fetchAgents();
+
+    // Subscribe to real-time updates
+    if (!supabase) return;
+    const channel = supabase
+      .channel("agents-realtime")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "agents" },
+        (payload) => {
+          const updated = payload.new as Agent;
+          setAgents((prev) =>
+            prev.map((a) => (a.id === updated.id ? updated : a))
+          );
+          // Flash animation
+          setRecentlyUpdated((prev) => new Set(prev).add(updated.id));
+          setTimeout(() => {
+            setRecentlyUpdated((prev) => {
+              const next = new Set(prev);
+              next.delete(updated.id);
+              return next;
+            });
+          }, 2000);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // Filter agents
@@ -329,7 +265,7 @@ export default function AgentsPage() {
           <AgentCard
             key={agent.id}
             agent={agent}
-            onSelect={setSelectedAgent}
+            isUpdated={recentlyUpdated.has(agent.id)}
           />
         ))}
       </div>
@@ -338,14 +274,6 @@ export default function AgentsPage() {
         <div className="text-center py-12 text-slate-500">
           No agents found matching your filters
         </div>
-      )}
-
-      {/* Agent Detail Modal */}
-      {selectedAgent && (
-        <AgentDetail
-          agent={selectedAgent}
-          onClose={() => setSelectedAgent(null)}
-        />
       )}
     </div>
   );

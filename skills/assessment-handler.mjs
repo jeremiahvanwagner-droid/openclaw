@@ -14,11 +14,8 @@
  */
 
 import https from 'https';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import { fileURLToPath } from 'url';
-
-const execAsync = promisify(exec);
+import { openclawSend, openclawMessage } from '../lib/safe-exec.mjs';
 
 // Configuration
 const GHL_API_KEY = process.env.GHL_TOKEN || process.env.GHL_PRIVATE_INTEGRATION_TOKEN || '';
@@ -172,8 +169,7 @@ function ghlRequest(method, path, data = null) {
  */
 async function notifyTelegram(message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
   } catch (error) {
     console.error('Telegram notification failed:', error.message);
   }
@@ -184,8 +180,7 @@ async function notifyTelegram(message) {
  */
 async function triggerAgent(agentId, message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw message --agent ${agentId} "${escaped}"`);
+    await openclawMessage({ agent: agentId, message });
   } catch (error) {
     console.error(`Agent trigger failed (${agentId}):`, error.message);
   }

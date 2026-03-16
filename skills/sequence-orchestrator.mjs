@@ -12,11 +12,8 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import https from 'https';
-
-const execAsync = promisify(exec);
+import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
 const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
@@ -238,7 +235,7 @@ async function sendMessage(contactId, channel, content) {
         const telegramId = contact.customFields?.find(f => f.key?.includes('telegram'))?.value;
         
         if (telegramId) {
-          await execAsync(`openclaw send --agent main --channel telegram --to ${telegramId} "${content.body.replace(/"/g, '\\"')}"`);
+          await openclawSend({ agent: 'main', channel: 'telegram', to: telegramId, message: content.body });
           await recordEngagement(contactId, 'telegram', false);
           return { success: true, channel };
         }

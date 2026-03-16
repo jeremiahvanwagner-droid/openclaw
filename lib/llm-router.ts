@@ -10,7 +10,16 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { withGovernor, type QueueClass } from "./api-rate-governor";
+import { logger } from "./logger";
+import {
+  llmRequestDuration,
+  llmRequestTotal,
+  llmTokensUsed,
+} from "./metrics";
+
+const log = logger.child({ module: "llm-router" });
 
 // Initialize clients lazily
 let anthropic: Anthropic | null = null;
@@ -28,6 +37,55 @@ function getOpenAI(): OpenAI {
     openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
   return openaiClient;
+}
+
+// Supabase client for cost logging (lazy)
+let costSupabase: SupabaseClient | null = null;
+function getCostSupabase(): SupabaseClient | null {
+  if (costSupabase) return costSupabase;
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) return null;
+  costSupabase = createClient(url, key);
+  return costSupabase;
+}
+
+// Per-1K-token pricing (USD) — keep updated
+const TOKEN_PRICING: Record<string, { input: number; output: number }> = {
+  "claude-opus-4-20250514":     { input: 0.015,  output: 0.075 },
+  "claude-sonnet-4-5-20250514": { input: 0.003,  output: 0.015 },
+  "gpt-4o":                     { input: 0.0025, output: 0.01 },
+  "gpt-4o-mini":                { input: 0.00015, output: 0.0006 },
+};
+
+function calculateCostUsd(model: string, inputTokens: number, outputTokens: number): number {
+  const pricing = TOKEN_PRICING[model];
+  if (!pricing) return 0;
+  return (inputTokens / 1000) * pricing.input + (outputTokens / 1000) * pricing.output;
+}
+
+async function logCost(
+  agentId: string,
+  provider: string,
+  model: string,
+  inputTokens: number,
+  outputTokens: number,
+  costUsd: number
+): Promise<void> {
+  const sb = getCostSupabase();
+  if (!sb) return;
+  try {
+    await sb.from("agent_costs").insert({
+      agent_id: agentId,
+      provider,
+      model,
+      tokens_in: inputTokens,
+      tokens_out: outputTokens,
+      cost_usd: costUsd,
+    });
+  } catch (err) {
+    log.warn({ err }, "Failed to log cost");
+  }
 }
 
 // Model configuration
@@ -115,32 +173,55 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
   // Estimate cost: ~$0.01 per 1K tokens for Opus, less for others
   const estimatedCostCents = config.tier === "strategic" ? 5 : config.tier === "content" ? 2 : 1;
 
-  return withGovernor(
-    { provider: config.provider, queueClass, agentId, estimatedCostCents },
-    async () => {
-      if (config.provider === "anthropic") {
-        return completeWithAnthropic({
-          model: config.model,
-          messages,
-          maxTokens: effectiveMaxTokens,
-          temperature,
-          stopSequences,
-        });
-      }
+  const timer = llmRequestDuration.startTimer({
+    provider: config.provider,
+    model: config.model,
+    agent: agentId || "unknown",
+  });
 
-      if (config.provider === "openai") {
-        return completeWithOpenAI({
-          model: config.model,
-          messages,
-          maxTokens: effectiveMaxTokens,
-          temperature,
-          stopSequences,
-        });
-      }
+  try {
+    const result = await withGovernor(
+      { provider: config.provider, queueClass, agentId, estimatedCostCents },
+      async () => {
+        if (config.provider === "anthropic") {
+          return completeWithAnthropic({
+            model: config.model,
+            messages,
+            maxTokens: effectiveMaxTokens,
+            temperature,
+            stopSequences,
+          });
+        }
 
-      throw new Error(`Unknown provider: ${config.provider}`);
+        if (config.provider === "openai") {
+          return completeWithOpenAI({
+            model: config.model,
+            messages,
+            maxTokens: effectiveMaxTokens,
+            temperature,
+            stopSequences,
+          });
+        }
+
+        throw new Error(`Unknown provider: ${config.provider}`);
+      }
+    );
+
+    timer({ provider: config.provider, model: config.model, agent: agentId || "unknown" });
+    llmRequestTotal.inc({ provider: config.provider, model: config.model, status: "success" });
+    if (result.usage) {
+      llmTokensUsed.inc({ provider: config.provider, model: config.model, direction: "input" }, result.usage.inputTokens);
+      llmTokensUsed.inc({ provider: config.provider, model: config.model, direction: "output" }, result.usage.outputTokens);
+      const costUsd = calculateCostUsd(config.model, result.usage.inputTokens, result.usage.outputTokens);
+      // Fire-and-forget cost log
+      logCost(agentId || "unknown", config.provider, config.model, result.usage.inputTokens, result.usage.outputTokens, costUsd);
     }
-  );
+    return result;
+  } catch (error) {
+    timer({ provider: config.provider, model: config.model, agent: agentId || "unknown" });
+    llmRequestTotal.inc({ provider: config.provider, model: config.model, status: "error" });
+    throw error;
+  }
 }
 
 /**
@@ -275,7 +356,7 @@ export async function completeJSON<T>(
     }
     return JSON.parse(result.content) as T;
   } catch (error) {
-    console.error("Failed to parse JSON response:", error);
+    log.error({ err: error }, "Failed to parse JSON response");
     return null;
   }
 }
