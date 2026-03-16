@@ -193,6 +193,11 @@
                           "id":  "division_7_shared_services",
                           "name":  "Cross-Division Shared Services",
                           "agent_count":  7
+                      },
+                      {
+                          "id":  "division_9_online_store",
+                          "name":  "Online Store Operations (store.truthjblue.com — Books & Merch)",
+                          "agent_count":  10
                       }
                   ],
     "agents":  [
@@ -3537,6 +3542,453 @@
                        "telegram_delivery":  false,
                        "teams_delivery":  false,
                        "reports_to":  "d8_saas_director"
+                   },
+                   {
+                       "agent_id":  "d9_store_director",
+                       "display_name":  "Online Store Director",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "executive",
+                       "primary_responsibilities":  [
+                                                         "Lead online store strategy for books and merch at store.truthjblue.com",
+                                                         "Own store P&L including revenue, margins, and promotional ROI",
+                                                         "Coordinate cross-division offers with Publishing (D5), Coaching (D4), and eCommerce (D2)",
+                                                         "Oversee WooCommerce/Divi platform operations and UX improvements",
+                                                         "Report store performance and strategic recommendations to CEO"
+                                                     ],
+                       "tools_required":  [
+                                              "woocommerce_admin",
+                                              "wordpress_admin",
+                                              "stripe_dashboard",
+                                              "google_analytics_ecommerce",
+                                              "campaign_analyst",
+                                              "executive_dashboarder"
+                                          ],
+                       "input_triggers":  [
+                                              "daily_store_revenue_cron",
+                                              "inventory_alert",
+                                              "conversion_rate_drop",
+                                              "promotional_campaign_launch",
+                                              "quarterly_store_review"
+                                          ],
+                       "output_format":  "decision",
+                       "escalation_path":  "d1_ceo",
+                       "llm_model":  "claude-opus-4",
+                       "memory_type":  "long-term",
+                       "queue_class":  "P1",
+                       "inter_agent_dependencies":  [
+                                                        "d1_ceo",
+                                                        "d1_cmo",
+                                                        "d5_publisher",
+                                                        "d2_director",
+                                                        "d4_cvo",
+                                                        "d9_merchandiser",
+                                                        "d9_offer_strategist",
+                                                        "d9_web_designer",
+                                                        "shared_master_orchestrator"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_store_director",
+                       "cron_schedule":  "0 7 * * *",
+                       "telegram_delivery":  true,
+                       "teams_delivery":  true,
+                       "reports_to":  "d1_ceo"
+                   },
+                   {
+                       "agent_id":  "d9_offer_strategist",
+                       "display_name":  "Offer & Pricing Psychologist",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "manager",
+                       "primary_responsibilities":  [
+                                                         "Design psychologically compelling offers, bundles, and discount structures",
+                                                         "Apply buyer psychology principles (scarcity, anchoring, reciprocity, social proof) to pricing",
+                                                         "Create cross-division bundle offers pairing books with coaching, merch with courses",
+                                                         "A/B test offer variations and analyze conversion lift",
+                                                         "Coordinate seasonal and launch promotions with D5 Publishing and D4 Coaching"
+                                                     ],
+                       "tools_required":  [
+                                              "woocommerce_coupons",
+                                              "ab_testing_tool",
+                                              "pricing_optimizer",
+                                              "campaign_calendar",
+                                              "customer_segmentation",
+                                              "analytics_dashboard"
+                                          ],
+                       "input_triggers":  [
+                                              "new_book_launch",
+                                              "seasonal_promotion_planning",
+                                              "conversion_rate_analysis",
+                                              "cross_division_bundle_request",
+                                              "weekly_offer_review_cron"
+                                          ],
+                       "output_format":  "decision",
+                       "escalation_path":  "d9_store_director",
+                       "llm_model":  "claude-sonnet-4.5",
+                       "memory_type":  "long-term",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_store_director",
+                                                        "d9_sales_copywriter",
+                                                        "d9_merchandiser",
+                                                        "d5_book_marketing",
+                                                        "d4_funnel_strategist",
+                                                        "d2_digital_marketing"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_offer_strategist",
+                       "cron_schedule":  "0 8 * * 1",
+                       "telegram_delivery":  true,
+                       "teams_delivery":  true,
+                       "reports_to":  "d9_store_director"
+                   },
+                   {
+                       "agent_id":  "d9_web_designer",
+                       "display_name":  "WordPress/Divi UX Designer",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "manager",
+                       "primary_responsibilities":  [
+                                                         "Design and implement UX/UI for store.truthjblue.com using Divi Builder",
+                                                         "Create high-converting product pages, landing pages, and checkout flows",
+                                                         "Ensure mobile responsiveness, accessibility, and brand consistency",
+                                                         "Optimize page load speed and Core Web Vitals for SEO",
+                                                         "Implement visual hierarchy and persuasive design patterns that drive conversions"
+                                                     ],
+                       "tools_required":  [
+                                              "wordpress_admin",
+                                              "divi_builder",
+                                              "browser_controller",
+                                              "page_speed_tools",
+                                              "figma_api",
+                                              "image_optimization_tool"
+                                          ],
+                       "input_triggers":  [
+                                              "design_revision_requested",
+                                              "new_product_page_needed",
+                                              "ux_audit_scheduled",
+                                              "performance_degradation_alert",
+                                              "rebrand_initiative"
+                                          ],
+                       "output_format":  "action",
+                       "escalation_path":  "d9_store_director",
+                       "llm_model":  "claude-sonnet-4.5",
+                       "memory_type":  "shared",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_store_director",
+                                                        "d9_wp_developer",
+                                                        "d9_sales_copywriter",
+                                                        "d1_ux_designer",
+                                                        "d2_graphic_designer",
+                                                        "browser_primary"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_web_designer",
+                       "telegram_delivery":  false,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_store_director"
+                   },
+                   {
+                       "agent_id":  "d9_wp_developer",
+                       "display_name":  "WordPress/WooCommerce Developer",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "specialist",
+                       "primary_responsibilities":  [
+                                                         "Maintain and customize WordPress/WooCommerce/Divi stack",
+                                                         "Implement checkout optimizations, payment gateways, and shipping rules",
+                                                         "Build custom Divi modules and WooCommerce extensions as needed",
+                                                         "Ensure site security, SSL, plugin updates, and backup integrity",
+                                                         "Integrate WooCommerce with GHL CRM, email marketing, and analytics"
+                                                     ],
+                       "tools_required":  [
+                                              "wordpress_admin",
+                                              "woocommerce_api",
+                                              "divi_builder",
+                                              "php_runtime",
+                                              "browser_controller",
+                                              "security_scanner"
+                                          ],
+                       "input_triggers":  [
+                                              "technical_issue_reported",
+                                              "plugin_update_available",
+                                              "feature_request_approved",
+                                              "integration_needed",
+                                              "security_audit_scheduled"
+                                          ],
+                       "output_format":  "action",
+                       "escalation_path":  "d9_web_designer",
+                       "llm_model":  "gpt-4o",
+                       "memory_type":  "short-term",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_web_designer",
+                                                        "d9_store_director",
+                                                        "d1_fullstack_dev",
+                                                        "d1_devops"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_wp_developer",
+                       "telegram_delivery":  false,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_web_designer"
+                   },
+                   {
+                       "agent_id":  "d9_sales_copywriter",
+                       "display_name":  "Sales Copywriter & Persuasion Specialist",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "specialist",
+                       "primary_responsibilities":  [
+                                                         "Write high-converting product descriptions for books and merch",
+                                                         "Craft sales page copy using proven persuasion frameworks (AIDA, PAS, StoryBrand)",
+                                                         "Create email sequences for abandoned carts, post-purchase upsells, and launch campaigns",
+                                                         "Develop offers copy that connects products to customer transformation journeys",
+                                                         "Ensure all copy reflects Truth J Blue brand voice — warm, spiritual, empowering"
+                                                     ],
+                       "tools_required":  [
+                                              "content_editor",
+                                              "seo_writing_assistant",
+                                              "email_template_builder",
+                                              "ab_testing_copy_tool",
+                                              "woocommerce_product_editor"
+                                          ],
+                       "input_triggers":  [
+                                              "new_product_listing",
+                                              "email_campaign_scheduled",
+                                              "sales_page_creation",
+                                              "offer_copy_needed",
+                                              "ad_copy_refresh_needed"
+                                          ],
+                       "output_format":  "data",
+                       "escalation_path":  "d9_offer_strategist",
+                       "llm_model":  "claude-sonnet-4.5",
+                       "memory_type":  "short-term",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_offer_strategist",
+                                                        "d9_web_designer",
+                                                        "d5_copywriter",
+                                                        "d2_copywriter"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_sales_copywriter",
+                       "telegram_delivery":  false,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_offer_strategist"
+                   },
+                   {
+                       "agent_id":  "d9_merchandiser",
+                       "display_name":  "Book & Merch Catalog Manager",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "specialist",
+                       "primary_responsibilities":  [
+                                                         "Manage the full product catalog — books, apparel, accessories, digital products",
+                                                         "Coordinate with D5 Publishing for new book releases and inventory",
+                                                         "Source, price, and list new merchandise aligned with the brand",
+                                                         "Manage product photography, descriptions, and category taxonomy",
+                                                         "Track inventory levels and coordinate print-on-demand/fulfillment"
+                                                     ],
+                       "tools_required":  [
+                                              "woocommerce_product_editor",
+                                              "inventory_management_system",
+                                              "supplier_portal",
+                                              "print_on_demand_api",
+                                              "product_photography_tool"
+                                          ],
+                       "input_triggers":  [
+                                              "new_book_published",
+                                              "merch_design_approved",
+                                              "inventory_low_threshold",
+                                              "product_audit_scheduled",
+                                              "seasonal_collection_planning"
+                                          ],
+                       "output_format":  "action",
+                       "escalation_path":  "d9_store_director",
+                       "llm_model":  "gpt-4o",
+                       "memory_type":  "shared",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_store_director",
+                                                        "d9_offer_strategist",
+                                                        "d5_publisher",
+                                                        "d5_digital_distribution",
+                                                        "d2_inventory_specialist"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_merchandiser",
+                       "cron_schedule":  "0 6 * * *",
+                       "telegram_delivery":  false,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_store_director"
+                   },
+                   {
+                       "agent_id":  "d9_social_promoter",
+                       "display_name":  "Store Social Media & Promotions Coordinator",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "specialist",
+                       "primary_responsibilities":  [
+                                                         "Coordinate with social media divisions to promote books and merch",
+                                                         "Create social-first promotional content — reels, stories, carousels, TikToks",
+                                                         "Plan and execute product launches on social channels",
+                                                         "Manage influencer/affiliate partnerships for book and merch promotions",
+                                                         "Track social-to-store conversion and optimize UTM-tagged campaigns"
+                                                     ],
+                       "tools_required":  [
+                                              "social_poster",
+                                              "canva_api",
+                                              "utm_tracking_system",
+                                              "affiliate_manager",
+                                              "campaign_calendar",
+                                              "analytics_dashboard"
+                                          ],
+                       "input_triggers":  [
+                                              "product_launch_scheduled",
+                                              "promotional_campaign_active",
+                                              "social_content_calendar_due",
+                                              "influencer_outreach_needed",
+                                              "weekly_social_report_cron"
+                                          ],
+                       "output_format":  "action",
+                       "escalation_path":  "d9_offer_strategist",
+                       "llm_model":  "claude-sonnet-4.5",
+                       "memory_type":  "shared",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_offer_strategist",
+                                                        "d9_sales_copywriter",
+                                                        "d4_social_creator",
+                                                        "d2_digital_marketing",
+                                                        "d5_book_marketing",
+                                                        "d5_pr_media"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_social_promoter",
+                       "cron_schedule":  "0 8 * * 1",
+                       "telegram_delivery":  true,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_offer_strategist"
+                   },
+                   {
+                       "agent_id":  "d9_customer_experience",
+                       "display_name":  "Store Customer Experience Specialist",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "specialist",
+                       "primary_responsibilities":  [
+                                                         "Handle store customer inquiries, order issues, and returns",
+                                                         "Process refunds and manage dispute resolution via WooCommerce",
+                                                         "Create post-purchase nurture sequences that recommend related books/merch",
+                                                         "Collect and manage product reviews and testimonials",
+                                                         "Identify upsell/cross-sell opportunities based on purchase history"
+                                                     ],
+                       "tools_required":  [
+                                              "woocommerce_orders",
+                                              "ghl_conversations",
+                                              "helpdesk_system",
+                                              "refund_processing",
+                                              "review_management",
+                                              "email_marketing_platform"
+                                          ],
+                       "input_triggers":  [
+                                              "new_support_ticket",
+                                              "order_issue_flagged",
+                                              "refund_request",
+                                              "review_submitted",
+                                              "post_purchase_trigger"
+                                          ],
+                       "output_format":  "message",
+                       "escalation_path":  "d9_store_director",
+                       "llm_model":  "gpt-4o-mini",
+                       "memory_type":  "short-term",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_store_director",
+                                                        "d9_merchandiser",
+                                                        "d2_customer_service",
+                                                        "d1_customer_success"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_customer_experience",
+                       "telegram_delivery":  false,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_store_director"
+                   },
+                   {
+                       "agent_id":  "d9_analytics",
+                       "display_name":  "Store Analytics & Conversion Optimizer",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "specialist",
+                       "primary_responsibilities":  [
+                                                         "Track and analyze store KPIs — revenue, AOV, conversion rate, cart abandonment",
+                                                         "Run heatmap and session recording analysis for UX optimization",
+                                                         "Build dashboards for store performance visibility",
+                                                         "Identify which books/merch drive the most cross-sells and lifetime value",
+                                                         "Provide data-backed recommendations for offer, pricing, and layout changes"
+                                                     ],
+                       "tools_required":  [
+                                              "google_analytics_ecommerce",
+                                              "woocommerce_reports",
+                                              "heatmap_tool",
+                                              "cohort_analysis",
+                                              "executive_dashboarder",
+                                              "ab_testing_tool"
+                                          ],
+                       "input_triggers":  [
+                                              "daily_store_metrics_cron",
+                                              "conversion_anomaly_detected",
+                                              "weekly_performance_report",
+                                              "ab_test_concluded",
+                                              "monthly_cohort_analysis"
+                                          ],
+                       "output_format":  "report",
+                       "escalation_path":  "d9_store_director",
+                       "llm_model":  "gpt-4o",
+                       "memory_type":  "shared",
+                       "queue_class":  "P2",
+                       "inter_agent_dependencies":  [
+                                                        "d9_store_director",
+                                                        "d9_offer_strategist",
+                                                        "d9_web_designer",
+                                                        "shared_data_analytics",
+                                                        "d1_data_analyst"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_analytics",
+                       "cron_schedule":  "0 7 * * *",
+                       "telegram_delivery":  true,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_store_director"
+                   },
+                   {
+                       "agent_id":  "d9_seo_content",
+                       "display_name":  "Store SEO & Content Marketer",
+                       "org_unit":  "division_9_online_store",
+                       "role_type":  "specialist",
+                       "primary_responsibilities":  [
+                                                         "Optimize product pages, book listings, and category pages for search engines",
+                                                         "Write blog content and resource pages that drive organic traffic to the store",
+                                                         "Build internal linking structure connecting books, merch, and content",
+                                                         "Manage schema markup for products, reviews, and books (ISBN, author)",
+                                                         "Monitor search rankings and organic traffic performance"
+                                                     ],
+                       "tools_required":  [
+                                              "google_search_console",
+                                              "yoast_seo",
+                                              "ahrefs_api",
+                                              "wordpress_editor",
+                                              "keyword_tracker",
+                                              "schema_generator"
+                                          ],
+                       "input_triggers":  [
+                                              "new_product_published",
+                                              "ranking_change_alert",
+                                              "content_calendar_due",
+                                              "seo_audit_scheduled",
+                                              "monthly_seo_report_cron"
+                                          ],
+                       "output_format":  "report",
+                       "escalation_path":  "d9_web_designer",
+                       "llm_model":  "claude-sonnet-4.5",
+                       "memory_type":  "short-term",
+                       "queue_class":  "P3",
+                       "inter_agent_dependencies":  [
+                                                        "d9_web_designer",
+                                                        "d9_sales_copywriter",
+                                                        "d2_seo_strategist",
+                                                        "d5_book_marketing"
+                                                    ],
+                       "workspace_path":  ".openclaw/workspaces/d9_seo_content",
+                       "cron_schedule":  "0 6 * * 1",
+                       "telegram_delivery":  false,
+                       "teams_delivery":  false,
+                       "reports_to":  "d9_web_designer"
                    }
                ]
 }

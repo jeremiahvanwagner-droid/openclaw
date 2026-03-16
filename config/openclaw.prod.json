@@ -221,6 +221,12 @@
         "name": "Master Orchestrator",
         "workspace": "/opt/openclaw/workspaces/shared_master_orchestrator",
         "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "d9_store_director",
+        "name": "Online Store Director",
+        "workspace": "/opt/openclaw/workspaces/d9_store_director",
+        "model": "openai/gpt-5.3-codex"
       }
     ]
   },
