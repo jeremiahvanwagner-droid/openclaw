@@ -44,6 +44,7 @@ openclaw config set 'agents.defaults.subagents.maxConcurrent' '1'
 openclaw config set 'agents.defaults.sandbox.browser.enabled' 'true'
 openclaw config set 'agents.defaults.sandbox.browser.type' '"chromium"'
 openclaw config set 'agents.defaults.sandbox.browser.headless' 'true'
+openclaw config set 'agents.defaults.sandbox.browser.args' '["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage","--disable-gpu"]'
 
 openclaw gateway install --runtime node --force
 
