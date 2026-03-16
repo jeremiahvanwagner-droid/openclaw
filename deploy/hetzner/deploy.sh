@@ -35,10 +35,15 @@ fi
 
 # ── 3. Install dependencies ──────────────────────────────────
 echo "[3/6] Installing dependencies..."
-if command -v pnpm &>/dev/null; then
+if command -v npm &>/dev/null; then
+    # Prefer npm here because the repo includes a pnpm workspace for the dashboard,
+    # while the bot deploy only needs the root production dependencies.
+    npm install --omit=dev
+elif command -v pnpm &>/dev/null; then
     pnpm install --frozen-lockfile --prod 2>/dev/null || pnpm install --prod
 else
-    npm install --omit=dev
+    echo "  No supported package manager found (expected npm or pnpm)."
+    exit 1
 fi
 
 # ── 4. Sync config files ────────────────────────────────────
