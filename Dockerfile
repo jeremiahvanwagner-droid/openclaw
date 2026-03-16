@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
+# Install OpenClaw CLI globally (required by openclaw.service ExecStart)
+ARG OPENCLAW_VERSION=latest
+RUN npm install -g openclaw@${OPENCLAW_VERSION}
+
 # Create non-root user
 RUN groupadd --gid 1001 openclaw && \
     useradd --uid 1001 --gid openclaw --shell /bin/bash --create-home openclaw
