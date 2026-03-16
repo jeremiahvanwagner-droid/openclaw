@@ -1,0 +1,38 @@
+# ═══════════════════════════════════════════════════════════════
+# OpenClaw — Docker Build Exclusions
+# ═══════════════════════════════════════════════════════════════
+
+# Version control
+.git
+.gitignore
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# CI/CD
+.github
+
+# Editor / IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp_*
+__pycache__
+
+# Node modules (rebuilt in container)
+node_modules
+
+# Deploy configs (not part of app image)
+deploy/
+
+# Build artifacts
+*.log
