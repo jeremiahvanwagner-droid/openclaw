@@ -1,7 +1,7 @@
 /**
  * Agent Memory Library
  * Open Claw Multi-Agent Network
- * 
+ *
  * Provides semantic memory operations using Supabase pgvector.
  * Supports private, division-scoped, and global memory sharing.
  */

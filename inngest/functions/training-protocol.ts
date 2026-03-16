@@ -2,7 +2,7 @@
  * Training Protocol Inngest Functions
  * OpenClaw Weekly Self-Training System
  * Truth J Blue LLC
- * 
+ *
  * Event handlers for the 7-day training cycle:
  * - Monday: Weekly Review & Planning
  * - Tuesday: Skill Development
@@ -1024,7 +1024,7 @@ function average(arr: number[]): number {
 function getAllAgentIds(): string[] {
   const workspacesDir = path.join(WORKSPACE_ROOT, "workspaces");
   if (fs.existsSync(workspacesDir)) {
-    return fs.readdirSync(workspacesDir).filter(f => 
+    return fs.readdirSync(workspacesDir).filter(f =>
       fs.statSync(path.join(workspacesDir, f)).isDirectory()
     );
   }

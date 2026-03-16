@@ -1,7 +1,7 @@
 /**
  * Agent Orchestrator Functions
  * Open Claw Multi-Agent Network
- * 
+ *
  * Core Inngest functions for:
  * - Cross-division event routing
  * - Escalation handling
