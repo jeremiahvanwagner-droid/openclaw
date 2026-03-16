@@ -35,21 +35,17 @@ fi
 
 # ── 3. Install dependencies ──────────────────────────────────
 echo "[3/6] Installing dependencies..."
-if command -v npm &>/dev/null; then
-    # Prefer npm here because the repo includes a pnpm workspace for the dashboard,
-    # while the bot deploy only needs the root production dependencies.
-    npm install --omit=dev
-elif command -v pnpm &>/dev/null; then
+if command -v pnpm &>/dev/null; then
     pnpm install --frozen-lockfile --prod 2>/dev/null || pnpm install --prod
+elif command -v npm &>/dev/null; then
+    npm install --omit=dev
 else
-    echo "  No supported package manager found (expected npm or pnpm)."
+    echo "  No supported package manager found (expected pnpm or npm)."
     exit 1
 fi
 
 # ── 4. Sync config files ────────────────────────────────────
 echo "[4/6] Syncing configuration..."
-cp config/cron/jobs.json cron/jobs.json 2>/dev/null || true
-cp config/cron/training-jobs.json cron/training-jobs.json 2>/dev/null || true
 
 # Install production openclaw.json (Linux paths, env-based secrets)
 if [ -f config/openclaw.prod.json ]; then

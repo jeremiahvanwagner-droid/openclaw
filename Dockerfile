@@ -11,9 +11,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install OpenClaw CLI globally (pin version for reproducibility)
-ARG OPENCLAW_VERSION=latest
-RUN npm install -g openclaw@${OPENCLAW_VERSION}
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Create non-root user
 RUN groupadd --gid 1001 openclaw && \
@@ -22,8 +21,8 @@ RUN groupadd --gid 1001 openclaw && \
 WORKDIR /opt/openclaw
 
 # Install project dependencies (root only — dashboard deploys separately)
-COPY package.json ./
-RUN npm install --omit=dev
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
 # Copy application files (order: least → most frequently changed)
 COPY templates/ templates/
@@ -47,10 +46,6 @@ RUN mkdir -p data logs backups cron/runs delivery-queue media memory \
     workspaces/d6_executive_director workspaces/shared_master_orchestrator \
     .openclaw && \
     chown -R openclaw:openclaw /opt/openclaw
-
-# Copy cron config (needs to be writable at runtime)
-RUN cp config/cron/jobs.json cron/jobs.json 2>/dev/null || true && \
-    cp config/cron/training-jobs.json cron/training-jobs.json 2>/dev/null || true
 
 # Install production config (Linux paths, env-based secrets)
 RUN cp config/openclaw.prod.json .openclaw/openclaw.json 2>/dev/null || true

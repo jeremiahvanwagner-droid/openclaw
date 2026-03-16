@@ -16,8 +16,24 @@ on:
         default: false
 
 jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
   deploy:
     name: Deploy to Hetzner
+    needs: test
     runs-on: ubuntu-latest
     environment: production
 
@@ -30,6 +46,8 @@ jobs:
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
             cd /opt/openclaw
+            # Ensure pnpm is available on the VPS
+            command -v pnpm >/dev/null 2>&1 || npm install -g pnpm
             if [ "${{ github.event.inputs.upgrade_cli }}" = "true" ]; then
               sudo bash deploy/hetzner/deploy.sh --upgrade
             else
