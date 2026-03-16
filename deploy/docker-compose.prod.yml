@@ -22,8 +22,6 @@ services:
       - openclaw-memory:/opt/openclaw/memory
     # Sandbox browser support
     shm_size: "512m"
-    security_opt:
-      - seccomp=unconfined
     restart: always
     deploy:
       resources:

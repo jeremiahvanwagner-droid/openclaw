@@ -34,7 +34,7 @@ WatchdogSec=300
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/openclaw/data /opt/openclaw/logs /opt/openclaw/backups /opt/openclaw/media /opt/openclaw/memory /opt/openclaw/cron/runs /opt/openclaw/delivery-queue /opt/openclaw/.openclaw /opt/openclaw/workspace /opt/openclaw/workspace-marketing /opt/openclaw/workspace-sales /opt/openclaw/workspace-support /opt/openclaw/workspaces /opt/openclaw/agents /tmp
+ReadWritePaths=/opt/openclaw/data /opt/openclaw/logs /opt/openclaw/backups /opt/openclaw/media /opt/openclaw/memory /opt/openclaw/cron/runs /opt/openclaw/delivery-queue /opt/openclaw/.openclaw /opt/openclaw/workspace /opt/openclaw/workspace-marketing /opt/openclaw/workspace-sales /opt/openclaw/workspace-support /opt/openclaw/workspaces /opt/openclaw/agents
 PrivateTmp=true
 
 # Resource limits
