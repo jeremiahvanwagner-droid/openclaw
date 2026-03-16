@@ -21,10 +21,9 @@ RUN groupadd --gid 1001 openclaw && \
 
 WORKDIR /opt/openclaw
 
-# Install project dependencies
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN corepack enable && corepack prepare pnpm@latest --activate && \
-    pnpm install --frozen-lockfile --prod
+# Install project dependencies (root only — dashboard deploys separately)
+COPY package.json ./
+RUN npm install --omit=dev
 
 # Copy application files (order: least → most frequently changed)
 COPY templates/ templates/

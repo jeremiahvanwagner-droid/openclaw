@@ -19,18 +19,18 @@ echo " OpenClaw Deploy — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "══════════════════════════════════════════════════════"
 
 # ── 1. Pull latest code ──────────────────────────────────────
-echo "[1/5] Pulling latest code..."
+echo "[1/6] Pulling latest code..."
 git fetch origin main
 git reset --hard origin/main
 echo "  $(git log --oneline -1)"
 
 # ── 2. Optional: upgrade OpenClaw CLI ────────────────────────
 if [[ "${1:-}" == "--upgrade" ]]; then
-    echo "[2/5] Upgrading OpenClaw CLI..."
+    echo "[2/6] Upgrading OpenClaw CLI..."
     npm install -g openclaw@latest
     echo "  OpenClaw $(openclaw --version 2>/dev/null || echo 'updated')"
 else
-    echo "[2/5] Skipping CLI upgrade (use --upgrade to update)"
+    echo "[2/6] Skipping CLI upgrade (use --upgrade to update)"
 fi
 
 # ── 3. Install dependencies ──────────────────────────────────
