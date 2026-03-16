@@ -46,6 +46,9 @@ openclaw config set 'agents.defaults.sandbox.browser.type' '"chromium"'
 openclaw config set 'agents.defaults.sandbox.browser.headless' 'true'
 
 openclaw gateway install --runtime node --force
+
+# Restart gateway so sandbox config takes effect
+openclaw gateway stop 2>/dev/null || true
 openclaw gateway start
 
 openclaw channels add --channel telegram --token "$TELEGRAM_BOT_TOKEN"
