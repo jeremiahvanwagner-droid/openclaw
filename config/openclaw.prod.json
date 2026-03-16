@@ -141,6 +141,12 @@
       "maxConcurrent": 6,
       "subagents": {
         "maxConcurrent": 8
+      },
+      "sandbox": {
+        "mode": "off",
+        "browser": {
+          "enabled": true
+        }
       }
     },
     "list": [
