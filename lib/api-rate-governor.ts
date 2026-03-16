@@ -13,13 +13,13 @@
  * 5. Budget tracking with hard ceilings
  */
 
-import { logger } from "./logger";
+import { logger } from "./logger.ts";
 import {
   circuitBreakerState,
   budgetUsedDollars,
   budgetCeilingDollars,
   concurrencyActive,
-} from "./metrics";
+} from "./metrics.ts";
 
 const log = logger.child({ module: "rate-governor" });
 

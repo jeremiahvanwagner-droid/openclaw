@@ -9,11 +9,11 @@
  * - Telegram alerting
  */
 
-import { inngest, getDivisionHead, getPodLead } from "../client";
+import { inngest, getDivisionHead, getPodLead } from "../client.ts";
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
-import { reportFailure as governorReportFailure } from "../../lib/api-rate-governor";
-import { logger } from "../../lib/logger";
+import { reportFailure as governorReportFailure } from "../../lib/api-rate-governor.ts";
+import { logger } from "../../lib/logger.ts";
 
 const log = logger.child({ module: "agent-orchestrator" });
 

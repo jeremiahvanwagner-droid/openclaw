@@ -11,13 +11,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { withGovernor, type QueueClass } from "./api-rate-governor";
-import { logger } from "./logger";
+import { withGovernor, type QueueClass } from "./api-rate-governor.ts";
+import { logger } from "./logger.ts";
 import {
   llmRequestDuration,
   llmRequestTotal,
   llmTokensUsed,
-} from "./metrics";
+} from "./metrics.ts";
 
 const log = logger.child({ module: "llm-router" });
 

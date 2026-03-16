@@ -6,7 +6,7 @@
  * to prevent requests from hanging indefinitely.
  */
 
-import { FETCH_TIMEOUT_MS } from "./constants";
+import { FETCH_TIMEOUT_MS } from "./constants.ts";
 
 export interface SafeFetchOptions extends RequestInit {
   /** Timeout in milliseconds. Defaults to FETCH_TIMEOUT_MS (30s). */

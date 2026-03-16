@@ -3,7 +3,7 @@
  * Routes SaaS-specific events to Division 8 agents.
  */
 
-import { inngest } from "../client";
+import { inngest } from "../client.ts";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
