@@ -13,6 +13,9 @@
  * 5. Budget tracking with hard ceilings
  */
 
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import { logger } from "./logger.ts";
 import {
   circuitBreakerState,
@@ -22,6 +25,74 @@ import {
 } from "./metrics.ts";
 
 const log = logger.child({ module: "rate-governor" });
+
+// ═══════════════════════════════════════════════════════════════════
+// STATE PERSISTENCE — survives gateway restarts
+// ═══════════════════════════════════════════════════════════════════
+
+const __filename_rg = fileURLToPath(import.meta.url);
+const __dirname_rg = path.dirname(__filename_rg);
+const STATE_FILE = path.join(__dirname_rg, "..", "data", "rate-governor-state.json");
+
+interface PersistedState {
+  savedAt: string;
+  budgets: Record<string, { day: string; spentCents: number; requestCount: number; warningEmitted: boolean }>;
+  circuits: Record<string, { state: CircuitState; failures: number; lastFailureAt: number; openedAt: number }>;
+}
+
+function persistState(): void {
+  try {
+    const state: PersistedState = {
+      savedAt: new Date().toISOString(),
+      budgets: {},
+      circuits: {},
+    };
+    for (const [key, b] of budgets.entries()) {
+      state.budgets[key] = { day: b.day, spentCents: b.spentCents, requestCount: b.requestCount, warningEmitted: b.warningEmitted };
+    }
+    for (const [provider, cb] of circuitBreakers.entries()) {
+      if (cb.state !== "closed") {
+        state.circuits[provider] = { state: cb.state, failures: cb.failures, lastFailureAt: cb.lastFailureAt, openedAt: cb.openedAt };
+      }
+    }
+    fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
+    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
+  } catch (err) {
+    log.warn({ err }, "Failed to persist rate governor state");
+  }
+}
+
+function loadState(): void {
+  try {
+    if (!fs.existsSync(STATE_FILE)) return;
+    const raw = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8")) as PersistedState;
+    const today = todayKey();
+
+    // Rehydrate budgets (only for today — stale days are irrelevant)
+    for (const [key, b] of Object.entries(raw.budgets)) {
+      if (b.day === today) {
+        budgets.set(key, { day: b.day, spentCents: b.spentCents, requestCount: b.requestCount, warningEmitted: b.warningEmitted });
+      }
+    }
+
+    // Rehydrate circuit breakers (open/half-open states)
+    for (const [provider, cb] of Object.entries(raw.circuits)) {
+      circuitBreakers.set(provider, {
+        state: cb.state,
+        failures: cb.failures,
+        lastFailureAt: cb.lastFailureAt,
+        openedAt: cb.openedAt,
+        halfOpenAttempts: 0,
+      });
+      const stateNum = cb.state === "open" ? 2 : cb.state === "half-open" ? 1 : 0;
+      circuitBreakerState.set({ provider }, stateNum);
+    }
+
+    log.info({ budgets: Object.keys(raw.budgets).length, circuits: Object.keys(raw.circuits).length }, "Rate governor state rehydrated from disk");
+  } catch (err) {
+    log.warn({ err }, "Failed to load rate governor state — starting fresh");
+  }
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // RATE LIMIT CONFIGURATION
@@ -132,10 +203,12 @@ function getCircuitBreaker(provider: string): CircuitBreakerState {
 
 function recordSuccess(provider: string): void {
   const cb = getCircuitBreaker(provider);
+  const wasOpen = cb.state !== "closed";
   cb.state = "closed";
   cb.failures = 0;
   cb.halfOpenAttempts = 0;
   circuitBreakerState.set({ provider }, 0);
+  if (wasOpen) persistState();
 }
 
 function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: boolean = false): void {
@@ -149,6 +222,7 @@ function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: bo
     circuitBreakerState.set({ provider }, 2);
     // Auth-expired circuits stay open longer — no point retrying until token is refreshed
     log.error({ provider }, "Circuit OPEN — AUTH EXPIRED (401/403). All requests blocked until token refresh.");
+    persistState();
     return;
   }
 
@@ -157,6 +231,7 @@ function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: bo
     cb.openedAt = Date.now();
     circuitBreakerState.set({ provider }, 2);
     log.warn({ provider, failures: cb.failures, isRateLimit }, "Circuit OPEN");
+    persistState();
   }
 }
 
@@ -320,6 +395,8 @@ function trackSpend(provider: string, costCents: number): void {
       log.warn({ provider, pct: +(pct * 100).toFixed(1), spent: budget.spentCents, ceiling: limits.dailyBudgetCents }, "BUDGET WARNING");
     }
   }
+
+  persistState();
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -550,3 +627,9 @@ function extractStatusCode(error: unknown): number | undefined {
   }
   return undefined;
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// INITIALIZATION — rehydrate persisted state on module load
+// ═══════════════════════════════════════════════════════════════════
+
+loadState();
