@@ -81,6 +81,21 @@ GHL_PRIVATE_INTEGRATION_TOKEN=${GHL_PRIVATE_INTEGRATION_TOKEN}
 EOF
 fi
 
+# ── Multi-tenant GHL tokens (TJB + MSL sub-accounts) ────────
+if [[ -n "${GHL_PRIVATE_INTEGRATION_TOKEN_TJB:-}" ]]; then
+  cat >> "$HOME/.config/openclaw-prod/credentials.env" <<EOF
+GHL_PRIVATE_INTEGRATION_TOKEN_TJB=${GHL_PRIVATE_INTEGRATION_TOKEN_TJB}
+GHL_LOCATION_ID_TJB=${GHL_LOCATION_ID_TJB}
+EOF
+fi
+
+if [[ -n "${GHL_PRIVATE_INTEGRATION_TOKEN_MSL:-}" ]]; then
+  cat >> "$HOME/.config/openclaw-prod/credentials.env" <<EOF
+GHL_PRIVATE_INTEGRATION_TOKEN_MSL=${GHL_PRIVATE_INTEGRATION_TOKEN_MSL}
+GHL_LOCATION_ID_MSL=${GHL_LOCATION_ID_MSL}
+EOF
+fi
+
 mkdir -p "$HOME/.openclaw/workspace"
 cat > "$HOME/.openclaw/workspace/SAFETY_POLICY.md" <<'EOF'
 # Outbound Safety Policy
