@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OpenClaw A/B Test Engine
- * 
+ *
  * Features:
  *   - Create and manage A/B experiments
  *   - Automatic variant assignment
@@ -14,14 +14,14 @@ import fs from 'fs/promises';
 import path from 'path';
 import https from 'https';
 import { openclawSend } from '../lib/safe-exec.mjs';
+import { resolve as resolveTenant } from '../lib/ghl-tenant-resolver.mjs';
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const EXPERIMENTS_FILE = path.join(DATA_DIR, 'ab-experiments.json');
 
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = resolveTenant();
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
 
 // Significance level (95% confidence)
@@ -44,7 +44,7 @@ function ghlRequest(method, urlPath, body = null) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
@@ -56,13 +56,13 @@ function ghlRequest(method, urlPath, body = null) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(30000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
-    
+
     if (body) {
       req.write(JSON.stringify(body));
     }
@@ -107,12 +107,12 @@ async function saveExperiments(data) {
  */
 function calculateZScore(conversionsA, samplesA, conversionsB, samplesB) {
   if (samplesA === 0 || samplesB === 0) return 0;
-  
+
   const pA = conversionsA / samplesA;
   const pB = conversionsB / samplesB;
   const pPooled = (conversionsA + conversionsB) / (samplesA + samplesB);
   const se = Math.sqrt(pPooled * (1 - pPooled) * (1/samplesA + 1/samplesB));
-  
+
   if (se === 0) return 0;
   return (pB - pA) / se;
 }
@@ -139,9 +139,9 @@ function zScoreToPValue(z) {
  */
 async function createExperiment(name, variants, goalTag, description = '') {
   const data = await loadExperiments();
-  
+
   const experimentId = `exp_${Date.now()}`;
-  
+
   data.experiments[experimentId] = {
     id: experimentId,
     name,
@@ -159,13 +159,13 @@ async function createExperiment(name, variants, goalTag, description = '') {
     winner: null,
     significanceReached: false
   };
-  
+
   await saveExperiments(data);
-  
+
   console.log(`\n✅ Experiment created: ${name} (${experimentId})`);
   console.log(`   Variants: ${variants.join(' vs ')}`);
   console.log(`   Goal: Tag with "${goalTag}"`);
-  
+
   return data.experiments[experimentId];
 }
 
@@ -175,22 +175,22 @@ async function createExperiment(name, variants, goalTag, description = '') {
 async function assignVariant(experimentId, contactId) {
   const data = await loadExperiments();
   const experiment = data.experiments[experimentId];
-  
+
   if (!experiment || experiment.status !== 'running') {
     return { error: 'Experiment not found or not running' };
   }
-  
+
   // Check if already assigned
   const assignmentKey = `${experimentId}:${contactId}`;
   if (data.assignments[assignmentKey]) {
     return { variant: data.assignments[assignmentKey], existing: true };
   }
-  
+
   // Weighted random assignment based on traffic split
   const rand = Math.random();
   let cumulative = 0;
   let assignedVariant = experiment.variants[0];
-  
+
   for (const variant of experiment.variants) {
     cumulative += variant.traffic;
     if (rand <= cumulative) {
@@ -198,13 +198,13 @@ async function assignVariant(experimentId, contactId) {
       break;
     }
   }
-  
+
   // Record assignment
   data.assignments[assignmentKey] = assignedVariant.id;
   assignedVariant.samples++;
-  
+
   await saveExperiments(data);
-  
+
   // Add GHL tag for variant
   try {
     await ghlRequest('PUT', `/contacts/${contactId}`, {
@@ -212,7 +212,7 @@ async function assignVariant(experimentId, contactId) {
       tags: [`ab:${experiment.name}:${assignedVariant.name}`]
     });
   } catch {}
-  
+
   return {
     experimentId,
     experimentName: experiment.name,
@@ -228,27 +228,27 @@ async function assignVariant(experimentId, contactId) {
 async function recordConversion(experimentId, contactId) {
   const data = await loadExperiments();
   const experiment = data.experiments[experimentId];
-  
+
   if (!experiment) {
     return { error: 'Experiment not found' };
   }
-  
+
   // Get assigned variant
   const assignmentKey = `${experimentId}:${contactId}`;
   const variantId = data.assignments[assignmentKey];
-  
+
   if (!variantId) {
     return { error: 'Contact not assigned to this experiment' };
   }
-  
+
   // Find variant and increment conversions
   const variant = experiment.variants.find(v => v.id === variantId);
   if (variant) {
     variant.conversions++;
     await saveExperiments(data);
-    
+
     console.log(`  📊 Conversion recorded: ${experiment.name} / ${variant.name}`);
-    
+
     return {
       experimentId,
       variantId,
@@ -258,7 +258,7 @@ async function recordConversion(experimentId, contactId) {
       rate: ((variant.conversions / variant.samples) * 100).toFixed(2)
     };
   }
-  
+
   return { error: 'Variant not found' };
 }
 
@@ -268,36 +268,36 @@ async function recordConversion(experimentId, contactId) {
 async function checkExperiment(experimentId, autoEnd = false) {
   const data = await loadExperiments();
   const experiment = data.experiments[experimentId];
-  
+
   if (!experiment) {
     return { error: 'Experiment not found' };
   }
-  
+
   const variants = experiment.variants;
-  
+
   // Need at least 2 variants
   if (variants.length < 2) {
     return { error: 'Need at least 2 variants' };
   }
-  
+
   // Calculate stats for each variant
   const stats = variants.map(v => ({
     ...v,
     rate: v.samples > 0 ? (v.conversions / v.samples) : 0,
     ratePercent: v.samples > 0 ? ((v.conversions / v.samples) * 100).toFixed(2) : '0.00'
   }));
-  
+
   // Sort by conversion rate
   stats.sort((a, b) => b.rate - a.rate);
-  
+
   // Calculate significance between top 2
   const A = stats[1]; // Control (lower rate)
   const B = stats[0]; // Treatment (higher rate)
-  
+
   const zScore = calculateZScore(A.conversions, A.samples, B.conversions, B.samples);
   const pValue = zScoreToPValue(zScore);
   const isSignificant = pValue < (1 - SIGNIFICANCE_LEVEL) && A.samples >= MIN_SAMPLE_SIZE && B.samples >= MIN_SAMPLE_SIZE;
-  
+
   const result = {
     experimentId,
     name: experiment.name,
@@ -311,7 +311,7 @@ async function checkExperiment(experimentId, autoEnd = false) {
     minSampleReached: A.samples >= MIN_SAMPLE_SIZE && B.samples >= MIN_SAMPLE_SIZE,
     recommendation: isSignificant ? `${B.name} is the winner!` : 'Keep running - more data needed'
   };
-  
+
   // Auto-end if significant
   if (autoEnd && isSignificant && experiment.status === 'running') {
     experiment.status = 'completed';
@@ -319,10 +319,10 @@ async function checkExperiment(experimentId, autoEnd = false) {
     experiment.significanceReached = true;
     experiment.completedAt = new Date().toISOString();
     await saveExperiments(data);
-    
+
     result.status = 'completed';
     result.autoEnded = true;
-    
+
     // Send notification
     await sendNotification(
       `🏆 A/B Test Winner!\n\n` +
@@ -332,7 +332,7 @@ async function checkExperiment(experimentId, autoEnd = false) {
       `Confidence: ${result.confidence}%`
     );
   }
-  
+
   return result;
 }
 
@@ -341,27 +341,27 @@ async function checkExperiment(experimentId, autoEnd = false) {
  */
 async function listExperiments(statusFilter = null) {
   const data = await loadExperiments();
-  
+
   console.log('\n' + '═'.repeat(70));
   console.log('🧪 A/B EXPERIMENTS');
   console.log('═'.repeat(70) + '\n');
-  
+
   const experiments = Object.values(data.experiments);
-  
+
   if (experiments.length === 0) {
     console.log('No experiments found. Create one with: ab-testing.mjs create');
     return;
   }
-  
-  const filtered = statusFilter 
+
+  const filtered = statusFilter
     ? experiments.filter(e => e.status === statusFilter)
     : experiments;
-  
+
   for (const exp of filtered) {
     const statusIcon = exp.status === 'running' ? '🔄' : exp.status === 'completed' ? '✅' : '⏸️';
     console.log(`${statusIcon} ${exp.name} (${exp.id})`);
     console.log(`   Status: ${exp.status} | Goal: ${exp.goalTag}`);
-    
+
     for (const v of exp.variants) {
       const rate = v.samples > 0 ? ((v.conversions / v.samples) * 100).toFixed(2) : '0.00';
       const winnerMark = exp.winner === v.id ? ' 🏆' : '';
@@ -377,12 +377,12 @@ async function listExperiments(statusFilter = null) {
 async function endExperiment(experimentId, winnerId = null) {
   const data = await loadExperiments();
   const experiment = data.experiments[experimentId];
-  
+
   if (!experiment) {
     console.log('Experiment not found');
     return;
   }
-  
+
   // Determine winner
   let winner = winnerId;
   if (!winner) {
@@ -394,17 +394,17 @@ async function endExperiment(experimentId, winnerId = null) {
     });
     winner = sorted[0].id;
   }
-  
+
   experiment.status = 'completed';
   experiment.winner = winner;
   experiment.completedAt = new Date().toISOString();
-  
+
   await saveExperiments(data);
-  
+
   const winnerVariant = experiment.variants.find(v => v.id === winner);
   console.log(`\n✅ Experiment ended: ${experiment.name}`);
   console.log(`   Winner: ${winnerVariant?.name || winner}`);
-  
+
   return experiment;
 }
 
@@ -413,22 +413,22 @@ async function endExperiment(experimentId, winnerId = null) {
  */
 async function showReport(experimentId) {
   const result = await checkExperiment(experimentId);
-  
+
   if (result.error) {
     console.log(result.error);
     return;
   }
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log(`🧪 EXPERIMENT REPORT: ${result.name}`);
   console.log('═'.repeat(60) + '\n');
-  
+
   console.log(`Status: ${result.status}`);
   console.log(`ID: ${result.experimentId}\n`);
-  
+
   console.log('Variant'.padEnd(20) + 'Conversions'.padStart(12) + 'Samples'.padStart(10) + 'Rate'.padStart(10));
   console.log('─'.repeat(52));
-  
+
   for (const v of result.variants) {
     const leader = v.id === result.leader.id ? ' ⭐' : '';
     console.log(
@@ -438,14 +438,14 @@ async function showReport(experimentId) {
       `${v.ratePercent}%`.padStart(10)
     );
   }
-  
+
   console.log('\n📊 STATISTICAL ANALYSIS:\n');
   console.log(`  Z-Score: ${result.zScore}`);
   console.log(`  P-Value: ${result.pValue}`);
   console.log(`  Confidence: ${result.confidence}%`);
   console.log(`  Significant: ${result.isSignificant ? '✅ YES' : '❌ NO'}`);
   console.log(`  Min Sample Reached: ${result.minSampleReached ? '✅ YES' : `❌ NO (need ${MIN_SAMPLE_SIZE} per variant)`}`);
-  
+
   console.log(`\n💡 Recommendation: ${result.recommendation}`);
   console.log('\n' + '═'.repeat(60));
 }
@@ -456,7 +456,7 @@ async function showReport(experimentId) {
 async function getContactVariant(experimentId, contactId) {
   const data = await loadExperiments();
   const assignmentKey = `${experimentId}:${contactId}`;
-  
+
   if (data.assignments[assignmentKey]) {
     const experiment = data.experiments[experimentId];
     const variant = experiment?.variants.find(v => v.id === data.assignments[assignmentKey]);
@@ -466,7 +466,7 @@ async function getContactVariant(experimentId, contactId) {
       variantName: variant?.name || 'Unknown'
     };
   }
-  
+
   return { assigned: false };
 }
 
@@ -476,14 +476,14 @@ async function getContactVariant(experimentId, contactId) {
 async function dailyCheck() {
   const data = await loadExperiments();
   const running = Object.values(data.experiments).filter(e => e.status === 'running');
-  
+
   console.log(`\n🔬 Checking ${running.length} running experiments...\n`);
-  
+
   for (const exp of running) {
     const result = await checkExperiment(exp.id, true);
     console.log(`  ${exp.name}: ${result.isSignificant ? '🏆 Winner found!' : `${result.confidence}% confidence`}`);
   }
-  
+
   console.log('\n✅ Daily check complete');
 }
 
@@ -502,7 +502,7 @@ switch (command) {
       createExperiment(name, variants, goalTag);
     }
     break;
-    
+
   case 'assign':
     if (args.length < 2) {
       console.log('Usage: ab-testing.mjs assign <experimentId> <contactId>');
@@ -510,7 +510,7 @@ switch (command) {
       assignVariant(args[0], args[1]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'convert':
     if (args.length < 2) {
       console.log('Usage: ab-testing.mjs convert <experimentId> <contactId>');
@@ -518,7 +518,7 @@ switch (command) {
       recordConversion(args[0], args[1]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'check':
     if (!args[0]) {
       console.log('Usage: ab-testing.mjs check <experimentId>');
@@ -526,7 +526,7 @@ switch (command) {
       checkExperiment(args[0], args[1] === '--auto').then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'report':
     if (!args[0]) {
       console.log('Usage: ab-testing.mjs report <experimentId>');
@@ -534,11 +534,11 @@ switch (command) {
       showReport(args[0]);
     }
     break;
-    
+
   case 'list':
     listExperiments(args[0]);
     break;
-    
+
   case 'end':
     if (!args[0]) {
       console.log('Usage: ab-testing.mjs end <experimentId> [winnerId]');
@@ -546,11 +546,11 @@ switch (command) {
       endExperiment(args[0], args[1]);
     }
     break;
-    
+
   case 'daily':
     dailyCheck();
     break;
-    
+
   case 'get-variant':
     if (args.length < 2) {
       console.log('Usage: ab-testing.mjs get-variant <experimentId> <contactId>');
@@ -558,7 +558,7 @@ switch (command) {
       getContactVariant(args[0], args[1]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   default:
     console.log(`
 A/B Test Engine

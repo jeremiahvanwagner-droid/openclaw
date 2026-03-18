@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OpenClaw Anomaly Detection System
- * 
+ *
  * Features:
  *   - Rolling baseline calculation (14-day average + std dev)
  *   - Z-score computation for key metrics
@@ -16,13 +16,12 @@ import https from 'https';
 import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const METRICS_FILE = path.join(DATA_DIR, 'anomaly-metrics.json');
 const ANOMALIES_FILE = path.join(DATA_DIR, 'anomalies.json');
 
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = (await import('../lib/ghl-tenant-resolver.mjs')).resolve();
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
 
 // Detection configuration
@@ -60,7 +59,7 @@ function ghlRequest(method, urlPath) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let body = '';
       res.on('data', chunk => { body += chunk; });
@@ -72,7 +71,7 @@ function ghlRequest(method, urlPath) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(30000, () => {
       req.destroy();
@@ -176,10 +175,10 @@ function zScore(value, avg, std) {
  */
 async function collectCurrentMetrics() {
   console.log('\n📊 Collecting current metrics...\n');
-  
+
   const today = new Date().toISOString().split('T')[0];
   const metrics = {};
-  
+
   // Count contacts by tag
   const tags = [
     { tag: 'lead', metric: 'new_leads' },
@@ -187,10 +186,10 @@ async function collectCurrentMetrics() {
     { tag: 'ebook-buyer', metric: 'ebook_purchases' },
     { tag: 'course-buyer', metric: 'course_purchases' }
   ];
-  
+
   for (const { tag, metric } of tags) {
     try {
-      const response = await ghlRequest('GET', 
+      const response = await ghlRequest('GET',
         `/contacts/?locationId=${GHL_LOCATION_ID}&tags=${tag}&limit=1`
       );
       metrics[metric] = response.meta?.total || 0;
@@ -200,12 +199,12 @@ async function collectCurrentMetrics() {
       metrics[metric] = null;
     }
   }
-  
+
   // Calculate rates
   if (metrics.new_leads && metrics.ebook_purchases) {
     metrics.conversion_rate = (metrics.ebook_purchases / metrics.new_leads * 100).toFixed(1);
   }
-  
+
   // Get abandoned cart data
   try {
     const cartData = await fs.readFile(path.join(DATA_DIR, 'abandoned-carts.json'), 'utf8');
@@ -216,10 +215,10 @@ async function collectCurrentMetrics() {
   } catch {
     metrics.cart_abandonment_rate = 0;
   }
-  
+
   console.log(`  cart_abandonment_rate: ${metrics.cart_abandonment_rate}%`);
   console.log(`  conversion_rate: ${metrics.conversion_rate || 0}%`);
-  
+
   return { date: today, metrics };
 }
 
@@ -229,20 +228,20 @@ async function collectCurrentMetrics() {
 async function updateBaseline(currentMetrics) {
   const history = await loadMetricsHistory();
   const today = currentMetrics.date;
-  
+
   // Initialize or update each metric
   for (const [metricId, value] of Object.entries(currentMetrics.metrics)) {
     if (value === null) continue;
-    
+
     if (!history.metrics[metricId]) {
       history.metrics[metricId] = {
         history: [],
         baseline: { mean: 0, stdDev: 0 }
       };
     }
-    
+
     const metric = history.metrics[metricId];
-    
+
     // Add today's value (prevent duplicates)
     const existingIndex = metric.history.findIndex(h => h.date === today);
     if (existingIndex >= 0) {
@@ -250,12 +249,12 @@ async function updateBaseline(currentMetrics) {
     } else {
       metric.history.push({ date: today, value: parseFloat(value) });
     }
-    
+
     // Keep only last CONFIG.baselineDays
     metric.history = metric.history
       .sort((a, b) => new Date(b.date) - new Date(a.date))
       .slice(0, CONFIG.baselineDays);
-    
+
     // Calculate baseline
     const values = metric.history.map(h => h.value);
     metric.baseline = {
@@ -264,7 +263,7 @@ async function updateBaseline(currentMetrics) {
       dataPoints: values.length
     };
   }
-  
+
   await saveMetricsHistory(history);
   return history;
 }
@@ -276,30 +275,30 @@ async function detectAnomalies(currentMetrics) {
   const history = await loadMetricsHistory();
   const anomaliesLog = await loadAnomalies();
   const detected = [];
-  
+
   console.log('\n🔍 Checking for anomalies...\n');
-  
+
   for (const metricConfig of MONITORED_METRICS) {
     const metricId = metricConfig.id;
     const currentValue = parseFloat(currentMetrics.metrics[metricId]);
-    
+
     if (isNaN(currentValue) || !history.metrics[metricId]) continue;
-    
+
     const baseline = history.metrics[metricId].baseline;
-    
+
     // Need minimum data points for valid detection
     if (baseline.dataPoints < CONFIG.minDataPoints) {
       console.log(`  ${metricConfig.name}: Insufficient data (${baseline.dataPoints}/${CONFIG.minDataPoints})`);
       continue;
     }
-    
+
     const z = zScore(currentValue, baseline.mean, baseline.stdDev);
     const absZ = Math.abs(z);
-    
+
     // Check direction-specific thresholds
     let isAnomaly = false;
     let direction = '';
-    
+
     if (metricConfig.direction === 'both') {
       isAnomaly = absZ >= CONFIG.zScoreThreshold;
       direction = z > 0 ? 'HIGH' : 'LOW';
@@ -310,16 +309,16 @@ async function detectAnomalies(currentMetrics) {
       isAnomaly = true;
       direction = 'LOW';
     }
-    
+
     const status = isAnomaly ? (absZ >= CONFIG.criticalThreshold ? '🚨' : '⚠️') : '✅';
-    
+
     console.log(
       `  ${status} ${metricConfig.name.padEnd(25)} ` +
       `Current: ${currentValue} | ` +
       `Baseline: ${baseline.mean.toFixed(1)} ± ${baseline.stdDev.toFixed(1)} | ` +
       `Z: ${z.toFixed(2)}`
     );
-    
+
     if (isAnomaly) {
       const anomaly = {
         id: `anomaly-${Date.now()}-${metricId}`,
@@ -335,17 +334,17 @@ async function detectAnomalies(currentMetrics) {
         status: 'active',
         investigation: null
       };
-      
+
       detected.push(anomaly);
       anomaliesLog.anomalies.push(anomaly);
       anomaliesLog.totalDetected++;
     }
   }
-  
+
   // Keep only last 100 anomalies
   anomaliesLog.anomalies = anomaliesLog.anomalies.slice(-100);
   await saveAnomalies(anomaliesLog);
-  
+
   return detected;
 }
 
@@ -354,15 +353,15 @@ async function detectAnomalies(currentMetrics) {
  */
 async function investigateAnomaly(anomaly) {
   console.log(`\n🔬 Investigating: ${anomaly.metricName}...\n`);
-  
+
   const findings = [];
-  
+
   // Check GHL API health
   const apiStartTime = Date.now();
   try {
     await ghlRequest('GET', `/contacts/?locationId=${GHL_LOCATION_ID}&limit=1`);
     const apiTime = Date.now() - apiStartTime;
-    
+
     if (apiTime > 5000) {
       findings.push(`GHL API slow response: ${apiTime}ms`);
     } else {
@@ -371,17 +370,17 @@ async function investigateAnomaly(anomaly) {
   } catch (error) {
     findings.push(`GHL API error: ${error.message}`);
   }
-  
+
   // Check webhook health
   try {
     const webhookStats = await fs.readFile(
       path.join(DATA_DIR, 'webhook-delivery-stats.json'), 'utf8'
     );
     const stats = JSON.parse(webhookStats);
-    const successRate = stats.totalAttempts > 0 
+    const successRate = stats.totalAttempts > 0
       ? (stats.successCount / stats.totalAttempts * 100).toFixed(1)
       : 100;
-    
+
     if (parseFloat(successRate) < 95) {
       findings.push(`Webhook delivery degraded: ${successRate}% success`);
     } else {
@@ -390,7 +389,7 @@ async function investigateAnomaly(anomaly) {
   } catch {
     findings.push('Webhook stats unavailable');
   }
-  
+
   // Check for specific metric patterns
   if (anomaly.direction === 'LOW') {
     if (['new_leads', 'scorecard_completions'].includes(anomaly.metricId)) {
@@ -402,14 +401,14 @@ async function investigateAnomaly(anomaly) {
       findings.push('Recommended: Review recent funnel changes, check competitor pricing');
     }
   }
-  
+
   if (anomaly.direction === 'HIGH') {
     if (anomaly.metricId === 'cart_abandonment_rate') {
       findings.push('Possible causes: Payment processor issue, checkout bug, price concern');
       findings.push('Recommended: Test checkout flow, verify Stripe/payment status');
     }
   }
-  
+
   return findings;
 }
 
@@ -423,24 +422,24 @@ async function runAnomalyCheck() {
   console.log(`Date: ${new Date().toLocaleString()}`);
   console.log(`Baseline Period: ${CONFIG.baselineDays} days`);
   console.log(`Alert Threshold: ${CONFIG.zScoreThreshold}σ`);
-  
+
   // Collect current metrics
   const currentMetrics = await collectCurrentMetrics();
-  
+
   // Update baseline
   await updateBaseline(currentMetrics);
-  
+
   // Detect anomalies
   const detected = await detectAnomalies(currentMetrics);
-  
+
   // If anomalies found, investigate and alert
   if (detected.length > 0) {
     console.log('\n' + '─'.repeat(60));
     console.log(`🚨 ${detected.length} ANOMALIES DETECTED\n`);
-    
+
     for (const anomaly of detected) {
       const findings = await investigateAnomaly(anomaly);
-      
+
       // Update anomaly with investigation
       const anomaliesLog = await loadAnomalies();
       const idx = anomaliesLog.anomalies.findIndex(a => a.id === anomaly.id);
@@ -451,24 +450,24 @@ async function runAnomalyCheck() {
         };
         await saveAnomalies(anomaliesLog);
       }
-      
+
       // Send alert
-      const alertMsg = 
+      const alertMsg =
         `${anomaly.metricName} ANOMALY\n\n` +
         `Current: ${anomaly.currentValue}\n` +
         `Expected: ${anomaly.baselineMean.toFixed(1)} ± ${anomaly.baselineStdDev.toFixed(1)}\n` +
         `Direction: ${anomaly.direction}\n` +
         `Z-Score: ${anomaly.zScore.toFixed(2)}σ\n\n` +
         `Investigation:\n${findings.join('\n')}`;
-      
+
       await sendAlert(alertMsg, anomaly.severity === 'critical');
     }
   } else {
     console.log('\n✅ No anomalies detected');
   }
-  
+
   console.log('\n' + '═'.repeat(60));
-  
+
   return detected;
 }
 
@@ -479,29 +478,29 @@ async function viewAnomalyHistory(days = 7) {
   const anomaliesLog = await loadAnomalies();
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - days);
-  
+
   const recent = anomaliesLog.anomalies.filter(
     a => new Date(a.detectedAt) >= cutoff
   );
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log(`📊 ANOMALY HISTORY (Last ${days} days)`);
   console.log('═'.repeat(60));
   console.log(`Total in period: ${recent.length}`);
   console.log(`Total all time: ${anomaliesLog.totalDetected}\n`);
-  
+
   if (recent.length === 0) {
     console.log('No anomalies in this period.\n');
     return;
   }
-  
+
   // Group by metric
   const byMetric = {};
   for (const anomaly of recent) {
     byMetric[anomaly.metricName] = byMetric[anomaly.metricName] || [];
     byMetric[anomaly.metricName].push(anomaly);
   }
-  
+
   for (const [metric, anomalies] of Object.entries(byMetric)) {
     console.log(`\n${metric}:`);
     for (const a of anomalies.slice(0, 5)) {
@@ -512,7 +511,7 @@ async function viewAnomalyHistory(days = 7) {
       console.log(`  ... and ${anomalies.length - 5} more`);
     }
   }
-  
+
   console.log('');
 }
 
@@ -521,15 +520,15 @@ async function viewAnomalyHistory(days = 7) {
  */
 async function viewBaselines() {
   const history = await loadMetricsHistory();
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log('📈 CURRENT BASELINES');
   console.log('═'.repeat(60));
   console.log(`Last Updated: ${history.lastUpdated || 'Never'}\n`);
-  
+
   console.log('Metric'.padEnd(30) + 'Mean'.padStart(10) + 'Std Dev'.padStart(10) + 'Data Points'.padStart(12));
   console.log('─'.repeat(62));
-  
+
   for (const config of MONITORED_METRICS) {
     const metric = history.metrics[config.id];
     if (metric) {
@@ -543,7 +542,7 @@ async function viewBaselines() {
       console.log(config.name.padEnd(30) + 'No data'.padStart(32));
     }
   }
-  
+
   console.log('');
 }
 
@@ -566,20 +565,20 @@ switch (command) {
   case 'run':
     runAnomalyCheck();
     break;
-    
+
   case 'history':
     viewAnomalyHistory(parseInt(args[0]) || 7);
     break;
-    
+
   case 'baselines':
   case 'baseline':
     viewBaselines();
     break;
-    
+
   case 'reset':
     resetAll();
     break;
-    
+
   default:
     console.log(`
 Anomaly Detection System

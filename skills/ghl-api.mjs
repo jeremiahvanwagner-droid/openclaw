@@ -2,9 +2,9 @@
 /**
  * GHL API Skill Module
  * Provides GoHighLevel operations for OpenClaw agents
- * 
+ *
  * Usage: node ghl-api.mjs <command> [args...]
- * 
+ *
  * Commands:
  *   get-contact <contactId>               Get contact details
  *   search-contacts <query>               Search contacts
@@ -22,11 +22,16 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { resolve as resolveTenant, GHL_BASE, API_VERSION } from '../lib/ghl-tenant-resolver.mjs';
 
-const GHL_TOKEN = process.env.GHL_PRIVATE_INTEGRATION_TOKEN || '';
-const GHL_LOCATION = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
-const GHL_BASE = 'https://services.leadconnectorhq.com';
-const API_VERSION = '2021-07-28';
+// Default tenant — override with --location <alias|locationId> CLI arg
+const locationArg = (() => {
+  const idx = process.argv.indexOf('--location');
+  return idx !== -1 ? process.argv[idx + 1] : undefined;
+})();
+const tenant = resolveTenant(locationArg);
+const GHL_TOKEN = tenant.token;
+const GHL_LOCATION = tenant.locationId;
 
 const headers = {
   'Authorization': `Bearer ${GHL_TOKEN}`,
@@ -65,7 +70,7 @@ async function apiCall(method, endpoint, body = null, _retryCount = 0) {
   if (body) {
     options.body = JSON.stringify(body);
   }
-  
+
   const response = await fetch(url, options);
 
   // Auth expired — do not retry, log to DLQ
@@ -102,7 +107,7 @@ async function apiCall(method, endpoint, body = null, _retryCount = 0) {
   }
 
   const data = await response.json();
-  
+
   if (!response.ok) {
     const msg = `GHL API Error ${response.status}: ${JSON.stringify(data)}`;
     if (response.status === 429) {
@@ -110,7 +115,7 @@ async function apiCall(method, endpoint, body = null, _retryCount = 0) {
     }
     throw new Error(msg);
   }
-  
+
   return data;
 }
 
@@ -187,9 +192,9 @@ async function getConversations(contactId) {
 async function calculateLeadScore(contactId) {
   const contact = await getContact(contactId);
   const conversations = await getConversations(contactId);
-  
+
   let score = 0;
-  
+
   // Response speed (0-20 pts)
   // If responded within 24h, full points
   const firstResponse = conversations.conversations?.[0];
@@ -201,26 +206,26 @@ async function calculateLeadScore(contactId) {
     else if (hoursToRespond < 72) score += 10;
     else score += 5;
   }
-  
+
   // Email engagement (0-20 pts)
   const contact_data = contact.contact || contact;
   if (contact_data.emailVerified) score += 10;
   const emailOpens = contact_data.customFields?.email_opens || 0;
   score += Math.min(emailOpens * 2, 10);
-  
+
   // SMS replies (0-20 pts)
   const smsReplies = conversations.conversations?.filter(c => c.type === 'SMS' && c.direction === 'inbound').length || 0;
   score += Math.min(smsReplies * 5, 20);
-  
+
   // Alignment score from scorecard (0-20 pts)
   const alignmentScore = contact_data.customFields?.alignment_score || 0;
   score += Math.round((alignmentScore / 100) * 20);
-  
+
   // Form completions (0-20 pts)
   const tags = contact_data.tags || [];
   if (tags.includes('scorecard-lead')) score += 10;
   if (tags.includes('ebook-buyer')) score += 10;
-  
+
   return {
     contactId,
     score: Math.min(score, 100),
@@ -238,7 +243,7 @@ async function calculateLeadScore(contactId) {
 
 async function main() {
   const [,, command, ...args] = process.argv;
-  
+
   if (!command) {
     console.log('Usage: node ghl-api.mjs <command> [args...]');
     console.log('Commands: get-contact, search-contacts, create-contact, update-contact,');
@@ -246,10 +251,10 @@ async function main() {
     console.log('          get-opportunities, get-conversations, calculate-lead-score');
     process.exit(1);
   }
-  
+
   try {
     let result;
-    
+
     switch (command) {
       case 'get-contact':
         result = await getContact(args[0]);
@@ -291,7 +296,7 @@ async function main() {
         console.error(`Unknown command: ${command}`);
         process.exit(1);
     }
-    
+
     console.log(JSON.stringify(result, null, 2));
   } catch (error) {
     console.error('Error:', error.message);

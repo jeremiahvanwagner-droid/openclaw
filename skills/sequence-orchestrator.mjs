@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OpenClaw Multi-Channel Orchestrator
- * 
+ *
  * Features:
  *   - Coordinate messages across email, SMS, Telegram
  *   - Smart channel selection based on engagement
@@ -16,13 +16,12 @@ import https from 'https';
 import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const SEQUENCES_FILE = path.join(DATA_DIR, 'sequences.json');
 const ENGAGEMENT_FILE = path.join(DATA_DIR, 'channel-engagement.json');
 
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = (await import('../lib/ghl-tenant-resolver.mjs')).resolve();
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
 
 // Channel configuration
@@ -63,7 +62,7 @@ function ghlRequest(method, urlPath, body = null) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
@@ -75,13 +74,13 @@ function ghlRequest(method, urlPath, body = null) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(30000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
-    
+
     if (body) {
       req.write(JSON.stringify(body));
     }
@@ -134,7 +133,7 @@ async function saveEngagement(data) {
  */
 async function recordEngagement(contactId, channel, engaged = true) {
   const data = await loadEngagement();
-  
+
   if (!data[contactId]) {
     data[contactId] = {
       email: { sent: 0, engaged: 0, lastSent: null },
@@ -142,13 +141,13 @@ async function recordEngagement(contactId, channel, engaged = true) {
       telegram: { sent: 0, engaged: 0, lastSent: null }
     };
   }
-  
+
   if (engaged) {
     data[contactId][channel].engaged++;
   }
   data[contactId][channel].sent++;
   data[contactId][channel].lastSent = new Date().toISOString();
-  
+
   await saveEngagement(data);
   return data[contactId][channel];
 }
@@ -159,41 +158,41 @@ async function recordEngagement(contactId, channel, engaged = true) {
 async function getBestChannel(contactId, excludeChannels = []) {
   const engagement = await loadEngagement();
   const contactData = engagement[contactId];
-  
+
   // Available channels
   const available = Object.keys(CHANNELS).filter(c => !excludeChannels.includes(c));
-  
+
   if (!contactData) {
     // New contact - use default priority
     return available.sort((a, b) => CHANNELS[a].priority - CHANNELS[b].priority)[0];
   }
-  
+
   // Score each channel
   const scores = available.map(channel => {
     const stats = contactData[channel];
     const config = CHANNELS[channel];
-    
+
     // Engagement rate
     const engagementRate = stats.sent > 0 ? stats.engaged / stats.sent : 0.5;
-    
+
     // Fatigue check
-    const hoursSinceLastSent = stats.lastSent 
+    const hoursSinceLastSent = stats.lastSent
       ? (Date.now() - new Date(stats.lastSent).getTime()) / (1000 * 60 * 60)
       : 999;
     const fatiguePenalty = hoursSinceLastSent < config.fatigueHours ? -0.5 : 0;
-    
+
     // Time of day bonus
     const currentHour = new Date().getHours();
     const timeBonus = config.bestHours.includes(currentHour) ? 0.2 : 0;
-    
+
     // Calculate score
     const score = engagementRate + fatiguePenalty + timeBonus - (config.costFactor * 0.01);
-    
+
     return { channel, score, engagementRate, hoursSinceLastSent };
   });
-  
+
   scores.sort((a, b) => b.score - a.score);
-  
+
   return scores[0].channel;
 }
 
@@ -204,7 +203,7 @@ async function sendMessage(contactId, channel, content) {
   console.log(`\n📨 Sending via ${channel.toUpperCase()}`);
   console.log(`   To: ${contactId}`);
   console.log(`   Content: "${content.subject || content.body?.substring(0, 50)}..."`);
-  
+
   try {
     switch (channel) {
       case 'email':
@@ -215,32 +214,32 @@ async function sendMessage(contactId, channel, content) {
           body: content.body,
           emailFrom: content.from || 'default'
         });
-        
+
         await recordEngagement(contactId, 'email', false);
         return { success: true, channel, messageId: emailResult.id || 'sent' };
-        
+
       case 'sms':
         // Use GHL to send SMS
         const smsResult = await ghlRequest('POST', `/contacts/${contactId}/sms`, {
           locationId: GHL_LOCATION_ID,
           body: content.body
         });
-        
+
         await recordEngagement(contactId, 'sms', false);
         return { success: true, channel, messageId: smsResult.id || 'sent' };
-        
+
       case 'telegram':
         // Use OpenClaw to send Telegram (if contact has Telegram)
         const contact = await ghlRequest('GET', `/contacts/${contactId}?locationId=${GHL_LOCATION_ID}`);
         const telegramId = contact.customFields?.find(f => f.key?.includes('telegram'))?.value;
-        
+
         if (telegramId) {
           await openclawSend({ agent: 'main', channel: 'telegram', to: telegramId, message: content.body });
           await recordEngagement(contactId, 'telegram', false);
           return { success: true, channel };
         }
         return { success: false, channel, error: 'No Telegram ID' };
-        
+
       default:
         return { success: false, error: 'Unknown channel' };
     }
@@ -254,9 +253,9 @@ async function sendMessage(contactId, channel, content) {
  */
 async function createSequence(name, steps, description = '') {
   const data = await loadSequences();
-  
+
   const sequenceId = `seq_${Date.now()}`;
-  
+
   data.sequences[sequenceId] = {
     id: sequenceId,
     name,
@@ -273,12 +272,12 @@ async function createSequence(name, steps, description = '') {
     status: 'active',
     createdAt: new Date().toISOString()
   };
-  
+
   await saveSequences(data);
-  
+
   console.log(`\n✅ Sequence created: ${name} (${sequenceId})`);
   console.log(`   Steps: ${steps.length}`);
-  
+
   return data.sequences[sequenceId];
 }
 
@@ -288,13 +287,13 @@ async function createSequence(name, steps, description = '') {
 async function enrollContact(sequenceId, contactId) {
   const data = await loadSequences();
   const sequence = data.sequences[sequenceId];
-  
+
   if (!sequence) {
     return { error: 'Sequence not found' };
   }
-  
+
   const enrollmentId = `enr_${Date.now()}_${contactId}`;
-  
+
   data.enrollments[enrollmentId] = {
     id: enrollmentId,
     sequenceId,
@@ -306,16 +305,16 @@ async function enrollContact(sequenceId, contactId) {
     completedSteps: [],
     skippedSteps: []
   };
-  
+
   await saveSequences(data);
-  
+
   console.log(`\n✅ Contact enrolled: ${contactId} → ${sequence.name}`);
-  
+
   // Execute first step immediately if no delay
   if (sequence.steps[0]?.delayMinutes === 0) {
     await executeStep(enrollmentId);
   }
-  
+
   return data.enrollments[enrollmentId];
 }
 
@@ -325,16 +324,16 @@ async function enrollContact(sequenceId, contactId) {
 async function executeStep(enrollmentId) {
   const data = await loadSequences();
   const enrollment = data.enrollments[enrollmentId];
-  
+
   if (!enrollment || enrollment.status !== 'active') {
     return { error: 'Enrollment not found or inactive' };
   }
-  
+
   const sequence = data.sequences[enrollment.sequenceId];
   if (!sequence) {
     return { error: 'Sequence not found' };
   }
-  
+
   const step = sequence.steps[enrollment.currentStep];
   if (!step) {
     // Sequence complete
@@ -343,16 +342,16 @@ async function executeStep(enrollmentId) {
     await saveSequences(data);
     return { status: 'completed', message: 'Sequence finished' };
   }
-  
+
   // Determine channel
   let channel = step.channel;
   if (channel === 'auto') {
     channel = await getBestChannel(enrollment.contactId, []);
   }
-  
+
   // Send message
   const result = await sendMessage(enrollment.contactId, channel, step.content);
-  
+
   if (!result.success && step.fallbackChannel) {
     // Try fallback
     const fallbackResult = await sendMessage(enrollment.contactId, step.fallbackChannel, step.content);
@@ -362,7 +361,7 @@ async function executeStep(enrollmentId) {
       result.channel = step.fallbackChannel;
     }
   }
-  
+
   // Update enrollment
   enrollment.completedSteps.push({
     stepId: step.id,
@@ -371,9 +370,9 @@ async function executeStep(enrollmentId) {
     success: result.success,
     usedFallback: result.usedFallback || false
   });
-  
+
   enrollment.currentStep++;
-  
+
   // Schedule next step
   const nextStep = sequence.steps[enrollment.currentStep];
   if (nextStep) {
@@ -383,9 +382,9 @@ async function executeStep(enrollmentId) {
     enrollment.status = 'completed';
     enrollment.completedAt = new Date().toISOString();
   }
-  
+
   await saveSequences(data);
-  
+
   return {
     stepId: step.id,
     channel: result.channel || channel,
@@ -401,12 +400,12 @@ async function executeStep(enrollmentId) {
 async function processDueSteps() {
   const data = await loadSequences();
   const now = new Date();
-  
+
   let processed = 0;
-  
+
   for (const enrollment of Object.values(data.enrollments)) {
     if (enrollment.status !== 'active') continue;
-    
+
     const nextRun = new Date(enrollment.nextRunAt);
     if (nextRun <= now) {
       console.log(`\n⏰ Processing: ${enrollment.id}`);
@@ -414,7 +413,7 @@ async function processDueSteps() {
       processed++;
     }
   }
-  
+
   console.log(`\n✅ Processed ${processed} due steps`);
   return processed;
 }
@@ -425,7 +424,7 @@ async function processDueSteps() {
 async function getChannelPreferences(contactId) {
   const engagement = await loadEngagement();
   const contactData = engagement[contactId];
-  
+
   if (!contactData) {
     return {
       contactId,
@@ -434,7 +433,7 @@ async function getChannelPreferences(contactId) {
       message: 'No engagement data - starting with email'
     };
   }
-  
+
   // Calculate rates
   const rates = {};
   for (const [channel, stats] of Object.entries(contactData)) {
@@ -445,12 +444,12 @@ async function getChannelPreferences(contactId) {
       lastSent: stats.lastSent
     };
   }
-  
+
   // Sort by engagement rate
   const sorted = Object.entries(rates)
     .filter(([_, s]) => s.sent > 0)
     .sort((a, b) => parseFloat(b[1].rate) - parseFloat(a[1].rate));
-  
+
   return {
     contactId,
     hasData: true,
@@ -465,9 +464,9 @@ async function getChannelPreferences(contactId) {
  */
 async function unenrollContact(contactId, sequenceId = null) {
   const data = await loadSequences();
-  
+
   let unenrolled = 0;
-  
+
   for (const enrollment of Object.values(data.enrollments)) {
     if (enrollment.contactId === contactId && enrollment.status === 'active') {
       if (!sequenceId || enrollment.sequenceId === sequenceId) {
@@ -477,7 +476,7 @@ async function unenrollContact(contactId, sequenceId = null) {
       }
     }
   }
-  
+
   await saveSequences(data);
   return { unenrolled };
 }
@@ -487,28 +486,28 @@ async function unenrollContact(contactId, sequenceId = null) {
  */
 async function listSequences() {
   const data = await loadSequences();
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log('📋 SEQUENCES');
   console.log('═'.repeat(60) + '\n');
-  
+
   const sequences = Object.values(data.sequences);
-  
+
   if (sequences.length === 0) {
     console.log('No sequences found.');
     return;
   }
-  
+
   for (const seq of sequences) {
     // Count enrollments
     const enrollments = Object.values(data.enrollments)
       .filter(e => e.sequenceId === seq.id);
     const active = enrollments.filter(e => e.status === 'active').length;
     const completed = enrollments.filter(e => e.status === 'completed').length;
-    
+
     console.log(`📨 ${seq.name} (${seq.id})`);
     console.log(`   Steps: ${seq.steps.length} | Active: ${active} | Completed: ${completed}`);
-    
+
     for (const step of seq.steps) {
       const channelIcon = step.channel === 'email' ? '📧' : step.channel === 'sms' ? '💬' : step.channel === 'telegram' ? '📱' : '🔀';
       console.log(`   ${step.order + 1}. ${channelIcon} ${step.channel} (${step.delayMinutes}m delay)`);
@@ -523,25 +522,25 @@ async function listSequences() {
 async function showEnrollment(enrollmentId) {
   const data = await loadSequences();
   const enrollment = data.enrollments[enrollmentId];
-  
+
   if (!enrollment) {
     console.log('Enrollment not found');
     return;
   }
-  
+
   const sequence = data.sequences[enrollment.sequenceId];
-  
+
   console.log('\n' + '═'.repeat(50));
   console.log('📋 ENROLLMENT STATUS');
   console.log('═'.repeat(50) + '\n');
-  
+
   console.log(`Sequence: ${sequence?.name || enrollment.sequenceId}`);
   console.log(`Contact: ${enrollment.contactId}`);
   console.log(`Status: ${enrollment.status}`);
   console.log(`Current Step: ${enrollment.currentStep + 1} of ${sequence?.steps.length || '?'}`);
   console.log(`Next Run: ${enrollment.nextRunAt}`);
   console.log('');
-  
+
   console.log('Completed Steps:');
   for (const step of enrollment.completedSteps) {
     const fallback = step.usedFallback ? ' (fallback)' : '';
@@ -558,7 +557,7 @@ switch (command) {
     console.log('  createSequence(name, steps, description)');
     console.log('  steps: [{ channel, delay, content: { subject, body }, fallback }]');
     break;
-    
+
   case 'enroll':
     if (args.length < 2) {
       console.log('Usage: sequence-orchestrator.mjs enroll <sequenceId> <contactId>');
@@ -566,15 +565,15 @@ switch (command) {
       enrollContact(args[0], args[1]);
     }
     break;
-    
+
   case 'process':
     processDueSteps();
     break;
-    
+
   case 'list':
     listSequences();
     break;
-    
+
   case 'status':
     if (!args[0]) {
       console.log('Usage: sequence-orchestrator.mjs status <enrollmentId>');
@@ -582,7 +581,7 @@ switch (command) {
       showEnrollment(args[0]);
     }
     break;
-    
+
   case 'preferences':
     if (!args[0]) {
       console.log('Usage: sequence-orchestrator.mjs preferences <contactId>');
@@ -590,7 +589,7 @@ switch (command) {
       getChannelPreferences(args[0]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'best-channel':
     if (!args[0]) {
       console.log('Usage: sequence-orchestrator.mjs best-channel <contactId>');
@@ -598,7 +597,7 @@ switch (command) {
       getBestChannel(args[0]).then(c => console.log(`Best channel for ${args[0]}: ${c}`));
     }
     break;
-    
+
   case 'send':
     if (args.length < 3) {
       console.log('Usage: sequence-orchestrator.mjs send <contactId> <channel> "<message>"');
@@ -606,7 +605,7 @@ switch (command) {
       sendMessage(args[0], args[1], { body: args.slice(2).join(' ') });
     }
     break;
-    
+
   case 'unenroll':
     if (!args[0]) {
       console.log('Usage: sequence-orchestrator.mjs unenroll <contactId> [sequenceId]');
@@ -614,7 +613,7 @@ switch (command) {
       unenrollContact(args[0], args[1]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   default:
     console.log(`
 Multi-Channel Orchestrator
@@ -644,13 +643,13 @@ Channel Selection Factors:
 `);
 }
 
-export { 
-  createSequence, 
-  enrollContact, 
-  executeStep, 
-  processDueSteps, 
-  getBestChannel, 
+export {
+  createSequence,
+  enrollContact,
+  executeStep,
+  processDueSteps,
+  getBestChannel,
   sendMessage,
   recordEngagement,
-  getChannelPreferences 
+  getChannelPreferences
 };

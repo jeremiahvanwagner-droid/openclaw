@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OpenClaw Content Personalization Engine
- * 
+ *
  * Features:
  *   - Dynamic content tokens based on contact attributes
  *   - Testimonial matching by demographics/tier
@@ -18,14 +18,13 @@ import https from 'https';
 const execAsync = promisify(exec);
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const PERSONALIZATION_DIR = path.join(DATA_DIR, 'personalization');
 const TESTIMONIALS_FILE = path.join(PERSONALIZATION_DIR, 'testimonials.json');
 const CONTENT_BLOCKS_FILE = path.join(PERSONALIZATION_DIR, 'content-blocks.json');
 
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = (await import('../lib/ghl-tenant-resolver.mjs')).resolve();
 
 // Default testimonials by tier
 const DEFAULT_TESTIMONIALS = {
@@ -192,7 +191,7 @@ function ghlRequest(method, urlPath) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
@@ -204,7 +203,7 @@ function ghlRequest(method, urlPath) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(30000, () => {
       req.destroy();
@@ -250,13 +249,13 @@ async function loadContentBlocks() {
 function detectTier(contact) {
   const tags = (contact.tags || []).map(t => t.toLowerCase());
   const tiers = ['transcendent', 'empowered', 'aligned', 'awakening', 'dormant'];
-  
+
   for (const tier of tiers) {
     if (tags.some(t => t.includes(tier))) {
       return tier;
     }
   }
-  
+
   // Infer tier from purchases
   if (tags.some(t => t.includes('intensive') || t.includes('operators'))) {
     return 'transcendent';
@@ -270,7 +269,7 @@ function detectTier(contact) {
   if (tags.some(t => t.includes('scorecard'))) {
     return 'awakening';
   }
-  
+
   return 'dormant';
 }
 
@@ -280,9 +279,9 @@ function detectTier(contact) {
 function detectProfession(contact) {
   const companyName = (contact.companyName || '').toLowerCase();
   const tags = (contact.tags || []).map(t => t.toLowerCase()).join(' ');
-  
+
   // Check for custom fields
-  const professionField = (contact.customFields || []).find(f => 
+  const professionField = (contact.customFields || []).find(f =>
     f.key?.toLowerCase().includes('profession') || f.key?.toLowerCase().includes('occupation')
   );
   if (professionField?.value) {
@@ -292,12 +291,12 @@ function detectProfession(contact) {
     if (val.includes('coach') || val.includes('consultant')) return 'coach';
     if (val.includes('creative') || val.includes('artist') || val.includes('designer')) return 'creative';
   }
-  
+
   // Infer from company
   if (companyName.includes('coach') || companyName.includes('consulting')) return 'coach';
   if (tags.includes('entrepreneur')) return 'entrepreneur';
   if (tags.includes('executive')) return 'executive';
-  
+
   return 'professional';
 }
 
@@ -306,46 +305,46 @@ function detectProfession(contact) {
  */
 async function getMatchingTestimonial(contactId, productContext = null) {
   const testimonials = await loadTestimonials();
-  
+
   // Get contact
   const contact = await ghlRequest('GET', `/contacts/${contactId}?locationId=${GHL_LOCATION_ID}`);
   if (!contact.contact && !contact.id) {
     return { error: 'Contact not found' };
   }
-  
+
   const contactData = contact.contact || contact;
   const tier = detectTier(contactData);
   const profession = detectProfession(contactData);
-  
+
   // Get testimonials for this tier
   const tierTestimonials = testimonials[tier] || testimonials['awakening'] || [];
-  
+
   if (tierTestimonials.length === 0) {
     return { error: 'No testimonials available', tier, profession };
   }
-  
+
   // Score each testimonial
   let bestMatch = null;
   let bestScore = -1;
-  
+
   for (const t of tierTestimonials) {
     let score = 0;
-    
+
     // Match profession
     if (t.demographic?.profession === profession) score += 3;
-    
+
     // Match product context
     if (productContext && t.product === productContext) score += 2;
-    
+
     // Random factor for variety
     score += Math.random() * 0.5;
-    
+
     if (score > bestScore) {
       bestScore = score;
       bestMatch = t;
     }
   }
-  
+
   return {
     testimonial: bestMatch,
     tier,
@@ -359,37 +358,37 @@ async function getMatchingTestimonial(contactId, productContext = null) {
  */
 async function personalizeContent(contactId) {
   const contentBlocks = await loadContentBlocks();
-  
+
   // Get contact
   const contact = await ghlRequest('GET', `/contacts/${contactId}?locationId=${GHL_LOCATION_ID}`);
   if (!contact.contact && !contact.id) {
     return { error: 'Contact not found' };
   }
-  
+
   const contactData = contact.contact || contact;
   const tier = detectTier(contactData);
   const profession = detectProfession(contactData);
   const firstName = contactData.firstName || 'there';
-  
+
   // Get matching testimonial
   const testimonialResult = await getMatchingTestimonial(contactId);
-  
+
   // Build personalized content
   const personalized = {
     contactId,
     firstName,
     tier,
     profession,
-    
+
     greeting: `Hey ${firstName}`,
     headline: contentBlocks.headlines[tier] || contentBlocks.headlines.awakening,
-    
+
     ctas: contentBlocks.ctas[tier] || contentBlocks.ctas.awakening,
-    
+
     valueProps: contentBlocks.valueProps[profession] || contentBlocks.valueProps.general,
-    
+
     testimonial: testimonialResult.testimonial || null,
-    
+
     // Dynamic tokens for email templates
     tokens: {
       '{{first_name}}': firstName,
@@ -404,7 +403,7 @@ async function personalizeContent(contactId) {
       '{{testimonial_highlight}}': testimonialResult.testimonial?.highlight || ''
     }
   };
-  
+
   return personalized;
 }
 
@@ -427,16 +426,16 @@ async function getNextBestOffer(contactId) {
   if (!contact.contact && !contact.id) {
     return { error: 'Contact not found' };
   }
-  
+
   const contactData = contact.contact || contact;
   const tags = (contactData.tags || []).map(t => t.toLowerCase());
-  
+
   // Determine what they have
   const hasEbook = tags.some(t => t.includes('ebook'));
   const hasCourse = tags.some(t => t.includes('course-buyer'));
   const hasIntensive = tags.some(t => t.includes('intensive'));
   const hasCircle = tags.some(t => t.includes('operators'));
-  
+
   // Determine next best offer
   if (hasCircle) {
     return {
@@ -446,7 +445,7 @@ async function getNextBestOffer(contactId) {
       priority: 'retain'
     };
   }
-  
+
   if (hasIntensive || hasCourse) {
     return {
       offer: 'operators-circle',
@@ -455,7 +454,7 @@ async function getNextBestOffer(contactId) {
       priority: 'upsell'
     };
   }
-  
+
   if (hasEbook) {
     return {
       offer: 'course',
@@ -464,7 +463,7 @@ async function getNextBestOffer(contactId) {
       priority: 'upsell'
     };
   }
-  
+
   return {
     offer: 'ebook',
     product: 'ebook',
@@ -478,14 +477,14 @@ async function getNextBestOffer(contactId) {
  */
 async function addTestimonial(tier, testimonial) {
   const testimonials = await loadTestimonials();
-  
+
   if (!testimonials[tier]) {
     testimonials[tier] = [];
   }
-  
+
   testimonial.id = `custom_${Date.now()}`;
   testimonials[tier].push(testimonial);
-  
+
   await fs.writeFile(TESTIMONIALS_FILE, JSON.stringify(testimonials, null, 2));
   return testimonial;
 }
@@ -497,56 +496,56 @@ async function showPreview(contactId) {
   console.log('\n' + '═'.repeat(60));
   console.log('🎯 CONTENT PERSONALIZATION PREVIEW');
   console.log('═'.repeat(60) + '\n');
-  
+
   const personalized = await personalizeContent(contactId);
-  
+
   if (personalized.error) {
     console.log(`Error: ${personalized.error}`);
     return;
   }
-  
+
   console.log(`Contact: ${personalized.firstName} (${contactId})`);
   console.log(`Tier: ${personalized.tier.toUpperCase()}`);
   console.log(`Profession: ${personalized.profession}`);
   console.log('');
-  
+
   console.log('📝 PERSONALIZED CONTENT:\n');
   console.log(`Greeting: "${personalized.greeting}"`);
   console.log(`Headline: "${personalized.headline}"`);
   console.log('');
-  
+
   console.log('🎯 CTAs:');
   console.log(`  Primary: "${personalized.ctas.primary}"`);
   console.log(`  Secondary: "${personalized.ctas.secondary}"`);
   console.log('');
-  
+
   console.log('💡 Value Props:');
   for (const vp of personalized.valueProps) {
     console.log(`  • ${vp}`);
   }
   console.log('');
-  
+
   if (personalized.testimonial) {
     console.log('⭐ MATCHED TESTIMONIAL:');
     console.log(`  "${personalized.testimonial.text}"`);
     console.log(`  — ${personalized.testimonial.name}`);
   }
   console.log('');
-  
+
   console.log('🏷️ TEMPLATE TOKENS:');
   for (const [token, value] of Object.entries(personalized.tokens)) {
     if (value) {
       console.log(`  ${token} = "${value.substring(0, 50)}${value.length > 50 ? '...' : ''}"`);
     }
   }
-  
+
   // Get next best offer
   const nbo = await getNextBestOffer(contactId);
   console.log('\n🎁 NEXT BEST OFFER:');
   console.log(`  Product: ${nbo.product}`);
   console.log(`  Message: ${nbo.message}`);
   console.log(`  Priority: ${nbo.priority}`);
-  
+
   console.log('\n' + '═'.repeat(60));
 }
 
@@ -555,9 +554,9 @@ async function showPreview(contactId) {
  */
 async function listTestimonials() {
   const testimonials = await loadTestimonials();
-  
+
   console.log('\n📣 TESTIMONIAL LIBRARY\n');
-  
+
   for (const [tier, list] of Object.entries(testimonials)) {
     console.log(`\n${tier.toUpperCase()} (${list.length}):`);
     for (const t of list) {
@@ -577,7 +576,7 @@ switch (command) {
       personalizeContent(args[0]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'preview':
     if (!args[0]) {
       console.log('Usage: content-personalization.mjs preview <contactId>');
@@ -585,7 +584,7 @@ switch (command) {
       showPreview(args[0]);
     }
     break;
-    
+
   case 'testimonial':
     if (!args[0]) {
       console.log('Usage: content-personalization.mjs testimonial <contactId>');
@@ -593,11 +592,11 @@ switch (command) {
       getMatchingTestimonial(args[0], args[1]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'testimonials':
     listTestimonials();
     break;
-    
+
   case 'nbo':
   case 'next-offer':
     if (!args[0]) {
@@ -606,11 +605,11 @@ switch (command) {
       getNextBestOffer(args[0]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'add-testimonial':
     console.log('Usage: Import and call addTestimonial(tier, testimonialObject)');
     break;
-    
+
   case 'apply':
     if (args.length < 2) {
       console.log('Usage: content-personalization.mjs apply <contactId> "<template>"');
@@ -625,7 +624,7 @@ switch (command) {
       });
     }
     break;
-    
+
   default:
     console.log(`
 Content Personalization Engine
