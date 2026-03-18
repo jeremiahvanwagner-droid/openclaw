@@ -43,7 +43,7 @@ type AgentEvents = {
     };
   };
 
-  // Pod-scoped events (8-pod runtime)
+  // Pod-scoped events (10-business runtime)
   "pod/*/task": {
     data: {
       type: string;
@@ -458,6 +458,7 @@ export const DIVISION_HEADS: Record<string, string> = {
   division_6_nonprofit: "d6_executive_director",
   division_7_shared_services: "shared_exec_orchestrator",
   division_8_saas_operations: "d8_saas_director",
+  division_9_online_store: "d9_store_director",
 };
 
 // Get division head for routing (legacy fallback)
@@ -465,17 +466,13 @@ export function getDivisionHead(division: string): string {
   return DIVISION_HEADS[division] || "shared_exec_orchestrator";
 }
 
-// Pod lead mapping for 8-pod runtime
-export const POD_LEADS: Record<string, string> = {
-  biz_01: "biz_01_pod_lead",
-  biz_02: "biz_02_pod_lead",
-  biz_03: "biz_03_pod_lead",
-  biz_04: "biz_04_pod_lead",
-  biz_05: "biz_05_pod_lead",
-  biz_06: "biz_06_pod_lead",
-  biz_07: "biz_07_pod_lead",
-  biz_08: "biz_08_pod_lead",
-};
+// Pod lead mapping for the 10-business runtime
+export const POD_LEADS: Record<string, string> = Object.fromEntries(
+  Array.from({ length: 10 }, (_, index) => {
+    const podId = `biz_${String(index + 1).padStart(2, "0")}`;
+    return [podId, `${podId}_pod_lead`];
+  }),
+);
 
 // Get pod lead for routing
 export function getPodLead(podId: string): string | null {

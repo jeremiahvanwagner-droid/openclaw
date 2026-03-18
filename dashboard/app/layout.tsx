@@ -4,7 +4,7 @@ import { ConnectionStatus } from "./connection-status";
 
 export const metadata: Metadata = {
   title: "OpenClaw Agent Dashboard",
-  description: "Monitor and manage the 75-agent network for Truth J Blue LLC",
+  description: "Monitor the OpenClaw 10-business GHL portfolio for Truth J Blue LLC",
 };
 
 function Nav() {

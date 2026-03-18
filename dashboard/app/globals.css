@@ -40,6 +40,8 @@ body {
 .division-d4 { @apply border-l-4 border-l-pink-500; }
 .division-d5 { @apply border-l-4 border-l-emerald-500; }
 .division-d6 { @apply border-l-4 border-l-cyan-500; }
+.division-d8 { @apply border-l-4 border-l-rose-500; }
+.division-d9 { @apply border-l-4 border-l-indigo-500; }
 .division-shared { @apply border-l-4 border-l-yellow-500; }
 
 /* Cards */

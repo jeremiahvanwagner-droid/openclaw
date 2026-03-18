@@ -96,8 +96,6 @@ const SUPERVISOR_IDS = new Set([
   "shared_exec_orchestrator",
   "shared_data_control",
   "shared_master_orchestrator",
-  "biz_01_pod_lead", "biz_02_pod_lead", "biz_03_pod_lead", "biz_04_pod_lead",
-  "biz_05_pod_lead", "biz_06_pod_lead", "biz_07_pod_lead", "biz_08_pod_lead",
 ]);
 
 const ADVISOR_IDS = new Set([
@@ -107,6 +105,7 @@ const ADVISOR_IDS = new Set([
 ]);
 
 function classifyAgentClass(agent) {
+  if (/^biz_\d{2}_pod_lead$/.test(agent.agent_id)) return "supervisor";
   if (SUPERVISOR_IDS.has(agent.agent_id)) return "supervisor";
   if (ADVISOR_IDS.has(agent.agent_id)) return "advisor";
   return "worker";
