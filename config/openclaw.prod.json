@@ -1,7 +1,7 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.13",
-    "lastTouchedAt": "2026-03-15T18:00:00.000Z"
+    "lastTouchedAt": "2026-03-18T23:30:36.791Z"
   },
   "wizard": {
     "lastRunAt": "2026-03-15T18:00:00.000Z",
@@ -24,73 +24,97 @@
       "ghl_token_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_PRIVATE_INTEGRATION_TOKEN"],
+        "args": [
+          "GHL_PRIVATE_INTEGRATION_TOKEN"
+        ],
         "timeoutMs": 3000
       },
       "ghl_location_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_LOCATION_ID"],
+        "args": [
+          "GHL_LOCATION_ID"
+        ],
         "timeoutMs": 3000
       },
       "telegram_token_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["OPENCLAW_TELEGRAM_BOT_TOKEN"],
+        "args": [
+          "OPENCLAW_TELEGRAM_BOT_TOKEN"
+        ],
         "timeoutMs": 3000
       },
       "user_env_exec": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN"],
+        "args": [
+          "OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN"
+        ],
         "timeoutMs": 3000
       },
       "supabase_url_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["SUPABASE_URL"],
+        "args": [
+          "SUPABASE_URL"
+        ],
         "timeoutMs": 3000
       },
       "supabase_service_role_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["SUPABASE_SERVICE_ROLE_KEY"],
+        "args": [
+          "SUPABASE_SERVICE_ROLE_KEY"
+        ],
         "timeoutMs": 3000
       },
       "canva_client_id_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["CANVA_CLIENT_ID"],
+        "args": [
+          "CANVA_CLIENT_ID"
+        ],
         "timeoutMs": 3000
       },
       "canva_client_secret_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["CANVA_CLIENT_SECRET"],
+        "args": [
+          "CANVA_CLIENT_SECRET"
+        ],
         "timeoutMs": 3000
       },
       "canva_brand_kit_id_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["CANVA_BRAND_KIT_ID"],
+        "args": [
+          "CANVA_BRAND_KIT_ID"
+        ],
         "timeoutMs": 3000
       },
       "ghl_email_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_EMAIL"],
+        "args": [
+          "GHL_EMAIL"
+        ],
         "timeoutMs": 3000
       },
       "ghl_password_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_PASSWORD"],
+        "args": [
+          "GHL_PASSWORD"
+        ],
         "timeoutMs": 3000
       },
       "openai_embeddings_key_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["OPENAI_API_KEY"],
+        "args": [
+          "OPENAI_API_KEY"
+        ],
         "timeoutMs": 3000
       }
     }
@@ -218,15 +242,99 @@
         "model": "openai/gpt-5.3-codex"
       },
       {
-        "id": "shared_master_orchestrator",
-        "name": "Master Orchestrator",
-        "workspace": "/opt/openclaw/workspaces/shared_master_orchestrator",
+        "id": "d8_saas_director",
+        "name": "SaaS Operations Director",
+        "workspace": "/opt/openclaw/workspaces/d8_saas_director",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d9_store_director",
         "name": "Online Store Director",
         "workspace": "/opt/openclaw/workspaces/d9_store_director",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "shared_master_orchestrator",
+        "name": "Master Orchestrator",
+        "workspace": "/opt/openclaw/workspaces/shared_master_orchestrator",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "shared_runtime_ops",
+        "name": "Shared Runtime Ops",
+        "workspace": "/opt/openclaw/workspaces/shared_runtime_ops",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "shared_exec_orchestrator",
+        "name": "Shared Executive Orchestrator",
+        "workspace": "/opt/openclaw/workspaces/shared_exec_orchestrator",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "shared_data_control",
+        "name": "Shared Data Control",
+        "workspace": "/opt/openclaw/workspaces/shared_data_control",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_01_pod_lead",
+        "name": "Truth J Blue Core Brand Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_01_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_02_pod_lead",
+        "name": "Beyond the Veil Mentorship Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_02_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_03_pod_lead",
+        "name": "Divine Path Walkers Community Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_03_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_04_pod_lead",
+        "name": "Truth J Blue Publishing Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_04_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_05_pod_lead",
+        "name": "Truth J Blue Consulting Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_05_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_06_pod_lead",
+        "name": "Inspire Build Motivate, Inc. Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_06_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_07_pod_lead",
+        "name": "Truth J Blue Online Store Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_07_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_08_pod_lead",
+        "name": "Truth J Blue Primary SaaS Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_08_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_09_pod_lead",
+        "name": "Incubator Shared Brands Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_09_pod_lead",
+        "model": "openai/gpt-5.3-codex"
+      },
+      {
+        "id": "biz_10_pod_lead",
+        "name": "Portfolio Control Pod Lead",
+        "workspace": "/opt/openclaw/workspaces/biz_10_pod_lead",
         "model": "openai/gpt-5.3-codex"
       }
     ]

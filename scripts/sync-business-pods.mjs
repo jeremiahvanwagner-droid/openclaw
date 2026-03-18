@@ -315,7 +315,7 @@ function buildAgentConfig(registry) {
 
   const mergedAgents = mergeByKey(configs.flatMap((config) => config.agents || []), "agent_id");
   const mergedDivisions = mergeByKey(
-    [...DIVISION_METADATA, ...configs.flatMap((config) => config.divisions || [])],
+    [...configs.flatMap((config) => config.divisions || []), ...DIVISION_METADATA],
     "id",
   );
   const newAgents = [

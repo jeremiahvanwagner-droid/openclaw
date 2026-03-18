@@ -61,7 +61,7 @@ fi
 echo "[6/10] Creating directory structure..."
 mkdir -p "$OPENCLAW_HOME"/{data,logs,backups,media,memory,cron/runs,delivery-queue,browser}
 mkdir -p "$OPENCLAW_HOME"/{workspace,workspace-marketing,workspace-sales,workspace-support}
-mkdir -p "$OPENCLAW_HOME"/workspaces/{d1_ceo,d1_cto,d2_director,d3_ceo,d4_cvo,d5_publisher,d6_executive_director,shared_master_orchestrator}
+mkdir -p "$OPENCLAW_HOME"/workspaces/{d1_ceo,d1_cto,d2_director,d3_ceo,d4_cvo,d5_publisher,d6_executive_director,d8_saas_director,d9_store_director,shared_master_orchestrator,shared_runtime_ops,shared_exec_orchestrator,shared_data_control,biz_01_pod_lead,biz_02_pod_lead,biz_03_pod_lead,biz_04_pod_lead,biz_05_pod_lead,biz_06_pod_lead,biz_07_pod_lead,biz_08_pod_lead,biz_09_pod_lead,biz_10_pod_lead}
 mkdir -p "$OPENCLAW_HOME"/.openclaw
 mkdir -p "$OPENCLAW_CONFIG"
 mkdir -p "$OPENCLAW_LOG"

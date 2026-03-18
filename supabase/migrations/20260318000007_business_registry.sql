@@ -99,20 +99,25 @@ ALTER TABLE business_registry ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_daily_scorecards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE business_approval_queue ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Anon read access on business_registry" ON business_registry;
 CREATE POLICY "Anon read access on business_registry" ON business_registry
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Anon read access on business_daily_scorecards" ON business_daily_scorecards;
 CREATE POLICY "Anon read access on business_daily_scorecards" ON business_daily_scorecards
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "Service role full access on business_registry" ON business_registry;
 CREATE POLICY "Service role full access on business_registry" ON business_registry
   FOR ALL USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Service role full access on business_daily_scorecards" ON business_daily_scorecards;
 CREATE POLICY "Service role full access on business_daily_scorecards" ON business_daily_scorecards
   FOR ALL USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');
 
+DROP POLICY IF EXISTS "Service role full access on business_approval_queue" ON business_approval_queue;
 CREATE POLICY "Service role full access on business_approval_queue" ON business_approval_queue
   FOR ALL USING (auth.role() = 'service_role')
   WITH CHECK (auth.role() = 'service_role');

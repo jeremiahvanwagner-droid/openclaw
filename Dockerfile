@@ -41,13 +41,22 @@ COPY handlers/ handlers/
 COPY skills/ skills/
 COPY agents/ agents/
 COPY config/ config/
+COPY workspaces/ workspaces/
 
 # Create runtime data directories and workspace dirs
 RUN mkdir -p data logs backups cron/runs delivery-queue media memory \
     workspace workspace-marketing workspace-sales workspace-support \
     workspaces/d1_ceo workspaces/d1_cto workspaces/d2_director \
     workspaces/d3_ceo workspaces/d4_cvo workspaces/d5_publisher \
-    workspaces/d6_executive_director workspaces/shared_master_orchestrator \
+    workspaces/d6_executive_director workspaces/d8_saas_director \
+    workspaces/d9_store_director workspaces/shared_master_orchestrator \
+    workspaces/shared_runtime_ops workspaces/shared_exec_orchestrator \
+    workspaces/shared_data_control workspaces/biz_01_pod_lead \
+    workspaces/biz_02_pod_lead workspaces/biz_03_pod_lead \
+    workspaces/biz_04_pod_lead workspaces/biz_05_pod_lead \
+    workspaces/biz_06_pod_lead workspaces/biz_07_pod_lead \
+    workspaces/biz_08_pod_lead workspaces/biz_09_pod_lead \
+    workspaces/biz_10_pod_lead \
     .openclaw && \
     chown -R openclaw:openclaw /opt/openclaw
 

@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "description": "Multi-SaaS Instance Registry — Division 8 SaaS Operations",
+  "ghl_agency_id": "TW8JsPW5NMnA3tfK2XLn",
+  "instances": [
+    {
+      "saas_instance_id": "00000000-0000-0000-0000-000000000001",
+      "business_id": "biz_08_primary_saas",
+      "brand_name": "Truth J Blue — Primary SaaS",
+      "niche": "AI-Powered Business Coaching",
+      "ghl_agency_account_id": "TW8JsPW5NMnA3tfK2XLn",
+      "stripe_connect_id": "",
+      "custom_domain": "app.truthjblue.com",
+      "snapshot_ids": [],
+      "pricing_tiers": [
+        {
+          "tier_id": "starter",
+          "name": "Starter",
+          "price_monthly": 97,
+          "price_annual": 970,
+          "features": ["CRM", "1 Funnel", "Email Marketing", "500 Contacts"]
+        },
+        {
+          "tier_id": "growth",
+          "name": "Growth",
+          "price_monthly": 297,
+          "price_annual": 2970,
+          "features": ["CRM", "Unlimited Funnels", "Email + SMS", "Memberships", "5000 Contacts"]
+        },
+        {
+          "tier_id": "scale",
+          "name": "Scale",
+          "price_monthly": 497,
+          "price_annual": 4970,
+          "features": ["Everything in Growth", "Workflows", "White-Label", "API Access", "Unlimited Contacts"]
+        }
+      ],
+      "status": "active",
+      "created_at": "2026-03-15T00:00:00.000Z",
+      "sub_accounts": [],
+      "settings": {
+        "lc_phone_enabled": false,
+        "lc_email_enabled": false,
+        "saas_mode_enabled": false,
+        "rebilling_configured": false,
+        "auto_provisioning": false
+      },
+      "metrics": {
+        "total_sub_accounts": 0,
+        "active_sub_accounts": 0,
+        "mrr": 0,
+        "churn_rate_30d": 0
+      }
+    }
+  ]
+}
