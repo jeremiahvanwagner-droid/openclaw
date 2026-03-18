@@ -68,12 +68,14 @@ vi.mock("@supabase/supabase-js", () => ({
 }));
 
 // Mock OpenAI for embeddings
+const mockEmbeddingCreate = vi.fn().mockResolvedValue({
+  data: [{ embedding: Array(512).fill(0.01) }],
+});
+
 vi.mock("openai", () => ({
   default: vi.fn(() => ({
     embeddings: {
-      create: vi.fn().mockResolvedValue({
-        data: [{ embedding: Array(1536).fill(0.01) }],
-      }),
+      create: mockEmbeddingCreate,
     },
   })),
 }));
@@ -104,10 +106,15 @@ describe("agent-memory", () => {
   // ─── Embedding ────────────────────────────────────────────────
 
   describe("generateEmbedding", () => {
-    it("returns 1536-dimensional vector", async () => {
+    it("returns 512-dimensional vector", async () => {
       const vec = await generateEmbedding("test content");
-      expect(vec).toHaveLength(1536);
+      expect(vec).toHaveLength(512);
       expect(vec[0]).toBe(0.01);
+      expect(mockEmbeddingCreate).toHaveBeenCalledWith({
+        model: "text-embedding-3-small",
+        dimensions: 512,
+        input: "test content",
+      });
     });
   });
 
@@ -117,6 +124,8 @@ describe("agent-memory", () => {
     it("stores memory and returns id", async () => {
       const id = await embedAndStore("d1_ceo", "Remember this fact");
       expect(id).toBe("mem-123");
+      const payload = mockInsert.mock.calls.at(-1)?.[0];
+      expect(payload.embedding_512).toHaveLength(512);
     });
 
     it("accepts scope and metadata options", async () => {
@@ -157,6 +166,18 @@ describe("agent-memory", () => {
       expect(results.length).toBe(2);
       expect(results[0].similarity).toBeGreaterThanOrEqual(0.7);
       expect(results[1].similarity).toBeGreaterThanOrEqual(0.7);
+      expect(mockRpc).toHaveBeenCalledWith(
+        "match_agent_memories_512",
+        expect.objectContaining({
+          query_embedding: expect.any(Array),
+          agent_id_filter: "d1_ceo",
+          division_filter: "division_1",
+          include_shared: true,
+          match_count: 5,
+        })
+      );
+      const rpcArgs = mockRpc.mock.calls.at(-1)?.[1];
+      expect(rpcArgs.query_embedding).toHaveLength(512);
     });
 
     it("respects custom minSimilarity", async () => {

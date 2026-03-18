@@ -58,6 +58,9 @@ const TOKEN_PRICING: Record<string, { input: number; output: number }> = {
   "gpt-4o-mini":                { input: 0.00015, output: 0.0006 },
 };
 
+const EMBEDDING_MODEL = "text-embedding-3-small";
+const EMBEDDING_DIMENSIONS = 512;
+
 function calculateCostUsd(model: string, inputTokens: number, outputTokens: number): number {
   const pricing = TOKEN_PRICING[model];
   if (!pricing) return 0;
@@ -366,11 +369,12 @@ export async function completeJSON<T>(
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * Generate embedding using OpenAI ada-002
+ * Generate embedding using OpenAI text-embedding-3-small.
  */
 export async function embed(text: string): Promise<number[]> {
   const response = await getOpenAI().embeddings.create({
-    model: "text-embedding-ada-002",
+    model: EMBEDDING_MODEL,
+    dimensions: EMBEDDING_DIMENSIONS,
     input: text,
   });
   return response.data[0].embedding;
@@ -381,7 +385,8 @@ export async function embed(text: string): Promise<number[]> {
  */
 export async function embedBatch(texts: string[]): Promise<number[][]> {
   const response = await getOpenAI().embeddings.create({
-    model: "text-embedding-ada-002",
+    model: EMBEDDING_MODEL,
+    dimensions: EMBEDDING_DIMENSIONS,
     input: texts,
   });
   return response.data.map(d => d.embedding);

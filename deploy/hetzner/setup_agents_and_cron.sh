@@ -234,12 +234,12 @@ MSG
 )"
 
 SENTINEL_MESSAGE="$(cat <<MSG
-Run the local critical incident sentinel only:
+Phase 1: run the local critical incident sentinel only:
 python3 ~/openclaw-prod/scripts/ops_control.py --db-path \"$OPS_DB_PATH\" sentinel --timezone \"$TZ_NAME\"
-If the command returns NO_ALERT or CRITICAL_ALERT_ALREADY_SENT, return a blank summary.
-If the command returns CRITICAL_ALERT_SENT, return only: [ACTION REQUIRED] Critical incident notification dispatched.
-If the command returns CRITICAL_ALERT_QUEUED_NO_CHANNEL, return only: [ACTION REQUIRED] Critical incident queued but no alert channel is configured.
-Do not initiate external API calls; sentinel logic is local-first and alert-exception only.
+Return blank when the command prints NO_ALERT or CRITICAL_ALERT_ALREADY_SENT.
+Return only: [ACTION REQUIRED] Critical incident notification dispatched when it prints CRITICAL_ALERT_SENT.
+Return only: [ACTION REQUIRED] Critical incident queued but no alert channel is configured when it prints CRITICAL_ALERT_QUEUED_NO_CHANNEL.
+Do not add analysis or initiate external API calls; sentinel logic is local-first and alert-exception only.
 MSG
 )"
 

@@ -20,6 +20,9 @@ const log = logger.child({ module: "agent-memory" });
 let supabase: SupabaseClient | null = null;
 let openai: OpenAI | null = null;
 
+const EMBEDDING_MODEL = "text-embedding-3-small";
+const EMBEDDING_DIMENSIONS = 512;
+
 function getSupabase(): SupabaseClient {
   if (!supabase) {
     supabase = createClient(
@@ -66,11 +69,12 @@ export interface QueryOptions {
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * Generate embedding vector for text using OpenAI ada-002
+ * Generate embedding vector for text using OpenAI text-embedding-3-small.
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await getOpenAI().embeddings.create({
-    model: "text-embedding-ada-002",
+    model: EMBEDDING_MODEL,
+    dimensions: EMBEDDING_DIMENSIONS,
     input: text,
   });
   return response.data[0].embedding;
@@ -108,7 +112,7 @@ export async function embedAndStore(
     .insert({
       agent_id: agentId,
       content,
-      embedding,
+      embedding_512: embedding,
       memory_scope: scope,
       metadata: {
         ...metadata,
@@ -196,8 +200,8 @@ export async function queryMemory(
   // Generate query embedding
   const queryEmbedding = await generateEmbedding(query);
 
-  // Query with pgvector RPC function
-  const { data, error } = await getSupabase().rpc("match_agent_memories", {
+  // Query with the 512-dim pgvector RPC function.
+  const { data, error } = await getSupabase().rpc("match_agent_memories_512", {
     query_embedding: queryEmbedding,
     agent_id_filter: agentId,
     division_filter: agent.org_unit,

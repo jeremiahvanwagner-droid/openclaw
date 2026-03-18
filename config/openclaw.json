@@ -228,7 +228,8 @@
       },
       "models": {
         "openai-codex/gpt-5.3-codex": {},
-        "openai/gpt-5.3-codex": {}
+        "openai/gpt-5.3-codex": {},
+        "openai/gpt-4o-mini": {}
       },
       "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace",
       "contextTokens": 240000,

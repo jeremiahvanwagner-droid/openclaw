@@ -19,6 +19,10 @@ vi.mock("@supabase/supabase-js", () => ({
 }));
 
 // Mock external dependencies BEFORE importing the module
+const mockEmbeddingCreate = vi.fn().mockResolvedValue({
+  data: [{ embedding: Array(512).fill(0.1) }],
+});
+
 vi.mock("@anthropic-ai/sdk", () => {
   const create = vi.fn().mockResolvedValue({
     content: [{ type: "text", text: "mocked anthropic response" }],
@@ -32,13 +36,10 @@ vi.mock("openai", () => {
     choices: [{ message: { content: "mocked openai response" } }],
     usage: { prompt_tokens: 10, completion_tokens: 20 },
   });
-  const embCreate = vi.fn().mockResolvedValue({
-    data: [{ embedding: Array(1536).fill(0.1) }],
-  });
   return {
     default: vi.fn(() => ({
       chat: { completions: { create } },
-      embeddings: { create: embCreate },
+      embeddings: { create: mockEmbeddingCreate },
     })),
   };
 });
@@ -225,10 +226,15 @@ describe("llm-router", () => {
   // ─── Embedding Operations ────────────────────────────────────
 
   describe("embed", () => {
-    it("returns 1536-dim embedding vector", async () => {
+    it("returns 512-dim embedding vector", async () => {
       const vec = await embed("test text");
-      expect(vec).toHaveLength(1536);
+      expect(vec).toHaveLength(512);
       expect(vec[0]).toBe(0.1);
+      expect(mockEmbeddingCreate).toHaveBeenCalledWith({
+        model: "text-embedding-3-small",
+        dimensions: 512,
+        input: "test text",
+      });
     });
   });
 
@@ -237,7 +243,12 @@ describe("llm-router", () => {
       const vecs = await embedBatch(["text one", "text two"]);
       // Mock returns single entry, but tests the call shape
       expect(vecs.length).toBeGreaterThanOrEqual(1);
-      expect(vecs[0]).toHaveLength(1536);
+      expect(vecs[0]).toHaveLength(512);
+      expect(mockEmbeddingCreate).toHaveBeenCalledWith({
+        model: "text-embedding-3-small",
+        dimensions: 512,
+        input: ["text one", "text two"],
+      });
     });
   });
 });

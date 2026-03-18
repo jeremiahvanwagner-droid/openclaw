@@ -86,6 +86,71 @@ PY
   fi
 done
 
+"${PYTHON[@]}" - "${CRON_JSON_TMP}" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as f:
+    data = json.load(f)
+
+jobs = {job.get("name"): job for job in data.get("jobs", [])}
+checks = {
+    "critical-incident-sentinel": {
+        "message_parts": [
+            "NO_ALERT or CRITICAL_ALERT_ALREADY_SENT",
+            "CRITICAL_ALERT_SENT",
+            "CRITICAL_ALERT_QUEUED_NO_CHANNEL",
+        ],
+    },
+    "agent-network-health-check": {
+        "message_parts": [
+            "network_health.py",
+            "Return blank when the script output is healthy or only reports OK:",
+            "ALERT: or observability_degraded",
+        ],
+    },
+    "agent-heartbeat-monitor": {
+        "message_parts": [
+            "heartbeat_monitor.py",
+            "Return blank when the output is healthy or starts with OK:",
+            "ALERT: or WARN:",
+        ],
+    },
+    "ghl-l25-urgent-rollback-sentinel-30m": {
+        "message_parts": [
+            "Return blank when all thresholds are within bounds.",
+            "return only URGENT",
+            "disable outbound-enabled jobs",
+        ],
+    },
+}
+
+errors = []
+for name, spec in checks.items():
+    job = jobs.get(name)
+    if not job:
+        errors.append(f"Missing required cron: {name}")
+        continue
+
+    payload = job.get("payload") or {}
+    message = payload.get("message") or ""
+    for part in spec["message_parts"]:
+        if part not in message:
+            errors.append(f"{name} payload missing expected text: {part}")
+
+    if payload.get("thinking") != "low":
+        errors.append(f"{name} payload thinking must remain low")
+    if payload.get("lightContext") is not True:
+        errors.append(f"{name} payload lightContext must remain true")
+    if "failureAlert" not in job:
+        errors.append(f"{name} must retain failureAlert configuration")
+
+if errors:
+    for error in errors:
+        print(error)
+    sys.exit(1)
+PY
+
 if ! "${PYTHON[@]}" - "${CRON_JSON_TMP}" <<'PY' >/dev/null
 import json
 import sys
