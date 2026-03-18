@@ -11,6 +11,8 @@ const supabase = supabaseUrl && supabaseKey
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [mode, setMode] = useState<"password" | "magic-link">("password");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -26,19 +28,34 @@ export default function LoginPage() {
       return;
     }
 
-    const { error: authError } = await supabase.auth.signInWithOtp({
-      email,
-      options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    if (mode === "password") {
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (authError) {
-      setError(authError.message);
+      if (authError) {
+        setError(authError.message);
+      } else {
+        window.location.href = "/";
+      }
     } else {
-      setSent(true);
+      const { error: authError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      setLoading(false);
+
+      if (authError) {
+        setError(authError.message);
+      } else {
+        setSent(true);
+      }
     }
   }
 
@@ -75,6 +92,23 @@ export default function LoginPage() {
               />
             </div>
 
+            {mode === "password" && (
+              <div>
+                <label htmlFor="password" className="block text-sm text-slate-400 mb-1">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-claw-500 focus:border-transparent"
+                />
+              </div>
+            )}
+
             {error && (
               <p className="text-red-400 text-sm">{error}</p>
             )}
@@ -84,7 +118,21 @@ export default function LoginPage() {
               disabled={loading}
               className="w-full py-2 px-4 bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-700 disabled:text-slate-500 text-white font-medium rounded-md transition"
             >
-              {loading ? "Sending..." : "Send Magic Link"}
+              {loading
+                ? "Signing in..."
+                : mode === "password"
+                ? "Sign In"
+                : "Send Magic Link"}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMode(mode === "password" ? "magic-link" : "password")}
+              className="w-full text-sm text-slate-400 hover:text-slate-300 transition"
+            >
+              {mode === "password"
+                ? "Use magic link instead"
+                : "Use password instead"}
             </button>
           </form>
         )}
