@@ -18,16 +18,20 @@ vi.mock("../metrics", () => ({
 // stateful module sequentially and reset state via its public surface where possible.
 
 import {
+  __resetForTests,
   checkRequest,
   reportSuccess,
   reportFailure,
   withGovernor,
   getStatus,
   getAllStatus,
-  type GuardedRequestOptions,
 } from "../api-rate-governor";
 
 describe("api-rate-governor", () => {
+  beforeEach(() => {
+    __resetForTests({ deleteStateFile: true });
+  });
+
   // ─── Token Bucket Rate Limiting ──────────────────────────────
 
   describe("checkRequest — token bucket", () => {

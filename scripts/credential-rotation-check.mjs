@@ -48,7 +48,7 @@ async function main() {
   const alerts = [];
 
   for (const cred of credentials) {
-    const { credential, rotate_by, revoke_procedure } = cred;
+    const { credential, rotate_by } = cred;
     if (!rotate_by) {
       alerts.push(`⚠️ ${credential}: No rotate_by date set!`);
       continue;

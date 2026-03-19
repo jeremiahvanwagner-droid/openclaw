@@ -447,7 +447,7 @@
       "dmPolicy": "allowlist",
       "botToken": "${TELEGRAM_BOT_TOKEN}",
       "allowFrom": [
-        7737707872
+        "${TELEGRAM_ALERT_CHAT_ID}"
       ],
       "groupPolicy": "allowlist",
       "streaming": "off"
@@ -456,7 +456,7 @@
       "enabled": false,
       "dmPolicy": "pairing",
       "groupAllowFrom": [
-        "7737707872"
+        "${TELEGRAM_ALERT_CHAT_ID}"
       ],
       "groupPolicy": "allowlist"
     },

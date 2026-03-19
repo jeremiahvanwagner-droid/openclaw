@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { buildPortfolioSummary, loadBusinessRegistry } from "../../../../../lib/business-registry.mjs";
+import { buildPortfolioSummary, loadBusinessRegistry } from "../../../../lib/business-registry.mjs";
 
 export async function GET() {
   try {

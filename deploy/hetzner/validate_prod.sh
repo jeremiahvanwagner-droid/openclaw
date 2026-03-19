@@ -184,11 +184,11 @@ then
 fi
 
 if command -v systemctl >/dev/null 2>&1; then
-  if systemctl list-unit-files | grep -q '^openclaw-ghl-webhook.service'; then
-    systemctl is-enabled openclaw-ghl-webhook.service >/dev/null
-    systemctl is-active openclaw-ghl-webhook.service >/dev/null
+  if systemctl list-unit-files | grep -q '^openclaw-webhook.service'; then
+    systemctl is-enabled openclaw-webhook.service >/dev/null
+    systemctl is-active openclaw-webhook.service >/dev/null
   else
-    echo "Webhook service not installed yet (openclaw-ghl-webhook.service)."
+    echo "Webhook service not installed yet (openclaw-webhook.service)."
     echo "Install with: sudo APP_USER=${APP_USER} bash ~/openclaw-prod/scripts/install_webhook_service.sh"
   fi
 fi

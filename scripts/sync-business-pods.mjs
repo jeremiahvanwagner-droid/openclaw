@@ -18,6 +18,8 @@ import {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const ROOT_DIR = resolve(__dirname, "..");
+const WINDOWS_RUNTIME_ROOT = process.env.OPENCLAW_WINDOWS_RUNTIME_ROOT || ROOT_DIR;
+const LINUX_RUNTIME_ROOT = process.env.OPENCLAW_LINUX_RUNTIME_ROOT || "/opt/openclaw";
 
 const AGENT_CONFIG_PATHS = [
   join(ROOT_DIR, "agents_config.json"),
@@ -28,21 +30,20 @@ const OPENCLAW_CONFIGS = [
   {
     path: join(ROOT_DIR, "openclaw.json"),
     platform: "windows",
-    workspaceRoot: "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces",
+    workspaceRoot: win32.join(WINDOWS_RUNTIME_ROOT, "workspaces"),
   },
   {
     path: join(ROOT_DIR, "config", "openclaw.json"),
     platform: "windows",
-    workspaceRoot: "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces",
+    workspaceRoot: win32.join(WINDOWS_RUNTIME_ROOT, "workspaces"),
   },
   {
     path: join(ROOT_DIR, "config", "openclaw.prod.json"),
     platform: "linux",
-    workspaceRoot: "/opt/openclaw/workspaces",
+    workspaceRoot: posix.join(LINUX_RUNTIME_ROOT, "workspaces"),
   },
 ];
 
-const POD_WORKER_TYPES = ["growth_worker", "sales_worker", "delivery_worker", "ops_worker"];
 const SHARED_SUPERVISOR_IDS = [
   "shared_runtime_ops",
   "shared_exec_orchestrator",

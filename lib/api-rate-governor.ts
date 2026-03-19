@@ -16,13 +16,13 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { logger } from "./logger.ts";
+import { logger } from "./logger";
 import {
   circuitBreakerState,
   budgetUsedDollars,
   budgetCeilingDollars,
   concurrencyActive,
-} from "./metrics.ts";
+} from "./metrics";
 
 const log = logger.child({ module: "rate-governor" });
 
@@ -605,6 +605,22 @@ export function getStatus(provider: string): GovernorStatus {
 
 export function getAllStatus(): GovernorStatus[] {
   return Object.keys(PROVIDER_LIMITS).map(getStatus);
+}
+
+export function __resetForTests(options: { deleteStateFile?: boolean } = {}): void {
+  minuteBuckets.clear();
+  hourBuckets.clear();
+  activeCounts.clear();
+  budgets.clear();
+  circuitBreakers.clear();
+
+  if (options.deleteStateFile) {
+    try {
+      fs.rmSync(STATE_FILE, { force: true });
+    } catch {
+      // Best-effort cleanup for test isolation.
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════

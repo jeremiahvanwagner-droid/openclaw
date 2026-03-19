@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseServer } from "../../supabase-server";
 import { createClient } from "@supabase/supabase-js";
+
+import { createSupabaseServer } from "../../supabase-server";
+import { isUserAdmin } from "../../../lib/admin";
 
 export async function POST(req: NextRequest) {
   // Verify authenticated session
@@ -9,8 +11,8 @@ export async function POST(req: NextRequest) {
     data: { user },
   } = await supabaseAuth.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!user || !isUserAdmin(user)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const { event_id } = await req.json();
@@ -22,7 +24,7 @@ export async function POST(req: NextRequest) {
   // Use service role to read and write events
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
   // Fetch original event
@@ -63,7 +65,7 @@ export async function POST(req: NextRequest) {
   if (!inngestRes.ok) {
     return NextResponse.json(
       { error: "Failed to replay event via Inngest" },
-      { status: 502 }
+      { status: 502 },
     );
   }
 

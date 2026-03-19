@@ -13,8 +13,8 @@
 import fs from "fs";
 import path from "path";
 import nodemailer from "nodemailer";
-import { logger } from "./logger.ts";
-import { alertsSentTotal } from "./metrics.ts";
+import { logger } from "./logger";
+import { alertsSentTotal } from "./metrics";
 
 const log = logger.child({ module: "alerting" });
 

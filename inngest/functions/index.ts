@@ -5,7 +5,7 @@
  * Exports all Inngest functions for registration with the serve handler.
  */
 
-export { inngest } from "../client.ts";
+export { inngest } from "../client";
 
 // Agent orchestration functions
 export {
@@ -15,7 +15,7 @@ export {
   telegramAlert,
   bookLaunchReady,
   functions,
-} from "./agent-orchestrator.ts";
+} from "./agent-orchestrator";
 
 // Training protocol functions
 export {
@@ -26,7 +26,7 @@ export {
   trainingPerformanceReview,
   trainingMemoryConsolidation,
   trainingHealthCheck,
-} from "./training-protocol.ts";
+} from "./training-protocol";
 
 // Division 8 — SaaS Operations event handlers
 export {
@@ -38,4 +38,4 @@ export {
   saasUsageThreshold,
   saasFunnelPublished,
   d8Functions,
-} from "./d8-saas-operations.ts";
+} from "./d8-saas-operations";

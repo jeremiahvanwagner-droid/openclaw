@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  bot:
+    name: Bot Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:source
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  dashboard:
+    name: Dashboard Checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dashboard dependencies
+        working-directory: dashboard
+        run: npm ci
+      - name: Dashboard typecheck
+        working-directory: dashboard
+        run: npm run typecheck
+      - name: Dashboard build
+        working-directory: dashboard
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://your-project.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: test_anon_key
+        run: npm run build

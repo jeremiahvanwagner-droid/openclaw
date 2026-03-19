@@ -112,7 +112,7 @@ async function main() {
   }
 
   let processed = 0;
-  while (true) {
+  for (;;) {
     const rows = await fetchPendingBatch();
     if (rows.length === 0) {
       break;

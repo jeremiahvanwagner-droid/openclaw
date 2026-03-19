@@ -117,6 +117,7 @@ vi.mock("../../inngest/client", () => ({
       return { config, trigger, handler };
     }),
   },
+  agentTaskName: vi.fn((agentId: string) => `agent/${agentId}/task`),
   getDivisionHead: vi.fn((div: string) => {
     const heads: Record<string, string> = {
       division_1_core_operations: "d1_ceo",
@@ -129,6 +130,7 @@ vi.mock("../../inngest/client", () => ({
     if (pod.startsWith("biz_")) return `${pod}_pod_lead`;
     return null;
   }),
+  podTaskName: vi.fn((podId: string) => `pod/${podId}/task`),
 }));
 
 // Import triggers the createFunction calls

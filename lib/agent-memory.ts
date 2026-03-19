@@ -8,11 +8,11 @@
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
-import { logger } from "./logger.ts";
+import { logger } from "./logger";
 import {
   memoryQueryDuration,
   memoryStoreTotal,
-} from "./metrics.ts";
+} from "./metrics";
 
 const log = logger.child({ module: "agent-memory" });
 

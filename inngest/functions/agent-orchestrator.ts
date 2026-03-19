@@ -9,11 +9,11 @@
  * - Telegram alerting
  */
 
-import { inngest, getDivisionHead, getPodLead } from "../client.ts";
+import { agentTaskName, getDivisionHead, getPodLead, inngest, podTaskName } from "../client";
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
-import { reportFailure as governorReportFailure } from "../../lib/api-rate-governor.ts";
-import { logger } from "../../lib/logger.ts";
+import { reportFailure as governorReportFailure } from "../../lib/api-rate-governor";
+import { logger } from "../../lib/logger";
 
 const log = logger.child({ module: "agent-orchestrator" });
 
@@ -168,7 +168,7 @@ export const agentInvoke = inngest.createFunction(
       if (agentPod && agentPod !== "shared" && getPodLead(agentPod)) {
         const podLead = getPodLead(agentPod)!;
         await step.sendEvent("route-via-pod", {
-          name: `pod/${agentPod}/task`,
+          name: podTaskName(agentPod),
           data: {
             type: "invoke",
             pod_id: agentPod,
@@ -191,7 +191,7 @@ export const agentInvoke = inngest.createFunction(
 
       // Direct routing for shared agents or agents without a pod
       await step.sendEvent("route-to-agent", {
-        name: `agent/${target_agent}/task`,
+        name: agentTaskName(target_agent),
         data: {
           type: "invoke",
           source: source_agent,
@@ -213,7 +213,7 @@ export const agentInvoke = inngest.createFunction(
       const divisionHead = getDivisionHead(target_division);
 
       await step.sendEvent("route-to-division", {
-        name: `agent/${divisionHead}/task`,
+        name: agentTaskName(divisionHead),
         data: {
           type: "division_invoke",
           source: source_agent,
@@ -353,7 +353,7 @@ export const agentEscalate = inngest.createFunction(
     // Step 5: Route based on target health
     if (targetStatus === "healthy") {
       await step.sendEvent("escalate-to-target", {
-        name: `agent/${nextAgent}/task`,
+        name: agentTaskName(nextAgent),
         data: {
           type: "escalation",
           source: source_agent,
@@ -373,7 +373,7 @@ export const agentEscalate = inngest.createFunction(
       name: "agent/escalate",
       data: {
         source_agent,
-        escalation_path: null, // Will fetch from agent config
+        escalation_path: undefined, // Will fetch from agent config
         payload,
         retry_count: retry_count + 1,
         reason: `Previous target ${nextAgent} is ${targetStatus}`,

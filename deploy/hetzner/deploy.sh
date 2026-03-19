@@ -20,8 +20,20 @@ echo "════════════════════════�
 
 # ── 1. Pull latest code ──────────────────────────────────────
 echo "[1/6] Pulling latest code..."
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+if [[ "$CURRENT_BRANCH" != "main" ]]; then
+    echo "  Refusing deploy from branch '$CURRENT_BRANCH'. Expected 'main'."
+    exit 1
+fi
+
+if [[ -n "$(git status --porcelain)" ]]; then
+    echo "  Refusing deploy: working tree has local changes."
+    echo "  Commit, stash, or clean the server checkout before running deploy."
+    exit 1
+fi
+
 git fetch origin main
-git reset --hard origin/main
+git pull --ff-only origin main
 echo "  $(git log --oneline -1)"
 
 # ── 2. Optional: upgrade OpenClaw CLI ────────────────────────

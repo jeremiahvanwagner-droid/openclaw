@@ -11,13 +11,13 @@
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import { withGovernor, type QueueClass } from "./api-rate-governor.ts";
-import { logger } from "./logger.ts";
+import { withGovernor, type QueueClass } from "./api-rate-governor";
+import { logger } from "./logger";
 import {
   llmRequestDuration,
   llmRequestTotal,
   llmTokensUsed,
-} from "./metrics.ts";
+} from "./metrics";
 
 const log = logger.child({ module: "llm-router" });
 
@@ -60,6 +60,10 @@ const TOKEN_PRICING: Record<string, { input: number; output: number }> = {
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
 const EMBEDDING_DIMENSIONS = 512;
+
+function assertNever(value: never): never {
+  throw new Error(`Unknown provider configuration: ${JSON.stringify(value)}`);
+}
 
 function calculateCostUsd(model: string, inputTokens: number, outputTokens: number): number {
   const pricing = TOKEN_PRICING[model];
@@ -186,28 +190,27 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
     const result = await withGovernor(
       { provider: config.provider, queueClass, agentId, estimatedCostCents },
       async () => {
-        if (config.provider === "anthropic") {
-          return completeWithAnthropic({
-            model: config.model,
-            messages,
-            maxTokens: effectiveMaxTokens,
-            temperature,
-            stopSequences,
-          });
+        switch (config.provider) {
+          case "anthropic":
+            return completeWithAnthropic({
+              model: config.model,
+              messages,
+              maxTokens: effectiveMaxTokens,
+              temperature,
+              stopSequences,
+            });
+          case "openai":
+            return completeWithOpenAI({
+              model: config.model,
+              messages,
+              maxTokens: effectiveMaxTokens,
+              temperature,
+              stopSequences,
+            });
+          default:
+            return assertNever(config);
         }
-
-        if (config.provider === "openai") {
-          return completeWithOpenAI({
-            model: config.model,
-            messages,
-            maxTokens: effectiveMaxTokens,
-            temperature,
-            stopSequences,
-          });
-        }
-
-        throw new Error(`Unknown provider: ${config.provider}`);
-      }
+      },
     );
 
     timer({ provider: config.provider, model: config.model, agent: agentId || "unknown" });
@@ -217,7 +220,7 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
       llmTokensUsed.inc({ provider: config.provider, model: config.model, direction: "output" }, result.usage.outputTokens);
       const costUsd = calculateCostUsd(config.model, result.usage.inputTokens, result.usage.outputTokens);
       // Fire-and-forget cost log
-      logCost(agentId || "unknown", config.provider, config.model, result.usage.inputTokens, result.usage.outputTokens, costUsd);
+      void logCost(agentId || "unknown", config.provider, config.model, result.usage.inputTokens, result.usage.outputTokens, costUsd);
     }
     return result;
   } catch (error) {

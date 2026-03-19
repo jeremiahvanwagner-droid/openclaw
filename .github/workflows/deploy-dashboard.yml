@@ -30,6 +30,10 @@ jobs:
         working-directory: dashboard
         run: npm ci
 
+      - name: Typecheck
+        working-directory: dashboard
+        run: npm run typecheck
+
       - name: Build
         working-directory: dashboard
         env:

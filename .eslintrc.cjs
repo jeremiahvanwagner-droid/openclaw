@@ -43,5 +43,10 @@ module.exports = {
     "reports/",
     "training/",
     "tmp_*",
+    "backups/",
+    "agents/",
+    "logs/",
+    "memory/",
+    "skills/node_modules/",
   ],
 };

@@ -13,7 +13,7 @@
  * - Sunday: Health Check
  */
 
-import { inngest } from "../client.ts";
+import { inngest } from "../client";
 import { createClient } from "@supabase/supabase-js";
 import * as fs from "fs";
 import * as path from "path";
@@ -24,8 +24,36 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_KEY!
 );
 
-const WORKSPACE_ROOT = "C:\\Users\\JeremiahVanWagner\\.openclaw";
+const WORKSPACE_ROOT = path.resolve(process.env.OPENCLAW_HOME ?? process.cwd());
 const TRAINING_DIR = path.join(WORKSPACE_ROOT, "training");
+
+function resolveProjectPath(...segments: string[]): string {
+  return path.join(WORKSPACE_ROOT, ...segments);
+}
+
+function resolveExistingProjectPath(...candidates: string[][]): string {
+  for (const candidate of candidates) {
+    const resolved = resolveProjectPath(...candidate);
+    if (fs.existsSync(resolved)) {
+      return resolved;
+    }
+  }
+
+  return resolveProjectPath(...candidates[0]);
+}
+
+const AGENT_CONFIG_PATH = resolveExistingProjectPath(
+  ["config", "agents_config.json"],
+  ["agents_config.json"],
+);
+const CRON_JOBS_PATH = resolveExistingProjectPath(
+  ["config", "cron", "jobs.json"],
+  ["cron", "jobs.json"],
+);
+const OPENCLAW_CONFIG_PATH = resolveExistingProjectPath(
+  ["config", "openclaw.json"],
+  ["openclaw.json"],
+);
 
 // ═══════════════════════════════════════════════════════════════════
 // TRAINING: WEEKLY REVIEW (Monday 7 AM)
@@ -232,7 +260,7 @@ export const trainingSkillDevelopment = inngest.createFunction(
 
     // Step 3: Update agents_config.json
     await step.run("update-config", async () => {
-      const configPath = path.join(WORKSPACE_ROOT, "agents_config.json");
+      const configPath = AGENT_CONFIG_PATH;
       const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
 
       // Update tools_required for each agent
@@ -884,7 +912,7 @@ export const trainingHealthCheck = inngest.createFunction(
 
     // Step 4: Check cron jobs
     healthResults.cron_jobs = await step.run("check-cron-jobs", async () => {
-      const cronPath = path.join(WORKSPACE_ROOT, "cron", "jobs.json");
+      const cronPath = CRON_JOBS_PATH;
       const issues: string[] = [];
 
       try {
@@ -951,7 +979,7 @@ export const trainingHealthCheck = inngest.createFunction(
       const issues: string[] = [];
 
       // Check for exposed tokens in config
-      const configPath = path.join(WORKSPACE_ROOT, "openclaw.json");
+      const configPath = OPENCLAW_CONFIG_PATH;
       const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
 
       // Check token rotation (90 day recommendation)

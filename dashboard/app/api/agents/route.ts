@@ -1,21 +1,59 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createSupabaseServer } from "../../supabase-server";
 import { createClient } from "@supabase/supabase-js";
+
+import { createSupabaseServer } from "../../supabase-server";
+import { isUserAdmin } from "../../../lib/admin";
+
+const ALLOWED_CONFIG_PATCH_FIELDS = new Set(["model", "role", "escalation_path"]);
+
+type AgentAction = "invoke" | "quarantine" | "update";
+type JsonObject = Record<string, unknown>;
+
+interface AgentMutationRequest {
+  action: AgentAction;
+  agent_id: string;
+  config?: JsonObject;
+}
 
 function getServiceSupabase() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 }
 
-async function requireAdmin(req: NextRequest) {
+async function requireAdmin() {
   const supabase = createSupabaseServer();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return null;
+  if (!user || !isUserAdmin(user)) return null;
   return user;
+}
+
+function sanitizeConfigPatch(config: unknown): JsonObject | null {
+  if (!config || typeof config !== "object" || Array.isArray(config)) {
+    return null;
+  }
+
+  const patch = Object.entries(config).reduce<JsonObject>((accumulator, [key, value]) => {
+    if (!ALLOWED_CONFIG_PATCH_FIELDS.has(key)) {
+      return accumulator;
+    }
+
+    if (typeof value === "string") {
+      accumulator[key] = value.trim();
+      return accumulator;
+    }
+
+    if (value === null) {
+      accumulator[key] = null;
+    }
+
+    return accumulator;
+  }, {});
+
+  return Object.keys(patch).length > 0 ? patch : null;
 }
 
 async function auditLog(
@@ -23,7 +61,7 @@ async function auditLog(
   action: string,
   agentId: string,
   userEmail: string,
-  details: Record<string, unknown>
+  details: Record<string, unknown>,
 ) {
   await db.from("agent_events").insert({
     event_name: `dashboard/${action}`,
@@ -38,13 +76,17 @@ async function auditLog(
 
 // POST /api/agents — dispatch by action field
 export async function POST(req: NextRequest) {
-  const user = await requireAdmin(req);
+  const user = await requireAdmin();
   if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const body = await req.json();
+  const body = (await req.json()) as Partial<AgentMutationRequest>;
   const { action, agent_id } = body;
+
+  if (!action || !["invoke", "quarantine", "update"].includes(action)) {
+    return NextResponse.json({ error: "Valid action required" }, { status: 400 });
+  }
 
   if (!agent_id || typeof agent_id !== "string") {
     return NextResponse.json({ error: "agent_id required" }, { status: 400 });
@@ -88,7 +130,7 @@ export async function POST(req: NextRequest) {
       if (!res.ok) {
         return NextResponse.json(
           { error: "Failed to invoke agent via Inngest" },
-          { status: 502 }
+          { status: 502 },
         );
       }
 
@@ -111,7 +153,7 @@ export async function POST(req: NextRequest) {
       if (updateErr) {
         return NextResponse.json(
           { error: "Failed to update agent status" },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -124,16 +166,20 @@ export async function POST(req: NextRequest) {
     }
 
     case "update": {
-      const { config } = body;
-      if (!config || typeof config !== "object") {
+      const config = sanitizeConfigPatch(body.config);
+      if (!config) {
         return NextResponse.json(
-          { error: "config object required for update" },
-          { status: 400 }
+          { error: "config must only include model, role, or escalation_path" },
+          { status: 400 },
         );
       }
 
       // Merge with existing config to avoid overwriting nested fields
-      const mergedConfig = { ...agent.config, ...config };
+      const existingConfig =
+        agent.config && typeof agent.config === "object" && !Array.isArray(agent.config)
+          ? (agent.config as JsonObject)
+          : {};
+      const mergedConfig = { ...existingConfig, ...config };
 
       const { error: updateErr } = await db
         .from("agents")
@@ -143,7 +189,7 @@ export async function POST(req: NextRequest) {
       if (updateErr) {
         return NextResponse.json(
           { error: "Failed to update agent config" },
-          { status: 500 }
+          { status: 500 },
         );
       }
 
@@ -157,7 +203,7 @@ export async function POST(req: NextRequest) {
     default:
       return NextResponse.json(
         { error: `Unknown action: ${action}` },
-        { status: 400 }
+        { status: 400 },
       );
   }
 }
