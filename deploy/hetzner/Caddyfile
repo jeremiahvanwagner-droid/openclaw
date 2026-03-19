@@ -1,19 +1,16 @@
-# ═══════════════════════════════════════════════════════════════
-# OpenClaw — Caddy Reverse Proxy (Auto-TLS via Let's Encrypt)
-# Place at /etc/caddy/Caddyfile on the Hetzner VPS
-# Replace YOUR_DOMAIN with your actual domain
-# ═══════════════════════════════════════════════════════════════
+{
+    admin 127.0.0.1:2019
+    metrics
 
-# Gateway API — OpenClaw bot endpoint
-api.truthjblue.dev {
-    reverse_proxy localhost:18789
-
-    # Rate limiting
-    @rateLimit {
-        path /
+    servers {
+        trusted_proxies static 127.0.0.1/32 ::1/128
     }
+}
 
-    # Security headers
+# OpenClaw gateway API (authoritative Hetzner gateway)
+api.truthjblue.dev {
+    reverse_proxy 127.0.0.1:18789
+
     header {
         X-Content-Type-Options nosniff
         X-Frame-Options DENY
@@ -29,17 +26,15 @@ api.truthjblue.dev {
     }
 }
 
-# Webhook endpoint — GHL inbound webhooks
+# GHL webhook ingress
 webhook.truthjblue.dev {
-    reverse_proxy localhost:8788
+    reverse_proxy 127.0.0.1:8788
 
-    # Only allow POST requests to webhook endpoint
     @notPost {
         not method POST
     }
     respond @notPost 405
 
-    # Security headers
     header {
         X-Content-Type-Options nosniff
         -Server
@@ -53,14 +48,9 @@ webhook.truthjblue.dev {
     }
 }
 
-# Tailscale private gateway — accessible only from your Tailnet
-http://100.84.3.71:19789 {
-    reverse_proxy localhost:18789
-}
-
-# Dashboard — self-hosted Next.js on port 3001
+# Dashboard
 truthjblue.dev {
-    reverse_proxy localhost:3001
+    reverse_proxy 127.0.0.1:3001
 
     header {
         X-Content-Type-Options nosniff

@@ -63,9 +63,9 @@ function buildAuthConfig(opts) {
   }
 
   if (authMode === 'bearer') {
-    const token = opts.auth_token || process.env.OPENCLAW_GATEWAY_AUTH_TOKEN || '';
+    const token = opts.auth_token || process.env.OPENCLAW_GATEWAY_AUTH_TOKEN || process.env.OPENCLAW_GATEWAY_TOKEN || '';
     if (!token) {
-      throw new Error('bearer auth requires --auth-token or OPENCLAW_GATEWAY_AUTH_TOKEN');
+      throw new Error('bearer auth requires --auth-token or OPENCLAW_GATEWAY_AUTH_TOKEN/OPENCLAW_GATEWAY_TOKEN');
     }
     return { mode: 'bearer', token };
   }

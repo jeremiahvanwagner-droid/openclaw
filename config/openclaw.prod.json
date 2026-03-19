@@ -7,7 +7,7 @@
     "lastRunAt": "2026-03-15T18:00:00.000Z",
     "lastRunVersion": "2026.3.13",
     "lastRunCommand": "configure",
-    "lastRunMode": "local"
+    "lastRunMode": "remote"
   },
   "browser": {
     "headless": true,
@@ -386,12 +386,20 @@
   },
   "gateway": {
     "port": 18789,
-    "mode": "local",
+    "mode": "remote",
     "bind": "loopback",
+    "remote": {
+      "url": "https://api.truthjblue.dev",
+      "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
+    },
     "auth": {
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
     },
+    "trustedProxies": [
+      "127.0.0.1/32",
+      "::1/128"
+    ],
     "tailscale": {
       "mode": "off",
       "resetOnExit": false

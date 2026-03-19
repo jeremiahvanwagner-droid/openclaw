@@ -6,10 +6,26 @@ rule_files:
   - "/etc/prometheus/rules/*.yml"
 
 scrape_configs:
+  - job_name: "openclaw-gateway"
+    static_configs:
+      - targets: ["host.docker.internal:18789"]
+        labels:
+          service: "gateway"
+    metrics_path: /metrics
+    scrape_interval: 15s
+
   - job_name: "openclaw-webhook"
     static_configs:
       - targets: ["host.docker.internal:8788"]
         labels:
           service: "webhook-handler"
+    metrics_path: /metrics
+    scrape_interval: 15s
+
+  - job_name: "caddy"
+    static_configs:
+      - targets: ["host.docker.internal:2019"]
+        labels:
+          service: "caddy"
     metrics_path: /metrics
     scrape_interval: 15s

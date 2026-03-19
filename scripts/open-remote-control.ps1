@@ -17,9 +17,12 @@ function Get-EnvValue {
 }
 
 $token = Get-EnvValue -Name "OPENCLAW_GATEWAY_AUTH_TOKEN"
+if ([string]::IsNullOrWhiteSpace($token)) {
+  $token = Get-EnvValue -Name "OPENCLAW_GATEWAY_TOKEN"
+}
 
 if ([string]::IsNullOrWhiteSpace($token)) {
-  throw "OPENCLAW_GATEWAY_AUTH_TOKEN is not set."
+  throw "OPENCLAW_GATEWAY_AUTH_TOKEN (or OPENCLAW_GATEWAY_TOKEN) is not set."
 }
 
 $url = "https://api.truthjblue.dev/#token=$token"

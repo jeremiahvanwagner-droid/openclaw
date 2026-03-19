@@ -9,11 +9,9 @@ User=openclaw
 Group=openclaw
 WorkingDirectory=/opt/openclaw/dashboard
 
-# Supabase environment
+# Shared runtime environment (do not hardcode secrets in unit files)
+EnvironmentFile=/etc/openclaw/.env
 Environment=NODE_ENV=production
-Environment=NEXT_PUBLIC_SUPABASE_URL=https://aagqvfwuixpxtdcrdxmv.supabase.co
-Environment=NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhZ3F2Znd1aXhweHRkY3JkeG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDc1NDQsImV4cCI6MjA4ODkyMzU0NH0.9FvkyIqKYnaUcJQt0sXammf35O1NSpC2Rwx3c6KouvQ
-Environment=DASHBOARD_ADMIN_EMAILS=jeremiahvanwagner@icloud.com
 
 ExecStart=/usr/bin/node /opt/openclaw/dashboard/node_modules/.bin/next start -p 3001
 

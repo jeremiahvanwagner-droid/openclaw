@@ -63,6 +63,14 @@
 | Dashboard | `localhost:3001` (dev) | Monitoring UI |
 | Telegram Bot | `@OpenClawAlertBot` | Critical alerts |
 
+### Remote-First Gateway Contract
+
+- Hetzner (`api.truthjblue.dev`) is the only authoritative production gateway.
+- Operator workstations must run `gateway.mode=remote` and should not run a local gateway listener on port `18789`.
+- Local status lines that reference `127.0.0.1` are non-authoritative in remote-first mode.
+- Browser relay operations are single-tab by policy: one attached tab per active build session.
+- Use `scripts/relay-preflight.ps1` before browser actions; use `scripts/relay-single-tab-lock.ps1 -Apply` to enforce one attached tab.
+
 ### Environment Variables
 
 ```bash

@@ -54,3 +54,15 @@ scrape_configs:
       - labels:
           level:
           module:
+
+  # Tail systemd journal for caddy reverse proxy
+  - job_name: caddy
+    journal:
+      json: true
+      labels:
+        job: caddy
+      path: /var/log/journal
+    relabel_configs:
+      - source_labels: ["__journal__systemd_unit"]
+        regex: "caddy\\.service"
+        action: keep

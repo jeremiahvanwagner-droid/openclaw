@@ -41,3 +41,53 @@ groups:
         annotations:
           summary: "Supervisor {{ $labels.agent_id }} is unhealthy"
           description: "Agent {{ $labels.agent_id }} in {{ $labels.division }} pod {{ $labels.pod_id }} health is {{ $value }} (expected 2=active)"
+
+      # Gateway target unavailable
+      - alert: GatewayDown
+        expr: up{job="openclaw-gateway"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OpenClaw gateway scrape target is down"
+          description: "Prometheus cannot reach the OpenClaw gateway metrics endpoint for >2m."
+
+      # Gateway process restart spikes (if process metrics are exported)
+      - alert: GatewayRestartSpike
+        expr: changes(process_start_time_seconds{job="openclaw-gateway"}[15m]) > 2
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Gateway restart spike detected"
+          description: "Gateway process restarted more than twice in 15 minutes."
+
+      # Caddy upstream failures
+      - alert: Caddy502Burst
+        expr: sum(increase(caddy_http_response_status_count_total{status="502"}[5m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Caddy upstream 502 burst"
+          description: "More than 10 HTTP 502 responses observed in 5 minutes."
+
+      # Browser relay attach failures (requires gateway metric emission)
+      - alert: RelayAttachFailures
+        expr: sum(increase(openclaw_browser_relay_attach_failures_total[10m])) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Browser relay attach failures detected"
+          description: "At least one browser relay attach failure occurred in the last 10 minutes."
+
+      # Gateway auth mismatches (requires gateway metric emission)
+      - alert: GatewayAuthMismatch
+        expr: sum(increase(openclaw_gateway_auth_mismatch_total[10m])) > 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Gateway auth mismatch events detected"
+          description: "Gateway observed authentication mismatch events in the last 10 minutes."
