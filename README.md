@@ -155,6 +155,76 @@ See [docs/deployment.md](docs/deployment.md) for the full production setup guide
 
 ---
 
+## Operator Access
+
+Use these steps when you need the production dashboard or browser-based gateway control without relying on Telegram.
+
+### Dashboard Login
+
+- URL: `https://truthjblue.dev/login`
+- Recommended path: click `Use magic link instead` and complete the email flow.
+- Password login is also supported and now creates the server-side Supabase session required by the dashboard middleware.
+- If a browser loops back to `/login`, clear cookies for `truthjblue.dev` and retry with the magic-link flow first.
+
+### Remote Gateway Control UI
+
+- URL: `https://api.truthjblue.dev`
+- Preferred launcher:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/open-remote-control.ps1
+```
+
+That script opens `https://api.truthjblue.dev/#token=<OPENCLAW_GATEWAY_AUTH_TOKEN>` and copies the full URL to the clipboard when possible.
+
+### First-Time Device Pairing
+
+The browser Control UI uses OpenClaw device approval. A new browser or machine can show `PAIRING_REQUIRED` on the first connection. That is expected.
+
+```powershell
+# Inspect current devices
+powershell -ExecutionPolicy Bypass -File scripts/approve-remote-device.ps1 -ListOnly
+
+# Approve the most recent pending device from the Hetzner host
+powershell -ExecutionPolicy Bypass -File scripts/approve-remote-device.ps1
+```
+
+Requirements:
+
+- `OPENCLAW_GATEWAY_AUTH_TOKEN` must be available in your shell environment.
+- SSH access to `root@87.99.138.98` with `~/.ssh/openclaw_hetzner`.
+
+### Health Checks
+
+```powershell
+openclaw health
+```
+
+`openclaw health` should succeed against the remote gateway after `gateway.remote.token` is present in `openclaw.json`.
+
+### Known CLI Caveat
+
+Some OpenClaw CLI commands still prefer local loopback URLs in their status output, even when the remote gateway is healthy. If `openclaw dashboard --no-open` or `openclaw status` shows `127.0.0.1`, use `scripts/open-remote-control.ps1` for browser access instead of trusting the printed dashboard URL.
+
+### Host-Side Troubleshooting
+
+If pairing or browser access still fails, inspect the live services on the Hetzner host:
+
+```powershell
+ssh -i $env:USERPROFILE\.ssh\openclaw_hetzner root@87.99.138.98 "journalctl -u openclaw -n 100 --no-pager"
+ssh -i $env:USERPROFILE\.ssh\openclaw_hetzner root@87.99.138.98 "journalctl -u caddy -n 100 --no-pager"
+ssh -i $env:USERPROFILE\.ssh\openclaw_hetzner root@87.99.138.98 "openclaw gateway status"
+```
+
+Interpret the common auth states as follows:
+
+- `PAIRING_REQUIRED`: approve the pending device.
+- `AUTH_TOKEN_MISMATCH` or `AUTH_DEVICE_TOKEN_MISMATCH`: the shared gateway token or approved device token has drifted and needs to be refreshed.
+
+For the broader production setup, see [docs/deployment.md](docs/deployment.md) and [docs/RUNBOOKS.md](docs/RUNBOOKS.md).
+
+---
+
 ## Project Structure
 
 ```

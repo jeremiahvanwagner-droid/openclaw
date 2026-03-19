@@ -12,7 +12,7 @@ const supabase = supabaseUrl && supabaseKey
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"password" | "magic-link">("password");
+  const [mode, setMode] = useState<"password" | "magic-link">("magic-link");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,17 +29,28 @@ export default function LoginPage() {
     }
 
     if (mode === "password") {
-      const { error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      try {
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        });
 
-      setLoading(false);
+        const result = await response.json().catch(() => ({}));
 
-      if (authError) {
-        setError(authError.message);
-      } else {
+        setLoading(false);
+
+        if (!response.ok) {
+          setError(result.error ?? "Unable to sign in.");
+          return;
+        }
+
         window.location.href = "/";
+      } catch {
+        setLoading(false);
+        setError("Unable to sign in.");
       }
     } else {
       const { error: authError } = await supabase.auth.signInWithOtp({
@@ -91,6 +102,12 @@ export default function LoginPage() {
                 className="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-md text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-claw-500 focus:border-transparent"
               />
             </div>
+
+            {mode === "magic-link" && (
+              <p className="text-xs text-slate-500">
+                Magic link is the recommended sign-in path for the hosted dashboard.
+              </p>
+            )}
 
             {mode === "password" && (
               <div>
