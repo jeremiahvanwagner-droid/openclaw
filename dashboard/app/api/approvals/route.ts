@@ -1,7 +1,92 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { resolveHumanApproval } from "../../../../lib/human-approval.mjs";
 import { getServiceSupabase, requireAdminUser } from "../../../lib/server-auth";
+
+type ApprovalDecision = "approve" | "reject";
+
+interface HumanApprovalRow {
+  id: string;
+  source_agent: string | null;
+  target_agent: string | null;
+  correlation_id: string | null;
+}
+
+async function writeApprovalResolutionEvent(params: {
+  approval: HumanApprovalRow;
+  channel: string;
+  decision: "approved" | "rejected";
+  note?: string;
+  resolvedBy: string;
+}) {
+  const db = getServiceSupabase();
+  await db.from("agent_events").insert({
+    event_name: "approval/resolved",
+    source_agent: params.resolvedBy,
+    target_agent: params.approval.target_agent,
+    payload: {
+      approval_id: params.approval.id,
+      decision: params.decision,
+      channel: params.channel,
+      note: params.note ?? null,
+    },
+    priority: "critical",
+    status: params.decision === "approved" ? "completed" : "failed",
+    correlation_id: params.approval.correlation_id || params.approval.id,
+    metadata: {
+      approval_id: params.approval.id,
+      resolution_channel: params.channel,
+    },
+  });
+}
+
+async function resolveApproval(params: {
+  approvalId: string;
+  decision: ApprovalDecision;
+  resolvedBy: string;
+  note?: string;
+  channel: string;
+}) {
+  const db = getServiceSupabase();
+  const status = params.decision === "approve" ? "approved" : "rejected";
+
+  const { data, error } = await db
+    .from("human_approval_queue")
+    .update({
+      status,
+      resolved_by: params.resolvedBy,
+      resolution_channel: params.channel,
+      resolution_note: params.note ?? null,
+      resolved_at: new Date().toISOString(),
+    })
+    .eq("id", params.approvalId)
+    .eq("status", "pending")
+    .select("*")
+    .single();
+
+  if (error) {
+    const { data: existing, error: existingError } = await db
+      .from("human_approval_queue")
+      .select("*")
+      .eq("id", params.approvalId)
+      .single();
+
+    if (existingError || !existing) {
+      throw error;
+    }
+
+    return existing;
+  }
+
+  await writeApprovalResolutionEvent({
+    approval: data as HumanApprovalRow,
+    channel: params.channel,
+    decision: status,
+    note: params.note,
+    resolvedBy: params.resolvedBy,
+  });
+
+  return data;
+}
 
 export async function GET(req: NextRequest) {
   const user = await requireAdminUser();
@@ -42,7 +127,7 @@ export async function POST(req: NextRequest) {
 
   const body = (await req.json()) as {
     approval_id?: string;
-    decision?: "approve" | "reject";
+    decision?: ApprovalDecision;
     note?: string;
   };
 
@@ -58,7 +143,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const approval = await resolveHumanApproval({
+    const approval = await resolveApproval({
       approvalId: body.approval_id,
       decision: body.decision,
       resolvedBy: user.email || "dashboard",
