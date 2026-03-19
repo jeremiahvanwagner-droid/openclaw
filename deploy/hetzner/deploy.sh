@@ -75,21 +75,43 @@ chown -h openclaw:openclaw /opt/openclaw/handlers/workspace/skills || true
 # Update systemd services if changed
 cp deploy/hetzner/openclaw.service /etc/systemd/system/
 cp deploy/hetzner/webhook.service /etc/systemd/system/openclaw-webhook.service
+cp deploy/hetzner/dashboard.service /etc/systemd/system/openclaw-dashboard.service
 cp deploy/hetzner/Caddyfile /etc/caddy/Caddyfile
 systemctl daemon-reload
 
-# ── 5. Restart services ─────────────────────────────────────
-echo "[5/6] Restarting services..."
+# ── 5. Build & deploy dashboard ──────────────────────────────
+echo "[5/8] Building dashboard..."
+if [ -f dashboard/package.json ]; then
+    cd dashboard
+    if command -v pnpm &>/dev/null; then
+        pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+    else
+        npm install
+    fi
+    NEXT_PUBLIC_SUPABASE_URL="https://aagqvfwuixpxtdcrdxmv.supabase.co" \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhZ3F2Znd1aXhweHRkY3JkeG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDc1NDQsImV4cCI6MjA4ODkyMzU0NH0.9FvkyIqKYnaUcJQt0sXammf35O1NSpC2Rwx3c6KouvQ" \
+    npx next build
+    cd "$OPENCLAW_HOME"
+    echo "  Dashboard built successfully"
+else
+    echo "  Skipping dashboard build (no package.json)"
+fi
+
+# ── 6. Restart services ─────────────────────────────────────
+echo "[6/8] Restarting services..."
 systemctl restart openclaw
 systemctl restart openclaw-webhook
+systemctl restart openclaw-dashboard
+systemctl enable openclaw-dashboard
 systemctl reload caddy
 
-# ── 6. Health check ──────────────────────────────────────────
-echo "[6/6] Running health check..."
+# ── 7. Health check ──────────────────────────────────────────
+echo "[7/8] Running health check..."
 sleep 15
 
 GATEWAY_OK=false
 WEBHOOK_OK=false
+DASHBOARD_OK=false
 
 for i in 1 2 3 4 5 6; do
     if curl -sf http://localhost:18789/health >/dev/null 2>&1; then
@@ -107,18 +129,28 @@ for i in 1 2 3; do
     sleep 2
 done
 
+for i in 1 2 3 4 5; do
+    if curl -sf http://localhost:3001 >/dev/null 2>&1; then
+        DASHBOARD_OK=true
+        break
+    fi
+    sleep 3
+done
+
 echo ""
-if $GATEWAY_OK && $WEBHOOK_OK; then
-    echo "  ✓ Gateway:  HEALTHY"
-    echo "  ✓ Webhook:  HEALTHY"
+if $GATEWAY_OK && $WEBHOOK_OK && $DASHBOARD_OK; then
+    echo "  ✓ Gateway:   HEALTHY"
+    echo "  ✓ Webhook:   HEALTHY"
+    echo "  ✓ Dashboard: HEALTHY"
     echo ""
     echo "══════════════════════════════════════════════════════"
     echo " ✓ Deploy Complete!"
     echo "══════════════════════════════════════════════════════"
     exit 0
 else
-    $GATEWAY_OK && echo "  ✓ Gateway:  HEALTHY" || echo "  ✗ Gateway:  UNHEALTHY"
-    $WEBHOOK_OK && echo "  ✓ Webhook:  HEALTHY" || echo "  ✗ Webhook:  UNHEALTHY"
+    $GATEWAY_OK && echo "  ✓ Gateway:   HEALTHY" || echo "  ✗ Gateway:   UNHEALTHY"
+    $WEBHOOK_OK && echo "  ✓ Webhook:   HEALTHY" || echo "  ✗ Webhook:   UNHEALTHY"
+    $DASHBOARD_OK && echo "  ✓ Dashboard: HEALTHY" || echo "  ✗ Dashboard: UNHEALTHY"
     echo ""
     echo "══════════════════════════════════════════════════════"
     echo " ⚠ Deploy completed with health check failures"
