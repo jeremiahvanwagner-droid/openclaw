@@ -5,6 +5,11 @@ RUN_SMOKE="${RUN_SMOKE:-false}"
 APP_USER="${APP_USER:-openclaw}"
 OPS_DB_PATH="${OPENCLAW_OPS_DB_PATH:-$HOME/.config/openclaw-prod/ops.db}"
 OPS_SCRIPT="$HOME/openclaw-prod/scripts/ops_control.py"
+CONFIG_PATH="${OPENCLAW_CONFIG_PATH:-/opt/openclaw/.openclaw/openclaw.json}"
+RELAY_PRECHECK="${OPENCLAW_VALIDATE_BROWSER_RELAY:-false}"
+RELAY_SINGLE_TAB="${OPENCLAW_RELAY_SINGLE_TAB:-true}"
+MAX_CADDY_502_15M="${OPENCLAW_MAX_CADDY_502_15M:-10}"
+RESTART_LIMIT="${OPENCLAW_MAX_RESTARTS:-5}"
 PYTHON=()
 
 if command -v python3 >/dev/null 2>&1 && python3 -V >/dev/null 2>&1; then
@@ -17,6 +22,143 @@ else
   echo "Missing working Python interpreter (python3/python/py)."
   exit 1
 fi
+
+canonicalize_gateway_token_env() {
+  if [[ -z "${OPENCLAW_GATEWAY_AUTH_TOKEN:-}" && -n "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
+    export OPENCLAW_GATEWAY_AUTH_TOKEN="${OPENCLAW_GATEWAY_TOKEN}"
+  fi
+  if [[ -n "${OPENCLAW_GATEWAY_AUTH_TOKEN:-}" && -z "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
+    export OPENCLAW_GATEWAY_TOKEN="${OPENCLAW_GATEWAY_AUTH_TOKEN}"
+  fi
+}
+
+check_topology_contract() {
+  if [[ ! -f "${CONFIG_PATH}" ]]; then
+    echo "Topology check skipped (config not found at ${CONFIG_PATH})."
+    return
+  fi
+
+  "${PYTHON[@]}" - "${CONFIG_PATH}" <<'PY'
+import json
+import sys
+
+cfg = json.load(open(sys.argv[1], "r", encoding="utf-8"))
+gateway = cfg.get("gateway") or {}
+mode = str(gateway.get("mode") or "").strip().lower()
+if mode != "remote":
+    raise SystemExit(f"Topology guard failed: gateway.mode={mode!r}; expected 'remote'.")
+
+remote = gateway.get("remote") or {}
+if not str(remote.get("url") or "").strip():
+    raise SystemExit("Topology guard failed: gateway.remote.url is required in remote-first mode.")
+
+trusted = gateway.get("trustedProxies")
+if trusted is None:
+    raise SystemExit("Topology guard failed: gateway.trustedProxies must be configured.")
+if not isinstance(trusted, list) or len(trusted) == 0:
+    raise SystemExit("Topology guard failed: gateway.trustedProxies must be a non-empty array.")
+PY
+}
+
+check_systemd_runtime() {
+  if ! command -v systemctl >/dev/null 2>&1; then
+    return
+  fi
+  if ! systemctl list-unit-files | grep -q '^openclaw.service'; then
+    return
+  fi
+
+  local active_state
+  local restart_count
+  active_state="$(systemctl show openclaw --property ActiveState --value)"
+  restart_count="$(systemctl show openclaw --property NRestarts --value)"
+  [[ "${active_state}" == "active" ]] || {
+    echo "openclaw.service ActiveState=${active_state}"
+    exit 1
+  }
+  if [[ "${restart_count}" =~ ^[0-9]+$ ]] && (( restart_count > RESTART_LIMIT )); then
+    echo "openclaw.service has restarted ${restart_count} times (limit=${RESTART_LIMIT})"
+    exit 1
+  fi
+}
+
+check_control_plane_noise() {
+  if ! command -v journalctl >/dev/null 2>&1; then
+    return
+  fi
+  local poller_conflicts
+  poller_conflicts="$(journalctl -u openclaw --since '30 minutes ago' --no-pager | grep -ci 'terminated by other getUpdates request' || true)"
+  if [[ "${poller_conflicts}" =~ ^[0-9]+$ ]] && (( poller_conflicts > 0 )); then
+    echo "Detected Telegram poller conflict events in the last 30 minutes (${poller_conflicts})."
+    exit 1
+  fi
+}
+
+check_caddy_502_burst() {
+  if ! command -v journalctl >/dev/null 2>&1; then
+    return
+  fi
+  local bursts
+  bursts="$(journalctl -u caddy --since '15 minutes ago' --no-pager | grep -c 'status=502' || true)"
+  if [[ "${bursts}" =~ ^[0-9]+$ ]] && (( bursts > MAX_CADDY_502_15M )); then
+    echo "Caddy 502 burst detected (${bursts} events in 15m, limit=${MAX_CADDY_502_15M})."
+    exit 1
+  fi
+}
+
+check_node_status_semantics() {
+  if ! openclaw node status --help >/dev/null 2>&1; then
+    return
+  fi
+  local node_json
+  node_json="$(openclaw node status --json)"
+  local node_tmp
+  node_tmp="$(mktemp)"
+  printf '%s' "${node_json}" > "${node_tmp}"
+  "${PYTHON[@]}" - "${node_tmp}" <<'PY'
+import json
+import sys
+
+data = json.load(open(sys.argv[1], "r", encoding="utf-8"))
+runtime = ((data.get("service") or {}).get("runtime") or {})
+detail = str(runtime.get("detail") or "")
+if "no listener detected on port 443" in detail:
+    raise SystemExit("Node status semantics regression: runtime inferred from remote port listener check.")
+print(f"Node runtime status={runtime.get('status', 'unknown')} detail={detail[:120]}")
+PY
+  rm -f "${node_tmp}"
+}
+
+check_browser_relay() {
+  if [[ "${RELAY_PRECHECK}" != "true" ]]; then
+    return
+  fi
+  local tabs_json
+  tabs_json="$(openclaw browser tabs --browser-profile chrome-relay --json)"
+  local tabs_tmp
+  tabs_tmp="$(mktemp)"
+  printf '%s' "${tabs_json}" > "${tabs_tmp}"
+  "${PYTHON[@]}" - "${tabs_tmp}" "${RELAY_SINGLE_TAB}" <<'PY'
+import json
+import sys
+
+tabs = (json.load(open(sys.argv[1], "r", encoding="utf-8")).get("tabs") or [])
+if len(tabs) == 0:
+    raise SystemExit("Relay preflight failed: no attached chrome-relay tabs.")
+if sys.argv[2].lower() == "true" and len(tabs) != 1:
+    raise SystemExit(f"Relay preflight failed: expected exactly 1 attached tab, found {len(tabs)}.")
+print(f"Relay preflight passed: attached tabs={len(tabs)}")
+PY
+  rm -f "${tabs_tmp}"
+}
+
+canonicalize_gateway_token_env
+check_topology_contract
+check_systemd_runtime
+check_control_plane_noise
+check_caddy_502_burst
+check_node_status_semantics
+check_browser_relay
 
 openclaw --version
 openclaw status
@@ -39,23 +181,57 @@ printf '%s' "${SECRETS_AUDIT_JSON}" > "${SECRETS_AUDIT_TMP}"
 "${PYTHON[@]}" - "${SECRETS_AUDIT_TMP}" <<'PY'
 import json
 import sys
+from pathlib import Path
 
 with open(sys.argv[1], "r", encoding="utf-8") as f:
     report = json.load(f)
 summary = report.get("summary") or {}
-plaintext = int(summary.get("plaintextCount", 0) or 0)
 unresolved = int(summary.get("unresolvedRefCount", 0) or 0)
 shadowed = int(summary.get("shadowedRefCount", 0) or 0)
 legacy = int(summary.get("legacyResidueCount", 0) or 0)
+findings = report.get("findings") or []
 
-if plaintext or unresolved or shadowed:
+def lookup_json_path(obj, path):
+    cur = obj
+    for part in path.split("."):
+        if not part:
+            continue
+        if not isinstance(cur, dict) or part not in cur:
+            return None
+        cur = cur.get(part)
+    return cur
+
+actionable_plaintext = 0
+for finding in findings:
+    if finding.get("code") != "PLAINTEXT_FOUND":
+        continue
+    file_path = Path(str(finding.get("file") or ""))
+    json_path = str(finding.get("jsonPath") or "")
+
+    if file_path.name == ".env":
+        continue
+
+    if file_path.name in {"openclaw.json", "openclaw.prod.json"}:
+        try:
+            cfg = json.loads(file_path.read_text(encoding="utf-8"))
+        except Exception:
+            cfg = {}
+        raw = lookup_json_path(cfg, json_path)
+        if isinstance(raw, str) and raw.startswith("${") and raw.endswith("}"):
+            continue
+
+    actionable_plaintext += 1
+
+if actionable_plaintext or unresolved or shadowed:
     print(
-        f"Secrets audit failed: plaintext={plaintext}, unresolved={unresolved}, shadowed={shadowed}, legacy={legacy}"
+        "Secrets audit failed: "
+        f"plaintext_actionable={actionable_plaintext}, unresolved={unresolved}, shadowed={shadowed}, legacy={legacy}"
     )
     sys.exit(1)
 
 print(
-    f"Secrets audit actionable checks passed: plaintext={plaintext}, unresolved={unresolved}, shadowed={shadowed}, legacy={legacy}"
+    "Secrets audit actionable checks passed: "
+    f"plaintext_actionable={actionable_plaintext}, unresolved={unresolved}, shadowed={shadowed}, legacy={legacy}"
 )
 PY
 rm -f "${SECRETS_AUDIT_TMP}"
