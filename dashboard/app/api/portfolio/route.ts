@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
 
-import { buildPortfolioSummary, loadBusinessRegistry } from "../../../../lib/business-registry.mjs";
+// Portfolio data is loaded from the local filesystem (data/business-registry.json)
+// which is only available in the self-hosted environment, not on Vercel.
+// This route returns a not-available response when deployed to Vercel.
 
 export async function GET() {
-  try {
-    const registry = loadBusinessRegistry();
-    const summary = buildPortfolioSummary(registry);
-    return NextResponse.json(summary);
-  } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to load portfolio summary" },
-      { status: 500 },
-    );
-  }
+  return NextResponse.json(
+    { error: "Portfolio API is not available in this deployment. Use the self-hosted gateway." },
+    { status: 503 },
+  );
 }
