@@ -21,6 +21,43 @@ import {
 
 const log = logger.child({ module: "llm-router" });
 
+// ═══════════════════════════════════════════════════════════════════
+// RESPONSE CACHE — deduplicates identical P2/P3 requests within TTL
+// ═══════════════════════════════════════════════════════════════════
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_MAX_ENTRIES = 200;
+
+interface CacheEntry {
+  result: CompletionResult;
+  expiresAt: number;
+}
+
+const responseCache = new Map<string, CacheEntry>();
+
+function cacheKey(model: string, messages: ChatMessage[]): string {
+  const msgKey = messages.map(m => `${m.role}:${m.content}`).join("|");
+  return `${model}::${msgKey}`;
+}
+
+function getCached(key: string): CompletionResult | null {
+  const entry = responseCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    responseCache.delete(key);
+    return null;
+  }
+  return entry.result;
+}
+
+function setCache(key: string, result: CompletionResult): void {
+  // Evict oldest entries if at capacity
+  if (responseCache.size >= CACHE_MAX_ENTRIES) {
+    const firstKey = responseCache.keys().next().value;
+    if (firstKey !== undefined) responseCache.delete(firstKey);
+  }
+  responseCache.set(key, { result, expiresAt: Date.now() + CACHE_TTL_MS });
+}
+
 // Initialize clients lazily
 let anthropic: Anthropic | null = null;
 let openaiClient: OpenAI | null = null;
@@ -101,25 +138,25 @@ const MODEL_MAP = {
     provider: "anthropic" as const,
     model: "claude-opus-4-20250514",
     tier: "strategic",
-    maxTokens: 4096,
+    maxTokens: 2048,
   },
   "claude-sonnet-4.5": {
     provider: "anthropic" as const,
     model: "claude-sonnet-4-5-20250514",
     tier: "content",
-    maxTokens: 4096,
+    maxTokens: 2048,
   },
   "gpt-4o-mini": {
     provider: "openai" as const,
     model: "gpt-4o-mini",
     tier: "routine",
-    maxTokens: 4096,
+    maxTokens: 1024,
   },
   "gpt-4o": {
     provider: "openai" as const,
     model: "gpt-4o",
     tier: "content",
-    maxTokens: 4096,
+    maxTokens: 2048,
   },
 } as const;
 
@@ -177,6 +214,17 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
 
   const effectiveMaxTokens = maxTokens || config.maxTokens;
 
+  // Check response cache for P2/P3 requests (routine/low-priority)
+  const cacheable = queueClass === "P2" || queueClass === "P3";
+  const key = cacheable ? cacheKey(model, messages) : "";
+  if (cacheable) {
+    const cached = getCached(key);
+    if (cached) {
+      log.debug({ model, agentId, queueClass }, "LLM cache hit — skipping API call");
+      return cached;
+    }
+  }
+
   // Estimate cost: ~$0.01 per 1K tokens for Opus, less for others
   const estimatedCostCents = config.tier === "strategic" ? 5 : config.tier === "content" ? 2 : 1;
 
@@ -222,6 +270,8 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
       // Fire-and-forget cost log
       void logCost(agentId || "unknown", config.provider, config.model, result.usage.inputTokens, result.usage.outputTokens, costUsd);
     }
+    // Cache P2/P3 results
+    if (cacheable) setCache(key, result);
     return result;
   } catch (error) {
     timer({ provider: config.provider, model: config.model, agent: agentId || "unknown" });

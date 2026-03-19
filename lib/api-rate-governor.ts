@@ -112,7 +112,7 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
   "openai-codex": {
     requestsPerMinute: 40,       // conservative vs. burst capacity
     requestsPerHour: 800,
-    dailyBudgetCents: 5000,      // $50/day hard ceiling
+    dailyBudgetCents: 2500,      // $25/day hard ceiling (reduced from $50)
     dailyBudgetWarningPct: 0.75,
     maxConcurrent: 8,
     retryAfterMs: 2000,
@@ -121,7 +121,7 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
   anthropic: {
     requestsPerMinute: 30,
     requestsPerHour: 600,
-    dailyBudgetCents: 4000,      // $40/day
+    dailyBudgetCents: 2000,      // $20/day (reduced from $40)
     dailyBudgetWarningPct: 0.75,
     maxConcurrent: 6,
     retryAfterMs: 3000,
@@ -130,7 +130,7 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
   openai: {
     requestsPerMinute: 50,
     requestsPerHour: 1000,
-    dailyBudgetCents: 3000,      // $30/day
+    dailyBudgetCents: 1500,      // $15/day (reduced from $30)
     dailyBudgetWarningPct: 0.75,
     maxConcurrent: 8,
     retryAfterMs: 2000,

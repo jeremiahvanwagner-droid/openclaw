@@ -1398,7 +1398,7 @@
       ],
       "output_format": "decision",
       "escalation_path": "d1_ceo",
-      "llm_model": "claude-opus-4",
+      "llm_model": "claude-sonnet-4.5",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d1_ceo",
@@ -2212,7 +2212,7 @@
       ],
       "output_format": "decision",
       "escalation_path": "d1_ceo",
-      "llm_model": "claude-opus-4",
+      "llm_model": "claude-sonnet-4.5",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d1_ceo",
@@ -2337,7 +2337,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d4_cvo",
-      "llm_model": "claude-opus-4",
+      "llm_model": "claude-sonnet-4.5",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d4_cvo",
@@ -2822,7 +2822,7 @@
       ],
       "output_format": "decision",
       "escalation_path": "d1_ceo",
-      "llm_model": "claude-opus-4",
+      "llm_model": "claude-sonnet-4.5",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d1_ceo",
@@ -3067,7 +3067,7 @@
       ],
       "output_format": "decision",
       "escalation_path": "d1_ceo",
-      "llm_model": "claude-opus-4",
+      "llm_model": "claude-sonnet-4.5",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d1_ceo",
@@ -3151,7 +3151,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d6_dev_director",
-      "llm_model": "claude-opus-4",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d6_dev_director",
@@ -4181,7 +4181,7 @@
       ],
       "output_format": "decision",
       "escalation_path": "d1_ceo",
-      "llm_model": "claude-opus-4",
+      "llm_model": "claude-sonnet-4.5",
       "memory_type": "long-term",
       "queue_class": "P1",
       "inter_agent_dependencies": [
@@ -4570,7 +4570,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d1_ceo",
-      "llm_model": "claude-opus-4",
+      "llm_model": "claude-sonnet-4.5",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d1_ceo",
