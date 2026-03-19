@@ -18,16 +18,12 @@
  */
 
 import { createHmac, randomBytes } from 'crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
 import { createGhlClient } from '../lib/ghl-client.mjs';
-
-const OPENCLAW_ROOT = join(process.env.USERPROFILE || process.env.HOME || '', '.openclaw');
-const WEBHOOK_REGISTRY = join(OPENCLAW_ROOT, 'data', 'workflow-webhook-registry.json');
-
-function ensureRegistryDir() {
-  mkdirSync(join(OPENCLAW_ROOT, 'data'), { recursive: true });
-}
+import {
+  DEFAULT_WORKFLOW_WEBHOOK_REGISTRY_PATH,
+  loadWorkflowWebhookRegistry,
+  saveWorkflowWebhookRegistry,
+} from '../lib/workflow-webhook-registry.mjs';
 
 function parseArgs(args) {
   const result = {};
@@ -37,16 +33,6 @@ function parseArgs(args) {
     result[key] = (i + 1 < args.length && !args[i + 1].startsWith('--')) ? args[++i] : true;
   }
   return result;
-}
-
-function loadRegistry() {
-  if (!existsSync(WEBHOOK_REGISTRY)) return { webhooks: [] };
-  return JSON.parse(readFileSync(WEBHOOK_REGISTRY, 'utf8'));
-}
-
-function saveRegistry(registry) {
-  ensureRegistryDir();
-  writeFileSync(WEBHOOK_REGISTRY, JSON.stringify(registry, null, 2), 'utf8');
 }
 
 function createRegistryId() {
@@ -128,7 +114,7 @@ async function registerWebhook(locationId, args) {
   }
 
   const { resolvedLocationId, location } = await validateLocation(locationId);
-  const registry = loadRegistry();
+  const registry = loadWorkflowWebhookRegistry(DEFAULT_WORKFLOW_WEBHOOK_REGISTRY_PATH);
   const entry = {
     id: createRegistryId(),
     locationId: resolvedLocationId,
@@ -145,7 +131,7 @@ async function registerWebhook(locationId, args) {
   };
 
   registry.webhooks.push(entry);
-  saveRegistry(registry);
+  saveWorkflowWebhookRegistry(registry, DEFAULT_WORKFLOW_WEBHOOK_REGISTRY_PATH);
 
   console.log(JSON.stringify({
     action: 'register',
@@ -163,7 +149,7 @@ async function registerWebhook(locationId, args) {
 
 async function listWebhooks(locationId) {
   const { resolvedLocationId } = await validateLocation(locationId);
-  const registry = loadRegistry();
+  const registry = loadWorkflowWebhookRegistry(DEFAULT_WORKFLOW_WEBHOOK_REGISTRY_PATH);
   const webhooks = registry.webhooks.filter(entry => entry.locationId === resolvedLocationId);
 
   console.log(JSON.stringify({
@@ -201,7 +187,7 @@ function buildTestPayload(entry) {
 
 async function testWebhook(locationId, webhookId) {
   const { resolvedLocationId } = await validateLocation(locationId);
-  const registry = loadRegistry();
+  const registry = loadWorkflowWebhookRegistry(DEFAULT_WORKFLOW_WEBHOOK_REGISTRY_PATH);
   const entry = registry.webhooks.find(record => record.id === webhookId && record.locationId === resolvedLocationId);
   if (!entry) {
     throw new Error(`Webhook ${webhookId} not found for location ${locationId}`);
@@ -242,9 +228,9 @@ async function testWebhook(locationId, webhookId) {
 
 async function deleteWebhook(locationId, webhookId) {
   const { resolvedLocationId } = await validateLocation(locationId);
-  const registry = loadRegistry();
+  const registry = loadWorkflowWebhookRegistry(DEFAULT_WORKFLOW_WEBHOOK_REGISTRY_PATH);
   const next = registry.webhooks.filter(entry => !(entry.id === webhookId && entry.locationId === resolvedLocationId));
-  saveRegistry({ ...registry, webhooks: next });
+  saveWorkflowWebhookRegistry({ ...registry, webhooks: next }, DEFAULT_WORKFLOW_WEBHOOK_REGISTRY_PATH);
 
   console.log(JSON.stringify({
     action: 'delete',

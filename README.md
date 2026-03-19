@@ -77,6 +77,41 @@ node handlers/ghl-webhook-handler.mjs
 
 ---
 
+## GHL Webhook Rollout
+
+The GHL webhook handler now supports three auth modes:
+
+- `X-GHL-Signature` for HighLevel platform webhooks using Ed25519 verification
+- `Authorization: Bearer <OPENCLAW_GATEWAY_AUTH_TOKEN>` for GHL Workflow Custom Webhook actions
+- `X-OpenClaw-Signature` as an OpenClaw HMAC fallback for local testing
+
+Recommended rollout for the 10-business portfolio:
+
+```bash
+# 1. Generate the outbound webhook plan from the business registry
+node scripts/bootstrap-ghl-workflow-webhooks.mjs --base-url https://agents.yourdomain.com
+
+# 2. Smoke-test the handler before wiring GHL workflows
+node scripts/smoke-test-ghl-webhook-handler.mjs --url https://agents.yourdomain.com/webhook/ghl --auth-mode bearer
+
+# 3. After adding real ghl_location_id / ghl_location_selector values to data/business-registry.json,
+#    write mapped outbound entries into the local workflow registry
+node scripts/bootstrap-ghl-workflow-webhooks.mjs --base-url https://agents.yourdomain.com --register-mapped
+```
+
+Generated files:
+
+- `~/.openclaw/data/generated-ghl-workflow-webhook-plan.json`: the full per-business webhook rollout plan
+- `~/.openclaw/data/workflow-webhook-registry.json`: locally registered mapped workflow webhooks
+
+Operational notes:
+
+- Private Integration Tokens should use GHL Workflow Custom Webhook and Inbound Webhook actions, not direct `/webhooks` registration
+- Keep `OPENCLAW_PUBLIC_WEBHOOK_BASE_URL`, `OPENCLAW_GATEWAY_AUTH_TOKEN`, and `OPENCLAW_GHL_WEBHOOK_SECRET` set in `.env`
+- `OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY` is optional unless HighLevel rotates the Ed25519 signing key
+
+---
+
 ## Production Deployment (24/7)
 
 The bot runs on a **Hetzner VPS** with systemd for auto-restart, Caddy for TLS, and GitHub Actions for CI/CD. The Next.js dashboard deploys separately to **Vercel**.
