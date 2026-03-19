@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "../supabase";
 
 interface AgentEvent {
   id: string;
   event_name: string;
   source_agent: string;
   target_agent: string;
-  payload: Record<string, any>;
+  payload: Record<string, unknown>;
   priority: string;
   status: string;
   correlation_id: string;
@@ -47,7 +46,7 @@ function EventRow({
   replayingId,
 }: {
   event: AgentEvent;
-  onSelect: (e: AgentEvent) => void;
+  onSelect: (event: AgentEvent) => void;
   onReplay: (id: string) => void;
   replayingId: string | null;
 }) {
@@ -56,53 +55,53 @@ function EventRow({
 
   return (
     <tr
-      className="border-b border-slate-700/50 hover:bg-slate-800/50 cursor-pointer"
+      className="cursor-pointer border-b border-slate-700/50 hover:bg-slate-800/50"
       onClick={() => onSelect(event)}
     >
-      <td className="py-3 px-4">
+      <td className="px-4 py-3">
         <div className="font-mono text-sm text-white">{event.event_name}</div>
         <div className="text-xs text-slate-500">
           {event.correlation_id?.substring(0, 8)}...
         </div>
       </td>
-      <td className="py-3 px-4">
+      <td className="px-4 py-3">
         <div className="text-sm text-slate-300">{event.source_agent}</div>
       </td>
-      <td className="py-3 px-4">
-        <div className="text-sm text-slate-300">{event.target_agent || "—"}</div>
+      <td className="px-4 py-3">
+        <div className="text-sm text-slate-300">{event.target_agent || "-"}</div>
       </td>
-      <td className="py-3 px-4">
+      <td className="px-4 py-3">
         <span
-          className={`px-2 py-0.5 rounded text-xs border ${
+          className={`rounded border px-2 py-0.5 text-xs ${
             PRIORITY_BADGES[event.priority] || PRIORITY_BADGES.normal
           }`}
         >
           {event.priority}
         </span>
       </td>
-      <td className="py-3 px-4">
+      <td className="px-4 py-3">
         <span
-          className={`px-2 py-0.5 rounded text-xs ${
+          className={`rounded px-2 py-0.5 text-xs ${
             STATUS_BADGES[event.status] || STATUS_BADGES.pending
           }`}
         >
           {event.status}
         </span>
       </td>
-      <td className="py-3 px-4 text-right">
+      <td className="px-4 py-3 text-right">
         <div className="flex items-center justify-end gap-2">
-          {event.status === "failed" && (
+          {event.status === "failed" ? (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
+              onClick={(clickEvent) => {
+                clickEvent.stopPropagation();
                 onReplay(event.id);
               }}
               disabled={replayingId === event.id}
-              className="px-2 py-1 text-xs bg-claw-500/20 text-claw-400 hover:bg-claw-500/30 rounded transition disabled:opacity-50"
+              className="rounded bg-claw-500/20 px-2 py-1 text-xs text-claw-400 transition hover:bg-claw-500/30 disabled:opacity-50"
             >
               {replayingId === event.id ? "..." : "Replay"}
             </button>
-          )}
+          ) : null}
           <div>
             <div className="text-sm text-slate-400">{time}</div>
             <div className="text-xs text-slate-600">{date}</div>
@@ -123,37 +122,29 @@ function EventDetail({
   onReplay: (id: string) => void;
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-xl border border-slate-700 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-slate-700 flex items-start justify-between">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl border border-slate-700 bg-slate-800">
+        <div className="flex items-start justify-between border-b border-slate-700 p-6">
           <div>
-            <h2 className="text-xl font-bold text-white font-mono">
-              {event.event_name}
-            </h2>
-            <p className="text-slate-400 text-sm mt-1">
-              ID: {event.correlation_id}
-            </p>
+            <h2 className="font-mono text-xl font-bold text-white">{event.event_name}</h2>
+            <p className="mt-1 text-sm text-slate-400">ID: {event.correlation_id}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-white text-2xl"
-          >
-            ×
+          <button onClick={onClose} className="text-2xl text-slate-400 hover:text-white">
+            x
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          {/* Status badges */}
+        <div className="space-y-6 p-6">
           <div className="flex gap-3">
             <span
-              className={`px-3 py-1 rounded text-sm border ${
+              className={`rounded border px-3 py-1 text-sm ${
                 PRIORITY_BADGES[event.priority] || PRIORITY_BADGES.normal
               }`}
             >
               {event.priority} priority
             </span>
             <span
-              className={`px-3 py-1 rounded text-sm ${
+              className={`rounded px-3 py-1 text-sm ${
                 STATUS_BADGES[event.status] || STATUS_BADGES.pending
               }`}
             >
@@ -161,62 +152,52 @@ function EventDetail({
             </span>
           </div>
 
-          {/* Event flow */}
-          <div className="flex items-center gap-4 p-4 bg-slate-900 rounded-lg">
+          <div className="flex items-center gap-4 rounded-lg bg-slate-900 p-4">
             <div className="text-center">
               <div className="text-sm text-slate-500">Source</div>
-              <div className="text-white font-medium">{event.source_agent}</div>
+              <div className="text-white">{event.source_agent}</div>
             </div>
-            <div className="flex-1 border-t border-dashed border-slate-600 relative">
-              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-slate-900 px-2">
-                <span className="text-slate-500">→</span>
+            <div className="relative flex-1 border-t border-dashed border-slate-600">
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900 px-2 text-slate-500">
+                -&gt;
               </div>
             </div>
             <div className="text-center">
               <div className="text-sm text-slate-500">Target</div>
-              <div className="text-white font-medium">
-                {event.target_agent || "Broadcast"}
-              </div>
+              <div className="text-white">{event.target_agent || "Broadcast"}</div>
             </div>
           </div>
 
-          {/* Timestamps */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <div className="text-slate-500 text-sm">Created</div>
-              <div className="text-white">
-                {new Date(event.created_at).toLocaleString()}
-              </div>
+              <div className="text-sm text-slate-500">Created</div>
+              <div className="text-white">{new Date(event.created_at).toLocaleString()}</div>
             </div>
             <div>
-              <div className="text-slate-500 text-sm">Processed</div>
+              <div className="text-sm text-slate-500">Processed</div>
               <div className="text-white">
-                {event.processed_at
-                  ? new Date(event.processed_at).toLocaleString()
-                  : "—"}
+                {event.processed_at ? new Date(event.processed_at).toLocaleString() : "-"}
               </div>
             </div>
           </div>
 
-          {/* Payload */}
           <div>
-            <div className="text-slate-500 text-sm mb-2">Payload</div>
-            <pre className="p-4 bg-slate-900 rounded-lg overflow-x-auto text-sm text-slate-300 font-mono">
+            <div className="mb-2 text-sm text-slate-500">Payload</div>
+            <pre className="overflow-x-auto rounded-lg bg-slate-900 p-4 font-mono text-sm text-slate-300">
               {JSON.stringify(event.payload, null, 2)}
             </pre>
           </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4 border-t border-slate-700">
-            {(event.status === "failed" || event.status === "pending") && (
+          <div className="flex gap-3 border-t border-slate-700 pt-4">
+            {event.status === "failed" || event.status === "pending" ? (
               <button
                 onClick={() => onReplay(event.id)}
-                className="px-4 py-2 bg-claw-500 hover:bg-claw-600 text-white rounded-lg transition"
+                className="rounded-lg bg-claw-500 px-4 py-2 text-white transition hover:bg-claw-600"
               >
                 Replay Event
               </button>
-            )}
-            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">
+            ) : null}
+            <button className="rounded-lg bg-slate-700 px-4 py-2 text-white transition hover:bg-slate-600">
               View Related
             </button>
           </div>
@@ -238,14 +219,15 @@ export default function EventsPage() {
   async function handleReplay(eventId: string) {
     setReplayingId(eventId);
     try {
-      const res = await fetch("/api/replay", {
+      const response = await fetch("/api/replay", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ event_id: eventId }),
       });
-      if (!res.ok) {
-        const err = await res.json();
-        alert(`Replay failed: ${err.error}`);
+
+      if (!response.ok) {
+        const error = (await response.json()) as { error?: string };
+        alert(`Replay failed: ${error.error || "Unknown error"}`);
       } else {
         setSelectedEvent(null);
       }
@@ -256,33 +238,37 @@ export default function EventsPage() {
 
   useEffect(() => {
     async function fetchEvents() {
-      if (!supabase) { setLoading(false); return; }
-      let query = supabase
-        .from("agent_events")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .range(page * pageSize, (page + 1) * pageSize - 1);
+      try {
+        const params = new URLSearchParams({
+          type: selectedType,
+          page: String(page),
+          pageSize: String(pageSize),
+        });
+        const response = await fetch(`/api/events?${params.toString()}`, {
+          cache: "no-store",
+        });
 
-      if (selectedType !== "all") {
-        query = query.ilike("event_name", `${selectedType}%`);
-      }
+        if (!response.ok) {
+          throw new Error("Failed to fetch events");
+        }
 
-      const { data, error } = await query;
-
-      if (error) {
+        const data = (await response.json()) as { events?: AgentEvent[] };
+        setEvents(data.events || []);
+      } catch (error) {
         console.error("Error fetching events:", error);
-      } else {
-        setEvents(data || []);
+        setEvents([]);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     }
 
+    setLoading(true);
     fetchEvents();
-  }, [selectedType, page]);
+  }, [page, pageSize, selectedType]);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-slate-400">Loading events...</div>
       </div>
     );
@@ -290,24 +276,22 @@ export default function EventsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Events</h1>
           <p className="text-slate-400">Recent agent events and workflows</p>
         </div>
-        <button className="px-4 py-2 bg-claw-500 hover:bg-claw-600 text-white rounded-lg transition">
+        <button className="rounded-lg bg-claw-500 px-4 py-2 text-white transition hover:bg-claw-600">
           + New Event
         </button>
       </div>
 
-      {/* Filters */}
       <div className="flex gap-4">
         <select
-          className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-claw-500"
+          className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-claw-500 focus:outline-none"
           value={selectedType}
-          onChange={(e) => {
-            setSelectedType(e.target.value);
+          onChange={(event) => {
+            setSelectedType(event.target.value);
             setPage(0);
           }}
         >
@@ -319,29 +303,16 @@ export default function EventsPage() {
         </select>
       </div>
 
-      {/* Events table */}
       <div className="card overflow-hidden p-0">
         <table className="w-full">
           <thead className="bg-slate-900 text-left">
             <tr>
-              <th className="py-3 px-4 text-sm text-slate-400 font-medium">
-                Event
-              </th>
-              <th className="py-3 px-4 text-sm text-slate-400 font-medium">
-                Source
-              </th>
-              <th className="py-3 px-4 text-sm text-slate-400 font-medium">
-                Target
-              </th>
-              <th className="py-3 px-4 text-sm text-slate-400 font-medium">
-                Priority
-              </th>
-              <th className="py-3 px-4 text-sm text-slate-400 font-medium">
-                Status
-              </th>
-              <th className="py-3 px-4 text-sm text-slate-400 font-medium text-right">
-                Time
-              </th>
+              <th className="px-4 py-3 text-sm font-medium text-slate-400">Event</th>
+              <th className="px-4 py-3 text-sm font-medium text-slate-400">Source</th>
+              <th className="px-4 py-3 text-sm font-medium text-slate-400">Target</th>
+              <th className="px-4 py-3 text-sm font-medium text-slate-400">Priority</th>
+              <th className="px-4 py-3 text-sm font-medium text-slate-400">Status</th>
+              <th className="px-4 py-3 text-right text-sm font-medium text-slate-400">Time</th>
             </tr>
           </thead>
           <tbody>
@@ -357,40 +328,36 @@ export default function EventsPage() {
           </tbody>
         </table>
 
-        {events.length === 0 && (
-          <div className="text-center py-12 text-slate-500">
-            No events found
-          </div>
-        )}
+        {events.length === 0 ? (
+          <div className="py-12 text-center text-slate-500">No events found</div>
+        ) : null}
       </div>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between">
         <button
           disabled={page === 0}
-          onClick={() => setPage((p) => p - 1)}
-          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => setPage((current) => current - 1)}
+          className="rounded-lg bg-slate-700 px-4 py-2 text-white transition hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Previous
         </button>
         <span className="text-slate-400">Page {page + 1}</span>
         <button
           disabled={events.length < pageSize}
-          onClick={() => setPage((p) => p + 1)}
-          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={() => setPage((current) => current + 1)}
+          className="rounded-lg bg-slate-700 px-4 py-2 text-white transition hover:bg-slate-600 disabled:cursor-not-allowed disabled:opacity-50"
         >
           Next
         </button>
       </div>
 
-      {/* Event Detail Modal */}
-      {selectedEvent && (
+      {selectedEvent ? (
         <EventDetail
           event={selectedEvent}
           onClose={() => setSelectedEvent(null)}
           onReplay={handleReplay}
         />
-      )}
+      ) : null}
     </div>
   );
 }

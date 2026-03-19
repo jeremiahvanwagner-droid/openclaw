@@ -9,6 +9,8 @@ const ADMIN_ONLY_PREFIXES = [
   "/costs",
   "/approvals",
   "/api/agents",
+  "/api/dashboard",
+  "/api/events",
   "/api/replay",
   "/api/costs",
   "/api/approvals",

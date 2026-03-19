@@ -9,6 +9,7 @@ const {
   getHumanApprovalRequest,
   markHumanApprovalExecuting,
   expireHumanApproval,
+  enforceAgentCapability,
   capturedFunctions,
 } = vi.hoisted(() => {
   const mockSupabaseInsert = vi.fn().mockReturnValue({
@@ -89,6 +90,7 @@ const {
       id: "approval-001",
       status: "expired",
     }),
+    enforceAgentCapability: vi.fn().mockResolvedValue({ allowed: true, mode: "warn" }),
     capturedFunctions: {} as Record<string, any>,
   };
 });
@@ -106,6 +108,10 @@ vi.mock("@supabase/supabase-js", () => ({
 
 vi.mock("../../lib/api-rate-governor", () => ({
   reportFailure: vi.fn(),
+}));
+
+vi.mock("../../lib/security-governance", () => ({
+  enforceAgentCapability,
 }));
 
 vi.mock("../../lib/human-approval", () => ({
@@ -175,6 +181,7 @@ describe("agent-orchestrator", () => {
     getHumanApprovalRequest.mockClear();
     markHumanApprovalExecuting.mockClear();
     expireHumanApproval.mockClear();
+    enforceAgentCapability.mockClear();
 
     getHumanApprovalRequest.mockResolvedValue({
       id: "approval-001",
@@ -229,6 +236,7 @@ describe("agent-orchestrator", () => {
 
     expect(createHumanApprovalRequest).toHaveBeenCalledTimes(1);
     expect(markHumanApprovalExecuting).toHaveBeenCalledTimes(1);
+    expect(enforceAgentCapability).toHaveBeenCalledTimes(1);
     expect(result.success).toBe(true);
   });
 

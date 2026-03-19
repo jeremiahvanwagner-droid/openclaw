@@ -34,6 +34,7 @@ import {
   markHumanApprovalExecuting,
   waitForHumanApproval,
 } from '../lib/human-approval.mjs';
+import { enforceAgentCapability } from "../lib/security-governance.mjs";
 
 const execAsync = promisify(exec);
 
@@ -305,6 +306,17 @@ async function enforceApprovalGate(task, sourceAgent = 'agent-coordinator', targ
     taskType: task.taskType,
     actionFamily: payload.actionFamily || payload.action_family,
     payload,
+  });
+
+  await enforceAgentCapability({
+    agentId: sourceAgent,
+    actionFamily: classification.actionFamily,
+    correlationId: task.id,
+    targetAgent,
+    metadata: {
+      division: task.division,
+      task_type: task.taskType,
+    },
   });
 
   if (!classification.requiresApproval || !classification.actionFamily) {

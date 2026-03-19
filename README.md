@@ -411,10 +411,10 @@ Cross-functional agents serving all divisions.
         │       OPENCLAW RUNTIME         │
         │   (Workspace-Based Context)    │
         │                                │
-        │  SOUL.md → Agent Identity      │
-        │  AGENTS.md → Operating Rules   │
-        │  MEMORY.md → Long-Term Memory  │
-        │  USER.md → Human Context       │
+        │  SOUL.md → Generated posture   │
+        │  AGENTS.md → Generated registry │
+        │  MEMORY.md → Generated policy  │
+        │  TOOLS.md → Generated controls │
         └────────────────────────────────┘
 ```
 
@@ -559,9 +559,9 @@ Automated alerts for:
 
 ## Contributing
 
-1. All agent changes require `SOUL.md` updates
-2. New agents must be added to `agents_config.json`
-3. Test escalation paths before deployment
+1. Runtime and agent policy changes must be made in `config/agents_config.json`
+2. Regenerate governance docs with `node scripts/generate-governance-docs.mjs`
+3. Test escalation paths and run `pnpm validate:security` before deployment
 4. Document integration changes in `stack_setup.md`
 
 ---

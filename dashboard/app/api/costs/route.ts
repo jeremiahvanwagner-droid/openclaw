@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
-import { createSupabaseServer } from "../../supabase-server";
-import { isUserAdmin } from "../../../lib/admin";
+import { getServiceSupabase, requireAdminUser } from "../../../lib/server-auth";
 
 interface CostRecord {
   agent_id: string;
@@ -13,20 +11,9 @@ interface CostRecord {
   recorded_at: string;
 }
 
-function getServiceSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-}
-
 export async function GET() {
-  const supabaseAuth = createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabaseAuth.auth.getUser();
-
-  if (!user || !isUserAdmin(user)) {
+  const user = await requireAdminUser();
+  if (!user) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -24,12 +24,12 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import { buildBrowserLaunchArgs, getBrowserStorageRoot } from "./browser-security.mjs";
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
-  path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
-const SESSIONS_DIR = path.join(DATA_DIR, 'browser-sessions');
-const COOKIES_DIR = path.join(DATA_DIR, 'social-sessions');
+const BROWSER_ROOT = getBrowserStorageRoot();
+const SESSIONS_DIR = path.join(BROWSER_ROOT, 'sessions');
+const COOKIES_DIR = path.join(BROWSER_ROOT, 'cookies');
 
 // Browser mode from environment
 const BROWSER_MODE = process.env.BROWSER_MODE || 'headless'; // headless | headed | debug
@@ -76,16 +76,12 @@ async function initDirs() {
 async function getPlaywrightBrowser(options = {}) {
   try {
     const { chromium } = await import('playwright');
+    const launchArgs = await buildBrowserLaunchArgs();
     
     const launchOptions = {
       headless: options.headless ?? BROWSER_CONFIG.headless,
       slowMo: BROWSER_CONFIG.slowMo,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-blink-features=AutomationControlled'
-      ]
+      args: launchArgs,
     };
     
     // Load persistent context if session exists
@@ -130,17 +126,14 @@ async function getPuppeteerStealthBrowser(options = {}) {
     
     const puppeteer = puppeteerExtra.default;
     puppeteer.use(StealthPlugin.default());
+    const launchArgs = await buildBrowserLaunchArgs([
+      `--window-size=${BROWSER_CONFIG.viewport.width},${BROWSER_CONFIG.viewport.height}`,
+    ]);
     
     const launchOptions = {
       headless: options.headless ?? BROWSER_CONFIG.headless ? 'new' : false,
       slowMo: BROWSER_CONFIG.slowMo,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-blink-features=AutomationControlled',
-        `--window-size=${BROWSER_CONFIG.viewport.width},${BROWSER_CONFIG.viewport.height}`
-      ],
+      args: launchArgs,
       defaultViewport: BROWSER_CONFIG.viewport
     };
     

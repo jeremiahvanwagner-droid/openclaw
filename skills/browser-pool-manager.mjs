@@ -21,12 +21,13 @@ import fs from 'fs/promises';
 import path from 'path';
 import EventEmitter from 'events';
 import { fileURLToPath } from 'url';
+import { getBrowserStorageRoot } from "./browser-security.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Configuration
 const DATA_DIR = path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
-const BROWSER_DIR = path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'browser');
+const BROWSER_DIR = getBrowserStorageRoot();
 
 const POOL_CONFIG = {
   maxInstances: 50,

@@ -12,6 +12,12 @@ services:
         OPENCLAW_VERSION: "latest"
     container_name: openclaw-bot
     env_file: /etc/openclaw/.env
+    environment:
+      OPENCLAW_ENVIRONMENT: production
+      OPENCLAW_BROWSER_DATA_DIR: /opt/openclaw/browser-runtime
+      OPENCLAW_BROWSER_ALLOW_UNSAFE_NO_SANDBOX: "false"
+      OPENCLAW_CAPABILITY_ENFORCEMENT_MODE: warn
+      OPENCLAW_SKILL_REGISTRY_ENFORCEMENT_MODE: warn
     ports:
       - "127.0.0.1:18789:18789"
     volumes:
@@ -20,6 +26,21 @@ services:
       - openclaw-backups:/opt/openclaw/backups
       - openclaw-media:/opt/openclaw/media
       - openclaw-memory:/opt/openclaw/memory
+      - openclaw-browser:/opt/openclaw/browser-runtime
+      - openclaw-workspace:/opt/openclaw/workspace
+      - openclaw-workspace-marketing:/opt/openclaw/workspace-marketing
+      - openclaw-workspace-sales:/opt/openclaw/workspace-sales
+      - openclaw-workspace-support:/opt/openclaw/workspace-support
+      - openclaw-workspaces:/opt/openclaw/workspaces
+    user: "1001:1001"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
+      - /home/openclaw/.cache
     restart: always
     deploy:
       resources:
@@ -47,12 +68,23 @@ services:
       dockerfile: Dockerfile
     container_name: openclaw-webhook
     env_file: /etc/openclaw/.env
+    environment:
+      OPENCLAW_ENVIRONMENT: production
+      OPENCLAW_BROWSER_ALLOW_UNSAFE_NO_SANDBOX: "false"
     command: ["node", "handlers/ghl-webhook-handler.mjs"]
     ports:
       - "127.0.0.1:8788:8788"
     volumes:
       - openclaw-data:/opt/openclaw/data
       - openclaw-logs:/opt/openclaw/logs
+    user: "1001:1001"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    tmpfs:
+      - /tmp
     restart: always
     deploy:
       resources:
@@ -80,3 +112,9 @@ volumes:
   openclaw-backups:
   openclaw-media:
   openclaw-memory:
+  openclaw-browser:
+  openclaw-workspace:
+  openclaw-workspace-marketing:
+  openclaw-workspace-sales:
+  openclaw-workspace-support:
+  openclaw-workspaces:

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
-import { createSupabaseServer } from "../../supabase-server";
-import { isUserAdmin } from "../../../lib/admin";
+import { getServiceSupabase, requireAdminUser } from "../../../lib/server-auth";
 
 const ALLOWED_CONFIG_PATCH_FIELDS = new Set(["model", "role", "escalation_path"]);
 
@@ -13,22 +11,6 @@ interface AgentMutationRequest {
   action: AgentAction;
   agent_id: string;
   config?: JsonObject;
-}
-
-function getServiceSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
-}
-
-async function requireAdmin() {
-  const supabase = createSupabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user || !isUserAdmin(user)) return null;
-  return user;
 }
 
 function sanitizeConfigPatch(config: unknown): JsonObject | null {
@@ -74,9 +56,45 @@ async function auditLog(
   });
 }
 
-// POST /api/agents — dispatch by action field
+export async function GET(req: NextRequest) {
+  const user = await requireAdminUser();
+  if (!user) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const agentId = req.nextUrl.searchParams.get("agent_id");
+  const db = getServiceSupabase();
+
+  if (agentId) {
+    const { data, error } = await db
+      .from("agents")
+      .select("*")
+      .eq("agent_id", agentId)
+      .single();
+
+    if (error || !data) {
+      return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ agent: data });
+  }
+
+  const { data, error } = await db
+    .from("agents")
+    .select("*")
+    .order("org_unit", { ascending: true })
+    .order("agent_id", { ascending: true });
+
+  if (error) {
+    return NextResponse.json({ error: "Failed to fetch agents" }, { status: 500 });
+  }
+
+  return NextResponse.json({ agents: data || [] });
+}
+
+// POST /api/agents -- dispatch by action field
 export async function POST(req: NextRequest) {
-  const user = await requireAdmin();
+  const user = await requireAdminUser();
   if (!user) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -93,8 +111,6 @@ export async function POST(req: NextRequest) {
   }
 
   const db = getServiceSupabase();
-
-  // Verify agent exists
   const { data: agent, error: fetchErr } = await db
     .from("agents")
     .select("*")
@@ -107,9 +123,7 @@ export async function POST(req: NextRequest) {
 
   switch (action) {
     case "invoke": {
-      // Trigger manual agent run via Inngest
-      const inngestUrl =
-        process.env.INNGEST_EVENT_API_URL ?? "http://localhost:8288/e";
+      const inngestUrl = process.env.INNGEST_EVENT_API_URL ?? "http://localhost:8288/e";
       const inngestKey = process.env.INNGEST_EVENT_KEY ?? "";
 
       const res = await fetch(`${inngestUrl}/${inngestKey}`, {
@@ -142,8 +156,7 @@ export async function POST(req: NextRequest) {
     }
 
     case "quarantine": {
-      const newStatus =
-        agent.status === "quarantined" ? "active" : "quarantined";
+      const newStatus = agent.status === "quarantined" ? "active" : "quarantined";
 
       const { error: updateErr } = await db
         .from("agents")
@@ -174,7 +187,6 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      // Merge with existing config to avoid overwriting nested fields
       const existingConfig =
         agent.config && typeof agent.config === "object" && !Array.isArray(agent.config)
           ? (agent.config as JsonObject)

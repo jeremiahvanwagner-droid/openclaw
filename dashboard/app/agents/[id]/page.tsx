@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "../../supabase";
 
 interface Agent {
   id: string;
@@ -33,8 +32,6 @@ const MODELS = [
   "gpt-4o-mini",
 ];
 
-const STATUSES = ["active", "idle", "paused", "quarantined", "error"];
-
 export default function AgentDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -49,7 +46,6 @@ export default function AgentDetailPage() {
     text: string;
   } | null>(null);
 
-  // Editable fields
   const [model, setModel] = useState("");
   const [status, setStatus] = useState("");
   const [role, setRole] = useState("");
@@ -57,41 +53,47 @@ export default function AgentDetailPage() {
 
   useEffect(() => {
     async function fetchAgent() {
-      if (!supabase) {
-        setLoading(false);
-        return;
-      }
-      const { data, error } = await supabase
-        .from("agents")
-        .select("*")
-        .eq("agent_id", agentId)
-        .single();
+      try {
+        const response = await fetch(`/api/agents?agent_id=${encodeURIComponent(agentId)}`, {
+          cache: "no-store",
+        });
 
-      if (error || !data) {
-        setLoading(false);
-        return;
-      }
+        if (!response.ok) {
+          throw new Error("Agent not found");
+        }
 
-      setAgent(data);
-      setModel(data.config?.model || "");
-      setStatus(data.status);
-      setRole(data.config?.role || "");
-      setEscalationPath(data.config?.escalation_path || "");
-      setLoading(false);
+        const data = (await response.json()) as { agent?: Agent };
+        if (!data.agent) {
+          throw new Error("Agent not found");
+        }
+
+        setAgent(data.agent);
+        setModel(data.agent.config?.model || "");
+        setStatus(data.agent.status);
+        setRole(data.agent.config?.role || "");
+        setEscalationPath(data.agent.config?.escalation_path || "");
+      } catch {
+        setAgent(null);
+      } finally {
+        setLoading(false);
+      }
     }
 
-    fetchAgent();
+    void fetchAgent();
   }, [agentId]);
 
   async function callApi(action: string, extra: Record<string, unknown> = {}) {
-    const res = await fetch("/api/agents", {
+    const response = await fetch("/api/agents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action, agent_id: agentId, ...extra }),
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error);
+    const data = (await response.json()) as { error?: string; status?: string };
+    if (!response.ok) {
+      throw new Error(data.error || "Request failed");
+    }
+
     return data;
   }
 
@@ -107,9 +109,9 @@ export default function AgentDetailPage() {
         },
       });
       setMessage({ type: "success", text: "Agent config updated" });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Update failed";
-      setMessage({ type: "error", text: msg });
+    } catch (error) {
+      const text = error instanceof Error ? error.message : "Update failed";
+      setMessage({ type: "error", text });
     } finally {
       setSaving(false);
     }
@@ -123,13 +125,10 @@ export default function AgentDetailPage() {
       if (action === "quarantine" && result.status) {
         setStatus(result.status);
       }
-      setMessage({
-        type: "success",
-        text: `${action} completed successfully`,
-      });
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : `${action} failed`;
-      setMessage({ type: "error", text: msg });
+      setMessage({ type: "success", text: `${action} completed successfully` });
+    } catch (error) {
+      const text = error instanceof Error ? error.message : `${action} failed`;
+      setMessage({ type: "error", text });
     } finally {
       setActionLoading(null);
     }
@@ -137,7 +136,7 @@ export default function AgentDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-slate-400">Loading agent...</div>
       </div>
     );
@@ -145,20 +144,19 @@ export default function AgentDetailPage() {
 
   if (!agent) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-slate-400">Agent not found</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8">
-      {/* Header */}
+    <div className="mx-auto max-w-3xl space-y-8">
       <div className="flex items-center justify-between">
         <div>
           <button
             onClick={() => router.push("/agents")}
-            className="text-slate-400 hover:text-white text-sm mb-2 block"
+            className="mb-2 block text-sm text-slate-400 hover:text-white"
           >
             &larr; Back to agents
           </button>
@@ -166,52 +164,46 @@ export default function AgentDetailPage() {
           <p className="text-slate-400">{agent.display_name || agent.config?.role || "Agent"}</p>
         </div>
         <span
-          className={`px-3 py-1 rounded-full text-sm font-medium ${
+          className={`rounded-full px-3 py-1 text-sm font-medium ${
             status === "active"
               ? "bg-green-500/20 text-green-400"
-              : status === "quarantined"
-              ? "bg-red-500/20 text-red-400"
-              : status === "error"
-              ? "bg-red-500/20 text-red-400"
-              : "bg-slate-500/20 text-slate-400"
+              : status === "quarantined" || status === "error"
+                ? "bg-red-500/20 text-red-400"
+                : "bg-slate-500/20 text-slate-400"
           }`}
         >
           {status}
         </span>
       </div>
 
-      {/* Message banner */}
-      {message && (
+      {message ? (
         <div
-          className={`p-3 rounded-lg text-sm ${
+          className={`rounded-lg p-3 text-sm ${
             message.type === "success"
-              ? "bg-green-500/10 border border-green-500/30 text-green-400"
-              : "bg-red-500/10 border border-red-500/30 text-red-400"
+              ? "border border-green-500/30 bg-green-500/10 text-green-400"
+              : "border border-red-500/30 bg-red-500/10 text-red-400"
           }`}
         >
           {message.text}
         </div>
-      )}
+      ) : null}
 
-      {/* Info section */}
       <div className="card">
-        <h2 className="text-lg font-semibold text-white mb-4">Agent Info</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">Agent Info</h2>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <span className="text-slate-500">Division:</span>
-            <span className="text-white ml-2">
-              {agent.org_unit?.replace(/_/g, " ")}
-            </span>
+            <span className="ml-2 text-white">{agent.org_unit?.replace(/_/g, " ")}</span>
           </div>
           <div>
             <span className="text-slate-500">Created:</span>
-            <span className="text-white ml-2">
+            <span className="ml-2 text-white">
               {new Date(agent.created_at).toLocaleDateString()}
             </span>
           </div>
           <div>
             <span className="text-slate-500">Last heartbeat:</span>
-            <span className="text-white ml-2">
+            <span className="ml-2 text-white">
               {agent.last_heartbeat_at
                 ? new Date(agent.last_heartbeat_at).toLocaleString()
                 : "Never"}
@@ -219,118 +211,109 @@ export default function AgentDetailPage() {
           </div>
           <div>
             <span className="text-slate-500">Events processed:</span>
-            <span className="text-white ml-2">
+            <span className="ml-2 text-white">
               {agent.config?.metrics?.events_processed || 0}
             </span>
           </div>
         </div>
       </div>
 
-      {/* Edit form */}
       <div className="card">
-        <h2 className="text-lg font-semibold text-white mb-4">
-          Configuration
-        </h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">Configuration</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Model</label>
+            <label className="mb-1 block text-sm text-slate-400">Model</label>
             <select
               value={model}
-              onChange={(e) => setModel(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-claw-500"
+              onChange={(event) => setModel(event.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-claw-500 focus:outline-none"
             >
               <option value="">Default</option>
-              {MODELS.map((m) => (
-                <option key={m} value={m}>
-                  {m}
+              {MODELS.map((entry) => (
+                <option key={entry} value={entry}>
+                  {entry}
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">Role</label>
+            <label className="mb-1 block text-sm text-slate-400">Role</label>
             <input
               value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-claw-500"
+              onChange={(event) => setRole(event.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-claw-500 focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="block text-sm text-slate-400 mb-1">
-              Escalation Path
-            </label>
+            <label className="mb-1 block text-sm text-slate-400">Escalation Path</label>
             <input
               value={escalationPath}
-              onChange={(e) => setEscalationPath(e.target.value)}
-              className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-claw-500"
+              onChange={(event) => setEscalationPath(event.target.value)}
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-white focus:border-claw-500 focus:outline-none"
             />
           </div>
 
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2 bg-claw-500 hover:bg-claw-600 text-white rounded-lg transition disabled:opacity-50"
+            className="rounded-lg bg-claw-500 px-4 py-2 text-white transition hover:bg-claw-600 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </div>
 
-      {/* Tools */}
-      {agent.config?.tools_required &&
-        agent.config.tools_required.length > 0 && (
-          <div className="card">
-            <h2 className="text-lg font-semibold text-white mb-4">Tools</h2>
-            <div className="flex flex-wrap gap-2">
-              {agent.config.tools_required.map((tool) => (
-                <span
-                  key={tool}
-                  className="px-2 py-1 bg-claw-500/20 text-claw-400 text-sm rounded border border-claw-500/30"
-                >
-                  {tool}
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
-
-      {/* Last Error */}
-      {agent.config?.metrics?.last_error && (
+      {agent.config?.tools_required && agent.config.tools_required.length > 0 ? (
         <div className="card">
-          <h2 className="text-lg font-semibold text-white mb-4">Last Error</h2>
-          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm font-mono">
+          <h2 className="mb-4 text-lg font-semibold text-white">Tools</h2>
+          <div className="flex flex-wrap gap-2">
+            {agent.config.tools_required.map((tool) => (
+              <span
+                key={tool}
+                className="rounded border border-claw-500/30 bg-claw-500/20 px-2 py-1 text-sm text-claw-400"
+              >
+                {tool}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {agent.config?.metrics?.last_error ? (
+        <div className="card">
+          <h2 className="mb-4 text-lg font-semibold text-white">Last Error</h2>
+          <div className="rounded border border-red-500/30 bg-red-500/10 p-3 font-mono text-sm text-red-400">
             {agent.config.metrics.last_error}
           </div>
         </div>
-      )}
+      ) : null}
 
-      {/* Actions */}
       <div className="card">
-        <h2 className="text-lg font-semibold text-white mb-4">Actions</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">Actions</h2>
         <div className="flex gap-3">
           <button
             onClick={() => handleAction("invoke")}
             disabled={actionLoading === "invoke"}
-            className="px-4 py-2 bg-claw-500 hover:bg-claw-600 text-white rounded-lg transition disabled:opacity-50"
+            className="rounded-lg bg-claw-500 px-4 py-2 text-white transition hover:bg-claw-600 disabled:opacity-50"
           >
             {actionLoading === "invoke" ? "Invoking..." : "Trigger Manual Run"}
           </button>
           <button
             onClick={() => handleAction("quarantine")}
             disabled={actionLoading === "quarantine"}
-            className={`px-4 py-2 rounded-lg transition disabled:opacity-50 ${
+            className={`rounded-lg px-4 py-2 text-white transition disabled:opacity-50 ${
               status === "quarantined"
-                ? "bg-green-600 hover:bg-green-700 text-white"
-                : "bg-red-600 hover:bg-red-700 text-white"
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-red-600 hover:bg-red-700"
             }`}
           >
             {actionLoading === "quarantine"
               ? "..."
               : status === "quarantined"
-              ? "Unquarantine"
-              : "Quarantine"}
+                ? "Unquarantine"
+                : "Quarantine"}
           </button>
         </div>
       </div>

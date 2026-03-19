@@ -168,9 +168,23 @@
         "maxConcurrent": 8
       },
       "sandbox": {
-        "mode": "off",
+        "mode": "all",
+        "docker": {
+          "readOnlyRoot": true,
+          "tmpfs": [
+            "/tmp",
+            "/home/openclaw/.cache"
+          ],
+          "network": "default",
+          "user": "openclaw",
+          "capDrop": [
+            "ALL"
+          ]
+        },
         "browser": {
-          "enabled": true
+          "enabled": true,
+          "allowHostControl": false,
+          "autoStart": false
         }
       }
     },

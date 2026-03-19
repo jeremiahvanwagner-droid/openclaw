@@ -21,6 +21,7 @@ import {
   getHumanApprovalRequest,
   markHumanApprovalExecuting,
 } from "../../lib/human-approval";
+import { enforceAgentCapability } from "../../lib/security-governance";
 import { logger } from "../../lib/logger";
 
 const log = logger.child({ module: "agent-orchestrator" });
@@ -122,6 +123,20 @@ export const agentInvoke = inngest.createFunction(
     });
 
     const approvalActionFamily = approvalClassification.actionFamily;
+    await step.run("enforce-capability-policy", async () =>
+      enforceAgentCapability({
+        agentId: source_agent,
+        tool: "inngest_orchestration",
+        actionFamily: approvalActionFamily,
+        correlationId: correlation_id || eventId,
+        targetAgent: target_agent || null,
+        metadata: {
+          target_division,
+          priority,
+        },
+      }),
+    );
+
     if (approvalClassification.requiresApproval && approvalActionFamily) {
       const approval = await step.run("create-human-approval", async () =>
         createHumanApprovalRequest({
@@ -341,6 +356,20 @@ export const agentEscalate = inngest.createFunction(
 
       return agent?.config?.escalation_path || "shared_exec_orchestrator";
     });
+
+    await step.run("enforce-escalation-capability-policy", async () =>
+      enforceAgentCapability({
+        agentId: source_agent,
+        tool: "inngest_orchestration",
+        correlationId: trace_id,
+        targetAgent: nextAgent || null,
+        metadata: {
+          escalation_path: escalation_path || null,
+          retry_count,
+          reason,
+        },
+      }),
+    );
 
     // Step 3: Check if we've exceeded retry limit
     if (retry_count >= MAX_RETRIES) {

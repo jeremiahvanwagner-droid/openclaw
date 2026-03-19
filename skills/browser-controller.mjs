@@ -26,12 +26,14 @@
 
 import fs from 'fs/promises';
 import path from 'path';
+import { buildBrowserLaunchArgs, getBrowserStorageRoot } from "./browser-security.mjs";
 
 // Configuration
 const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
-const SESSIONS_DIR = path.join(DATA_DIR, 'browser-sessions');
-const SCREENSHOTS_DIR = path.join(DATA_DIR, 'screenshots');
+const BROWSER_ROOT = getBrowserStorageRoot();
+const SESSIONS_DIR = path.join(BROWSER_ROOT, 'sessions');
+const SCREENSHOTS_DIR = path.join(BROWSER_ROOT, 'screenshots');
 
 // Browser settings
 const BROWSER_CONFIG = {
@@ -124,16 +126,14 @@ async function getPuppeteer() {
  */
 async function launchBrowser(options = {}) {
   const puppeteer = await getPuppeteer();
+  const launchArgs = await buildBrowserLaunchArgs([
+    `--window-size=${BROWSER_CONFIG.viewport.width},${BROWSER_CONFIG.viewport.height}`,
+  ]);
   
   const launchOptions = {
     headless: options.headless ?? BROWSER_CONFIG.headless,
     slowMo: BROWSER_CONFIG.slowMo,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      `--window-size=${BROWSER_CONFIG.viewport.width},${BROWSER_CONFIG.viewport.height}`
-    ],
+    args: launchArgs,
     defaultViewport: BROWSER_CONFIG.viewport
   };
   

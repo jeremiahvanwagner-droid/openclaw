@@ -191,6 +191,133 @@
       "internal_scopes": 0
     }
   },
+  "security_policy": {
+    "enforcement_modes": {
+      "capabilities": "warn"
+    },
+    "defaults": {
+      "allowed_tools": [
+        "agent_messaging"
+      ],
+      "allowed_channels": [],
+      "allowed_action_families": [],
+      "requires_hitl_for": [
+        "ghl_write",
+        "email_send",
+        "payment_action"
+      ]
+    },
+    "alias_agents": {
+      "main": {
+        "allowed_tools": [
+          "agent_messaging",
+          "approval_queue",
+          "dashboard_admin",
+          "runtime_alerting"
+        ],
+        "allowed_channels": [
+          "telegram",
+          "msteams",
+          "email"
+        ],
+        "allowed_action_families": [
+          "ghl_write",
+          "email_send",
+          "payment_action"
+        ],
+        "requires_hitl_for": [
+          "ghl_write",
+          "email_send",
+          "payment_action"
+        ]
+      },
+      "marketing": {
+        "allowed_tools": [
+          "agent_messaging",
+          "campaign_delivery"
+        ],
+        "allowed_channels": [
+          "telegram",
+          "email"
+        ],
+        "allowed_action_families": [
+          "ghl_write",
+          "email_send"
+        ],
+        "requires_hitl_for": [
+          "ghl_write",
+          "email_send",
+          "payment_action"
+        ]
+      },
+      "sales": {
+        "allowed_tools": [
+          "agent_messaging",
+          "crm_follow_up"
+        ],
+        "allowed_channels": [
+          "telegram",
+          "email",
+          "msteams"
+        ],
+        "allowed_action_families": [
+          "ghl_write",
+          "email_send",
+          "payment_action"
+        ],
+        "requires_hitl_for": [
+          "ghl_write",
+          "email_send",
+          "payment_action"
+        ]
+      },
+      "support": {
+        "allowed_tools": [
+          "agent_messaging",
+          "support_follow_up"
+        ],
+        "allowed_channels": [
+          "telegram",
+          "email"
+        ],
+        "allowed_action_families": [
+          "ghl_write",
+          "email_send"
+        ],
+        "requires_hitl_for": [
+          "ghl_write",
+          "email_send",
+          "payment_action"
+        ]
+      }
+    },
+    "tool_channel_map": {
+      "telegram_alerts": "telegram",
+      "telegram_master_channel": "telegram",
+      "telegram_broadcast": "telegram",
+      "msteams_delivery": "msteams",
+      "teams_delivery": "msteams",
+      "email_broadcaster": "email",
+      "email_dispatcher": "email",
+      "email_marketing": "email",
+      "m365_email": "email"
+    },
+    "tool_action_family_map": {
+      "ghl": "ghl_write",
+      "ghl_contacts": "ghl_write",
+      "ghl_contact": "ghl_write",
+      "ghl_workflows": "ghl_write",
+      "ghl_pipeline_view": "ghl_write",
+      "approval_queue": "ghl_write",
+      "email_broadcaster": "email_send",
+      "email_dispatcher": "email_send",
+      "email_marketing": "email_send",
+      "stripe_dashboard": "payment_action",
+      "checkout_integrator": "payment_action",
+      "payment_plans": "payment_action",
+      "refunds": "payment_action"
+    }
+  },
   "divisions": [
     {
       "id": "division_1_core_operations",

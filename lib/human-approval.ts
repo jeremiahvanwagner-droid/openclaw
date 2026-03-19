@@ -1,4 +1,4 @@
-// @ts-ignore - runtime implementation lives in the adjacent .mjs module.
+// @ts-expect-error - runtime implementation lives in the adjacent .mjs module.
 import * as runtime from "./human-approval.mjs";
 
 export interface ApprovalQueueRow {
