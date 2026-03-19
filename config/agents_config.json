@@ -1,12 +1,12 @@
 {
   "$schema": "./schemas/agent-config.schema.json",
   "version": "2.0.0",
-  "generated_at": "2026-03-18T23:30:36.786Z",
+  "generated_at": "2026-03-19T00:59:08.366Z",
   "organization": "Truth J Blue LLC",
   "total_agents": 103,
   "runtime_model": "10-pod",
   "runtime": {
-    "description": "13 always-on runtime supervisors plus on-demand workers. Business registry drives mixed GHL tenancy and pod assignment.",
+    "description": "13 always-on runtime supervisors plus on-demand workers. Business registry drives shared TJB/MSL GHL tenancy and pod assignment.",
     "pods": [
       {
         "pod_id": "biz_01",
@@ -186,9 +186,9 @@
     "business_registry_path": "data/business-registry.json",
     "portfolio_summary": {
       "total_businesses": 10,
-      "dedicated_scopes": 8,
-      "shared_scopes": 1,
-      "internal_scopes": 1
+      "dedicated_scopes": 0,
+      "shared_scopes": 10,
+      "internal_scopes": 0
     }
   },
   "divisions": [

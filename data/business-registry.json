@@ -1,7 +1,7 @@
 {
   "version": 1,
   "portfolio_name": "Truth J Blue 10-Business GHL Portfolio",
-  "ghl_model": "mixed",
+  "ghl_model": "dual_shared_tjb_msl",
   "system_of_record": "GoHighLevel",
   "orchestration_plane": "OpenClaw",
   "boundary_rule": "Customer-facing records, pipelines, calendars, memberships, billing triggers, and community objects live in GHL. Cross-business provisioning, QA, optimization, exception routing, analytics, and orchestration live in OpenClaw.",
@@ -21,7 +21,8 @@
       "status": "active",
       "vertical": "flagship_coaching",
       "offer_model": "Flagship coaching, core offers, and primary brand operations",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": true,
@@ -110,7 +111,8 @@
       "status": "active",
       "vertical": "coaching_program",
       "offer_model": "High-ticket mentorship and cohort enrollment",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_msl_subaccount",
+      "ghl_location_selector": "MSL",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": true,
@@ -199,7 +201,8 @@
       "status": "active",
       "vertical": "community_membership",
       "offer_model": "Ongoing community membership, accountability, and member retention",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_msl_subaccount",
+      "ghl_location_selector": "MSL",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": true,
@@ -288,7 +291,8 @@
       "status": "active",
       "vertical": "publishing_media",
       "offer_model": "Books, launches, digital publications, and media distribution",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": true,
@@ -376,7 +380,8 @@
       "status": "active",
       "vertical": "consulting_services",
       "offer_model": "Consulting, strategic advisory, and custom implementation",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": true,
@@ -465,7 +470,8 @@
       "status": "active",
       "vertical": "nonprofit_operations",
       "offer_model": "Programs, donor stewardship, volunteer engagement, and nonprofit operations",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_msl_subaccount",
+      "ghl_location_selector": "MSL",
       "tenancy_inputs": {
         "distinct_legal_entity": true,
         "distinct_billing_stack": true,
@@ -553,7 +559,8 @@
       "status": "active",
       "vertical": "ecommerce",
       "offer_model": "Books, merch, digital products, upsells, and post-purchase automation",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": true,
@@ -642,7 +649,8 @@
       "status": "active",
       "vertical": "saas",
       "offer_model": "White-label SaaS, onboarding, retention, and expansion revenue",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": true,
@@ -732,7 +740,8 @@
       "status": "incubating",
       "vertical": "incubator",
       "offer_model": "Idea validation, waitlists, and pre-launch experimentation",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": false,
@@ -820,7 +829,8 @@
       "status": "internal",
       "vertical": "internal_operations",
       "offer_model": "Portfolio oversight, approvals, executive scorecards, and exception handling",
-      "ghl_scope_type": "auto",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
       "tenancy_inputs": {
         "distinct_legal_entity": false,
         "distinct_billing_stack": false,

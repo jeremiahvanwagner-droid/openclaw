@@ -37,6 +37,26 @@ describe("business-registry", () => {
     expect(result.ghl_scope_type).toBe("internal_operations_subaccount");
   });
 
+  it("allows internal portfolio businesses to share TJB or MSL explicitly", () => {
+    const result = classifyBusinessTenancy(
+      {
+        internal_operations_scope: true,
+      },
+      "shared_tjb_subaccount",
+    );
+
+    expect(result.scope_family).toBe("shared");
+    expect(result.ghl_scope_type).toBe("shared_tjb_subaccount");
+    expect(result.reasons).toContain("internal portfolio control scope");
+  });
+
+  it("respects explicit shared tenant scope types", () => {
+    const result = classifyBusinessTenancy({}, "shared_tjb_subaccount");
+
+    expect(result.scope_family).toBe("shared");
+    expect(result.ghl_scope_type).toBe("shared_tjb_subaccount");
+  });
+
   it("summarizes the automation blueprint coverage", () => {
     const summary = summarizeAutomationBlueprint({
       snapshot_pack: true,
@@ -49,15 +69,15 @@ describe("business-registry", () => {
     expect(summary.coverage).toBeCloseTo(2 / 3, 5);
   });
 
-  it("loads the seeded 10-business portfolio and returns a mixed summary", () => {
+  it("loads the seeded 10-business portfolio and returns a TJB/MSL shared summary", () => {
     const registry = loadBusinessRegistry();
     const summary = buildPortfolioSummary(registry);
 
     expect(registry.businesses).toHaveLength(10);
     expect(summary.total_businesses).toBe(10);
-    expect(summary.dedicated_scopes).toBe(8);
-    expect(summary.shared_scopes).toBe(1);
-    expect(summary.internal_scopes).toBe(1);
+    expect(summary.dedicated_scopes).toBe(0);
+    expect(summary.shared_scopes).toBe(10);
+    expect(summary.internal_scopes).toBe(0);
     expect(summary.businesses_with_memberships).toBe(4);
     expect(summary.businesses_with_communities).toBe(2);
   });

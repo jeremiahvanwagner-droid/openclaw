@@ -348,7 +348,7 @@ function buildAgentConfig(registry) {
       ...baseConfig.runtime,
       description:
         `${registry.businesses.length + SHARED_SUPERVISOR_IDS.length} always-on runtime supervisors plus on-demand workers. ` +
-        "Business registry drives mixed GHL tenancy and pod assignment.",
+        "Business registry drives shared TJB/MSL GHL tenancy and pod assignment.",
       business_registry_path: "data/business-registry.json",
       portfolio_summary: {
         total_businesses: portfolioSummary.total_businesses,
