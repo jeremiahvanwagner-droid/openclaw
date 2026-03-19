@@ -165,6 +165,23 @@ OPENAI_API_KEY=<secret>
 | SEV-3 | Minor issue | < 4 hours | Single agent errors |
 | SEV-4 | Low impact | < 24 hours | Performance degradation |
 
+### Sentinel Drift & Alert Noise Triage
+
+Use these commands before manually resolving incidents:
+
+```bash
+# Check queue/event reconciliation drift (default 12h window)
+python deploy/hetzner/ops_control.py reconciliation-check --since-minutes 720
+
+# Preview RED alerts that would be resolved (no changes made)
+python deploy/hetzner/ops_control.py resolve-alerts --severity RED --dry-run
+
+# Preview a specific alert class only
+python deploy/hetzner/ops_control.py resolve-alerts --alert-type critical_rate_limited --dry-run
+```
+
+If drift is reported (`status":"drift"`), do **not** mass-resolve alerts first—investigate orphan events/tasks and stale queue causes, then resolve alerts.
+
 ### SEV-1: Complete Agent Network Outage
 
 **Symptoms:**
