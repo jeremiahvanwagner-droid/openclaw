@@ -15,6 +15,12 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { listTenants } from '../lib/ghl-tenant-resolver.mjs';
 import { authenticateGhlWebhookRequest, normalizeGhlWebhookPayload } from '../lib/ghl-webhook.mjs';
+import {
+  answerTelegramCallback,
+  parseTelegramApprovalCallback,
+  resolveHumanApproval,
+  verifyTelegramApprovalCallback,
+} from '../lib/human-approval.mjs';
 import { openclawSend, openclawMessage } from '../lib/safe-exec.mjs';
 import { childLogger } from '../lib/logger.mjs';
 import { registry, eventProcessedTotal, eventProcessingDuration } from '../lib/metrics.mjs';
@@ -90,9 +96,11 @@ const TEAMS_CHANNEL_ID = process.env.OPENCLAW_ALERT_TEAMS_CHANNEL_ID || '';
 const M365_EMAIL_OWNER = process.env.M365_EMAIL_OWNER || '';
 const GATEWAY_AUTH_TOKEN = process.env.OPENCLAW_GATEWAY_AUTH_TOKEN || process.env.OPENCLAW_GATEWAY_TOKEN || '';
 const GHL_WEBHOOK_PUBLIC_KEY = process.env.OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY || undefined;
+const TELEGRAM_WEBHOOK_SECRET = process.env.OPENCLAW_TELEGRAM_WEBHOOK_SECRET || '';
 
 const MAX_BODY_SIZE = 1 * 1024 * 1024;
 const WEBHOOK_PATHS = new Set(['/webhook', '/webhook/ghl', '/webhooks/ghl']);
+const TELEGRAM_WEBHOOK_PATH = '/webhook/telegram';
 
 const configuredTenants = listTenants();
 if (configuredTenants.length === 0) {
@@ -506,6 +514,70 @@ async function processEventAsync(eventType, payload, traceId, authStrategy) {
 const server = http.createServer(async (req, res) => {
   const pathname = getPathname(req.url);
 
+  if (req.method === 'POST' && pathname === TELEGRAM_WEBHOOK_PATH) {
+    try {
+      if (TELEGRAM_WEBHOOK_SECRET) {
+        const secretHeader = req.headers['x-telegram-bot-api-secret-token'];
+        if (secretHeader !== TELEGRAM_WEBHOOK_SECRET) {
+          res.writeHead(401, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Unauthorized telegram webhook' }));
+          return;
+        }
+      }
+
+      const rawBody = await collectRequestBody(req);
+      let payload;
+      try {
+        payload = JSON.parse(rawBody.toString('utf8'));
+      } catch {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid JSON payload' }));
+        return;
+      }
+
+      const callback = payload?.callback_query;
+      if (!callback?.data) {
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true, ignored: true }));
+        return;
+      }
+
+      const parsed = parseTelegramApprovalCallback(callback.data);
+      if (!parsed || !verifyTelegramApprovalCallback(parsed)) {
+        await answerTelegramCallback(callback.id, 'Invalid approval token');
+        res.writeHead(401, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Invalid approval token' }));
+        return;
+      }
+
+      const approval = await resolveHumanApproval({
+        approvalId: parsed.approvalId,
+        decision: parsed.decision,
+        resolvedBy: callback.from?.username || String(callback.from?.id || 'telegram'),
+        channel: 'telegram',
+        note: `telegram_callback:${callback.id}`,
+      });
+
+      await answerTelegramCallback(
+        callback.id,
+        parsed.decision === 'approve' ? 'Approved' : 'Rejected',
+      );
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({
+        ok: true,
+        approval_id: approval.id,
+        status: approval.status,
+      }));
+      return;
+    } catch (error) {
+      log.error({ err: error.message }, 'Telegram webhook processing error');
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Internal Server Error' }));
+      return;
+    }
+  }
+
   if (req.method === 'GET' && pathname === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
@@ -532,7 +604,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  if (!isWebhookPath(req.url) && pathname !== '/health' && pathname !== '/metrics') {
+  if (!isWebhookPath(req.url) && pathname !== '/health' && pathname !== '/metrics' && pathname !== TELEGRAM_WEBHOOK_PATH) {
     if (GATEWAY_AUTH_TOKEN) {
       const authHeader = req.headers.authorization || '';
       const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';

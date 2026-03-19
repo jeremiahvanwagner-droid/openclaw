@@ -27,6 +27,13 @@ import fs from 'fs/promises';
 import path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import {
+  buildApprovalPreview,
+  classifyApprovalCandidate,
+  createHumanApprovalRequest,
+  markHumanApprovalExecuting,
+  waitForHumanApproval,
+} from '../lib/human-approval.mjs';
 
 const execAsync = promisify(exec);
 
@@ -285,8 +292,94 @@ function createTask(division, taskType, data, priority = 2) {
     completedAt: null,
     result: null,
     error: null,
+    approvalId: null,
+    approvalStatus: null,
     retries: 0,
     maxRetries: 3
+  };
+}
+
+async function enforceApprovalGate(task, sourceAgent = 'agent-coordinator', targetAgent = null) {
+  const payload = task.data && typeof task.data === 'object' ? task.data : {};
+  const classification = classifyApprovalCandidate({
+    taskType: task.taskType,
+    actionFamily: payload.actionFamily || payload.action_family,
+    payload,
+  });
+
+  if (!classification.requiresApproval || !classification.actionFamily) {
+    return { approved: true, gated: false, actionFamily: null };
+  }
+
+  task.status = 'awaiting_approval';
+  task.approvalStatus = 'pending';
+  await saveQueue();
+
+  const approval = await createHumanApprovalRequest({
+    requestType: 'agent_action',
+    actionFamily: classification.actionFamily,
+    sourceAgent,
+    targetAgent,
+    correlationId: task.id,
+    payloadPreview: buildApprovalPreview({
+      division: task.division,
+      taskType: task.taskType,
+      data: task.data,
+    }),
+    fullPayload: {
+      taskId: task.id,
+      division: task.division,
+      taskType: task.taskType,
+      data: task.data,
+      priority: task.priority,
+    },
+    requestedBy: sourceAgent,
+  });
+
+  task.approvalId = approval.id;
+  task.approvalStatus = approval.status;
+  await saveQueue();
+
+  const resolution = await waitForHumanApproval(approval.id);
+  task.approvalStatus = resolution.status;
+
+  if (resolution.status !== 'approved' && resolution.status !== 'executing') {
+    task.status = resolution.status === 'rejected' ? 'rejected' : 'expired';
+    task.error = `Human approval ${resolution.status}`;
+    await saveQueue();
+    return {
+      approved: false,
+      gated: true,
+      actionFamily: classification.actionFamily,
+      status: resolution.status,
+    };
+  }
+
+  const executingApproval = resolution.status === 'executing'
+    ? resolution.approval
+    : await markHumanApprovalExecuting(approval.id);
+
+  if (!executingApproval) {
+    task.status = 'blocked';
+    task.error = 'Approval could not transition to executing';
+    await saveQueue();
+    return {
+      approved: false,
+      gated: true,
+      actionFamily: classification.actionFamily,
+      status: 'blocked',
+    };
+  }
+
+  task.approvalStatus = executingApproval.status;
+  task.status = 'pending';
+  await saveQueue();
+
+  return {
+    approved: true,
+    gated: true,
+    actionFamily: classification.actionFamily,
+    status: executingApproval.status,
   };
 }
 
@@ -320,30 +413,43 @@ function getBestAgent(division, taskType) {
  */
 async function dispatchTask(division, taskType, data, priority = 2) {
   const task = createTask(division, taskType, data, priority);
-  
-  // Try to assign immediately
-  const agent = getBestAgent(division, taskType);
-  
-  if (agent) {
-    task.assignedTo = agent.id;
-    task.status = 'assigned';
-    agent.status = 'busy';
-    agent.currentTask = task.id;
-    agent.tasksInProgress++;
-    await saveAgentRegistry();
-  }
-  
+
   taskQueue.push(task);
   taskQueue.sort((a, b) => a.priority - b.priority);
-  
   await saveQueue();
-  
+
   metrics.totalTasks++;
   metrics.tasksByDivision[division] = (metrics.tasksByDivision[division] || 0) + 1;
   metrics.tasksByPriority[priority]++;
   metrics.hourlyActivity[new Date().getHours()]++;
-  await saveMetrics();
   
+  const approval = await enforceApprovalGate(task);
+  if (!approval.approved) {
+    metrics.failedTasks++;
+    await saveMetrics();
+    console.log(`Task dispatched: ${task.id} -> ${division}`);
+    console.log(`  Blocked by human approval: ${approval.status}`);
+    return task;
+  }
+
+  // Try to assign immediately
+  const agent = getBestAgent(division, taskType);
+
+  if (agent) {
+    task.assignedTo = agent.id;
+    task.status = 'assigned';
+    task.startedAt = new Date().toISOString();
+    agent.status = 'busy';
+    agent.currentTask = task.id;
+    agent.tasksInProgress++;
+    await saveAgentRegistry();
+  } else {
+    task.status = 'pending';
+  }
+
+  await saveQueue();
+  await saveMetrics();
+
   console.log(`Task dispatched: ${task.id} -> ${division}`);
   if (agent) {
     console.log(`  Assigned to: ${agent.id}`);
@@ -368,6 +474,20 @@ async function assignTask(agentId, task) {
   }
   
   const taskObj = typeof task === 'string' ? { id: task, taskType: task } : task;
+  const approvalProbe = {
+    id: taskObj.id || `direct-${Date.now()}`,
+    division: agent.division,
+    taskType: taskObj.taskType,
+    data: taskObj.data || {},
+    priority: 2,
+    status: 'pending',
+    approvalId: null,
+    approvalStatus: null,
+  };
+  const approval = await enforceApprovalGate(approvalProbe, 'agent-coordinator', agentId);
+  if (!approval.approved) {
+    return { success: false, error: `Human approval ${approval.status || 'blocked'}` };
+  }
   
   agent.status = 'busy';
   agent.currentTask = taskObj.id || taskObj.taskType;
@@ -435,6 +555,17 @@ async function processQueue() {
   let assigned = 0;
   
   for (const task of pendingTasks) {
+    if (task.approvalId && !['approved', 'executing'].includes(task.approvalStatus || '')) {
+      continue;
+    }
+
+    if (!task.approvalId) {
+      const approval = await enforceApprovalGate(task, 'agent-coordinator', null);
+      if (!approval.approved) {
+        continue;
+      }
+    }
+
     const agent = getBestAgent(task.division, task.taskType);
     
     if (agent) {
@@ -541,8 +672,9 @@ function getQueueStatus() {
   return {
     pending: taskQueue.filter(t => t.status === 'pending').length,
     assigned: taskQueue.filter(t => t.status === 'assigned').length,
+    awaitingApproval: taskQueue.filter(t => t.status === 'awaiting_approval').length,
     completed: taskQueue.filter(t => t.status === 'completed').length,
-    failed: taskQueue.filter(t => t.status === 'failed').length,
+    failed: taskQueue.filter(t => ['failed', 'rejected', 'expired', 'blocked'].includes(t.status)).length,
     tasks: taskQueue.slice(-20).map(t => ({
       id: t.id.substring(0, 20),
       division: t.division,
@@ -625,7 +757,7 @@ async function main() {
         const queue = getQueueStatus();
         console.log('Task Queue Status');
         console.log('='.repeat(50));
-        console.log(`Pending: ${queue.pending} | In Progress: ${queue.assigned} | Completed: ${queue.completed} | Failed: ${queue.failed}`);
+        console.log(`Pending: ${queue.pending} | Awaiting Approval: ${queue.awaitingApproval} | In Progress: ${queue.assigned} | Completed: ${queue.completed} | Failed: ${queue.failed}`);
         console.log('\nRecent Tasks:');
         for (const task of queue.tasks) {
           console.log(`  ${task.id}... [${task.status}] ${task.division}/${task.type} ${task.assignedTo ? '-> ' + task.assignedTo : ''}`);

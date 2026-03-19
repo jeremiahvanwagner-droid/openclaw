@@ -13,6 +13,14 @@ import { agentTaskName, getDivisionHead, getPodLead, inngest, podTaskName } from
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
 import { reportFailure as governorReportFailure } from "../../lib/api-rate-governor";
+import {
+  buildApprovalPreview,
+  classifyApprovalCandidate,
+  createHumanApprovalRequest,
+  expireHumanApproval,
+  getHumanApprovalRequest,
+  markHumanApprovalExecuting,
+} from "../../lib/human-approval";
 import { logger } from "../../lib/logger";
 
 const log = logger.child({ module: "agent-orchestrator" });
@@ -20,8 +28,28 @@ const log = logger.child({ module: "agent-orchestrator" });
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY!
 );
+
+const APPROVAL_POLL_INTERVAL = "30s";
+
+async function waitForApproval(step: any, approvalId: string, expiresAt: string | null) {
+  let attempt = 0;
+  let approval = await step.run("approval-load-0", async () => getHumanApprovalRequest(approvalId));
+  const deadline = expiresAt ? new Date(expiresAt).getTime() : Date.now() + 30 * 60 * 1000;
+
+  while (approval?.status === "pending" && Date.now() < deadline) {
+    await step.sleep(`approval-sleep-${attempt}`, APPROVAL_POLL_INTERVAL);
+    attempt += 1;
+    approval = await step.run(`approval-load-${attempt}`, async () => getHumanApprovalRequest(approvalId));
+  }
+
+  if (approval?.status === "pending") {
+    approval = await step.run("approval-expire", async () => expireHumanApproval(approvalId));
+  }
+
+  return approval;
+}
 
 // ═══════════════════════════════════════════════════════════════════
 // AGENT INVOKE ROUTER
@@ -82,39 +110,68 @@ export const agentInvoke = inngest.createFunction(
     });
 
     // Step 1.7: Autonomy gating — check if this action requires escalation
-    const actionDomain = (payload as Record<string, unknown>)?.action_domain as string | undefined;
-    if (actionDomain) {
-      const ESCALATE_DOMAINS = ["finance", "credential_changes", "destructive_actions", "legal_compliance", "irreversible_account_actions"];
-      if (ESCALATE_DOMAINS.includes(actionDomain)) {
-        // Route to shared_exec_orchestrator for approval instead of direct execution
-        await step.run("log-gated-action", async () => {
-          await supabase.from("agent_events").insert({
-            event_name: "gated_action_request",
+    const approvalClassification = classifyApprovalCandidate({
+      taskType:
+        ((payload as Record<string, unknown>)?.taskType as string | undefined) ||
+        ((payload as Record<string, unknown>)?.type as string | undefined) ||
+        ((payload as Record<string, unknown>)?.command as string | undefined),
+      actionFamily:
+        ((payload as Record<string, unknown>)?.action_family as string | undefined) ||
+        ((payload as Record<string, unknown>)?.actionFamily as string | undefined),
+      payload: (payload as Record<string, unknown>) || {},
+    });
+
+    const approvalActionFamily = approvalClassification.actionFamily;
+    if (approvalClassification.requiresApproval && approvalActionFamily) {
+      const approval = await step.run("create-human-approval", async () =>
+        createHumanApprovalRequest({
+          requestType: "agent_action",
+          actionFamily: approvalActionFamily,
+          sourceAgent: source_agent,
+          targetAgent: target_agent || null,
+          correlationId: correlation_id || eventId,
+          payloadPreview: buildApprovalPreview(payload),
+          fullPayload: {
             source_agent,
-            target_agent: target_agent || "unknown",
-            payload: { action_domain: actionDomain, original_payload: payload, correlation_id },
-            priority: "critical",
-          });
-        });
-
-        await step.sendEvent("route-to-gating", {
-          name: "agent/shared_exec_orchestrator/task",
-          data: {
-            type: "gated_action",
-            source: source_agent,
-            action_domain: actionDomain,
-            original_target: target_agent,
-            correlation_id: correlation_id || eventId,
+            target_agent,
+            target_division,
+            payload,
+            priority,
             trace_id,
-            ...payload,
           },
-        });
+          requestedBy: source_agent,
+        }),
+      );
 
+      const resolvedApproval = await waitForApproval(step, approval.id, approval.expires_at || null);
+      if (
+        !resolvedApproval ||
+        resolvedApproval.status === "rejected" ||
+        resolvedApproval.status === "expired" ||
+        resolvedApproval.status === "pending"
+      ) {
         return {
-          success: true,
+          success: false,
           gated: true,
-          routed_to: "shared_exec_orchestrator",
-          action_domain: actionDomain,
+          approval_id: approval.id,
+          approval_status: resolvedApproval?.status || "expired",
+          event_id: eventId,
+        };
+      }
+
+      const executingApproval =
+        resolvedApproval.status === "executing"
+          ? resolvedApproval
+          : await step.run("mark-human-approval-executing", async () =>
+              markHumanApprovalExecuting(approval.id),
+            );
+
+      if (!executingApproval) {
+        return {
+          success: false,
+          gated: true,
+          approval_id: approval.id,
+          approval_status: "blocked",
           event_id: eventId,
         };
       }
@@ -530,8 +587,12 @@ export const telegramAlert = inngest.createFunction(
   async ({ event, step }) => {
     const { channel, message, priority = "normal", agent_id } = event.data;
 
-    const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    const TELEGRAM_BOT_TOKEN =
+      process.env.TELEGRAM_BOT_TOKEN || process.env.OPENCLAW_TELEGRAM_BOT_TOKEN;
+    const TELEGRAM_CHAT_ID =
+      process.env.TELEGRAM_CHAT_ID ||
+      process.env.TELEGRAM_ALERT_CHAT_ID ||
+      process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID;
 
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
       log.error("Telegram credentials not configured");

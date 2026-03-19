@@ -1,9 +1,9 @@
 /**
  * API Rate Governor
- * Truth J Blue LLC — OpenClaw Multi-Agent Network
+ * Truth J Blue LLC - OpenClaw Multi-Agent Network
  *
  * Global rate-limiting, circuit-breaking, and request budgeting layer.
- * Prevents API limit hits and critical overload across all 77 agents.
+ * Prevents API limit hits and critical overload across all agents.
  *
  * Key protections:
  * 1. Per-provider token-bucket rate limiting
@@ -13,9 +13,7 @@
  * 5. Budget tracking with hard ceilings
  */
 
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { logger } from "./logger";
 import {
   circuitBreakerState,
@@ -26,93 +24,58 @@ import {
 
 const log = logger.child({ module: "rate-governor" });
 
-// ═══════════════════════════════════════════════════════════════════
-// STATE PERSISTENCE — survives gateway restarts
-// ═══════════════════════════════════════════════════════════════════
+type CircuitState = "closed" | "open" | "half-open";
 
-const __filename_rg = fileURLToPath(import.meta.url);
-const __dirname_rg = path.dirname(__filename_rg);
-const STATE_FILE = path.join(__dirname_rg, "..", "data", "rate-governor-state.json");
-
-interface PersistedState {
-  savedAt: string;
-  budgets: Record<string, { day: string; spentCents: number; requestCount: number; warningEmitted: boolean }>;
-  circuits: Record<string, { state: CircuitState; failures: number; lastFailureAt: number; openedAt: number }>;
+interface GovernorStateRow {
+  provider: string;
+  state_day: string;
+  spent_cents: number;
+  request_count: number;
+  warning_emitted: boolean;
+  circuit_state: CircuitState;
+  failures: number;
+  last_failure_at: number;
+  opened_at: number;
+  saved_at: string;
 }
 
-function persistState(): void {
-  try {
-    const state: PersistedState = {
-      savedAt: new Date().toISOString(),
-      budgets: {},
-      circuits: {},
-    };
-    for (const [key, b] of budgets.entries()) {
-      state.budgets[key] = { day: b.day, spentCents: b.spentCents, requestCount: b.requestCount, warningEmitted: b.warningEmitted };
-    }
-    for (const [provider, cb] of circuitBreakers.entries()) {
-      if (cb.state !== "closed") {
-        state.circuits[provider] = { state: cb.state, failures: cb.failures, lastFailureAt: cb.lastFailureAt, openedAt: cb.openedAt };
-      }
-    }
-    fs.mkdirSync(path.dirname(STATE_FILE), { recursive: true });
-    fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
-  } catch (err) {
-    log.warn({ err }, "Failed to persist rate governor state");
-  }
+interface CircuitBreakerState {
+  state: CircuitState;
+  failures: number;
+  lastFailureAt: number;
+  openedAt: number;
+  halfOpenAttempts: number;
 }
 
-function loadState(): void {
-  try {
-    if (!fs.existsSync(STATE_FILE)) return;
-    const raw = JSON.parse(fs.readFileSync(STATE_FILE, "utf-8")) as PersistedState;
-    const today = todayKey();
-
-    // Rehydrate budgets (only for today — stale days are irrelevant)
-    for (const [key, b] of Object.entries(raw.budgets)) {
-      if (b.day === today) {
-        budgets.set(key, { day: b.day, spentCents: b.spentCents, requestCount: b.requestCount, warningEmitted: b.warningEmitted });
-      }
-    }
-
-    // Rehydrate circuit breakers (open/half-open states)
-    for (const [provider, cb] of Object.entries(raw.circuits)) {
-      circuitBreakers.set(provider, {
-        state: cb.state,
-        failures: cb.failures,
-        lastFailureAt: cb.lastFailureAt,
-        openedAt: cb.openedAt,
-        halfOpenAttempts: 0,
-      });
-      const stateNum = cb.state === "open" ? 2 : cb.state === "half-open" ? 1 : 0;
-      circuitBreakerState.set({ provider }, stateNum);
-    }
-
-    log.info({ budgets: Object.keys(raw.budgets).length, circuits: Object.keys(raw.circuits).length }, "Rate governor state rehydrated from disk");
-  } catch (err) {
-    log.warn({ err }, "Failed to load rate governor state — starting fresh");
-  }
+interface TokenBucket {
+  tokens: number;
+  maxTokens: number;
+  refillRate: number;
+  lastRefill: number;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// RATE LIMIT CONFIGURATION
-// ═══════════════════════════════════════════════════════════════════
+interface DailyBudget {
+  day: string;
+  spentCents: number;
+  requestCount: number;
+  warningEmitted: boolean;
+}
 
 export interface ProviderLimits {
   requestsPerMinute: number;
   requestsPerHour: number;
-  dailyBudgetCents: number;        // hard ceiling in cents
-  dailyBudgetWarningPct: number;   // alert threshold (e.g. 0.8 = 80%)
+  dailyBudgetCents: number;
+  dailyBudgetWarningPct: number;
   maxConcurrent: number;
-  retryAfterMs: number;            // default backoff base
+  retryAfterMs: number;
   maxRetries: number;
 }
 
 const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
   "openai-codex": {
-    requestsPerMinute: 40,       // conservative vs. burst capacity
+    requestsPerMinute: 40,
     requestsPerHour: 800,
-    dailyBudgetCents: 2500,      // $25/day hard ceiling (reduced from $50)
+    dailyBudgetCents: 2500,
     dailyBudgetWarningPct: 0.75,
     maxConcurrent: 8,
     retryAfterMs: 2000,
@@ -121,7 +84,7 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
   anthropic: {
     requestsPerMinute: 30,
     requestsPerHour: 600,
-    dailyBudgetCents: 2000,      // $20/day (reduced from $40)
+    dailyBudgetCents: 2000,
     dailyBudgetWarningPct: 0.75,
     maxConcurrent: 6,
     retryAfterMs: 3000,
@@ -130,18 +93,18 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
   openai: {
     requestsPerMinute: 50,
     requestsPerHour: 1000,
-    dailyBudgetCents: 1500,      // $15/day (reduced from $30)
+    dailyBudgetCents: 1500,
     dailyBudgetWarningPct: 0.75,
     maxConcurrent: 8,
     retryAfterMs: 2000,
     maxRetries: 3,
   },
   ghl: {
-    requestsPerMinute: 20,       // GoHighLevel is aggressive on limits
+    requestsPerMinute: 20,
     requestsPerHour: 400,
-    dailyBudgetCents: 0,         // included in plan
+    dailyBudgetCents: 0,
     dailyBudgetWarningPct: 1.0,
-    maxConcurrent: 5,            // raised from 3 — safe with staggered cron schedules
+    maxConcurrent: 5,
     retryAfterMs: 5000,
     maxRetries: 2,
   },
@@ -155,7 +118,7 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
     maxRetries: 3,
   },
   telegram: {
-    requestsPerMinute: 25,       // Telegram limits: 30 msg/sec but burst protection
+    requestsPerMinute: 25,
     requestsPerHour: 1000,
     dailyBudgetCents: 0,
     dailyBudgetWarningPct: 1.0,
@@ -165,28 +128,75 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
   },
 };
 
-// ═══════════════════════════════════════════════════════════════════
-// CIRCUIT BREAKER
-// ═══════════════════════════════════════════════════════════════════
-
-type CircuitState = "closed" | "open" | "half-open";
-
-interface CircuitBreakerState {
-  state: CircuitState;
-  failures: number;
-  lastFailureAt: number;
-  openedAt: number;
-  halfOpenAttempts: number;
-}
-
 const CIRCUIT_BREAKER_CONFIG = {
-  failureThreshold: 5,        // open after N consecutive failures
-  resetTimeoutMs: 60_000,     // try half-open after 60s
-  halfOpenMaxAttempts: 2,     // allow 2 test requests in half-open
-  maxOpenTimeMs: 300_000,     // force half-open after 5 min max
+  failureThreshold: 5,
+  resetTimeoutMs: 60_000,
+  halfOpenMaxAttempts: 2,
+  maxOpenTimeMs: 300_000,
 };
 
+export type QueueClass = "P0" | "P1" | "P2" | "P3";
+
+const PRIORITY_WEIGHTS: Record<QueueClass, number> = {
+  P0: 0,
+  P1: 1,
+  P2: 2,
+  P3: 3,
+};
+
+const minuteBuckets = new Map<string, TokenBucket>();
+const hourBuckets = new Map<string, TokenBucket>();
+const activeCounts = new Map<string, number>();
+const budgets = new Map<string, DailyBudget>();
 const circuitBreakers = new Map<string, CircuitBreakerState>();
+
+let governorSupabase: SupabaseClient | null = null;
+let persistenceHealthy = true;
+
+function todayKey(): string {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getGovernorSupabase(): SupabaseClient | null {
+  if (governorSupabase) return governorSupabase;
+
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) return null;
+
+  governorSupabase = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+  return governorSupabase;
+}
+
+function markPersistenceDegraded(operation: string, error?: unknown): void {
+  if (!persistenceHealthy) return;
+  persistenceHealthy = false;
+  log.error(
+    { operation, err: error, critical: true },
+    "Rate governor Supabase persistence degraded; continuing in in-memory mode",
+  );
+}
+
+function markPersistenceRecovered(): void {
+  if (persistenceHealthy) return;
+  persistenceHealthy = true;
+  log.info("Rate governor Supabase persistence recovered");
+}
+
+function getBudget(provider: string): DailyBudget {
+  const key = `${provider}:${todayKey()}`;
+  if (!budgets.has(key)) {
+    budgets.set(key, {
+      day: todayKey(),
+      spentCents: 0,
+      requestCount: 0,
+      warningEmitted: false,
+    });
+  }
+  return budgets.get(key)!;
+}
 
 function getCircuitBreaker(provider: string): CircuitBreakerState {
   if (!circuitBreakers.has(provider)) {
@@ -201,17 +211,121 @@ function getCircuitBreaker(provider: string): CircuitBreakerState {
   return circuitBreakers.get(provider)!;
 }
 
+async function persistProviderState(
+  provider: string,
+  spentCentsDelta: number = 0,
+  requestCountDelta: number = 0,
+): Promise<void> {
+  const db = getGovernorSupabase();
+  if (!db) {
+    markPersistenceDegraded("persist:missing_credentials");
+    return;
+  }
+
+  const budget = budgets.get(`${provider}:${todayKey()}`) || {
+    day: todayKey(),
+    spentCents: 0,
+    requestCount: 0,
+    warningEmitted: false,
+  };
+  const circuit = getCircuitBreaker(provider);
+
+  const { error } = await db.rpc("upsert_rate_governor_state", {
+    p_provider: provider,
+    p_state_day: todayKey(),
+    p_spent_cents_delta: Math.max(0, spentCentsDelta),
+    p_request_count_delta: Math.max(0, requestCountDelta),
+    p_warning_emitted: budget.warningEmitted,
+    p_circuit_state: circuit.state,
+    p_failures: circuit.failures,
+    p_last_failure_at: circuit.lastFailureAt,
+    p_opened_at: circuit.openedAt,
+    p_saved_at: new Date().toISOString(),
+  });
+
+  if (error) {
+    markPersistenceDegraded("persist:rpc", error);
+    return;
+  }
+
+  markPersistenceRecovered();
+}
+
+async function loadState(): Promise<void> {
+  const db = getGovernorSupabase();
+  if (!db) {
+    markPersistenceDegraded("load:missing_credentials");
+    return;
+  }
+
+  const { data, error } = await db.from("rate_governor_state").select("*");
+  if (error) {
+    markPersistenceDegraded("load:select", error);
+    return;
+  }
+
+  const today = todayKey();
+  let budgetCount = 0;
+  let circuitCount = 0;
+
+  for (const row of (data || []) as GovernorStateRow[]) {
+    if (row.state_day === today) {
+      budgets.set(`${row.provider}:${row.state_day}`, {
+        day: row.state_day,
+        spentCents: row.spent_cents,
+        requestCount: row.request_count,
+        warningEmitted: row.warning_emitted,
+      });
+      budgetUsedDollars.set({ provider: row.provider }, row.spent_cents / 100);
+      const limits = PROVIDER_LIMITS[row.provider];
+      if (limits?.dailyBudgetCents > 0) {
+        budgetCeilingDollars.set({ provider: row.provider }, limits.dailyBudgetCents / 100);
+      }
+      budgetCount++;
+    }
+
+    if (row.circuit_state !== "closed") {
+      circuitBreakers.set(row.provider, {
+        state: row.circuit_state,
+        failures: row.failures,
+        lastFailureAt: row.last_failure_at,
+        openedAt: row.opened_at,
+        halfOpenAttempts: 0,
+      });
+      circuitBreakerState.set(
+        { provider: row.provider },
+        row.circuit_state === "open" ? 2 : 1,
+      );
+      circuitCount++;
+    }
+  }
+
+  markPersistenceRecovered();
+  log.info(
+    { budgets: budgetCount, circuits: circuitCount },
+    "Rate governor state rehydrated from Supabase",
+  );
+}
+
 function recordSuccess(provider: string): void {
   const cb = getCircuitBreaker(provider);
   const wasOpen = cb.state !== "closed";
   cb.state = "closed";
   cb.failures = 0;
+  cb.lastFailureAt = 0;
+  cb.openedAt = 0;
   cb.halfOpenAttempts = 0;
   circuitBreakerState.set({ provider }, 0);
-  if (wasOpen) persistState();
+  if (wasOpen) {
+    void persistProviderState(provider);
+  }
 }
 
-function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: boolean = false): void {
+function recordFailure(
+  provider: string,
+  isRateLimit: boolean,
+  isAuthExpired: boolean = false,
+): void {
   const cb = getCircuitBreaker(provider);
   cb.failures++;
   cb.lastFailureAt = Date.now();
@@ -220,9 +334,11 @@ function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: bo
     cb.state = "open";
     cb.openedAt = Date.now();
     circuitBreakerState.set({ provider }, 2);
-    // Auth-expired circuits stay open longer — no point retrying until token is refreshed
-    log.error({ provider }, "Circuit OPEN — AUTH EXPIRED (401/403). All requests blocked until token refresh.");
-    persistState();
+    log.error(
+      { provider },
+      "Circuit OPEN - AUTH EXPIRED (401/403). All requests blocked until token refresh.",
+    );
+    void persistProviderState(provider);
     return;
   }
 
@@ -231,7 +347,7 @@ function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: bo
     cb.openedAt = Date.now();
     circuitBreakerState.set({ provider }, 2);
     log.warn({ provider, failures: cb.failures, isRateLimit }, "Circuit OPEN");
-    persistState();
+    void persistProviderState(provider);
   }
 }
 
@@ -243,38 +359,40 @@ function canAttempt(provider: string): { allowed: boolean; reason?: string } {
 
   if (cb.state === "open") {
     const elapsed = now - cb.openedAt;
-    if (elapsed >= CIRCUIT_BREAKER_CONFIG.maxOpenTimeMs || elapsed >= CIRCUIT_BREAKER_CONFIG.resetTimeoutMs) {
+    if (
+      elapsed >= CIRCUIT_BREAKER_CONFIG.maxOpenTimeMs ||
+      elapsed >= CIRCUIT_BREAKER_CONFIG.resetTimeoutMs
+    ) {
       cb.state = "half-open";
       cb.halfOpenAttempts = 0;
       circuitBreakerState.set({ provider }, 1);
       return { allowed: true };
     }
-    return { allowed: false, reason: `Circuit open for ${provider} — retry in ${Math.ceil((CIRCUIT_BREAKER_CONFIG.resetTimeoutMs - elapsed) / 1000)}s` };
+    return {
+      allowed: false,
+      reason: `Circuit open for ${provider} - retry in ${Math.ceil(
+        (CIRCUIT_BREAKER_CONFIG.resetTimeoutMs - elapsed) / 1000,
+      )}s`,
+    };
   }
 
-  // half-open
   if (cb.halfOpenAttempts < CIRCUIT_BREAKER_CONFIG.halfOpenMaxAttempts) {
     cb.halfOpenAttempts++;
     return { allowed: true };
   }
-  return { allowed: false, reason: `Circuit half-open for ${provider} — max test attempts reached` };
+
+  return {
+    allowed: false,
+    reason: `Circuit half-open for ${provider} - max test attempts reached`,
+  };
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// TOKEN BUCKET RATE LIMITER
-// ═══════════════════════════════════════════════════════════════════
-
-interface TokenBucket {
-  tokens: number;
-  maxTokens: number;
-  refillRate: number;     // tokens per ms
-  lastRefill: number;
-}
-
-const minuteBuckets = new Map<string, TokenBucket>();
-const hourBuckets = new Map<string, TokenBucket>();
-
-function getBucket(map: Map<string, TokenBucket>, provider: string, max: number, windowMs: number): TokenBucket {
+function getBucket(
+  map: Map<string, TokenBucket>,
+  provider: string,
+  max: number,
+  windowMs: number,
+): TokenBucket {
   if (!map.has(provider)) {
     map.set(provider, {
       tokens: max,
@@ -295,33 +413,42 @@ function refillBucket(bucket: TokenBucket): void {
 
 function tryConsume(provider: string): { allowed: boolean; retryAfterMs?: number } {
   const limits = PROVIDER_LIMITS[provider];
-  if (!limits) return { allowed: true }; // unknown provider = no limit
+  if (!limits) return { allowed: true };
 
-  const minBucket = getBucket(minuteBuckets, provider, limits.requestsPerMinute, 60_000);
-  const hrBucket = getBucket(hourBuckets, provider, limits.requestsPerHour, 3_600_000);
+  const minuteBucket = getBucket(
+    minuteBuckets,
+    provider,
+    limits.requestsPerMinute,
+    60_000,
+  );
+  const hourBucket = getBucket(
+    hourBuckets,
+    provider,
+    limits.requestsPerHour,
+    3_600_000,
+  );
 
-  refillBucket(minBucket);
-  refillBucket(hrBucket);
+  refillBucket(minuteBucket);
+  refillBucket(hourBucket);
 
-  if (minBucket.tokens < 1) {
-    const waitMs = Math.ceil((1 - minBucket.tokens) / minBucket.refillRate);
-    return { allowed: false, retryAfterMs: waitMs };
+  if (minuteBucket.tokens < 1) {
+    return {
+      allowed: false,
+      retryAfterMs: Math.ceil((1 - minuteBucket.tokens) / minuteBucket.refillRate),
+    };
   }
-  if (hrBucket.tokens < 1) {
-    const waitMs = Math.ceil((1 - hrBucket.tokens) / hrBucket.refillRate);
-    return { allowed: false, retryAfterMs: waitMs };
+
+  if (hourBucket.tokens < 1) {
+    return {
+      allowed: false,
+      retryAfterMs: Math.ceil((1 - hourBucket.tokens) / hourBucket.refillRate),
+    };
   }
 
-  minBucket.tokens -= 1;
-  hrBucket.tokens -= 1;
+  minuteBucket.tokens -= 1;
+  hourBucket.tokens -= 1;
   return { allowed: true };
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// CONCURRENCY SEMAPHORE
-// ═══════════════════════════════════════════════════════════════════
-
-const activeCounts = new Map<string, number>();
 
 function acquireConcurrency(provider: string): boolean {
   const limits = PROVIDER_LIMITS[provider];
@@ -337,34 +464,9 @@ function acquireConcurrency(provider: string): boolean {
 
 function releaseConcurrency(provider: string): void {
   const current = activeCounts.get(provider) || 0;
-  const newCount = Math.max(0, current - 1);
-  activeCounts.set(provider, newCount);
-  concurrencyActive.set({ provider }, newCount);
-}
-
-// ═══════════════════════════════════════════════════════════════════
-// DAILY BUDGET TRACKER
-// ═══════════════════════════════════════════════════════════════════
-
-interface DailyBudget {
-  day: string;         // YYYY-MM-DD
-  spentCents: number;
-  requestCount: number;
-  warningEmitted: boolean;
-}
-
-const budgets = new Map<string, DailyBudget>();
-
-function todayKey(): string {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function getBudget(provider: string): DailyBudget {
-  const key = `${provider}:${todayKey()}`;
-  if (!budgets.has(key)) {
-    budgets.set(key, { day: todayKey(), spentCents: 0, requestCount: 0, warningEmitted: false });
-  }
-  return budgets.get(key)!;
+  const next = Math.max(0, current - 1);
+  activeCounts.set(provider, next);
+  concurrencyActive.set({ provider }, next);
 }
 
 function checkBudget(provider: string): { allowed: boolean; reason?: string } {
@@ -373,8 +475,14 @@ function checkBudget(provider: string): { allowed: boolean; reason?: string } {
 
   const budget = getBudget(provider);
   if (budget.spentCents >= limits.dailyBudgetCents) {
-    return { allowed: false, reason: `Daily budget exhausted for ${provider}: $${(budget.spentCents / 100).toFixed(2)} / $${(limits.dailyBudgetCents / 100).toFixed(2)}` };
+    return {
+      allowed: false,
+      reason: `Daily budget exhausted for ${provider}: $${(budget.spentCents / 100).toFixed(2)} / $${(
+        limits.dailyBudgetCents / 100
+      ).toFixed(2)}`,
+    };
   }
+
   return { allowed: true };
 }
 
@@ -383,6 +491,7 @@ function trackSpend(provider: string, costCents: number): void {
   const budget = getBudget(provider);
   budget.spentCents += costCents;
   budget.requestCount++;
+
   budgetUsedDollars.set({ provider }, budget.spentCents / 100);
   if (limits && limits.dailyBudgetCents > 0) {
     budgetCeilingDollars.set({ provider }, limits.dailyBudgetCents / 100);
@@ -392,37 +501,30 @@ function trackSpend(provider: string, costCents: number): void {
     const pct = budget.spentCents / limits.dailyBudgetCents;
     if (pct >= limits.dailyBudgetWarningPct && !budget.warningEmitted) {
       budget.warningEmitted = true;
-      log.warn({ provider, pct: +(pct * 100).toFixed(1), spent: budget.spentCents, ceiling: limits.dailyBudgetCents }, "BUDGET WARNING");
+      log.warn(
+        {
+          provider,
+          pct: +(pct * 100).toFixed(1),
+          spent: budget.spentCents,
+          ceiling: limits.dailyBudgetCents,
+        },
+        "BUDGET WARNING",
+      );
     }
   }
 
-  persistState();
+  void persistProviderState(provider, costCents, 1);
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// PRIORITY QUEUE CLASS
-// ═══════════════════════════════════════════════════════════════════
-
-export type QueueClass = "P0" | "P1" | "P2" | "P3";
-
-const PRIORITY_WEIGHTS: Record<QueueClass, number> = {
-  P0: 0,   // runtime — immediate, skip queue if possible
-  P1: 1,   // revenue — high priority
-  P2: 2,   // growth  — normal
-  P3: 3,   // batch   — can be deferred
-};
-
-// P3 requests get extra backoff when load is high
-function priorityBackoffMultiplier(queueClass: QueueClass, activeLoad: number, maxLoad: number): number {
+function priorityBackoffMultiplier(
+  queueClass: QueueClass,
+  activeLoad: number,
+  maxLoad: number,
+): number {
   const loadRatio = activeLoad / maxLoad;
-  if (loadRatio < 0.5) return 1;  // under 50% — no penalty
-  const weight = PRIORITY_WEIGHTS[queueClass];
-  return 1 + weight * loadRatio;  // P3 at 90% load → 3.7x backoff
+  if (loadRatio < 0.5) return 1;
+  return 1 + PRIORITY_WEIGHTS[queueClass] * loadRatio;
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// PUBLIC API: guarded request execution
-// ═══════════════════════════════════════════════════════════════════
 
 export interface GuardedRequestOptions {
   provider: string;
@@ -437,26 +539,23 @@ export interface GuardResult {
   retryAfterMs?: number;
 }
 
-/**
- * Check whether a request is allowed under all rate/budget/circuit constraints.
- * Call this BEFORE making any external API call.
- */
 export function checkRequest(opts: GuardedRequestOptions): GuardResult {
   const { provider, queueClass = "P2" } = opts;
 
-  // 1. Circuit breaker
   const circuit = canAttempt(provider);
   if (!circuit.allowed) {
-    return { allowed: false, reason: circuit.reason, retryAfterMs: CIRCUIT_BREAKER_CONFIG.resetTimeoutMs };
+    return {
+      allowed: false,
+      reason: circuit.reason,
+      retryAfterMs: CIRCUIT_BREAKER_CONFIG.resetTimeoutMs,
+    };
   }
 
-  // 2. Daily budget
   const budget = checkBudget(provider);
   if (!budget.allowed) {
     return { allowed: false, reason: budget.reason };
   }
 
-  // 3. Token bucket rate limit
   const rateResult = tryConsume(provider);
   if (!rateResult.allowed) {
     const limits = PROVIDER_LIMITS[provider];
@@ -464,10 +563,13 @@ export function checkRequest(opts: GuardedRequestOptions): GuardResult {
     const maxLoad = limits?.maxConcurrent || 10;
     const multiplier = priorityBackoffMultiplier(queueClass, activeLoad, maxLoad);
     const backoff = Math.ceil((rateResult.retryAfterMs || 2000) * multiplier);
-    return { allowed: false, reason: `Rate limited for ${provider}`, retryAfterMs: backoff };
+    return {
+      allowed: false,
+      reason: `Rate limited for ${provider}`,
+      retryAfterMs: backoff,
+    };
   }
 
-  // 4. Concurrency semaphore
   if (!acquireConcurrency(provider)) {
     const limits = PROVIDER_LIMITS[provider];
     return {
@@ -480,19 +582,12 @@ export function checkRequest(opts: GuardedRequestOptions): GuardResult {
   return { allowed: true };
 }
 
-/**
- * Call after a successful API response.
- */
 export function reportSuccess(provider: string, costCents: number = 0): void {
   releaseConcurrency(provider);
   recordSuccess(provider);
   if (costCents > 0) trackSpend(provider, costCents);
 }
 
-/**
- * Call after a failed API response.
- * Detects 401/403 as auth-expired and opens a long-lived circuit.
- */
 export function reportFailure(provider: string, statusCode?: number): void {
   releaseConcurrency(provider);
   const isRateLimit = statusCode === 429;
@@ -500,13 +595,9 @@ export function reportFailure(provider: string, statusCode?: number): void {
   recordFailure(provider, isRateLimit, isAuthExpired);
 }
 
-/**
- * Execute a function with full rate governance protection.
- * Handles acquire/release, retry with backoff, and circuit breaking.
- */
 export async function withGovernor<T>(
   opts: GuardedRequestOptions,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<T> {
   const { provider, queueClass = "P2" } = opts;
   const limits = PROVIDER_LIMITS[provider];
@@ -517,11 +608,22 @@ export async function withGovernor<T>(
     const guard = checkRequest(opts);
     if (!guard.allowed) {
       if (attempt === maxRetries) {
-        throw new Error(`[RateGovernor] Request blocked after ${maxRetries} retries: ${guard.reason}`);
+        throw new Error(
+          `[RateGovernor] Request blocked after ${maxRetries} retries: ${guard.reason}`,
+        );
       }
       const jitter = Math.random() * 1000;
       const delay = (guard.retryAfterMs || baseBackoff) * Math.pow(2, attempt) + jitter;
-      log.warn({ provider, attempt: attempt + 1, maxAttempts: maxRetries + 1, reason: guard.reason, delayMs: Math.ceil(delay) }, "Request blocked, waiting");
+      log.warn(
+        {
+          provider,
+          attempt: attempt + 1,
+          maxAttempts: maxRetries + 1,
+          reason: guard.reason,
+          delayMs: Math.ceil(delay),
+        },
+        "Request blocked, waiting",
+      );
       await sleep(delay);
       continue;
     }
@@ -534,13 +636,11 @@ export async function withGovernor<T>(
       const statusCode = extractStatusCode(error);
       reportFailure(provider, statusCode);
 
-      // Auth-expired: open circuit immediately, no retry
       if (statusCode === 401 || statusCode === 403) {
         log.error({ provider, statusCode }, "Auth expired, circuit opened");
         throw error;
       }
 
-      // Other non-retryable 4xx errors (except 429 rate limit)
       if (statusCode && statusCode >= 400 && statusCode < 500 && statusCode !== 429) {
         throw error;
       }
@@ -549,17 +649,22 @@ export async function withGovernor<T>(
 
       const jitter = Math.random() * 1000;
       const delay = baseBackoff * Math.pow(2, attempt) + jitter;
-      log.warn({ provider, attempt: attempt + 1, maxAttempts: maxRetries + 1, statusCode, delayMs: Math.ceil(delay) }, "Request failed, retrying");
+      log.warn(
+        {
+          provider,
+          attempt: attempt + 1,
+          maxAttempts: maxRetries + 1,
+          statusCode,
+          delayMs: Math.ceil(delay),
+        },
+        "Request failed, retrying",
+      );
       await sleep(delay);
     }
   }
 
   throw new Error(`[RateGovernor] Exhausted retries for ${provider}`);
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// TELEMETRY & STATUS
-// ═══════════════════════════════════════════════════════════════════
 
 export interface GovernorStatus {
   provider: string;
@@ -576,27 +681,31 @@ export interface GovernorStatus {
 
 export function getStatus(provider: string): GovernorStatus {
   const limits = PROVIDER_LIMITS[provider] || {
-    requestsPerMinute: 0, requestsPerHour: 0,
-    dailyBudgetCents: 0, maxConcurrent: 0,
-    dailyBudgetWarningPct: 1, retryAfterMs: 2000, maxRetries: 3,
+    requestsPerMinute: 0,
+    requestsPerHour: 0,
+    dailyBudgetCents: 0,
+    dailyBudgetWarningPct: 1,
+    maxConcurrent: 0,
+    retryAfterMs: 2000,
+    maxRetries: 3,
   };
 
-  const cb = getCircuitBreaker(provider);
-  const minBucket = minuteBuckets.get(provider);
-  const hrBucket = hourBuckets.get(provider);
+  const circuit = getCircuitBreaker(provider);
+  const minuteBucket = minuteBuckets.get(provider);
+  const hourBucket = hourBuckets.get(provider);
   const budget = getBudget(provider);
 
-  if (minBucket) refillBucket(minBucket);
-  if (hrBucket) refillBucket(hrBucket);
+  if (minuteBucket) refillBucket(minuteBucket);
+  if (hourBucket) refillBucket(hourBucket);
 
   return {
     provider,
-    circuitState: cb.state,
-    consecutiveFailures: cb.failures,
+    circuitState: circuit.state,
+    consecutiveFailures: circuit.failures,
     activeConcurrency: activeCounts.get(provider) || 0,
     maxConcurrency: limits.maxConcurrent,
-    minuteTokensRemaining: Math.floor(minBucket?.tokens ?? limits.requestsPerMinute),
-    hourTokensRemaining: Math.floor(hrBucket?.tokens ?? limits.requestsPerHour),
+    minuteTokensRemaining: Math.floor(minuteBucket?.tokens ?? limits.requestsPerMinute),
+    hourTokensRemaining: Math.floor(hourBucket?.tokens ?? limits.requestsPerHour),
     dailySpentCents: budget.spentCents,
     dailyBudgetCents: limits.dailyBudgetCents,
     dailyRequestCount: budget.requestCount,
@@ -613,39 +722,26 @@ export function __resetForTests(options: { deleteStateFile?: boolean } = {}): vo
   activeCounts.clear();
   budgets.clear();
   circuitBreakers.clear();
-
-  if (options.deleteStateFile) {
-    try {
-      fs.rmSync(STATE_FILE, { force: true });
-    } catch {
-      // Best-effort cleanup for test isolation.
-    }
-  }
+  governorSupabase = null;
+  persistenceHealthy = true;
+  void options;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// UTILITIES
-// ═══════════════════════════════════════════════════════════════════
-
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function extractStatusCode(error: unknown): number | undefined {
   if (error && typeof error === "object") {
-    const e = error as Record<string, unknown>;
-    if (typeof e.status === "number") return e.status;
-    if (typeof e.statusCode === "number") return e.statusCode;
-    if (e.response && typeof e.response === "object") {
-      const r = e.response as Record<string, unknown>;
-      if (typeof r.status === "number") return r.status;
+    const maybeError = error as Record<string, unknown>;
+    if (typeof maybeError.status === "number") return maybeError.status;
+    if (typeof maybeError.statusCode === "number") return maybeError.statusCode;
+    if (maybeError.response && typeof maybeError.response === "object") {
+      const response = maybeError.response as Record<string, unknown>;
+      if (typeof response.status === "number") return response.status;
     }
   }
   return undefined;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// INITIALIZATION — rehydrate persisted state on module load
-// ═══════════════════════════════════════════════════════════════════
-
-loadState();
+void loadState();
