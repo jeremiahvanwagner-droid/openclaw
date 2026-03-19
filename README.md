@@ -43,7 +43,13 @@ cd openclaw
 cp .env.example .env
 # Edit .env with your actual API keys
 
-# 3. Run with Docker Compose
+# 3. Sync the primary runtime-facing GHL env from .env
+powershell -ExecutionPolicy Bypass -File scripts/sync-local-ghl-env.ps1 -PrimaryTenant TJB
+
+# 4. Verify GHL auth before boot
+node scripts/check-ghl-auth.mjs
+
+# 5. Run with Docker Compose
 docker compose up
 
 # Gateway available at http://localhost:18789
@@ -59,20 +65,26 @@ npm install -g openclaw@latest
 # 2. Configure environment
 cp .env.example .env
 
-# 3. Initialize database
+# 3. Sync the primary runtime-facing GHL env from .env
+powershell -ExecutionPolicy Bypass -File scripts/sync-local-ghl-env.ps1 -PrimaryTenant TJB
+
+# 4. Verify GHL auth before boot
+node scripts/check-ghl-auth.mjs
+
+# 5. Initialize database
 npx supabase db push
 
-# 4. Generate agent workspaces
+# 6. Generate agent workspaces
 node scripts/generate-workspaces.mjs
 
-# 5. Register agents
+# 7. Register agents
 node scripts/register-agents.mjs
 
-# 6. Start the gateway
-openclaw gateway --port 18789
+# 8. Start the gateway
+powershell -ExecutionPolicy Bypass -File scripts/restart-local.ps1 -PrimaryTenant TJB
 
-# 7. Start webhook handler (separate terminal)
-node handlers/ghl-webhook-handler.mjs
+# Manual webhook-only restart if needed (separate terminal)
+node --env-file=.env handlers/ghl-webhook-handler.mjs
 ```
 
 ---
@@ -109,6 +121,8 @@ Operational notes:
 - Private Integration Tokens should use GHL Workflow Custom Webhook and Inbound Webhook actions, not direct `/webhooks` registration
 - Keep `OPENCLAW_PUBLIC_WEBHOOK_BASE_URL`, `OPENCLAW_GATEWAY_AUTH_TOKEN`, and `OPENCLAW_GHL_WEBHOOK_SECRET` set in `.env`
 - `OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY` is optional unless HighLevel rotates the Ed25519 signing key
+- Use `node scripts/check-ghl-auth.mjs` to confirm both resolver-based tenant auth and primary runtime auth
+- Use `powershell -ExecutionPolicy Bypass -File scripts/restart-local.ps1 -PrimaryTenant TJB` after rotating PITs so the gateway restarts against synced credentials
 
 ---
 

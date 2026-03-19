@@ -1,3 +1,8 @@
+param(
+  [ValidateSet('TJB', 'MSL')]
+  [string]$PrimaryTenant = 'TJB'
+)
+
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
@@ -11,6 +16,8 @@ $gatewayPort = 18789
 $webhookPort = 8788
 $openclawCmd = Join-Path $env:APPDATA "npm\openclaw.cmd"
 $nodeExe = (Get-Command node.exe).Source
+$syncScript = Join-Path $PSScriptRoot "sync-local-ghl-env.ps1"
+$localEnvPath = Join-Path $repoRoot ".env"
 
 function Stop-PortProcesses {
   param([int[]]$Ports)
@@ -78,6 +85,19 @@ if (-not (Test-Path $openclawCmd)) {
 New-Item -ItemType Directory -Force -Path $logsDir | Out-Null
 
 Ensure-Dependencies
+
+Write-Host "Syncing GHL env from $localEnvPath (PrimaryTenant=$PrimaryTenant)..."
+& powershell.exe -NoProfile -ExecutionPolicy Bypass -File $syncScript -EnvPath $localEnvPath -PrimaryTenant $PrimaryTenant
+if ($LASTEXITCODE -ne 0) {
+  throw "Failed to sync local GHL environment."
+}
+
+Write-Host "Running GHL auth preflight..."
+& $nodeExe "scripts/check-ghl-auth.mjs"
+if ($LASTEXITCODE -ne 0) {
+  throw "GHL auth preflight failed. Fix credentials before restarting local services."
+}
+
 Stop-PortProcesses -Ports @($gatewayPort, $webhookPort)
 
 $gateway = Start-DetachedProcess `
