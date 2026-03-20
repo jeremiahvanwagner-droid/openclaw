@@ -13,7 +13,7 @@ WorkingDirectory=/opt/openclaw/dashboard
 EnvironmentFile=/etc/openclaw/.env
 Environment=NODE_ENV=production
 
-ExecStart=/usr/bin/node /opt/openclaw/dashboard/node_modules/.bin/next start -p 3001
+ExecStart=/usr/bin/node /opt/openclaw/dashboard/node_modules/next/dist/bin/next start -p 3001
 
 Restart=always
 RestartSec=10
