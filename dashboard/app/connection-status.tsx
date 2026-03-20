@@ -1,26 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { supabase } from "./supabase";
 
 export function ConnectionStatus() {
   const [status, setStatus] = useState<"checking" | "connected" | "disconnected">("checking");
 
   useEffect(() => {
     async function check() {
-      try {
-        const response = await fetch("/api/system", { cache: "no-store" });
-        if (!response.ok) {
-          setStatus("disconnected");
-          return;
-        }
-
-        const data = (await response.json()) as { connected?: boolean };
-        setStatus(data.connected ? "connected" : "disconnected");
-      } catch {
+      if (!supabase) {
         setStatus("disconnected");
+        return;
       }
+      const { error } = await supabase.from("agents").select("agent_id", { count: "exact", head: true });
+      setStatus(error ? "disconnected" : "connected");
     }
-
     check();
     const interval = setInterval(check, 60000);
     return () => clearInterval(interval);

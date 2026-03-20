@@ -976,272 +976,6 @@ def compute_health(
     return "GREEN"
 
 
-def count_active_red_incidents(conn: sqlite3.Connection) -> int:
-    """
-    Count unresolved RED incidents that represent underlying system issues.
-
-    Excludes `sentinel_dispatch` bookkeeping alerts so sentinel notifications
-    cannot recursively keep the system in RED on their own.
-    """
-    return int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM alerts
-            WHERE resolved_at IS NULL
-              AND severity = 'RED'
-              AND alert_type != 'sentinel_dispatch'
-            """
-        ).fetchone()["c"]
-    )
-
-
-def auto_resolve_recovered_alerts(conn: sqlite3.Connection) -> Dict[str, int]:
-    """
-    Resolve alert classes that can be safely auto-closed when recovery is verified.
-    """
-    now = iso_utc()
-    resolved: Dict[str, int] = {
-        "critical_rate_limited": 0,
-        "quota_hard_stop": 0,
-    }
-
-    has_recent_critical_429 = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM api_call_log
-            WHERE status = 'rate_limited' AND critical = 1
-              AND created_at >= ?
-            """,
-            (iso_utc(now_utc() - dt.timedelta(minutes=30)),),
-        ).fetchone()["c"]
-    )
-    if has_recent_critical_429 == 0:
-        row = conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM alerts
-            WHERE resolved_at IS NULL
-              AND alert_type = 'critical_rate_limited'
-              AND severity = 'RED'
-            """
-        ).fetchone()
-        resolved["critical_rate_limited"] = int(row["c"])
-        if resolved["critical_rate_limited"] > 0:
-            conn.execute(
-                """
-                UPDATE alerts
-                SET resolved_at = ?
-                WHERE resolved_at IS NULL
-                  AND alert_type = 'critical_rate_limited'
-                  AND severity = 'RED'
-                """,
-                (now,),
-            )
-
-    hard_stop_still_active = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM api_usage
-            WHERE window_start = ?
-              AND quota_pct >= ?
-            """,
-            (today_window_start(), STOP_QUOTA_PCT),
-        ).fetchone()["c"]
-    )
-    if hard_stop_still_active == 0:
-        row = conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM alerts
-            WHERE resolved_at IS NULL
-              AND alert_type = 'quota_hard_stop'
-              AND severity = 'RED'
-            """
-        ).fetchone()
-        resolved["quota_hard_stop"] = int(row["c"])
-        if resolved["quota_hard_stop"] > 0:
-            conn.execute(
-                """
-                UPDATE alerts
-                SET resolved_at = ?
-                WHERE resolved_at IS NULL
-                  AND alert_type = 'quota_hard_stop'
-                  AND severity = 'RED'
-                """,
-                (now,),
-            )
-
-    if any(count > 0 for count in resolved.values()):
-        conn.commit()
-        log_action(conn, "sentinel", "auto_resolve_recovered_alerts", resolved)
-    return resolved
-
-
-def summarize_event_task_reconciliation(conn: sqlite3.Connection, since: dt.datetime) -> Dict[str, Any]:
-    since_iso = iso_utc(since)
-    stale_minutes = int(os.getenv("OPENCLAW_PENDING_TASK_STALE_MINUTES", "30"))
-    stale_cutoff = iso_utc(now_utc() - dt.timedelta(minutes=stale_minutes))
-
-    orphan_events_total = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM ops_events e
-            LEFT JOIN task_queue t ON t.event_id = e.event_id
-            WHERE t.task_id IS NULL
-            """
-        ).fetchone()["c"]
-    )
-    orphan_events_since = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM ops_events e
-            LEFT JOIN task_queue t ON t.event_id = e.event_id
-            WHERE t.task_id IS NULL
-              AND e.received_at >= ?
-            """,
-            (since_iso,),
-        ).fetchone()["c"]
-    )
-    orphan_tasks_total = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM task_queue t
-            LEFT JOIN ops_events e ON e.event_id = t.event_id
-            WHERE e.event_id IS NULL
-            """
-        ).fetchone()["c"]
-    )
-    stale_pending_count = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM task_queue
-            WHERE status IN ('pending', 'retry_wait')
-              AND updated_at < ?
-            """,
-            (stale_cutoff,),
-        ).fetchone()["c"]
-    )
-
-    oldest_pending_row = conn.execute(
-        """
-        SELECT created_at
-        FROM task_queue
-        WHERE status IN ('pending', 'retry_wait')
-        ORDER BY created_at ASC
-        LIMIT 1
-        """
-    ).fetchone()
-    oldest_pending_minutes: Optional[int] = None
-    if oldest_pending_row and oldest_pending_row["created_at"]:
-        oldest_pending_minutes = int((now_utc() - parse_iso(str(oldest_pending_row["created_at"]))).total_seconds() // 60)
-
-    lines: List[str] = [
-        f"Orphan events (total): {orphan_events_total}",
-        f"Orphan events (since last report): {orphan_events_since}",
-        f"Orphan tasks referencing missing events: {orphan_tasks_total}",
-        f"Pending/retry tasks stale > {stale_minutes}m: {stale_pending_count}",
-    ]
-    if oldest_pending_minutes is not None:
-        lines.append(f"Oldest queued task age: {oldest_pending_minutes} minutes")
-
-    has_drift = orphan_events_total > 0 or orphan_tasks_total > 0 or stale_pending_count > 0
-    return {
-        "orphan_events_total": orphan_events_total,
-        "orphan_events_since": orphan_events_since,
-        "orphan_tasks_total": orphan_tasks_total,
-        "stale_pending_count": stale_pending_count,
-        "oldest_pending_minutes": oldest_pending_minutes,
-        "has_drift": has_drift,
-        "lines": lines,
-    }
-
-
-def summarize_sentinel_telemetry(conn: sqlite3.Connection, since: dt.datetime) -> List[str]:
-    since_iso = iso_utc(since)
-
-    sent = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM action_log
-            WHERE component = 'sentinel'
-              AND action = 'sentinel_notification_sent'
-              AND created_at >= ?
-            """,
-            (since_iso,),
-        ).fetchone()["c"]
-    )
-    suppressed_interval = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM action_log
-            WHERE component = 'sentinel'
-              AND action = 'sentinel_notification_suppressed_min_interval'
-              AND created_at >= ?
-            """,
-            (since_iso,),
-        ).fetchone()["c"]
-    )
-    suppressed_reminder = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM action_log
-            WHERE component = 'sentinel'
-              AND action = 'sentinel_notification_suppressed_reminder'
-              AND created_at >= ?
-            """,
-            (since_iso,),
-        ).fetchone()["c"]
-    )
-    no_alert_runs = int(
-        conn.execute(
-            """
-            SELECT COUNT(*) AS c
-            FROM action_log
-            WHERE component = 'sentinel'
-              AND action = 'sentinel_notification_no_alert'
-              AND created_at >= ?
-            """,
-            (since_iso,),
-        ).fetchone()["c"]
-    )
-
-    resolved_rows = conn.execute(
-        """
-        SELECT details_json
-        FROM action_log
-        WHERE component = 'sentinel'
-          AND action = 'auto_resolve_recovered_alerts'
-          AND created_at >= ?
-        """,
-        (since_iso,),
-    ).fetchall()
-    auto_resolved_total = 0
-    for row in resolved_rows:
-        try:
-            details = json.loads(str(row["details_json"]))
-            auto_resolved_total += sum(int(v) for v in details.values() if isinstance(v, int))
-        except Exception:
-            continue
-
-    return [
-        f"sent={sent}",
-        f"suppressed_min_interval={suppressed_interval}",
-        f"suppressed_reminder={suppressed_reminder}",
-        f"auto_resolved={auto_resolved_total}",
-        f"no_alert_runs={no_alert_runs}",
-    ]
-
-
 def format_list_or_none(lines: List[str], none_text: str) -> str:
     if not lines:
         return f"- {none_text}"
@@ -1525,9 +1259,9 @@ def compose_report(
         ).fetchone()["c"]
     )
     retry_count = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status = 'retry_wait'").fetchone()["c"])
-    unresolved_critical = count_active_red_incidents(conn)
-    reconciliation = summarize_event_task_reconciliation(conn, since)
-    sentinel_telemetry_lines = summarize_sentinel_telemetry(conn, since)
+    unresolved_critical = int(
+        conn.execute("SELECT COUNT(*) AS c FROM alerts WHERE resolved_at IS NULL AND severity = 'RED'").fetchone()["c"]
+    )
 
     api_lines, quota_warning_count = summarize_api_usage(conn, since)
     health = compute_health(unresolved_critical, failed_count, retry_count, quota_warning_count)
@@ -1598,7 +1332,6 @@ def compose_report(
         SELECT severity, message
         FROM alerts
         WHERE resolved_at IS NULL
-                    AND alert_type != 'sentinel_dispatch'
         ORDER BY
           CASE severity WHEN 'RED' THEN 0 WHEN 'YELLOW' THEN 1 ELSE 2 END,
           last_seen_at DESC
@@ -1611,14 +1344,6 @@ def compose_report(
         msg = str(alert["message"])
         marker = "[ACTION REQUIRED] " if sev == "RED" else ""
         action_required.append(f"{marker}{sev}: {msg}")
-
-    if reconciliation["has_drift"]:
-        action_required.append(
-            "[ACTION REQUIRED] YELLOW: Event/task reconciliation drift detected "
-            f"(orphan_events={reconciliation['orphan_events_total']}, "
-            f"orphan_tasks={reconciliation['orphan_tasks_total']}, "
-            f"stale_pending={reconciliation['stale_pending_count']})"
-        )
 
     windows = next_window_times(timezone_name)
     pending_total = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status IN ('pending', 'retry_wait')").fetchone()["c"])
@@ -1642,10 +1367,9 @@ Coverage since: {since_iso}
 
 ### 1. STATUS SUMMARY
 - Overall system health: [{health}]
-- Active unresolved critical incidents: {unresolved_critical}
 - Automation coverage (A over A+B+C): {coverage['coverage_pct']}%
 - Skill health: human {skill_health['human']['target_met']}/{skill_health['human']['total']} at target, agent {skill_health['agent']['target_met']}/{skill_health['agent']['total']} at target
-- Active queued tasks (pending/retry):
+- Active tasks currently running:
 {format_list_or_none(active_lines, "No active tasks running.")}
 - Tasks completed since last report:
 {format_list_or_none(completed_lines, "No tasks completed in this interval.")}
@@ -1661,10 +1385,6 @@ Coverage since: {since_iso}
 - Any webhook events received or sent:
 - Received events: {webhook_received}
 - Sent events/alerts: {sent_count}
-- Event/task reconciliation checks:
-{format_list_or_none(reconciliation['lines'], "No reconciliation data recorded.")}
-- Sentinel notification telemetry (since last report):
-{format_list_or_none(sentinel_telemetry_lines, "No sentinel runs recorded in interval.")}
 
 ### 4. ERRORS & ANOMALIES
 - Any failed tasks or retries:
@@ -1876,9 +1596,7 @@ def collect_critical_conditions(conn: sqlite3.Connection) -> List[Dict[str, Any]
         """
         SELECT alert_id, alert_type, severity, message, details_json
         FROM alerts
-        WHERE resolved_at IS NULL
-          AND severity = 'RED'
-          AND alert_type != 'sentinel_dispatch'
+        WHERE resolved_at IS NULL AND severity = 'RED'
         ORDER BY last_seen_at DESC
         """
     ).fetchall()
@@ -1887,7 +1605,6 @@ def collect_critical_conditions(conn: sqlite3.Connection) -> List[Dict[str, Any]
             {
                 "kind": "alert",
                 "message": str(row["message"]),
-                "key": f"alert:{row['alert_id']}",
                 "details": json.loads(str(row["details_json"])),
             }
         )
@@ -1907,7 +1624,6 @@ def collect_critical_conditions(conn: sqlite3.Connection) -> List[Dict[str, Any]
             {
                 "kind": "critical_429",
                 "message": f"{row['api_name']} {row['endpoint']} returned 429 for critical flow at {row['created_at']}",
-                "key": f"critical_429:{row['api_name']}:{row['endpoint']}",
                 "details": {"api_name": row["api_name"], "endpoint": row["endpoint"]},
             }
         )
@@ -1927,7 +1643,6 @@ def collect_critical_conditions(conn: sqlite3.Connection) -> List[Dict[str, Any]
             {
                 "kind": "critical_task_failed",
                 "message": f"critical task failed: id={row['task_id']} type={row['task_type']} at {row['updated_at']}",
-                "key": f"critical_task_failed:{row['task_id']}",
                 "details": {"task_id": row["task_id"], "error": row["last_error"]},
             }
         )
@@ -2048,36 +1763,11 @@ def check_and_repair_gateway(conn: sqlite3.Connection) -> Dict[str, str]:
 def run_sentinel(args: argparse.Namespace) -> int:
     conn = connect_db(args.db_path)
     init_db(conn)
-    auto_resolved = auto_resolve_recovered_alerts(conn)
     gateway_state = check_and_repair_gateway(conn)
     critical = collect_critical_conditions(conn)
     if gateway_state["status"] == "failed":
-        critical.append(
-            {
-                "message": gateway_state["message"],
-                "key": "gateway:check_failed",
-                "details": {"kind": "gateway"},
-            }
-        )
+        critical.append({"message": gateway_state["message"], "details": {"kind": "gateway"}})
     if not critical:
-        conn.execute(
-            """
-            UPDATE alerts
-            SET resolved_at = COALESCE(resolved_at, ?)
-            WHERE resolved_at IS NULL AND alert_type = 'sentinel_dispatch'
-            """,
-            (iso_utc(),),
-        )
-        conn.commit()
-        log_action(
-            conn,
-            "sentinel",
-            "sentinel_notification_no_alert",
-            {
-                "auto_resolved_total": sum(auto_resolved.values()),
-                "auto_resolved": auto_resolved,
-            },
-        )
         print("NO_ALERT")
         return 0
 
@@ -2086,53 +1776,17 @@ def run_sentinel(args: argparse.Namespace) -> int:
         lines.append(f"- {item['message']}")
     message = "\n".join(lines)
 
-    incident_keys = sorted(str(item.get("key") or item["message"]) for item in critical)
-    incident_seed = safe_json({"keys": incident_keys})
-    fingerprint = hashlib.sha256(incident_seed.encode("utf-8")).hexdigest()
+    fingerprint = hashlib.sha256(message.encode("utf-8")).hexdigest()
     row = conn.execute(
         "SELECT alert_id, notified_at FROM alerts WHERE fingerprint = ?",
         (f"sentinel:{fingerprint}",),
     ).fetchone()
     already_recent = False
-    reminder_not_due = False
-    elapsed_minutes: Optional[int] = None
     if row and row["notified_at"]:
         notified_at = parse_iso(str(row["notified_at"]))
-        elapsed = now_utc() - notified_at
-        elapsed_minutes = int(elapsed.total_seconds() // 60)
-        already_recent = elapsed < dt.timedelta(minutes=args.min_notify_interval_minutes)
-        if args.remind_after_minutes > 0 and elapsed < dt.timedelta(minutes=args.remind_after_minutes):
-            reminder_not_due = True
+        already_recent = (now_utc() - notified_at) < dt.timedelta(minutes=args.min_notify_interval_minutes)
 
-    if already_recent:
-        log_action(
-            conn,
-            "sentinel",
-            "sentinel_notification_suppressed_min_interval",
-            {
-                "elapsed_minutes": elapsed_minutes,
-                "min_notify_interval_minutes": args.min_notify_interval_minutes,
-                "incident_fingerprint": fingerprint,
-            },
-        )
-        print("CRITICAL_ALERT_ALREADY_SENT")
-        return 0
-
-    if reminder_not_due:
-        log_action(
-            conn,
-            "sentinel",
-            "sentinel_notification_suppressed_reminder",
-            {
-                "elapsed_minutes": elapsed_minutes,
-                "remind_after_minutes": args.remind_after_minutes,
-                "incident_fingerprint": fingerprint,
-            },
-        )
-        print("CRITICAL_ALERT_STILL_ACTIVE_NO_REMINDER")
-        return 0
-
-    if not already_recent and not reminder_not_due:
+    if not already_recent:
         bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
         chat_id = os.getenv("OPENCLAW_ALERT_TELEGRAM_CHAT_ID", "")
         teams_url = os.getenv("OPENCLAW_ALERT_MSTEAMS_WEBHOOK_URL", "")
@@ -2152,11 +1806,7 @@ def run_sentinel(args: argparse.Namespace) -> int:
             alert_type="sentinel_dispatch",
             severity="RED",
             message="Critical sentinel notification dispatched",
-            details={
-                "critical_count": len(critical),
-                "channels_sent": sent_count,
-                "incident_keys": incident_keys,
-            },
+            details={"critical_count": len(critical), "channels_sent": sent_count},
             fingerprint=f"sentinel:{fingerprint}",
         )
         conn.execute(
@@ -2164,17 +1814,6 @@ def run_sentinel(args: argparse.Namespace) -> int:
             (iso_utc(), f"sentinel:{fingerprint}"),
         )
         conn.commit()
-        log_action(
-            conn,
-            "sentinel",
-            "sentinel_notification_sent",
-            {
-                "critical_count": len(critical),
-                "channels_sent": sent_count,
-                "incident_fingerprint": fingerprint,
-                "incident_keys": incident_keys,
-            },
-        )
         if sent_count > 0:
             print("CRITICAL_ALERT_SENT")
         else:
@@ -2308,7 +1947,7 @@ def cmd_snapshot(args: argparse.Namespace) -> int:
     init_db(conn)
     pending = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status IN ('pending','retry_wait')").fetchone()["c"])
     failed = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status = 'failed'").fetchone()["c"])
-    critical = count_active_red_incidents(conn)
+    critical = int(conn.execute("SELECT COUNT(*) AS c FROM alerts WHERE resolved_at IS NULL AND severity = 'RED'").fetchone()["c"])
     print(
         safe_json(
             {
@@ -2548,31 +2187,9 @@ def cmd_resolve_alerts(args: argparse.Namespace) -> int:
     where_sql = " AND ".join(clauses)
     row = conn.execute(f"SELECT COUNT(*) AS c FROM alerts WHERE {where_sql}", tuple(params)).fetchone()
     count = int(row["c"])
-    if args.dry_run:
-        print(safe_json({"dry_run": True, "matching_open_alerts": count, "where": where_sql}))
-        return 0
     conn.execute(f"UPDATE alerts SET resolved_at = ? WHERE {where_sql}", (now, *params))
     conn.commit()
     print(safe_json({"resolved": count, "resolved_at": now}))
-    return 0
-
-
-def cmd_reconciliation_check(args: argparse.Namespace) -> int:
-    conn = connect_db(args.db_path)
-    init_db(conn)
-    since = now_utc() - dt.timedelta(minutes=args.since_minutes)
-    summary = summarize_event_task_reconciliation(conn, since)
-    summary_payload = {
-        "since_minutes": args.since_minutes,
-        "status": "drift" if summary["has_drift"] else "ok",
-        "orphan_events_total": summary["orphan_events_total"],
-        "orphan_events_since": summary["orphan_events_since"],
-        "orphan_tasks_total": summary["orphan_tasks_total"],
-        "stale_pending_count": summary["stale_pending_count"],
-        "oldest_pending_minutes": summary["oldest_pending_minutes"],
-        "lines": summary["lines"],
-    }
-    print(safe_json(summary_payload))
     return 0
 
 
@@ -2659,12 +2276,6 @@ def build_parser() -> argparse.ArgumentParser:
     sentinel = sub.add_parser("sentinel", help="Evaluate critical conditions and notify only on exceptions")
     sentinel.add_argument("--timezone", default="America/Chicago")
     sentinel.add_argument("--min-notify-interval-minutes", type=int, default=60)
-    sentinel.add_argument(
-        "--remind-after-minutes",
-        type=int,
-        default=360,
-        help="Reminder cadence for unchanged active incidents (0 disables reminders).",
-    )
     sentinel.set_defaults(func=run_sentinel)
 
     apilog = sub.add_parser("record-api-call", help="Record API call usage")
@@ -2744,12 +2355,7 @@ def build_parser() -> argparse.ArgumentParser:
     resolve_alerts = sub.add_parser("resolve-alerts", help="Resolve open alerts by type/severity filter")
     resolve_alerts.add_argument("--alert-type", default=None)
     resolve_alerts.add_argument("--severity", choices=["YELLOW", "RED"], default=None)
-    resolve_alerts.add_argument("--dry-run", action="store_true", help="Preview matching alerts without resolving them")
     resolve_alerts.set_defaults(func=cmd_resolve_alerts)
-
-    reconciliation = sub.add_parser("reconciliation-check", help="Check event/task reconciliation drift")
-    reconciliation.add_argument("--since-minutes", type=int, default=720, help="Lookback window for recent orphan-event count")
-    reconciliation.set_defaults(func=cmd_reconciliation_check)
 
     queue_check = sub.add_parser("queue-check", help="Check if a job can run within its control loop budget")
     queue_check.add_argument("--job-id", required=True, help="Cron job ID to check")

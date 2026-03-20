@@ -12,24 +12,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { withGovernor, type QueueClass } from "./api-rate-governor";
-import {
-  APPROVAL_ACTION_FAMILIES,
-  buildApprovalPreview,
-  createHumanApprovalRequest,
-} from "./human-approval";
 import { logger } from "./logger";
 import {
   llmRequestDuration,
   llmRequestTotal,
   llmTokensUsed,
 } from "./metrics";
-import {
-  buildCompletionSafetyMetadata,
-  detectPromptInjection,
-  GuardrailBlockedError,
-  type CompletionSafetyMetadata,
-  scrubModelOutput,
-} from "./semantic-guardrails";
 
 const log = logger.child({ module: "llm-router" });
 
@@ -93,7 +81,7 @@ let costSupabase: SupabaseClient | null = null;
 function getCostSupabase(): SupabaseClient | null {
   if (costSupabase) return costSupabase;
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY;
+  const key = process.env.SUPABASE_SERVICE_KEY;
   if (!url || !key) return null;
   costSupabase = createClient(url, key);
   return costSupabase;
@@ -198,7 +186,6 @@ export interface CompletionResult {
     inputTokens: number;
     outputTokens: number;
   };
-  safety?: CompletionSafetyMetadata;
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -223,50 +210,6 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
   const config = MODEL_MAP[model];
   if (!config) {
     throw new Error(`Unknown model: ${model}. Valid models: ${Object.keys(MODEL_MAP).join(", ")}`);
-  }
-
-  const inputAssessment = detectPromptInjection(messages);
-  if (inputAssessment.blocked) {
-    const correlationId = `guardrail:${agentId || "unknown"}:${Date.now()}`;
-    try {
-      await createHumanApprovalRequest({
-        requestType: "semantic_input_review",
-        actionFamily: APPROVAL_ACTION_FAMILIES.SEMANTIC_INPUT_REVIEW,
-        sourceAgent: agentId || "llm-router",
-        targetAgent: null,
-        correlationId,
-        payloadPreview: buildApprovalPreview(
-          messages
-            .filter((message) => message.role !== "system")
-            .map((message) => `${message.role}: ${message.content}`)
-            .join("\n\n"),
-        ),
-        fullPayload: {
-          model,
-          queueClass,
-          matches: inputAssessment.matches,
-          messages: messages
-            .filter((message) => message.role !== "system")
-            .map((message) => ({ role: message.role, content: message.content })),
-        },
-        requestedBy: agentId || "llm-router",
-      });
-    } catch (approvalError) {
-      log.warn({ err: approvalError, agentId, model }, "Failed to create semantic guardrail review request");
-    }
-
-    log.warn(
-      {
-        agentId,
-        model,
-        matches: inputAssessment.matches.map((match) => match.rule),
-      },
-      "Prompt injection blocked before completion",
-    );
-    throw new GuardrailBlockedError(
-      "Prompt injection guardrail blocked the completion request",
-      inputAssessment.matches,
-    );
   }
 
   const effectiveMaxTokens = maxTokens || config.maxTokens;
@@ -327,17 +270,9 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
       // Fire-and-forget cost log
       void logCost(agentId || "unknown", config.provider, config.model, result.usage.inputTokens, result.usage.outputTokens, costUsd);
     }
-
-    const outputAssessment = scrubModelOutput(result.content);
-    const safeResult: CompletionResult = {
-      ...result,
-      content: outputAssessment.content,
-      safety: buildCompletionSafetyMetadata(inputAssessment, outputAssessment),
-    };
-
     // Cache P2/P3 results
-    if (cacheable) setCache(key, safeResult);
-    return safeResult;
+    if (cacheable) setCache(key, result);
+    return result;
   } catch (error) {
     timer({ provider: config.provider, model: config.model, agent: agentId || "unknown" });
     llmRequestTotal.inc({ provider: config.provider, model: config.model, status: "error" });
@@ -446,8 +381,6 @@ export async function agentComplete(
     messages,
   });
 }
-
-export { GuardrailBlockedError };
 
 /**
  * Generate a structured JSON response

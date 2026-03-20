@@ -45,8 +45,8 @@ async function main() {
   const headers = { 'Content-Type': 'application/json' };
 
   if (authMode === 'bearer') {
-    const token = process.env.OPENCLAW_GATEWAY_AUTH_TOKEN || process.env.OPENCLAW_GATEWAY_TOKEN || '';
-    if (!token) throw new Error('OPENCLAW_GATEWAY_AUTH_TOKEN (or OPENCLAW_GATEWAY_TOKEN) is required for bearer smoke tests');
+    const token = process.env.OPENCLAW_GATEWAY_AUTH_TOKEN || '';
+    if (!token) throw new Error('OPENCLAW_GATEWAY_AUTH_TOKEN is required for bearer smoke tests');
     headers.Authorization = `Bearer ${token}`;
   } else if (authMode === 'hmac') {
     const secret = process.env.OPENCLAW_GHL_WEBHOOK_SECRET || '';

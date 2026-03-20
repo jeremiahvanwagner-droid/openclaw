@@ -7,13 +7,9 @@ const ADMIN_ONLY_PREFIXES = [
   "/agents",
   "/events",
   "/costs",
-  "/approvals",
   "/api/agents",
-  "/api/dashboard",
-  "/api/events",
   "/api/replay",
   "/api/costs",
-  "/api/approvals",
 ];
 
 function isAdminOnlyPath(pathname: string): boolean {

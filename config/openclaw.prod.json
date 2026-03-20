@@ -7,7 +7,7 @@
     "lastRunAt": "2026-03-15T18:00:00.000Z",
     "lastRunVersion": "2026.3.13",
     "lastRunCommand": "configure",
-    "lastRunMode": "remote"
+    "lastRunMode": "local"
   },
   "browser": {
     "headless": true,
@@ -168,23 +168,9 @@
         "maxConcurrent": 8
       },
       "sandbox": {
-        "mode": "all",
-        "docker": {
-          "readOnlyRoot": true,
-          "tmpfs": [
-            "/tmp",
-            "/home/openclaw/.cache"
-          ],
-          "network": "default",
-          "user": "openclaw",
-          "capDrop": [
-            "ALL"
-          ]
-        },
+        "mode": "off",
         "browser": {
-          "enabled": true,
-          "allowHostControl": false,
-          "autoStart": false
+          "enabled": true
         }
       }
     },
@@ -400,20 +386,12 @@
   },
   "gateway": {
     "port": 18789,
-    "mode": "remote",
+    "mode": "local",
     "bind": "loopback",
-    "remote": {
-      "url": "https://api.truthjblue.dev",
-      "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
-    },
     "auth": {
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
     },
-    "trustedProxies": [
-      "127.0.0.1/32",
-      "::1/128"
-    ],
     "tailscale": {
       "mode": "off",
       "resetOnExit": false

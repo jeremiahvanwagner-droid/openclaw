@@ -23,16 +23,10 @@ if (!SUPABASE_SERVICE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-const HEARTBEAT_STALE_MINUTES = Number(process.env.OPENCLAW_HEARTBEAT_STALE_MINUTES || 30);
-const AGENT_ERROR_CRITICAL_COUNT = Number(process.env.OPENCLAW_AGENT_ERROR_CRITICAL_COUNT || 5);
-const PENDING_EVENTS_CRITICAL_COUNT = Number(process.env.OPENCLAW_PENDING_EVENTS_CRITICAL_COUNT || 500);
-const FAILED_EVENTS_DEGRADED_24H = Number(process.env.OPENCLAW_FAILED_EVENTS_DEGRADED_24H || 10);
-const PENDING_EVENT_AGE_DEGRADED_MINUTES = Number(process.env.OPENCLAW_PENDING_EVENT_AGE_DEGRADED_MINUTES || 30);
-
 // Parse CLI arguments
 const args = process.argv.slice(2);
-const divisionFilter = args.includes("--division")
-  ? args[args.indexOf("--division") + 1]
+const divisionFilter = args.includes("--division") 
+  ? args[args.indexOf("--division") + 1] 
   : null;
 const jsonOutput = args.includes("--json");
 
@@ -78,7 +72,6 @@ async function main() {
       idle: 0,
       paused: 0,
       error: 0,
-      stale_heartbeat_active: 0,
     },
     divisions: {},
     events: {
@@ -96,7 +89,7 @@ async function main() {
   let query = supabase.from("agents").select("*");
   if (divisionFilter) {
     // Map short filter to org_unit pattern
-    const orgPattern = divisionFilter.startsWith("d")
+    const orgPattern = divisionFilter.startsWith("d") 
       ? `division_${divisionFilter.substring(1)}%`
       : `%${divisionFilter}%`;
     query = query.ilike("org_unit", orgPattern);
@@ -128,11 +121,9 @@ async function main() {
       // Check for stale heartbeats (use last_heartbeat_at column)
       if (agent.last_heartbeat_at) {
         const lastSeen = new Date(agent.last_heartbeat_at);
-        const staleThreshold = Date.now() - HEARTBEAT_STALE_MINUTES * 60 * 1000;
+        const staleThreshold = Date.now() - 5 * 60 * 1000; // 5 minutes
         if (lastSeen.getTime() < staleThreshold && status === "active") {
-          const staleMinutes = Math.floor((Date.now() - lastSeen.getTime()) / 60000);
-          healthReport.agents.stale_heartbeat_active += 1;
-          healthReport.issues.push(`Agent ${agent.agent_id} has stale heartbeat (${staleMinutes}m)`);
+          healthReport.issues.push(`Agent ${agent.agent_id} has stale heartbeat`);
         }
       }
     });
@@ -143,10 +134,6 @@ async function main() {
     log(`   ⏸️  Idle:   ${healthReport.agents.idle}`, "yellow");
     log(`   ⏹️  Paused: ${healthReport.agents.paused || 0}`, "dim");
     log(`   ❌ Error:  ${healthReport.agents.error}`, healthReport.agents.error > 0 ? "red" : "reset");
-    log(
-      `   🫀 Stale active heartbeats (>${HEARTBEAT_STALE_MINUTES}m): ${healthReport.agents.stale_heartbeat_active}`,
-      healthReport.agents.stale_heartbeat_active > 0 ? "red" : "reset",
-    );
 
     // Division breakdown
     log(`\n📁 Division Status`, "cyan");
@@ -176,7 +163,7 @@ async function main() {
   if (oldestPending) {
     healthReport.events.oldest_pending = oldestPending.created_at;
     const ageMinutes = Math.floor((Date.now() - new Date(oldestPending.created_at).getTime()) / 60000);
-    if (ageMinutes > PENDING_EVENT_AGE_DEGRADED_MINUTES) {
+    if (ageMinutes > 30) {
       healthReport.issues.push(`Oldest pending event is ${ageMinutes} minutes old`);
     }
   }
@@ -200,21 +187,10 @@ async function main() {
   }
 
   // Determine overall status
-  const hasCriticalSignals =
-    healthReport.agents.error > AGENT_ERROR_CRITICAL_COUNT ||
-    healthReport.events.pending > PENDING_EVENTS_CRITICAL_COUNT ||
-    healthReport.agents.stale_heartbeat_active > 0;
-  const hasDegradedSignals =
-    healthReport.agents.error > 0 ||
-    healthReport.events.failed_24h > FAILED_EVENTS_DEGRADED_24H ||
-    healthReport.issues.length > 0;
-
-  if (healthReport.status !== "critical") {
-    if (hasCriticalSignals) {
-      healthReport.status = "critical";
-    } else if (hasDegradedSignals) {
-      healthReport.status = "degraded";
-    }
+  if (healthReport.agents.error > 5 || healthReport.events.pending > 500) {
+    healthReport.status = "critical";
+  } else if (healthReport.agents.error > 0 || healthReport.events.failed_24h > 10 || healthReport.issues.length > 0) {
+    healthReport.status = "degraded";
   }
 
   // Summary

@@ -33,11 +33,8 @@ openclaw onboard \
   --skip-skills \
   --skip-ui
 
-openclaw config set 'gateway.mode' '"remote"'
+openclaw config set 'gateway.mode' '"local"'
 openclaw config set 'gateway.bind' '"loopback"'
-openclaw config set 'gateway.remote.url' "\"${OPENCLAW_REMOTE_GATEWAY_URL:-https://api.truthjblue.dev}\""
-openclaw config set 'gateway.remote.token' '"${OPENCLAW_GATEWAY_AUTH_TOKEN}"'
-openclaw config set 'gateway.trustedProxies' '["127.0.0.1/32","::1/128"]'
 openclaw config set 'gateway.tailscale.mode' '"route"'
 openclaw config set 'agents.defaults.model.primary' '"openai/gpt-5"'
 openclaw config set 'agents.defaults.maxConcurrent' '1'
@@ -66,10 +63,6 @@ PY
 fi
 export OPENCLAW_GHL_WEBHOOK_SECRET
 
-if [[ -z "${OPENCLAW_GATEWAY_AUTH_TOKEN:-}" && -n "${OPENCLAW_GATEWAY_TOKEN:-}" ]]; then
-  OPENCLAW_GATEWAY_AUTH_TOKEN="${OPENCLAW_GATEWAY_TOKEN}"
-fi
-
 if [[ -z "${OPENCLAW_GATEWAY_AUTH_TOKEN:-}" ]]; then
   if command -v openssl >/dev/null 2>&1; then
     OPENCLAW_GATEWAY_AUTH_TOKEN="$(openssl rand -hex 32)"
@@ -82,7 +75,6 @@ PY
   fi
 fi
 export OPENCLAW_GATEWAY_AUTH_TOKEN
-export OPENCLAW_GATEWAY_TOKEN="${OPENCLAW_GATEWAY_AUTH_TOKEN}"
 
 cat > "$HOME/.config/openclaw-prod/credentials.env" <<EOF
 OPENCLAW_OPS_DB_PATH=${OPENCLAW_OPS_DB_PATH:-$HOME/.config/openclaw-prod/ops.db}
@@ -90,7 +82,6 @@ OPENCLAW_GHL_WEBHOOK_HOST=${OPENCLAW_GHL_WEBHOOK_HOST:-127.0.0.1}
 OPENCLAW_GHL_WEBHOOK_PORT=${OPENCLAW_GHL_WEBHOOK_PORT:-8788}
 OPENCLAW_GHL_WEBHOOK_SECRET=${OPENCLAW_GHL_WEBHOOK_SECRET}
 OPENCLAW_GATEWAY_AUTH_TOKEN=${OPENCLAW_GATEWAY_AUTH_TOKEN}
-OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_AUTH_TOKEN}
 OPENCLAW_PUBLIC_WEBHOOK_BASE_URL=${OPENCLAW_PUBLIC_WEBHOOK_BASE_URL:-}
 OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY=${OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY:-}
 OPENCLAW_REPORT_TZ=${OPENCLAW_REPORT_TZ:-America/Chicago}
