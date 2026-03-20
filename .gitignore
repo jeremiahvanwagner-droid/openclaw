@@ -58,6 +58,7 @@ workspace-sales/
 workspace-support/
 workspaces/
 .openclaw-dev/
+.openclaw/
 
 # ── Node.js / Build ──────────────────────────────────────────
 node_modules/
