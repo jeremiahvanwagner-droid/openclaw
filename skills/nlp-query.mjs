@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
  * OpenClaw NLP Query Interface
- * 
+ *
  * Natural language queries for GHL data via Telegram
- * 
+ *
  * Features:
  *   - Parse natural language queries
  *   - Execute GHL searches
@@ -13,19 +13,15 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import https from 'https';
-
-const execAsync = promisify(exec);
+import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const QUERY_LOG_FILE = path.join(DATA_DIR, 'nlp-query-log.json');
 
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = (await import('../lib/ghl-tenant-resolver.mjs')).resolve();
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
 
 // Query patterns
@@ -113,7 +109,7 @@ function ghlRequest(method, urlPath, body = null) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
@@ -125,13 +121,13 @@ function ghlRequest(method, urlPath, body = null) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(30000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
-    
+
     if (body) {
       req.write(JSON.stringify(body));
     }
@@ -144,8 +140,7 @@ function ghlRequest(method, urlPath, body = null) {
  */
 async function sendResponse(message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
     return true;
   } catch {
     return false;
@@ -157,7 +152,7 @@ async function sendResponse(message) {
  */
 function parseQuery(text) {
   const normalizedText = text.trim().toLowerCase();
-  
+
   for (const { pattern, type, extract } of QUERY_PATTERNS) {
     const match = text.match(pattern);
     if (match) {
@@ -168,7 +163,7 @@ function parseQuery(text) {
       };
     }
   }
-  
+
   // Default: treat as contact search
   return {
     type: 'search-contacts',
@@ -182,41 +177,41 @@ function parseQuery(text) {
  */
 async function executeQuery(parsed) {
   const { type, params } = parsed;
-  
+
   switch (type) {
     case 'count-contacts':
       return await countContacts();
-      
+
     case 'count-contacts-filtered':
       return await countContactsFiltered(params.filter);
-      
+
     case 'recent-contacts':
       return await getRecentContacts(params.limit);
-      
+
     case 'search-contacts':
       return await searchContacts(params.query);
-      
+
     case 'buyers':
       return await searchBuyers(params.product);
-      
+
     case 'count-opportunities':
       return await countOpportunities();
-      
+
     case 'opportunities-stage':
       return await getOpportunitiesByStage(params.stage);
-      
+
     case 'total-revenue':
       return await calculateTotalRevenue();
-      
+
     case 'revenue-period':
       return await getRevenuePeriod(params.period);
-      
+
     case 'conversion-rate':
       return await calculateConversionRate();
-      
+
     case 'top-sources':
       return await getTopSources(params.limit);
-      
+
     default:
       return { success: false, message: "I don't understand that query." };
   }
@@ -226,7 +221,7 @@ async function executeQuery(parsed) {
 
 async function countContacts() {
   try {
-    const response = await ghlRequest('GET', 
+    const response = await ghlRequest('GET',
       `/contacts/?locationId=${GHL_LOCATION_ID}&limit=1`
     );
     const total = response.meta?.total || response.contacts?.length || 0;
@@ -242,15 +237,15 @@ async function countContacts() {
 async function countContactsFiltered(filter) {
   try {
     // Check if filter is a tag
-    const response = await ghlRequest('POST', 
-      `/contacts/search`, 
+    const response = await ghlRequest('POST',
+      `/contacts/search`,
       {
         locationId: GHL_LOCATION_ID,
         query: filter,
         limit: 100
       }
     );
-    
+
     const count = response.contacts?.length || 0;
     return {
       success: true,
@@ -263,22 +258,22 @@ async function countContactsFiltered(filter) {
 
 async function getRecentContacts(limit = 5) {
   try {
-    const response = await ghlRequest('GET', 
+    const response = await ghlRequest('GET',
       `/contacts/?locationId=${GHL_LOCATION_ID}&limit=${limit}&sortBy=dateAdded&sortOrder=desc`
     );
-    
+
     const contacts = response.contacts || [];
     if (contacts.length === 0) {
       return { success: true, message: 'No contacts found.' };
     }
-    
+
     let message = `📋 Last ${contacts.length} Contacts:\n\n`;
     for (const c of contacts) {
       const name = [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unknown';
       const date = new Date(c.dateAdded).toLocaleDateString();
       message += `• ${name} (${c.email || 'no email'}) - ${date}\n`;
     }
-    
+
     return { success: true, message };
   } catch (error) {
     return { success: false, message: `Error: ${error.message}` };
@@ -288,7 +283,7 @@ async function getRecentContacts(limit = 5) {
 async function searchContacts(query) {
   try {
     // Try search endpoint
-    const response = await ghlRequest('POST', 
+    const response = await ghlRequest('POST',
       `/contacts/search`,
       {
         locationId: GHL_LOCATION_ID,
@@ -296,12 +291,12 @@ async function searchContacts(query) {
         limit: 10
       }
     );
-    
+
     const contacts = response.contacts || [];
     if (contacts.length === 0) {
       return { success: true, message: `No contacts found for "${query}"` };
     }
-    
+
     let message = `🔍 Found ${contacts.length} contact(s) for "${query}":\n\n`;
     for (const c of contacts) {
       const name = [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unknown';
@@ -310,7 +305,7 @@ async function searchContacts(query) {
       if (tags) message += `  🏷️ ${tags}\n`;
       message += '\n';
     }
-    
+
     return { success: true, message };
   } catch (error) {
     return { success: false, message: `Error: ${error.message}` };
@@ -321,7 +316,7 @@ async function searchBuyers(product) {
   try {
     const productNormalized = product.toLowerCase().trim();
     let tagSearch = productNormalized;
-    
+
     // Map common product names to tags
     if (productNormalized.includes('ebook') || productNormalized.includes('e-book')) {
       tagSearch = 'ebook';
@@ -332,30 +327,30 @@ async function searchBuyers(product) {
     } else if (productNormalized.includes('circle') || productNormalized.includes('operator')) {
       tagSearch = 'operators-circle';
     }
-    
-    const response = await ghlRequest('GET', 
+
+    const response = await ghlRequest('GET',
       `/contacts/?locationId=${GHL_LOCATION_ID}&limit=50`
     );
-    
+
     const contacts = response.contacts || [];
-    const buyers = contacts.filter(c => 
+    const buyers = contacts.filter(c =>
       (c.tags || []).some(t => t.toLowerCase().includes(tagSearch))
     );
-    
+
     if (buyers.length === 0) {
       return { success: true, message: `No buyers found for "${product}"` };
     }
-    
+
     let message = `🛒 ${buyers.length} buyer(s) of "${product}":\n\n`;
     for (const c of buyers.slice(0, 10)) {
       const name = [c.firstName, c.lastName].filter(Boolean).join(' ') || 'Unknown';
       message += `• ${name} (${c.email || 'no email'})\n`;
     }
-    
+
     if (buyers.length > 10) {
       message += `\n... and ${buyers.length - 10} more`;
     }
-    
+
     return { success: true, message };
   } catch (error) {
     return { success: false, message: `Error: ${error.message}` };
@@ -364,7 +359,7 @@ async function searchBuyers(product) {
 
 async function countOpportunities() {
   try {
-    const response = await ghlRequest('GET', 
+    const response = await ghlRequest('GET',
       `/opportunities/search?location_id=${GHL_LOCATION_ID}&limit=1`
     );
     const total = response.meta?.total || response.opportunities?.length || 0;
@@ -379,28 +374,28 @@ async function countOpportunities() {
 
 async function getOpportunitiesByStage(stageName) {
   try {
-    const response = await ghlRequest('GET', 
+    const response = await ghlRequest('GET',
       `/opportunities/search?location_id=${GHL_LOCATION_ID}&limit=100`
     );
-    
+
     const opps = response.opportunities || [];
-    const filtered = opps.filter(o => 
+    const filtered = opps.filter(o =>
       (o.pipelineStageId || o.status || '').toLowerCase().includes(stageName.toLowerCase())
     );
-    
+
     if (filtered.length === 0) {
       return { success: true, message: `No opportunities in "${stageName}" stage` };
     }
-    
+
     let totalValue = filtered.reduce((sum, o) => sum + (o.monetaryValue || 0), 0);
-    
+
     let message = `📌 ${filtered.length} opportunities in "${stageName}":\n`;
     message += `💰 Total Value: $${totalValue.toLocaleString()}\n\n`;
-    
+
     for (const o of filtered.slice(0, 5)) {
       message += `• ${o.name || o.contactName || 'Unknown'} - $${(o.monetaryValue || 0).toLocaleString()}\n`;
     }
-    
+
     return { success: true, message };
   } catch (error) {
     return { success: false, message: `Error: ${error.message}` };
@@ -409,13 +404,13 @@ async function getOpportunitiesByStage(stageName) {
 
 async function calculateTotalRevenue() {
   try {
-    const response = await ghlRequest('GET', 
+    const response = await ghlRequest('GET',
       `/opportunities/search?location_id=${GHL_LOCATION_ID}&status=won&limit=500`
     );
-    
+
     const opps = response.opportunities || [];
     const total = opps.reduce((sum, o) => sum + (o.monetaryValue || 0), 0);
-    
+
     return {
       success: true,
       message: `💰 Total Revenue (Won Opps): $${total.toLocaleString()}\n📊 From ${opps.length} closed deals`
@@ -429,7 +424,7 @@ async function getRevenuePeriod(period) {
   try {
     const now = new Date();
     let startDate;
-    
+
     switch (period.toLowerCase()) {
       case 'week':
         startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -443,18 +438,18 @@ async function getRevenuePeriod(period) {
       default:
         startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
     }
-    
-    const response = await ghlRequest('GET', 
+
+    const response = await ghlRequest('GET',
       `/opportunities/search?location_id=${GHL_LOCATION_ID}&status=won&limit=500`
     );
-    
+
     const opps = (response.opportunities || []).filter(o => {
       const oppDate = new Date(o.updatedAt || o.createdAt);
       return oppDate >= startDate;
     });
-    
+
     const total = opps.reduce((sum, o) => sum + (o.monetaryValue || 0), 0);
-    
+
     return {
       success: true,
       message: `💰 Revenue this ${period}: $${total.toLocaleString()}\n📊 From ${opps.length} deals`
@@ -467,19 +462,19 @@ async function getRevenuePeriod(period) {
 async function calculateConversionRate() {
   try {
     // Get total contacts
-    const contactsResp = await ghlRequest('GET', 
+    const contactsResp = await ghlRequest('GET',
       `/contacts/?locationId=${GHL_LOCATION_ID}&limit=1`
     );
     const totalContacts = contactsResp.meta?.total || 0;
-    
+
     // Get won opportunities
-    const oppsResp = await ghlRequest('GET', 
+    const oppsResp = await ghlRequest('GET',
       `/opportunities/search?location_id=${GHL_LOCATION_ID}&status=won&limit=1`
     );
     const wonOpps = oppsResp.meta?.total || oppsResp.opportunities?.length || 0;
-    
+
     const rate = totalContacts > 0 ? ((wonOpps / totalContacts) * 100).toFixed(2) : 0;
-    
+
     return {
       success: true,
       message: `📈 Overall Conversion Rate: ${rate}%\n👥 Total Contacts: ${totalContacts.toLocaleString()}\n✅ Won Opportunities: ${wonOpps.toLocaleString()}`
@@ -491,29 +486,29 @@ async function calculateConversionRate() {
 
 async function getTopSources(limit = 5) {
   try {
-    const response = await ghlRequest('GET', 
+    const response = await ghlRequest('GET',
       `/contacts/?locationId=${GHL_LOCATION_ID}&limit=500`
     );
-    
+
     const contacts = response.contacts || [];
     const sourceCounts = {};
-    
+
     for (const c of contacts) {
       const source = c.source || 'direct';
       sourceCounts[source] = (sourceCounts[source] || 0) + 1;
     }
-    
+
     const sorted = Object.entries(sourceCounts)
       .sort((a, b) => b[1] - a[1])
       .slice(0, limit);
-    
+
     let message = `📊 Top ${limit} Traffic Sources:\n\n`;
     for (let i = 0; i < sorted.length; i++) {
       const [source, count] = sorted[i];
       const pct = ((count / contacts.length) * 100).toFixed(1);
       message += `${i + 1}. ${source}: ${count} (${pct}%)\n`;
     }
-    
+
     return { success: true, message };
   } catch (error) {
     return { success: false, message: `Error: ${error.message}` };
@@ -530,7 +525,7 @@ async function logQuery(query, parsed, result) {
       const data = await fs.readFile(QUERY_LOG_FILE, 'utf8');
       logs = JSON.parse(data);
     } catch {}
-    
+
     logs.push({
       timestamp: new Date().toISOString(),
       query,
@@ -538,12 +533,12 @@ async function logQuery(query, parsed, result) {
       parsedParams: parsed.params,
       success: result.success
     });
-    
+
     // Keep last 1000 queries
     if (logs.length > 1000) {
       logs = logs.slice(-1000);
     }
-    
+
     await fs.mkdir(DATA_DIR, { recursive: true });
     await fs.writeFile(QUERY_LOG_FILE, JSON.stringify(logs, null, 2));
   } catch {}
@@ -554,20 +549,20 @@ async function logQuery(query, parsed, result) {
  */
 async function processQuery(queryText) {
   console.log(`\n🔍 Processing query: "${queryText}"\n`);
-  
+
   // Parse query
   const parsed = parseQuery(queryText);
   console.log(`  Parsed as: ${parsed.type}`);
   console.log(`  Params: ${JSON.stringify(parsed.params)}`);
-  
+
   // Execute query
   const result = await executeQuery(parsed);
   console.log(`  Success: ${result.success}`);
   console.log(`\n${result.message}`);
-  
+
   // Log query
   await logQuery(queryText, parsed, result);
-  
+
   return result;
 }
 
@@ -580,26 +575,26 @@ async function interactiveMode() {
     input: process.stdin,
     output: process.stdout
   });
-  
+
   console.log('\n🦞 OpenClaw NLP Query Interface');
   console.log('═'.repeat(50));
   console.log('Ask questions about your GHL data in natural language.');
   console.log('Type "exit" to quit.\n');
-  
+
   const askQuestion = () => {
     rl.question('> ', async (input) => {
       if (input.toLowerCase() === 'exit') {
         rl.close();
         return;
       }
-      
+
       const result = await processQuery(input);
       console.log('');
-      
+
       askQuestion();
     });
   };
-  
+
   askQuestion();
 }
 
@@ -619,26 +614,26 @@ async function showStats() {
   try {
     const data = await fs.readFile(QUERY_LOG_FILE, 'utf8');
     const logs = JSON.parse(data);
-    
+
     console.log('\n📊 Query Statistics\n');
     console.log(`Total queries: ${logs.length}`);
-    
+
     // Count by type
     const typeCounts = {};
     for (const log of logs) {
       typeCounts[log.parsedType] = (typeCounts[log.parsedType] || 0) + 1;
     }
-    
+
     console.log('\nBy Type:');
     const sorted = Object.entries(typeCounts).sort((a, b) => b[1] - a[1]);
     for (const [type, count] of sorted) {
       console.log(`  ${type}: ${count}`);
     }
-    
+
     // Success rate
     const successful = logs.filter(l => l.success).length;
     console.log(`\nSuccess rate: ${((successful / logs.length) * 100).toFixed(1)}%`);
-    
+
   } catch {
     console.log('No query logs found.');
   }
@@ -656,7 +651,7 @@ switch (command) {
       processQuery(args.join(' '));
     }
     break;
-    
+
   case 'send':
     if (args.length === 0) {
       console.log('Usage: nlp-query.mjs send "your question here"');
@@ -664,23 +659,23 @@ switch (command) {
       queryAndSend(args.join(' '));
     }
     break;
-    
+
   case 'interactive':
   case 'i':
     interactiveMode();
     break;
-    
+
   case 'stats':
     showStats();
     break;
-    
+
   case 'patterns':
     console.log('\nSupported Query Patterns:\n');
     for (const { pattern, type } of QUERY_PATTERNS) {
       console.log(`  ${type}: ${pattern.source}`);
     }
     break;
-    
+
   default:
     console.log(`
 NLP Query Interface

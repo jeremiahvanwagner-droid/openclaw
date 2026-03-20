@@ -1,0 +1,912 @@
+{
+  "version": 1,
+  "portfolio_name": "Truth J Blue 10-Business GHL Portfolio",
+  "ghl_model": "dual_shared_tjb_msl",
+  "system_of_record": "GoHighLevel",
+  "orchestration_plane": "OpenClaw",
+  "boundary_rule": "Customer-facing records, pipelines, calendars, memberships, billing triggers, and community objects live in GHL. Cross-business provisioning, QA, optimization, exception routing, analytics, and orchestration live in OpenClaw.",
+  "human_in_the_loop_rule": [
+    "money",
+    "legal_compliance",
+    "destructive_actions"
+  ],
+  "businesses": [
+    {
+      "business_id": "biz_01_truth_j_blue_core",
+      "pod_id": "biz_01",
+      "business_name": "Truth J Blue Core Brand",
+      "brand_name": "Truth J Blue",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "truthjblue.com",
+      "status": "active",
+      "vertical": "flagship_coaching",
+      "offer_model": "Flagship coaching, core offers, and primary brand operations",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe",
+      "calendar_model": "high_ticket_sales_plus_delivery",
+      "pipeline_set": [
+        "lead_intake",
+        "qualification",
+        "consultation",
+        "client_onboarding",
+        "client_success"
+      ],
+      "membership": {
+        "enabled": false,
+        "community": false,
+        "client_portal": true
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.9,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_01_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 2
+    },
+    {
+      "business_id": "biz_02_beyond_the_veil",
+      "pod_id": "biz_02",
+      "business_name": "Beyond the Veil Mentorship",
+      "brand_name": "Beyond the Veil",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "truthjblue.com",
+      "status": "active",
+      "vertical": "coaching_program",
+      "offer_model": "High-ticket mentorship and cohort enrollment",
+      "ghl_scope_type": "shared_msl_subaccount",
+      "ghl_location_selector": "MSL",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe",
+      "calendar_model": "application_review_and_enrollment_calls",
+      "pipeline_set": [
+        "application_intake",
+        "qualification",
+        "enrollment",
+        "onboarding",
+        "retention"
+      ],
+      "membership": {
+        "enabled": true,
+        "community": false,
+        "client_portal": true
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.92,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_02_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 2
+    },
+    {
+      "business_id": "biz_03_divine_path_walkers",
+      "pod_id": "biz_03",
+      "business_name": "Divine Path Walkers Community",
+      "brand_name": "Divine Path Walkers",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "truthjblue.com",
+      "status": "active",
+      "vertical": "community_membership",
+      "offer_model": "Ongoing community membership, accountability, and member retention",
+      "ghl_scope_type": "shared_msl_subaccount",
+      "ghl_location_selector": "MSL",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe",
+      "calendar_model": "community_events_and_support_calls",
+      "pipeline_set": [
+        "member_acquisition",
+        "trial_conversion",
+        "member_onboarding",
+        "engagement",
+        "renewal_and_winback"
+      ],
+      "membership": {
+        "enabled": true,
+        "community": true,
+        "client_portal": true
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.9,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_03_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 3
+    },
+    {
+      "business_id": "biz_04_publishing_media",
+      "pod_id": "biz_04",
+      "business_name": "Truth J Blue Publishing",
+      "brand_name": "Truth J Blue Publishing",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "truthjblue.com",
+      "status": "active",
+      "vertical": "publishing_media",
+      "offer_model": "Books, launches, digital publications, and media distribution",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe",
+      "calendar_model": "launch_campaign_and_partner_calls",
+      "pipeline_set": [
+        "reader_leads",
+        "launch_campaigns",
+        "affiliate_partners",
+        "rights_and_distribution"
+      ],
+      "membership": {
+        "enabled": false,
+        "community": false,
+        "client_portal": false
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.85,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_04_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 2
+    },
+    {
+      "business_id": "biz_05_consulting_services",
+      "pod_id": "biz_05",
+      "business_name": "Truth J Blue Consulting",
+      "brand_name": "Truth J Blue Consulting",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "truthjblue.com",
+      "status": "active",
+      "vertical": "consulting_services",
+      "offer_model": "Consulting, strategic advisory, and custom implementation",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe",
+      "calendar_model": "discovery_and_strategy_sessions",
+      "pipeline_set": [
+        "b2b_leads",
+        "discovery",
+        "proposal",
+        "contracting",
+        "delivery"
+      ],
+      "membership": {
+        "enabled": false,
+        "community": false,
+        "client_portal": true
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.9,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_05_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 2
+    },
+    {
+      "business_id": "biz_06_inspire_build_motivate",
+      "pod_id": "biz_06",
+      "business_name": "Inspire Build Motivate, Inc.",
+      "brand_name": "Inspire Build Motivate",
+      "legal_entity": "Inspire Build Motivate, Inc.",
+      "domain": "truthjblue.com",
+      "status": "active",
+      "vertical": "nonprofit_operations",
+      "offer_model": "Programs, donor stewardship, volunteer engagement, and nonprofit operations",
+      "ghl_scope_type": "shared_msl_subaccount",
+      "ghl_location_selector": "MSL",
+      "tenancy_inputs": {
+        "distinct_legal_entity": true,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": true,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe_donations",
+      "calendar_model": "donor_calls_and_program_sessions",
+      "pipeline_set": [
+        "donor_leads",
+        "grant_pipeline",
+        "program_enrollment",
+        "volunteer_coordination"
+      ],
+      "membership": {
+        "enabled": true,
+        "community": true,
+        "client_portal": true
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.85,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_06_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 1
+    },
+    {
+      "business_id": "biz_07_online_store",
+      "pod_id": "biz_07",
+      "business_name": "Truth J Blue Online Store",
+      "brand_name": "Truth J Blue Store",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "store.truthjblue.com",
+      "status": "active",
+      "vertical": "ecommerce",
+      "offer_model": "Books, merch, digital products, upsells, and post-purchase automation",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "woocommerce_stripe",
+      "calendar_model": "support_only",
+      "pipeline_set": [
+        "product_interest",
+        "abandoned_cart",
+        "order_fulfillment",
+        "review_request",
+        "vip_reorder"
+      ],
+      "membership": {
+        "enabled": false,
+        "community": false,
+        "client_portal": false
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.8,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_07_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 2
+    },
+    {
+      "business_id": "biz_08_primary_saas",
+      "pod_id": "biz_08",
+      "business_name": "Truth J Blue Primary SaaS",
+      "brand_name": "Truth J Blue AI Platform",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "app.truthjblue.com",
+      "status": "active",
+      "vertical": "saas",
+      "offer_model": "White-label SaaS, onboarding, retention, and expansion revenue",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": true,
+        "distinct_brand_domain": true,
+        "distinct_support_team": true,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": true,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe_connect",
+      "calendar_model": "sales_demo_and_customer_success",
+      "pipeline_set": [
+        "trial_signup",
+        "sales_demo",
+        "client_onboarding",
+        "renewal",
+        "expansion"
+      ],
+      "membership": {
+        "enabled": true,
+        "community": false,
+        "client_portal": true
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.92,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_08_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": true,
+        "nurture_workflows": true,
+        "no_show_recovery": true,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": true,
+        "review_request_workflow": true,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 4,
+      "saas_instance_id": "00000000-0000-0000-0000-000000000001"
+    },
+    {
+      "business_id": "biz_09_incubator_shared",
+      "pod_id": "biz_09",
+      "business_name": "Incubator Shared Brands",
+      "brand_name": "Truth J Blue Incubator",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "truthjblue.com",
+      "status": "incubating",
+      "vertical": "incubator",
+      "offer_model": "Idea validation, waitlists, and pre-launch experimentation",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": false,
+        "distinct_brand_domain": false,
+        "distinct_support_team": false,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": false,
+        "incubator_shared_candidate": true,
+        "internal_operations_scope": false
+      },
+      "payment_provider": "stripe",
+      "calendar_model": "validation_calls",
+      "pipeline_set": [
+        "idea_validation",
+        "waitlist_growth",
+        "soft_launch",
+        "kill_or_scale"
+      ],
+      "membership": {
+        "enabled": false,
+        "community": false,
+        "client_portal": false
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 0.8,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_09_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": true,
+        "onboarding_workflows": false,
+        "nurture_workflows": true,
+        "no_show_recovery": false,
+        "billing_and_dunning": true,
+        "fulfillment_access_rules": false,
+        "review_request_workflow": false,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 1
+    },
+    {
+      "business_id": "biz_10_portfolio_control",
+      "pod_id": "biz_10",
+      "business_name": "Portfolio Control",
+      "brand_name": "OpenClaw Portfolio Control",
+      "legal_entity": "Truth J Blue LLC",
+      "domain": "openclaw.truthjblue.com",
+      "status": "internal",
+      "vertical": "internal_operations",
+      "offer_model": "Portfolio oversight, approvals, executive scorecards, and exception handling",
+      "ghl_scope_type": "shared_tjb_subaccount",
+      "ghl_location_selector": "TJB",
+      "tenancy_inputs": {
+        "distinct_legal_entity": false,
+        "distinct_billing_stack": false,
+        "distinct_brand_domain": false,
+        "distinct_support_team": false,
+        "compliance_sensitive": false,
+        "distinct_fulfillment_model": false,
+        "incubator_shared_candidate": false,
+        "internal_operations_scope": true
+      },
+      "payment_provider": "internal",
+      "calendar_model": "executive_ops",
+      "pipeline_set": [
+        "approval_queue",
+        "ops_incidents",
+        "daily_scorecards",
+        "dead_letter_recovery"
+      ],
+      "membership": {
+        "enabled": false,
+        "community": false,
+        "client_portal": true
+      },
+      "approval_policy": {
+        "human_review_required": [
+          "money",
+          "legal_compliance",
+          "destructive_actions"
+        ],
+        "autonomous_domains": [
+          "crm_updates",
+          "standard_messaging",
+          "scheduling",
+          "publishing",
+          "routine_fulfillment"
+        ]
+      },
+      "kpi_targets": {
+        "automation_target_rate": 0.95,
+        "first_response_seconds": 60,
+        "appointment_self_service_rate": 1,
+        "payment_failure_dunning_minutes": 5,
+        "access_event_coverage_rate": 1,
+        "human_queue_share_max": 0.05
+      },
+      "owner_pod": "biz_10_pod_lead",
+      "owner_lane_map": {
+        "platform": "d8_platform_architect",
+        "funnels": "d8_funnel_engineer",
+        "automation": "d8_automation_architect",
+        "crm": "d8_crm_ops",
+        "revenue": "d8_revenue_ops",
+        "marketing": "d8_marketing_automation",
+        "content": "d8_content_ops",
+        "success": "d8_customer_success",
+        "community": "d8_community_manager",
+        "membership": "d8_membership_director",
+        "compliance": "d8_compliance_auditor"
+      },
+      "automation_blueprint": {
+        "snapshot_pack": true,
+        "custom_values": true,
+        "pipelines": true,
+        "calendars": true,
+        "forms_surveys_quizzes": false,
+        "onboarding_workflows": true,
+        "nurture_workflows": false,
+        "no_show_recovery": false,
+        "billing_and_dunning": false,
+        "fulfillment_access_rules": false,
+        "review_request_workflow": false,
+        "support_routing": true,
+        "dashboard_widgets": true,
+        "exception_rules": true
+      },
+      "rollout_wave": 4
+    }
+  ]
+}

@@ -15,12 +15,11 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://aagqvfwuixpxtdcrdxmv.supabase.co";
+const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const INNGEST_EVENT_KEY = process.env.INNGEST_EVENT_KEY;
 
-if (!SUPABASE_SERVICE_KEY) {
-  console.error("❌ SUPABASE_SERVICE_ROLE_KEY required");
+if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) {
+  console.error("❌ SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required");
   process.exit(1);
 }
 
@@ -157,7 +156,7 @@ async function sendEvent(event, results) {
   const start = Date.now();
   
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("agent_events")
       .insert(event)
       .select("id")
@@ -365,3 +364,5 @@ main().catch((err) => {
   log(`\n❌ Fatal error: ${err.message}`, "red");
   process.exit(1);
 });
+
+

@@ -11,11 +11,8 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import https from 'https';
-
-const execAsync = promisify(exec);
+import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
 const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
@@ -98,12 +95,56 @@ async function loadDeadLetterQueue() {
 }
 
 /**
- * Save dead letter queue
+ * Save dead letter queue (with file size rotation)
  */
 async function saveDeadLetterQueue(dlq) {
   await fs.mkdir(DATA_DIR, { recursive: true });
   dlq.lastUpdated = new Date().toISOString();
-  await fs.writeFile(DEAD_LETTER_FILE, JSON.stringify(dlq, null, 2));
+  const content = JSON.stringify(dlq, null, 2);
+
+  // Check if file would exceed 100 MB — rotate if so
+  const DLQ_MAX_SIZE = 100 * 1024 * 1024;
+  try {
+    const stat = await fs.stat(DEAD_LETTER_FILE);
+    if (stat.size >= DLQ_MAX_SIZE) {
+      await rotateDLQ();
+    }
+  } catch {
+    // File doesn't exist yet — that's fine
+  }
+
+  await fs.writeFile(DEAD_LETTER_FILE, content);
+}
+
+/**
+ * Rotate the DLQ file: rename current → timestamped .old, prune excess files
+ */
+async function rotateDLQ() {
+  const MAX_ROTATED = 3;
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const rotatedPath = path.join(DATA_DIR, `dead-letter-queue-${timestamp}.jsonl.old`);
+
+  try {
+    await fs.rename(DEAD_LETTER_FILE, rotatedPath);
+  } catch {
+    // If rename fails, just overwrite
+    return;
+  }
+
+  // Prune excess rotated files (keep only MAX_ROTATED)
+  try {
+    const files = await fs.readdir(DATA_DIR);
+    const rotatedFiles = files
+      .filter(f => f.startsWith('dead-letter-queue-') && f.endsWith('.old'))
+      .sort()
+      .reverse();
+
+    for (const old of rotatedFiles.slice(MAX_ROTATED)) {
+      await fs.unlink(path.join(DATA_DIR, old));
+    }
+  } catch {
+    // Pruning failure is non-fatal
+  }
 }
 
 /**
@@ -137,8 +178,7 @@ async function addToDeadLetterQueue(entry) {
  */
 async function sendAlert(message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent support --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'support', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
     return true;
   } catch {
     console.error('Failed to send alert:', message);

@@ -43,9 +43,13 @@ const STATUS_BADGES: Record<string, string> = {
 function EventRow({
   event,
   onSelect,
+  onReplay,
+  replayingId,
 }: {
   event: AgentEvent;
   onSelect: (e: AgentEvent) => void;
+  onReplay: (id: string) => void;
+  replayingId: string | null;
 }) {
   const time = new Date(event.created_at).toLocaleTimeString();
   const date = new Date(event.created_at).toLocaleDateString();
@@ -86,8 +90,24 @@ function EventRow({
         </span>
       </td>
       <td className="py-3 px-4 text-right">
-        <div className="text-sm text-slate-400">{time}</div>
-        <div className="text-xs text-slate-600">{date}</div>
+        <div className="flex items-center justify-end gap-2">
+          {event.status === "failed" && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onReplay(event.id);
+              }}
+              disabled={replayingId === event.id}
+              className="px-2 py-1 text-xs bg-claw-500/20 text-claw-400 hover:bg-claw-500/30 rounded transition disabled:opacity-50"
+            >
+              {replayingId === event.id ? "..." : "Replay"}
+            </button>
+          )}
+          <div>
+            <div className="text-sm text-slate-400">{time}</div>
+            <div className="text-xs text-slate-600">{date}</div>
+          </div>
+        </div>
       </td>
     </tr>
   );
@@ -96,9 +116,11 @@ function EventRow({
 function EventDetail({
   event,
   onClose,
+  onReplay,
 }: {
   event: AgentEvent;
   onClose: () => void;
+  onReplay: (id: string) => void;
 }) {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -186,9 +208,14 @@ function EventDetail({
 
           {/* Actions */}
           <div className="flex gap-3 pt-4 border-t border-slate-700">
-            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">
-              Replay Event
-            </button>
+            {(event.status === "failed" || event.status === "pending") && (
+              <button
+                onClick={() => onReplay(event.id)}
+                className="px-4 py-2 bg-claw-500 hover:bg-claw-600 text-white rounded-lg transition"
+              >
+                Replay Event
+              </button>
+            )}
             <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">
               View Related
             </button>
@@ -205,7 +232,27 @@ export default function EventsPage() {
   const [selectedType, setSelectedType] = useState("all");
   const [selectedEvent, setSelectedEvent] = useState<AgentEvent | null>(null);
   const [page, setPage] = useState(0);
+  const [replayingId, setReplayingId] = useState<string | null>(null);
   const pageSize = 50;
+
+  async function handleReplay(eventId: string) {
+    setReplayingId(eventId);
+    try {
+      const res = await fetch("/api/replay", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event_id: eventId }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        alert(`Replay failed: ${err.error}`);
+      } else {
+        setSelectedEvent(null);
+      }
+    } finally {
+      setReplayingId(null);
+    }
+  }
 
   useEffect(() => {
     async function fetchEvents() {
@@ -303,6 +350,8 @@ export default function EventsPage() {
                 key={event.id}
                 event={event}
                 onSelect={setSelectedEvent}
+                onReplay={handleReplay}
+                replayingId={replayingId}
               />
             ))}
           </tbody>
@@ -339,6 +388,7 @@ export default function EventsPage() {
         <EventDetail
           event={selectedEvent}
           onClose={() => setSelectedEvent(null)}
+          onReplay={handleReplay}
         />
       )}
     </div>

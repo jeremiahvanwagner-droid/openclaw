@@ -1,16 +1,62 @@
 /**
  * LLM Router Library
  * Open Claw Multi-Agent Network
- * 
+ *
  * Routes completion requests to appropriate LLM providers based on model key.
  * Supports Anthropic (Claude) and OpenAI (GPT) models.
- * 
+ *
  * Rate-governed via api-rate-governor to prevent API limit hits and overload.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
 import OpenAI from "openai";
+import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { withGovernor, type QueueClass } from "./api-rate-governor";
+import { logger } from "./logger";
+import {
+  llmRequestDuration,
+  llmRequestTotal,
+  llmTokensUsed,
+} from "./metrics";
+
+const log = logger.child({ module: "llm-router" });
+
+// ═══════════════════════════════════════════════════════════════════
+// RESPONSE CACHE — deduplicates identical P2/P3 requests within TTL
+// ═══════════════════════════════════════════════════════════════════
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const CACHE_MAX_ENTRIES = 200;
+
+interface CacheEntry {
+  result: CompletionResult;
+  expiresAt: number;
+}
+
+const responseCache = new Map<string, CacheEntry>();
+
+function cacheKey(model: string, messages: ChatMessage[]): string {
+  const msgKey = messages.map(m => `${m.role}:${m.content}`).join("|");
+  return `${model}::${msgKey}`;
+}
+
+function getCached(key: string): CompletionResult | null {
+  const entry = responseCache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    responseCache.delete(key);
+    return null;
+  }
+  return entry.result;
+}
+
+function setCache(key: string, result: CompletionResult): void {
+  // Evict oldest entries if at capacity
+  if (responseCache.size >= CACHE_MAX_ENTRIES) {
+    const firstKey = responseCache.keys().next().value;
+    if (firstKey !== undefined) responseCache.delete(firstKey);
+  }
+  responseCache.set(key, { result, expiresAt: Date.now() + CACHE_TTL_MS });
+}
 
 // Initialize clients lazily
 let anthropic: Anthropic | null = null;
@@ -30,31 +76,87 @@ function getOpenAI(): OpenAI {
   return openaiClient;
 }
 
+// Supabase client for cost logging (lazy)
+let costSupabase: SupabaseClient | null = null;
+function getCostSupabase(): SupabaseClient | null {
+  if (costSupabase) return costSupabase;
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) return null;
+  costSupabase = createClient(url, key);
+  return costSupabase;
+}
+
+// Per-1K-token pricing (USD) — keep updated
+const TOKEN_PRICING: Record<string, { input: number; output: number }> = {
+  "claude-opus-4-20250514":     { input: 0.015,  output: 0.075 },
+  "claude-sonnet-4-5-20250514": { input: 0.003,  output: 0.015 },
+  "gpt-4o":                     { input: 0.0025, output: 0.01 },
+  "gpt-4o-mini":                { input: 0.00015, output: 0.0006 },
+};
+
+const EMBEDDING_MODEL = "text-embedding-3-small";
+const EMBEDDING_DIMENSIONS = 512;
+
+function assertNever(value: never): never {
+  throw new Error(`Unknown provider configuration: ${JSON.stringify(value)}`);
+}
+
+function calculateCostUsd(model: string, inputTokens: number, outputTokens: number): number {
+  const pricing = TOKEN_PRICING[model];
+  if (!pricing) return 0;
+  return (inputTokens / 1000) * pricing.input + (outputTokens / 1000) * pricing.output;
+}
+
+async function logCost(
+  agentId: string,
+  provider: string,
+  model: string,
+  inputTokens: number,
+  outputTokens: number,
+  costUsd: number
+): Promise<void> {
+  const sb = getCostSupabase();
+  if (!sb) return;
+  try {
+    await sb.from("agent_costs").insert({
+      agent_id: agentId,
+      provider,
+      model,
+      tokens_in: inputTokens,
+      tokens_out: outputTokens,
+      cost_usd: costUsd,
+    });
+  } catch (err) {
+    log.warn({ err }, "Failed to log cost");
+  }
+}
+
 // Model configuration
 const MODEL_MAP = {
   "claude-opus-4": {
     provider: "anthropic" as const,
     model: "claude-opus-4-20250514",
     tier: "strategic",
-    maxTokens: 4096,
+    maxTokens: 2048,
   },
   "claude-sonnet-4.5": {
     provider: "anthropic" as const,
     model: "claude-sonnet-4-5-20250514",
     tier: "content",
-    maxTokens: 4096,
+    maxTokens: 2048,
   },
   "gpt-4o-mini": {
     provider: "openai" as const,
     model: "gpt-4o-mini",
     tier: "routine",
-    maxTokens: 4096,
+    maxTokens: 1024,
   },
   "gpt-4o": {
     provider: "openai" as const,
     model: "gpt-4o",
     tier: "content",
-    maxTokens: 4096,
+    maxTokens: 2048,
   },
 } as const;
 
@@ -112,35 +214,70 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
 
   const effectiveMaxTokens = maxTokens || config.maxTokens;
 
+  // Check response cache for P2/P3 requests (routine/low-priority)
+  const cacheable = queueClass === "P2" || queueClass === "P3";
+  const key = cacheable ? cacheKey(model, messages) : "";
+  if (cacheable) {
+    const cached = getCached(key);
+    if (cached) {
+      log.debug({ model, agentId, queueClass }, "LLM cache hit — skipping API call");
+      return cached;
+    }
+  }
+
   // Estimate cost: ~$0.01 per 1K tokens for Opus, less for others
   const estimatedCostCents = config.tier === "strategic" ? 5 : config.tier === "content" ? 2 : 1;
 
-  return withGovernor(
-    { provider: config.provider, queueClass, agentId, estimatedCostCents },
-    async () => {
-      if (config.provider === "anthropic") {
-        return completeWithAnthropic({
-          model: config.model,
-          messages,
-          maxTokens: effectiveMaxTokens,
-          temperature,
-          stopSequences,
-        });
-      }
+  const timer = llmRequestDuration.startTimer({
+    provider: config.provider,
+    model: config.model,
+    agent: agentId || "unknown",
+  });
 
-      if (config.provider === "openai") {
-        return completeWithOpenAI({
-          model: config.model,
-          messages,
-          maxTokens: effectiveMaxTokens,
-          temperature,
-          stopSequences,
-        });
-      }
+  try {
+    const result = await withGovernor(
+      { provider: config.provider, queueClass, agentId, estimatedCostCents },
+      async () => {
+        switch (config.provider) {
+          case "anthropic":
+            return completeWithAnthropic({
+              model: config.model,
+              messages,
+              maxTokens: effectiveMaxTokens,
+              temperature,
+              stopSequences,
+            });
+          case "openai":
+            return completeWithOpenAI({
+              model: config.model,
+              messages,
+              maxTokens: effectiveMaxTokens,
+              temperature,
+              stopSequences,
+            });
+          default:
+            return assertNever(config);
+        }
+      },
+    );
 
-      throw new Error(`Unknown provider: ${config.provider}`);
+    timer({ provider: config.provider, model: config.model, agent: agentId || "unknown" });
+    llmRequestTotal.inc({ provider: config.provider, model: config.model, status: "success" });
+    if (result.usage) {
+      llmTokensUsed.inc({ provider: config.provider, model: config.model, direction: "input" }, result.usage.inputTokens);
+      llmTokensUsed.inc({ provider: config.provider, model: config.model, direction: "output" }, result.usage.outputTokens);
+      const costUsd = calculateCostUsd(config.model, result.usage.inputTokens, result.usage.outputTokens);
+      // Fire-and-forget cost log
+      void logCost(agentId || "unknown", config.provider, config.model, result.usage.inputTokens, result.usage.outputTokens, costUsd);
     }
-  );
+    // Cache P2/P3 results
+    if (cacheable) setCache(key, result);
+    return result;
+  } catch (error) {
+    timer({ provider: config.provider, model: config.model, agent: agentId || "unknown" });
+    llmRequestTotal.inc({ provider: config.provider, model: config.model, status: "error" });
+    throw error;
+  }
 }
 
 /**
@@ -275,7 +412,7 @@ export async function completeJSON<T>(
     }
     return JSON.parse(result.content) as T;
   } catch (error) {
-    console.error("Failed to parse JSON response:", error);
+    log.error({ err: error }, "Failed to parse JSON response");
     return null;
   }
 }
@@ -285,11 +422,12 @@ export async function completeJSON<T>(
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * Generate embedding using OpenAI ada-002
+ * Generate embedding using OpenAI text-embedding-3-small.
  */
 export async function embed(text: string): Promise<number[]> {
   const response = await getOpenAI().embeddings.create({
-    model: "text-embedding-ada-002",
+    model: EMBEDDING_MODEL,
+    dimensions: EMBEDDING_DIMENSIONS,
     input: text,
   });
   return response.data[0].embedding;
@@ -300,7 +438,8 @@ export async function embed(text: string): Promise<number[]> {
  */
 export async function embedBatch(texts: string[]): Promise<number[][]> {
   const response = await getOpenAI().embeddings.create({
-    model: "text-embedding-ada-002",
+    model: EMBEDDING_MODEL,
+    dimensions: EMBEDDING_DIMENSIONS,
     input: texts,
   });
   return response.data.map(d => d.embedding);

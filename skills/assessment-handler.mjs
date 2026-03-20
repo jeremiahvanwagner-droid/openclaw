@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * OpenClaw Divine Alignment Assessment Handler
- * 
+ *
  * Processes scorecard submissions, calculates alignment tier,
  * routes to results pages, and triggers appropriate nurture sequences.
- * 
+ *
  * Alignment Tiers:
  *   0-20:  DORMANT        — Needs awakening content
  *   21-40: AWAKENING      — Ready for foundational resources
@@ -14,15 +14,12 @@
  */
 
 import https from 'https';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import { fileURLToPath } from 'url';
-
-const execAsync = promisify(exec);
+import { openclawSend, openclawMessage } from '../lib/safe-exec.mjs';
+import { resolve as resolveTenant } from '../lib/ghl-tenant-resolver.mjs';
 
 // Configuration
-const GHL_API_KEY = process.env.GHL_TOKEN || process.env.GHL_PRIVATE_INTEGRATION_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || process.env.GHL_LOCATION_ID_TJB || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = resolveTenant();
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || process.env.TELEGRAM_ALERT_CHAT_ID || '7737707872';
 
 // Alignment Tier Configuration
@@ -88,7 +85,7 @@ const QUESTION_WEIGHTS = {
  */
 function calculateTier(score) {
   const numScore = parseInt(score) || 0;
-  
+
   for (const [tier, config] of Object.entries(ALIGNMENT_TIERS)) {
     if (numScore >= config.range[0] && numScore <= config.range[1]) {
       return {
@@ -98,7 +95,7 @@ function calculateTier(score) {
       };
     }
   }
-  
+
   // Default to DORMANT if score is out of range
   return {
     tier: 'DORMANT',
@@ -113,7 +110,7 @@ function calculateTier(score) {
 function calculateWeightedScore(responses) {
   let totalWeight = 0;
   let weightedSum = 0;
-  
+
   for (const [question, weight] of Object.entries(QUESTION_WEIGHTS)) {
     if (responses[question] !== undefined) {
       const value = parseInt(responses[question]) || 0;
@@ -121,9 +118,9 @@ function calculateWeightedScore(responses) {
       totalWeight += weight * 10; // Max 10 per question
     }
   }
-  
+
   if (totalWeight === 0) return 0;
-  
+
   // Normalize to 0-100 scale
   return Math.round((weightedSum / totalWeight) * 100);
 }
@@ -144,7 +141,7 @@ function ghlRequest(method, path, data = null) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let body = '';
       res.on('data', chunk => { body += chunk; });
@@ -156,13 +153,13 @@ function ghlRequest(method, path, data = null) {
         }
       });
     });
-    
+
     req.on('error', reject);
-    
+
     if (data) {
       req.write(JSON.stringify(data));
     }
-    
+
     req.end();
   });
 }
@@ -172,8 +169,7 @@ function ghlRequest(method, path, data = null) {
  */
 async function notifyTelegram(message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
   } catch (error) {
     console.error('Telegram notification failed:', error.message);
   }
@@ -184,8 +180,7 @@ async function notifyTelegram(message) {
  */
 async function triggerAgent(agentId, message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw message --agent ${agentId} "${escaped}"`);
+    await openclawMessage({ agent: agentId, message });
   } catch (error) {
     console.error(`Agent trigger failed (${agentId}):`, error.message);
   }
@@ -198,14 +193,14 @@ async function processAssessment(contactId, formData) {
   console.log(`\n${'═'.repeat(60)}`);
   console.log('📊 PROCESSING DIVINE ALIGNMENT ASSESSMENT');
   console.log('═'.repeat(60));
-  
+
   // 1. Get contact info
   const contact = await ghlRequest('GET', `/contacts/${contactId}`);
   const name = contact.contact?.firstName || 'Unknown';
   const email = contact.contact?.email || '';
-  
+
   console.log(`👤 Contact: ${name} (${email})`);
-  
+
   // 2. Calculate score (use provided score or calculate from responses)
   let score;
   if (formData.alignment_score !== undefined) {
@@ -216,14 +211,14 @@ async function processAssessment(contactId, formData) {
     // Calculate from individual responses
     score = calculateWeightedScore(formData);
   }
-  
+
   // 3. Determine tier
   const tierInfo = calculateTier(score);
-  
+
   console.log(`🎯 Score: ${score}/100`);
   console.log(`📍 Tier: ${tierInfo.tier}`);
   console.log(`📝 ${tierInfo.description}`);
-  
+
   // 4. Update contact in GHL
   const updateData = {
     customFields: [
@@ -234,12 +229,12 @@ async function processAssessment(contactId, formData) {
     ],
     tags: [tierInfo.tag, 'scorecard-complete']
   };
-  
+
   await ghlRequest('PUT', `/contacts/${contactId}`, updateData);
   console.log('✅ Contact updated with alignment data');
-  
+
   // 5. Add to appropriate nurture workflow
-  await triggerAgent('marketing', 
+  await triggerAgent('marketing',
     `ASSESSMENT COMPLETE: ${name} scored ${score}/100 (${tierInfo.tier}). ` +
     `Actions: ` +
     `1) Confirm ${tierInfo.tag} tag is applied, ` +
@@ -247,7 +242,7 @@ async function processAssessment(contactId, formData) {
     `3) Send personalized results email with ${tierInfo.offer} CTA, ` +
     `4) Schedule Day 1 nurture SMS for tomorrow 10am.`
   );
-  
+
   // 6. Send Telegram notification
   const tierEmoji = {
     DORMANT: '🌑',
@@ -256,7 +251,7 @@ async function processAssessment(contactId, formData) {
     EMPOWERED: '🔥',
     TRANSCENDENT: '👑'
   };
-  
+
   await notifyTelegram(
     `${tierEmoji[tierInfo.tier]} Alignment Scorecard Complete\n` +
     `👤 ${name}\n` +
@@ -264,7 +259,7 @@ async function processAssessment(contactId, formData) {
     `🏆 Tier: ${tierInfo.tier}\n` +
     `🎯 Offer: ${tierInfo.offer}`
   );
-  
+
   // 7. High-value leads get special handling
   if (tierInfo.tier === 'TRANSCENDENT') {
     await triggerAgent('sales',
@@ -272,7 +267,7 @@ async function processAssessment(contactId, formData) {
       `This contact is ready for Implementation Intensive offer. ` +
       `Generate pre-call briefing and prepare personalized outreach.`
     );
-    
+
     await notifyTelegram(
       `🚨 HIGH-VALUE LEAD ALERT!\n` +
       `👤 ${name}\n` +
@@ -281,13 +276,13 @@ async function processAssessment(contactId, formData) {
       `⚡ Priority follow-up recommended`
     );
   }
-  
+
   // 8. Return result page URL
   const resultUrl = `https://truthjblue.com${tierInfo.resultPage}?score=${score}&name=${encodeURIComponent(name)}`;
-  
+
   console.log(`\n🔗 Result Page: ${resultUrl}`);
   console.log('═'.repeat(60));
-  
+
   return {
     success: true,
     contactId,
@@ -305,23 +300,23 @@ async function processAssessment(contactId, formData) {
  */
 async function batchRecalculate() {
   console.log('🔄 Batch recalculating alignment scores...');
-  
+
   // Get contacts with scorecard-complete tag but missing tier
-  const response = await ghlRequest('GET', 
+  const response = await ghlRequest('GET',
     `/contacts/?locationId=${GHL_LOCATION_ID}&tags=scorecard-complete&limit=100`
   );
-  
+
   const contacts = response.contacts || [];
   let updated = 0;
-  
+
   for (const contact of contacts) {
     const customFields = contact.customFields || [];
     const scoreField = customFields.find(f => f.key === 'alignment_score');
     const tierField = customFields.find(f => f.key === 'alignment_tier');
-    
+
     if (scoreField && !tierField) {
       const tierInfo = calculateTier(scoreField.value);
-      
+
       await ghlRequest('PUT', `/contacts/${contact.id}`, {
         customFields: [
           { key: 'alignment_tier', value: tierInfo.tier },
@@ -329,12 +324,12 @@ async function batchRecalculate() {
         ],
         tags: [tierInfo.tag]
       });
-      
+
       updated++;
       console.log(`  ✅ ${contact.firstName}: ${scoreField.value} → ${tierInfo.tier}`);
     }
   }
-  
+
   console.log(`\n📊 Updated ${updated} contacts`);
 }
 
@@ -353,7 +348,7 @@ if (process.argv[1] === __skillFilename) {
     const formData = args[1] ? { alignment_score: args[1] } : {};
     processAssessment(args[0], formData);
     break;
-    
+
   case 'calculate':
     if (args.length < 1) {
       console.log('Usage: assessment-handler.mjs calculate <score>');
@@ -362,11 +357,11 @@ if (process.argv[1] === __skillFilename) {
     const result = calculateTier(args[0]);
     console.log(JSON.stringify(result, null, 2));
     break;
-    
+
   case 'batch':
     batchRecalculate();
     break;
-    
+
   case 'tiers':
     console.log('\n📊 DIVINE ALIGNMENT TIER SYSTEM\n');
     for (const [tier, config] of Object.entries(ALIGNMENT_TIERS)) {
@@ -377,7 +372,7 @@ if (process.argv[1] === __skillFilename) {
       console.log(`  ${config.description}\n`);
     }
     break;
-    
+
   default:
     console.log(`
 Divine Alignment Assessment Handler

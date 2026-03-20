@@ -32,6 +32,10 @@ ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Install OpenClaw CLI globally (pin version for reproducibility)
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
+
+# Install OpenClaw CLI globally (required by openclaw.service ExecStart)
 ARG OPENCLAW_VERSION=latest
 RUN npm install -g openclaw@${OPENCLAW_VERSION}
 
@@ -40,6 +44,10 @@ RUN groupadd --gid 1001 openclaw && \
     useradd --uid 1001 --gid openclaw --shell /bin/bash --create-home openclaw
 
 WORKDIR /opt/openclaw
+
+# Install project dependencies (root only — dashboard deploys separately)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile --prod
 
 # Copy application files (order: least → most frequently changed)
 COPY templates/ templates/
@@ -54,19 +62,24 @@ COPY handlers/ handlers/
 COPY skills/ skills/
 COPY agents/ agents/
 COPY config/ config/
+COPY workspaces/ workspaces/
 
 # Create runtime data directories and workspace dirs
 RUN mkdir -p data logs backups cron/runs delivery-queue media memory \
     workspace workspace-marketing workspace-sales workspace-support \
     workspaces/d1_ceo workspaces/d1_cto workspaces/d2_director \
     workspaces/d3_ceo workspaces/d4_cvo workspaces/d5_publisher \
-    workspaces/d6_executive_director workspaces/shared_master_orchestrator \
+    workspaces/d6_executive_director workspaces/d8_saas_director \
+    workspaces/d9_store_director workspaces/shared_master_orchestrator \
+    workspaces/shared_runtime_ops workspaces/shared_exec_orchestrator \
+    workspaces/shared_data_control workspaces/biz_01_pod_lead \
+    workspaces/biz_02_pod_lead workspaces/biz_03_pod_lead \
+    workspaces/biz_04_pod_lead workspaces/biz_05_pod_lead \
+    workspaces/biz_06_pod_lead workspaces/biz_07_pod_lead \
+    workspaces/biz_08_pod_lead workspaces/biz_09_pod_lead \
+    workspaces/biz_10_pod_lead \
     .openclaw && \
     chown -R openclaw:openclaw /opt/openclaw
-
-# Copy cron config (needs to be writable at runtime)
-RUN cp config/cron/jobs.json cron/jobs.json 2>/dev/null || true && \
-    cp config/cron/training-jobs.json cron/training-jobs.json 2>/dev/null || true
 
 # Install production config (Linux paths, env-based secrets)
 RUN cp config/openclaw.prod.json .openclaw/openclaw.json 2>/dev/null || true

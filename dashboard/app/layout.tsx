@@ -4,7 +4,7 @@ import { ConnectionStatus } from "./connection-status";
 
 export const metadata: Metadata = {
   title: "OpenClaw Agent Dashboard",
-  description: "Monitor and manage the 75-agent network for Truth J Blue LLC",
+  description: "Monitor the OpenClaw 10-business GHL portfolio for Truth J Blue LLC",
 };
 
 function Nav() {
@@ -20,7 +20,7 @@ function Nav() {
           <a href="/" className="text-white hover:text-claw-400 transition">Dashboard</a>
           <a href="/agents" className="text-slate-400 hover:text-white transition">Agents</a>
           <a href="/events" className="text-slate-400 hover:text-white transition">Events</a>
-          <a href="/metrics" className="text-slate-400 hover:text-white transition">Metrics</a>
+          <a href="/costs" className="text-slate-400 hover:text-white transition">Costs</a>
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
             <ConnectionStatus />
           </div>

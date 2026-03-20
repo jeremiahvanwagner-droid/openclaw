@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /**
  * OpenClaw GHL Analytics Dashboard
- * 
+ *
  * Real-time metrics aggregation for Truth J Blue GHL operations.
  * Provides KPIs, funnel metrics, revenue tracking, and trend analysis.
- * 
+ *
  * Metrics Tracked:
  *   - Lead flow (new, qualified, converted)
  *   - Revenue (daily, weekly, monthly, by product)
@@ -17,10 +17,11 @@ import https from 'https';
 import fs from 'fs/promises';
 import path from 'path';
 
+import { resolve as resolveTenant } from '../lib/ghl-tenant-resolver.mjs';
+
 // Configuration
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = resolveTenant();
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const METRICS_FILE = path.join(DATA_DIR, 'analytics-metrics.json');
 
@@ -59,7 +60,7 @@ function ghlRequest(method, urlPath) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let body = '';
       res.on('data', chunk => { body += chunk; });
@@ -71,7 +72,7 @@ function ghlRequest(method, urlPath) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.end();
   });
@@ -85,8 +86,8 @@ async function loadMetrics() {
     const data = await fs.readFile(METRICS_FILE, 'utf8');
     return JSON.parse(data);
   } catch {
-    return { 
-      snapshots: [], 
+    return {
+      snapshots: [],
       lastUpdated: null,
       historicalRevenue: [],
       historicalLeads: []
@@ -111,12 +112,12 @@ async function getContactMetrics() {
     'high-ticket-prospect', 'intensive-client', 'membership-active',
     'dormant-soul', 'awakening-soul', 'aligned-soul', 'empowered-soul', 'transcendent-soul'
   ];
-  
+
   const counts = {};
-  
+
   for (const tag of tags) {
     try {
-      const response = await ghlRequest('GET', 
+      const response = await ghlRequest('GET',
         `/contacts/?locationId=${GHL_LOCATION_ID}&tags=${tag}&limit=1`
       );
       counts[tag] = response.meta?.total || response.contacts?.length || 0;
@@ -124,7 +125,7 @@ async function getContactMetrics() {
       counts[tag] = 0;
     }
   }
-  
+
   return counts;
 }
 
@@ -132,13 +133,13 @@ async function getContactMetrics() {
  * Get pipeline metrics
  */
 async function getPipelineMetrics() {
-  const response = await ghlRequest('GET', 
+  const response = await ghlRequest('GET',
     `/opportunities/pipelines?locationId=${GHL_LOCATION_ID}`
   );
-  
+
   const pipelines = response.pipelines || [];
   const metrics = [];
-  
+
   for (const pipeline of pipelines) {
     const pipelineMetrics = {
       id: pipeline.id,
@@ -147,24 +148,24 @@ async function getPipelineMetrics() {
       totalValue: 0,
       totalOpportunities: 0
     };
-    
+
     // Get opportunities for this pipeline
     try {
-      const opps = await ghlRequest('GET', 
+      const opps = await ghlRequest('GET',
         `/opportunities/?locationId=${GHL_LOCATION_ID}&pipelineId=${pipeline.id}&limit=100`
       );
-      
+
       const opportunities = opps.opportunities || [];
       pipelineMetrics.totalOpportunities = opportunities.length;
       pipelineMetrics.totalValue = opportunities.reduce((sum, o) => sum + (o.monetaryValue || 0), 0);
-      
+
       // Count by stage
       const stageCounts = {};
       for (const opp of opportunities) {
         const stageId = opp.pipelineStageId;
         stageCounts[stageId] = (stageCounts[stageId] || 0) + 1;
       }
-      
+
       for (const stage of pipeline.stages || []) {
         pipelineMetrics.stages.push({
           id: stage.id,
@@ -175,10 +176,10 @@ async function getPipelineMetrics() {
     } catch {
       // Pipeline may be empty
     }
-    
+
     metrics.push(pipelineMetrics);
   }
-  
+
   return metrics;
 }
 
@@ -191,7 +192,7 @@ function calculateConversionRates(contactCounts) {
   const ebookBuyers = contactCounts['ebook-buyer'] || 0;
   const courseBuyers = contactCounts['course-buyer'] || 0;
   const intensiveClients = contactCounts['intensive-client'] || 0;
-  
+
   return {
     leadToScorecard: leads > 0 ? ((scorecardComplete / leads) * 100).toFixed(1) : 0,
     leadToEbook: leads > 0 ? ((ebookBuyers / leads) * 100).toFixed(1) : 0,
@@ -208,7 +209,7 @@ function calculateConversionRates(contactCounts) {
 function calculateTierDistribution(contactCounts) {
   const tiers = ['dormant-soul', 'awakening-soul', 'aligned-soul', 'empowered-soul', 'transcendent-soul'];
   const total = tiers.reduce((sum, tier) => sum + (contactCounts[tier] || 0), 0);
-  
+
   return {
     dormant: { count: contactCounts['dormant-soul'] || 0, pct: total > 0 ? ((contactCounts['dormant-soul'] || 0) / total * 100).toFixed(1) : 0 },
     awakening: { count: contactCounts['awakening-soul'] || 0, pct: total > 0 ? ((contactCounts['awakening-soul'] || 0) / total * 100).toFixed(1) : 0 },
@@ -227,7 +228,7 @@ function estimateRevenue(contactCounts) {
   const courseRevenue = (contactCounts['course-buyer'] || 0) * PRODUCT_VALUES['course'];
   const intensiveRevenue = (contactCounts['intensive-client'] || 0) * PRODUCT_VALUES['intensive'];
   const membershipRevenue = (contactCounts['membership-active'] || 0) * PRODUCT_VALUES['operators-circle'];
-  
+
   return {
     ebook: ebookRevenue,
     course: courseRevenue,
@@ -270,17 +271,17 @@ async function generateDashboard() {
   console.log('═'.repeat(70));
   console.log(`Generated: ${new Date().toLocaleString()}`);
   console.log('─'.repeat(70));
-  
+
   // Fetch all metrics
   console.log('\n⏳ Fetching metrics from GHL...\n');
-  
+
   const contactCounts = await getContactMetrics();
   const pipelineMetrics = await getPipelineMetrics();
   const conversionRates = calculateConversionRates(contactCounts);
   const tierDistribution = calculateTierDistribution(contactCounts);
   const revenueEstimate = estimateRevenue(contactCounts);
   const kpiStatus = evaluateKPIs(conversionRates, revenueEstimate);
-  
+
   // Contact Overview
   console.log('👥 CONTACT FUNNEL');
   console.log('─'.repeat(40));
@@ -290,7 +291,7 @@ async function generateDashboard() {
   console.log(`  Course Buyers:      ${contactCounts['course-buyer'] || 0}`);
   console.log(`  Intensive Clients:  ${contactCounts['intensive-client'] || 0}`);
   console.log(`  Active Members:     ${contactCounts['membership-active'] || 0}`);
-  
+
   // Alignment Tier Distribution
   console.log('\n🎯 ALIGNMENT TIER DISTRIBUTION');
   console.log('─'.repeat(40));
@@ -299,7 +300,7 @@ async function generateDashboard() {
   console.log(`  ⭐ Aligned:      ${tierDistribution.aligned.count} (${tierDistribution.aligned.pct}%)`);
   console.log(`  🔥 Empowered:    ${tierDistribution.empowered.count} (${tierDistribution.empowered.pct}%)`);
   console.log(`  👑 Transcendent: ${tierDistribution.transcendent.count} (${tierDistribution.transcendent.pct}%)`);
-  
+
   // Conversion Rates
   console.log('\n📈 CONVERSION RATES');
   console.log('─'.repeat(40));
@@ -308,7 +309,7 @@ async function generateDashboard() {
   console.log(`  Scorecard → eBook:   ${conversionRates.scorecardToEbook}%`);
   console.log(`  eBook → Course:      ${conversionRates.ebookToCourse}%`);
   console.log(`  Course → Intensive:  ${conversionRates.courseToIntensive}%`);
-  
+
   // Revenue
   console.log('\n💰 REVENUE ESTIMATE (Lifetime)');
   console.log('─'.repeat(40));
@@ -318,14 +319,14 @@ async function generateDashboard() {
   console.log(`  Membership MRR:      $${revenueEstimate.mrr.toFixed(2)}/mo`);
   console.log(`  ─────────────────────────────`);
   console.log(`  Total Lifetime:      $${revenueEstimate.total.toFixed(2)}`);
-  
+
   // KPI Status
   console.log('\n🎯 KPI STATUS');
   console.log('─'.repeat(40));
   console.log(`  ${kpiStatus.leadConversion.status} Lead Conversion: ${kpiStatus.leadConversion.actual}% (target: ${kpiStatus.leadConversion.target}%)`);
   console.log(`  ${kpiStatus.ebookToCourse.status} eBook→Course: ${kpiStatus.ebookToCourse.actual}% (target: ${kpiStatus.ebookToCourse.target}%)`);
   console.log(`  ${kpiStatus.monthlyRevenue.status} Revenue: $${kpiStatus.monthlyRevenue.actual.toFixed(0)} (target: $${kpiStatus.monthlyRevenue.target})`);
-  
+
   // Pipeline Summary
   console.log('\n📊 PIPELINE SUMMARY');
   console.log('─'.repeat(40));
@@ -340,9 +341,9 @@ async function generateDashboard() {
       }
     }
   }
-  
+
   console.log('\n' + '═'.repeat(70));
-  
+
   // Save snapshot
   const metrics = await loadMetrics();
   const snapshot = {
@@ -354,13 +355,13 @@ async function generateDashboard() {
     pipelineMetrics,
     kpiStatus
   };
-  
+
   metrics.snapshots.unshift(snapshot);
   metrics.snapshots = metrics.snapshots.slice(0, 100); // Keep last 100 snapshots
   metrics.lastUpdated = snapshot.timestamp;
-  
+
   await saveMetrics(metrics);
-  
+
   return snapshot;
 }
 
@@ -370,40 +371,40 @@ async function generateDashboard() {
 async function getTrends(days = 7) {
   const metrics = await loadMetrics();
   const cutoff = Date.now() - (days * 24 * 60 * 60 * 1000);
-  
-  const recentSnapshots = metrics.snapshots.filter(s => 
+
+  const recentSnapshots = metrics.snapshots.filter(s =>
     new Date(s.timestamp).getTime() > cutoff
   );
-  
+
   if (recentSnapshots.length < 2) {
     console.log('Not enough data for trend analysis. Need at least 2 snapshots.');
     return null;
   }
-  
+
   const oldest = recentSnapshots[recentSnapshots.length - 1];
   const newest = recentSnapshots[0];
-  
+
   console.log('\n📈 TREND ANALYSIS (' + days + ' days)');
   console.log('═'.repeat(50));
-  
+
   // Contact growth
   const leadGrowth = (newest.contactCounts['lead'] || 0) - (oldest.contactCounts['lead'] || 0);
   const buyerGrowth = (newest.contactCounts['ebook-buyer'] || 0) - (oldest.contactCounts['ebook-buyer'] || 0);
   const courseGrowth = (newest.contactCounts['course-buyer'] || 0) - (oldest.contactCounts['course-buyer'] || 0);
-  
+
   console.log(`\n👥 Contact Growth:`);
   console.log(`  Leads:        ${leadGrowth >= 0 ? '+' : ''}${leadGrowth}`);
   console.log(`  eBook Buyers: ${buyerGrowth >= 0 ? '+' : ''}${buyerGrowth}`);
   console.log(`  Course Buyers: ${courseGrowth >= 0 ? '+' : ''}${courseGrowth}`);
-  
+
   // Revenue growth
   const revenueGrowth = newest.revenueEstimate.total - oldest.revenueEstimate.total;
   console.log(`\n💰 Revenue Growth: ${revenueGrowth >= 0 ? '+' : ''}$${revenueGrowth.toFixed(2)}`);
-  
+
   // Conversion rate changes
   const convGrowth = parseFloat(newest.conversionRates.leadToEbook) - parseFloat(oldest.conversionRates.leadToEbook);
   console.log(`\n📊 Conversion Rate: ${convGrowth >= 0 ? '+' : ''}${convGrowth.toFixed(1)}%`);
-  
+
   return {
     period: days,
     leadGrowth,
@@ -432,22 +433,22 @@ switch (command) {
   case 'dash':
     generateDashboard();
     break;
-    
+
   case 'trends':
     getTrends(parseInt(args[0]) || 7);
     break;
-    
+
   case 'export':
     exportMetrics();
     break;
-    
+
   case 'kpis':
     generateDashboard().then(snapshot => {
       console.log('\n🎯 KPI DETAILS:');
       console.log(JSON.stringify(snapshot.kpiStatus, null, 2));
     });
     break;
-    
+
   default:
     console.log(`
 GHL Analytics Dashboard
@@ -461,10 +462,10 @@ Usage:
 `);
 }
 
-export { 
-  generateDashboard, 
-  getTrends, 
-  getContactMetrics, 
+export {
+  generateDashboard,
+  getTrends,
+  getContactMetrics,
   getPipelineMetrics,
   KPI_TARGETS,
   PRODUCT_VALUES

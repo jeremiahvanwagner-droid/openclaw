@@ -1,0 +1,56 @@
+server:
+  http_listen_port: 9080
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Tail systemd journal for openclaw service
+  - job_name: openclaw
+    journal:
+      json: true
+      labels:
+        job: openclaw
+      path: /var/log/journal
+    relabel_configs:
+      - source_labels: ["__journal__systemd_unit"]
+        regex: "openclaw\\.service"
+        action: keep
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            msg: msg
+            module: module
+            agent_id: agent_id
+            correlation_id: correlation_id
+            trace_id: trace_id
+      - labels:
+          level:
+          module:
+
+  # Tail systemd journal for webhook handler service
+  - job_name: openclaw-webhook
+    journal:
+      json: true
+      labels:
+        job: openclaw-webhook
+      path: /var/log/journal
+    relabel_configs:
+      - source_labels: ["__journal__systemd_unit"]
+        regex: "openclaw-webhook\\.service"
+        action: keep
+    pipeline_stages:
+      - json:
+          expressions:
+            level: level
+            msg: msg
+            module: module
+            event_type: eventType
+            trace_id: trace_id
+      - labels:
+          level:
+          module:

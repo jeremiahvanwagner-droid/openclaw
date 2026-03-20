@@ -1,17 +1,27 @@
 /**
  * Agent Memory Library
  * Open Claw Multi-Agent Network
- * 
+ *
  * Provides semantic memory operations using Supabase pgvector.
  * Supports private, division-scoped, and global memory sharing.
  */
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import OpenAI from "openai";
+import { logger } from "./logger";
+import {
+  memoryQueryDuration,
+  memoryStoreTotal,
+} from "./metrics";
+
+const log = logger.child({ module: "agent-memory" });
 
 // Initialize clients lazily
 let supabase: SupabaseClient | null = null;
 let openai: OpenAI | null = null;
+
+const EMBEDDING_MODEL = "text-embedding-3-small";
+const EMBEDDING_DIMENSIONS = 512;
 
 function getSupabase(): SupabaseClient {
   if (!supabase) {
@@ -59,11 +69,12 @@ export interface QueryOptions {
 // ═══════════════════════════════════════════════════════════════════
 
 /**
- * Generate embedding vector for text using OpenAI ada-002
+ * Generate embedding vector for text using OpenAI text-embedding-3-small.
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
   const response = await getOpenAI().embeddings.create({
-    model: "text-embedding-ada-002",
+    model: EMBEDDING_MODEL,
+    dimensions: EMBEDDING_DIMENSIONS,
     input: text,
   });
   return response.data[0].embedding;
@@ -101,7 +112,7 @@ export async function embedAndStore(
     .insert({
       agent_id: agentId,
       content,
-      embedding,
+      embedding_512: embedding,
       memory_scope: scope,
       metadata: {
         ...metadata,
@@ -113,10 +124,11 @@ export async function embedAndStore(
     .single();
 
   if (error) {
-    console.error("Failed to store memory:", error);
+    log.error({ err: error }, "Failed to store memory");
     throw error;
   }
 
+  memoryStoreTotal.inc({ agent_id: agentId, scope });
   return data.id;
 }
 
@@ -133,7 +145,7 @@ export async function batchStore(
   const BATCH_SIZE = 5;
   for (let i = 0; i < entries.length; i += BATCH_SIZE) {
     const batch = entries.slice(i, i + BATCH_SIZE);
-    const results = await Promise.all(
+    const results = await Promise.allSettled(
       batch.map(entry =>
         embedAndStore(agentId, entry.content, {
           scope: entry.scope,
@@ -141,7 +153,13 @@ export async function batchStore(
         })
       )
     );
-    ids.push(...results);
+    for (const r of results) {
+      if (r.status === "fulfilled") {
+        ids.push(r.value);
+      } else {
+        log.error({ err: r.reason }, "batchStore: failed to store entry");
+      }
+    }
   }
 
   return ids;
@@ -159,6 +177,7 @@ export async function queryMemory(
   query: string,
   options: QueryOptions = {}
 ): Promise<MemoryEntry[]> {
+  const stopTimer = memoryQueryDuration.startTimer({ agent_id: agentId });
   const {
     topK = 5,
     includeShared = true,
@@ -173,15 +192,16 @@ export async function queryMemory(
     .single();
 
   if (!agent) {
-    console.warn(`Agent ${agentId} not found in registry`);
+    log.warn({ agentId }, "Agent not found in registry");
+    stopTimer();
     return [];
   }
 
   // Generate query embedding
   const queryEmbedding = await generateEmbedding(query);
 
-  // Query with pgvector RPC function
-  const { data, error } = await getSupabase().rpc("match_agent_memories", {
+  // Query with the 512-dim pgvector RPC function.
+  const { data, error } = await getSupabase().rpc("match_agent_memories_512", {
     query_embedding: queryEmbedding,
     agent_id_filter: agentId,
     division_filter: agent.org_unit,
@@ -190,10 +210,12 @@ export async function queryMemory(
   });
 
   if (error) {
-    console.error("Failed to query memory:", error);
+    log.error({ err: error }, "Failed to query memory");
+    stopTimer();
     throw error;
   }
 
+  stopTimer();
   // Filter by minimum similarity
   return (data || []).filter(
     (entry: MemoryEntry) => entry.similarity >= minSimilarity
@@ -215,7 +237,7 @@ export async function getRecentMemories(
     .limit(limit);
 
   if (error) {
-    console.error("Failed to get recent memories:", error);
+    log.error({ err: error }, "Failed to get recent memories");
     throw error;
   }
 
@@ -274,16 +296,20 @@ export async function broadcastToDivision(
     .neq("agent_id", fromAgent);
 
   if (!agents || agents.length === 0) {
-    console.warn(`No other agents found in division ${division}`);
+    log.warn({ division }, "No other agents found in division");
     return;
   }
 
   // Share with each agent
-  await Promise.all(
+  const results = await Promise.allSettled(
     agents.map(agent =>
       shareContext(fromAgent, agent.agent_id, context, metadata)
     )
   );
+  const failures = results.filter(r => r.status === "rejected");
+  if (failures.length) {
+    log.error({ failures: failures.length, total: results.length }, "broadcastToDivision: partial share failure");
+  }
 }
 
 /**
@@ -319,7 +345,7 @@ export async function deleteMemory(memoryId: string): Promise<void> {
     .eq("id", memoryId);
 
   if (error) {
-    console.error("Failed to delete memory:", error);
+    log.error({ err: error }, "Failed to delete memory");
     throw error;
   }
 }
@@ -343,7 +369,7 @@ export async function clearAgentMemory(
   const { data, error } = await query.select("id");
 
   if (error) {
-    console.error("Failed to clear memory:", error);
+    log.error({ err: error }, "Failed to clear memory");
     throw error;
   }
 
@@ -361,7 +387,7 @@ export async function cleanupExpiredMemories(): Promise<number> {
     .select("id");
 
   if (error) {
-    console.error("Failed to cleanup expired memories:", error);
+    log.error({ err: error }, "Failed to cleanup expired memories");
     throw error;
   }
 
@@ -383,7 +409,7 @@ export async function getMemoryStats(agentId: string): Promise<{
     .eq("agent_id", agentId);
 
   if (error) {
-    console.error("Failed to get memory stats:", error);
+    log.error({ err: error }, "Failed to get memory stats");
     throw error;
   }
 

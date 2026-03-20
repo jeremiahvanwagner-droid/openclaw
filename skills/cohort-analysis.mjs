@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OpenClaw Cohort Analysis Module
- * 
+ *
  * Features:
  *   - Group contacts by acquisition month/source/tier
  *   - Calculate LTV per cohort
@@ -12,20 +12,16 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import https from 'https';
-
-const execAsync = promisify(exec);
+import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const COHORTS_DIR = path.join(DATA_DIR, 'cohorts');
 const COHORT_FILE = path.join(DATA_DIR, 'cohort-data.json');
 
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = (await import('../lib/ghl-tenant-resolver.mjs')).resolve();
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
 
 // Product values
@@ -72,7 +68,7 @@ function ghlRequest(method, urlPath) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let body = '';
       res.on('data', chunk => { body += chunk; });
@@ -84,7 +80,7 @@ function ghlRequest(method, urlPath) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(60000, () => {
       req.destroy();
@@ -99,8 +95,7 @@ function ghlRequest(method, urlPath) {
  */
 async function sendNotification(message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
     return true;
   } catch {
     return false;
@@ -138,17 +133,17 @@ async function saveCohortData(data) {
 function detectSource(contact) {
   // Check source field
   let source = (contact.source || '').toLowerCase();
-  
+
   // Check UTM tags
   if (contact.customFields) {
-    const utmSource = contact.customFields.find(f => 
+    const utmSource = contact.customFields.find(f =>
       f.key?.toLowerCase().includes('utm_source') || f.id?.includes('utm_source')
     );
     if (utmSource?.value) {
       source = utmSource.value.toLowerCase();
     }
   }
-  
+
   // Check tags for source hints
   for (const tag of (contact.tags || [])) {
     const tagLower = tag.toLowerCase();
@@ -158,14 +153,14 @@ function detectSource(contact) {
       }
     }
   }
-  
+
   // Match source to category
   for (const [keyword, category] of Object.entries(SOURCE_CATEGORIES)) {
     if (source.includes(keyword)) {
       return { source: keyword, category };
     }
   }
-  
+
   return { source: source || 'unknown', category: 'direct' };
 }
 
@@ -174,7 +169,7 @@ function detectSource(contact) {
  */
 function detectAlignmentTier(contact) {
   const tiers = ['transcendent', 'empowered', 'aligned', 'awakening', 'dormant'];
-  
+
   for (const tag of (contact.tags || [])) {
     const tagLower = tag.toLowerCase();
     for (const tier of tiers) {
@@ -183,7 +178,7 @@ function detectAlignmentTier(contact) {
       }
     }
   }
-  
+
   return 'unknown';
 }
 
@@ -193,19 +188,19 @@ function detectAlignmentTier(contact) {
 function calculateLTV(contact) {
   let ltv = 0;
   const tags = (contact.tags || []).map(t => t.toLowerCase());
-  
+
   if (tags.some(t => t.includes('ebook') || t.includes('e-book'))) {
     ltv += PRODUCT_VALUES.ebook;
   }
-  
+
   if (tags.some(t => t.includes('course-buyer') || t.includes('course buyer'))) {
     ltv += PRODUCT_VALUES.course;
   }
-  
+
   if (tags.some(t => t.includes('intensive'))) {
     ltv += PRODUCT_VALUES.intensive;
   }
-  
+
   // Check for subscription (estimate months active)
   if (tags.some(t => t.includes('operators') || t.includes('circle'))) {
     const dateAdded = new Date(contact.dateAdded);
@@ -213,7 +208,7 @@ function calculateLTV(contact) {
     const monthsActive = Math.max(1, Math.floor((now - dateAdded) / (1000 * 60 * 60 * 24 * 30)));
     ltv += PRODUCT_VALUES['operators-circle'] * monthsActive;
   }
-  
+
   return ltv;
 }
 
@@ -222,42 +217,42 @@ function calculateLTV(contact) {
  */
 async function syncCohorts() {
   console.log('\n📊 Syncing contacts and building cohorts...\n');
-  
+
   const cohortData = await loadCohortData();
   cohortData.cohorts = {};
   cohortData.totalContacts = 0;
-  
+
   // Fetch all contacts (paginated)
   let allContacts = [];
   let hasMore = true;
   let offset = 0;
   const limit = 100;
-  
+
   while (hasMore) {
     try {
-      const response = await ghlRequest('GET', 
+      const response = await ghlRequest('GET',
         `/contacts/?locationId=${GHL_LOCATION_ID}&limit=${limit}&skip=${offset}`
       );
-      
+
       const contacts = response.contacts || [];
       allContacts.push(...contacts);
-      
+
       console.log(`  Fetched ${allContacts.length} contacts...`);
-      
+
       hasMore = contacts.length === limit;
       offset += limit;
-      
+
       await new Promise(r => setTimeout(r, 200));
-      
+
     } catch (error) {
       console.error(`  Error at offset ${offset}: ${error.message}`);
       break;
     }
   }
-  
+
   cohortData.totalContacts = allContacts.length;
   console.log(`\n  Processing ${allContacts.length} contacts into cohorts...\n`);
-  
+
   // Process each contact
   for (const contact of allContacts) {
     const dateAdded = new Date(contact.dateAdded);
@@ -265,7 +260,7 @@ async function syncCohorts() {
     const { source, category } = detectSource(contact);
     const tier = detectAlignmentTier(contact);
     const ltv = calculateLTV(contact);
-    
+
     // Build cohort keys
     const keys = [
       `month:${cohortMonth}`,
@@ -274,7 +269,7 @@ async function syncCohorts() {
       `tier:${tier}`,
       `month-source:${cohortMonth}-${source}`
     ];
-    
+
     for (const key of keys) {
       if (!cohortData.cohorts[key]) {
         cohortData.cohorts[key] = {
@@ -285,18 +280,18 @@ async function syncCohorts() {
           contacts: []
         };
       }
-      
+
       const cohort = cohortData.cohorts[key];
       cohort.count++;
       cohort.totalLTV += ltv;
-      
+
       // Track conversions
       const tags = (contact.tags || []).map(t => t.toLowerCase());
       if (tags.some(t => t.includes('ebook'))) cohort.conversions.ebook++;
       if (tags.some(t => t.includes('course-buyer'))) cohort.conversions.course++;
       if (tags.some(t => t.includes('intensive'))) cohort.conversions.intensive++;
       if (tags.some(t => t.includes('operators') || t.includes('circle'))) cohort.conversions.circle++;
-      
+
       // Store contact reference (ID only for efficiency)
       cohort.contacts.push({
         id: contact.id,
@@ -305,7 +300,7 @@ async function syncCohorts() {
       });
     }
   }
-  
+
   // Calculate averages
   for (const cohort of Object.values(cohortData.cohorts)) {
     cohort.avgLTV = cohort.count > 0 ? (cohort.totalLTV / cohort.count).toFixed(2) : 0;
@@ -316,10 +311,10 @@ async function syncCohorts() {
       circle: cohort.count > 0 ? ((cohort.conversions.circle / cohort.count) * 100).toFixed(1) : 0
     };
   }
-  
+
   await saveCohortData(cohortData);
   console.log(`  ✅ Built ${Object.keys(cohortData.cohorts).length} cohort segments`);
-  
+
   return cohortData;
 }
 
@@ -329,21 +324,21 @@ async function syncCohorts() {
 async function calculateRetention(cohortKey) {
   const cohortData = await loadCohortData();
   const cohort = cohortData.cohorts[cohortKey];
-  
+
   if (!cohort) {
     console.log(`Cohort ${cohortKey} not found`);
     return null;
   }
-  
+
   const retention = {
     cohort: cohortKey,
     initialCount: cohort.count,
     retentionDays: [30, 60, 90, 180, 365],
     retentionRates: {}
   };
-  
+
   const now = new Date();
-  
+
   for (const days of retention.retentionDays) {
     const activeCount = cohort.contacts.filter(c => {
       const dateAdded = new Date(c.dateAdded);
@@ -351,13 +346,13 @@ async function calculateRetention(cohortKey) {
       // Consider retained if they have any LTV or if joined within the period
       return daysSinceJoin >= days ? c.ltv > 0 : daysSinceJoin < days;
     }).length;
-    
+
     retention.retentionRates[days] = {
       count: activeCount,
       rate: ((activeCount / cohort.count) * 100).toFixed(1)
     };
   }
-  
+
   return retention;
 }
 
@@ -366,29 +361,29 @@ async function calculateRetention(cohortKey) {
  */
 async function generateReport(groupBy = 'month') {
   const cohortData = await loadCohortData();
-  
+
   console.log('\n' + '═'.repeat(70));
   console.log(`📊 COHORT ANALYSIS REPORT (By ${groupBy.toUpperCase()})`);
   console.log('═'.repeat(70));
   console.log(`Generated: ${new Date().toLocaleString()}`);
   console.log(`Total Contacts: ${cohortData.totalContacts}\n`);
-  
+
   // Filter cohorts by grouping
   const prefix = `${groupBy}:`;
   const relevantCohorts = Object.values(cohortData.cohorts)
     .filter(c => c.key.startsWith(prefix))
     .sort((a, b) => b.totalLTV - a.totalLTV);
-  
+
   if (relevantCohorts.length === 0) {
     console.log('No cohort data available. Run: cohort-analysis.mjs sync');
     return;
   }
-  
+
   // Summary table
-  console.log('Cohort'.padEnd(20) + 'Count'.padStart(8) + 'Avg LTV'.padStart(12) + 'Total LTV'.padStart(12) + 
+  console.log('Cohort'.padEnd(20) + 'Count'.padStart(8) + 'Avg LTV'.padStart(12) + 'Total LTV'.padStart(12) +
               'eBook %'.padStart(10) + 'Course %'.padStart(10));
   console.log('─'.repeat(70));
-  
+
   for (const cohort of relevantCohorts.slice(0, 15)) {
     const label = cohort.key.replace(prefix, '');
     console.log(
@@ -400,27 +395,27 @@ async function generateReport(groupBy = 'month') {
       `${cohort.conversionRates.course}%`.padStart(10)
     );
   }
-  
+
   // Best performing cohorts
   console.log('\n📈 TOP PERFORMING COHORTS (By Avg LTV)\n');
-  
+
   const byAvgLTV = [...relevantCohorts].sort((a, b) => parseFloat(b.avgLTV) - parseFloat(a.avgLTV));
-  
+
   for (const cohort of byAvgLTV.slice(0, 5)) {
     const label = cohort.key.replace(prefix, '');
     console.log(`  ${label}: $${cohort.avgLTV} avg LTV (${cohort.count} contacts)`);
   }
-  
+
   // Worst performing (for improvement)
   console.log('\n📉 LOWEST PERFORMING COHORTS\n');
-  
+
   for (const cohort of byAvgLTV.slice(-5).reverse()) {
     const label = cohort.key.replace(prefix, '');
     console.log(`  ${label}: $${cohort.avgLTV} avg LTV (${cohort.count} contacts)`);
   }
-  
+
   console.log('\n' + '═'.repeat(70));
-  
+
   return relevantCohorts;
 }
 
@@ -429,22 +424,22 @@ async function generateReport(groupBy = 'month') {
  */
 async function compareCohorts(cohort1Key, cohort2Key) {
   const cohortData = await loadCohortData();
-  
+
   const c1 = cohortData.cohorts[cohort1Key];
   const c2 = cohortData.cohorts[cohort2Key];
-  
+
   if (!c1 || !c2) {
     console.log('One or both cohorts not found');
     return;
   }
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log('📊 COHORT COMPARISON');
   console.log('═'.repeat(60) + '\n');
-  
+
   console.log('Metric'.padEnd(25) + cohort1Key.padStart(17) + cohort2Key.padStart(17) + 'Diff'.padStart(10));
   console.log('─'.repeat(60));
-  
+
   const metrics = [
     ['Count', c1.count, c2.count],
     ['Avg LTV', parseFloat(c1.avgLTV), parseFloat(c2.avgLTV), '$'],
@@ -453,12 +448,12 @@ async function compareCohorts(cohort1Key, cohort2Key) {
     ['Course Conv %', parseFloat(c1.conversionRates.course), parseFloat(c2.conversionRates.course), '%'],
     ['Intensive Conv %', parseFloat(c1.conversionRates.intensive), parseFloat(c2.conversionRates.intensive), '%']
   ];
-  
+
   for (const [name, v1, v2, unit = ''] of metrics) {
     const diff = v2 - v1;
     const diffStr = diff >= 0 ? `+${unit}${diff.toFixed(1)}` : `${unit}${diff.toFixed(1)}`;
     const color = diff > 0 ? '🟢' : diff < 0 ? '🔴' : '⚪';
-    
+
     console.log(
       name.padEnd(25) +
       `${unit}${v1}`.padStart(17) +
@@ -466,7 +461,7 @@ async function compareCohorts(cohort1Key, cohort2Key) {
       `${color} ${diffStr}`.padStart(12)
     );
   }
-  
+
   console.log('');
 }
 
@@ -475,14 +470,14 @@ async function compareCohorts(cohort1Key, cohort2Key) {
  */
 async function findBestTier() {
   const cohortData = await loadCohortData();
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log('🎯 ALIGNMENT TIER PERFORMANCE');
   console.log('═'.repeat(60) + '\n');
-  
+
   const tiers = ['transcendent', 'empowered', 'aligned', 'awakening', 'dormant'];
   const tierData = [];
-  
+
   for (const tier of tiers) {
     const cohort = cohortData.cohorts[`tier:${tier}`];
     if (cohort) {
@@ -495,14 +490,14 @@ async function findBestTier() {
       });
     }
   }
-  
+
   // Sort by course conversion
   tierData.sort((a, b) => b.courseConv - a.courseConv);
-  
-  console.log('Tier'.padEnd(15) + 'Count'.padStart(8) + 'Avg LTV'.padStart(12) + 
+
+  console.log('Tier'.padEnd(15) + 'Count'.padStart(8) + 'Avg LTV'.padStart(12) +
               'Course %'.padStart(10) + 'Intensive %'.padStart(12));
   console.log('─'.repeat(55));
-  
+
   for (const tier of tierData) {
     console.log(
       tier.tier.padEnd(15) +
@@ -512,16 +507,16 @@ async function findBestTier() {
       `${tier.intensiveConv}%`.padStart(12)
     );
   }
-  
+
   if (tierData.length > 0) {
     console.log(`\n✨ Best Converting Tier: ${tierData[0].tier} (${tierData[0].courseConv}% to course)`);
-    
+
     const highestLTV = [...tierData].sort((a, b) => b.avgLTV - a.avgLTV)[0];
     console.log(`💰 Highest LTV Tier: ${highestLTV.tier} ($${highestLTV.avgLTV} avg)`);
   }
-  
+
   console.log('');
-  
+
   return tierData;
 }
 
@@ -532,31 +527,31 @@ async function monthlySnapshot() {
   console.log('\n' + '═'.repeat(70));
   console.log('📊 MONTHLY COHORT SNAPSHOT');
   console.log('═'.repeat(70));
-  
+
   const now = new Date();
   const thisMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
   const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
   const lastMonthKey = `${lastMonth.getFullYear()}-${String(lastMonth.getMonth() + 1).padStart(2, '0')}`;
-  
+
   console.log(`\nReport Period: ${lastMonthKey}\n`);
-  
+
   // Sync latest data
   await syncCohorts();
-  
+
   // Generate reports
   await generateReport('month');
   await findBestTier();
-  
+
   // Compare this month to last month
   const cohortData = await loadCohortData();
   const thisMonthCohort = cohortData.cohorts[`month:${thisMonth}`];
   const lastMonthCohort = cohortData.cohorts[`month:${lastMonthKey}`];
-  
+
   if (thisMonthCohort && lastMonthCohort) {
     console.log('\n📈 MONTH-OVER-MONTH COMPARISON\n');
     await compareCohorts(`month:${lastMonthKey}`, `month:${thisMonth}`);
   }
-  
+
   // Save snapshot
   await fs.mkdir(COHORTS_DIR, { recursive: true });
   const snapshotFile = path.join(COHORTS_DIR, `snapshot-${thisMonth}.json`);
@@ -565,9 +560,9 @@ async function monthlySnapshot() {
     period: thisMonth,
     data: cohortData
   }, null, 2));
-  
+
   console.log(`\n📁 Snapshot saved: ${snapshotFile}`);
-  
+
   // Send Telegram summary
   if (thisMonthCohort) {
     await sendNotification(
@@ -578,7 +573,7 @@ async function monthlySnapshot() {
       `Course Conv: ${thisMonthCohort.conversionRates.course}%`
     );
   }
-  
+
   console.log('═'.repeat(70) + '\n');
 }
 
@@ -589,11 +584,11 @@ switch (command) {
   case 'sync':
     syncCohorts();
     break;
-    
+
   case 'report':
     generateReport(args[0] || 'month');
     break;
-    
+
   case 'compare':
     if (args.length < 2) {
       console.log('Usage: cohort-analysis.mjs compare <cohort1> <cohort2>');
@@ -602,12 +597,12 @@ switch (command) {
       compareCohorts(args[0], args[1]);
     }
     break;
-    
+
   case 'tiers':
   case 'best-tier':
     findBestTier();
     break;
-    
+
   case 'retention':
     if (!args[0]) {
       console.log('Usage: cohort-analysis.mjs retention <cohort-key>');
@@ -615,12 +610,12 @@ switch (command) {
       calculateRetention(args[0]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'monthly':
   case 'snapshot':
     monthlySnapshot();
     break;
-    
+
   default:
     console.log(`
 Cohort Analysis Module

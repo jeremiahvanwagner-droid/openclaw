@@ -20,6 +20,7 @@ export const saasClientSignup = inngest.createFunction(
   { event: "saas/client.signup" },
   async ({ event, step }) => {
     const { saas_instance_id, client_name, email, phone, plan_tier, niche, correlation_id } = event.data;
+    const corrId = correlation_id || `signup_${Date.now()}`;
 
     // Log event
     await step.run("log-signup", async () => {
@@ -29,52 +30,132 @@ export const saasClientSignup = inngest.createFunction(
         target_agent: "d8_platform_architect",
         payload: event.data,
         priority: "high",
-        correlation_id,
+        correlation_id: corrId,
       });
     });
 
-    // Step 1: Provision sub-account via d8_platform_architect
-    await step.sendEvent("provision-subaccount", {
-      name: "agent/d8_platform_architect/task",
-      data: {
-        type: "provision_new_client",
-        source: "saas_event_handler",
-        correlation_id: correlation_id || `signup_${Date.now()}`,
-        saas_instance_id,
-        client_name,
-        email,
-        phone,
-        plan_tier,
-        niche,
-      },
-    });
+    // ── Saga Step 1: Provision sub-account ──────────────────────
+    // On failure → stop entirely (no resources to clean up yet)
+    let provisionResult: { provisioned: boolean };
+    try {
+      provisionResult = await step.run("provision-subaccount", async () => {
+        await supabase.from("agent_events").insert({
+          event_name: "saga/step",
+          source_agent: "saas_event_handler",
+          target_agent: "d8_platform_architect",
+          payload: { step: "provision", saas_instance_id, plan_tier },
+          priority: "high",
+          correlation_id: corrId,
+        });
+        return { provisioned: true };
+      });
 
-    // Step 2: Create CRM contact
-    await step.sendEvent("create-crm-contact", {
-      name: "agent/d8_crm_ops/task",
-      data: {
-        type: "create_saas_client_contact",
-        source: "saas_event_handler",
-        correlation_id: correlation_id || `signup_${Date.now()}`,
-        saas_instance_id,
-        client_name,
-        email,
-        phone,
-        tags: ["saas_client", `plan_${plan_tier}`, `niche_${niche || "general"}`],
-      },
-    });
+      await step.sendEvent("send-provision-task", {
+        name: "agent/d8_platform_architect/task",
+        data: {
+          type: "provision_new_client",
+          source: "saas_event_handler",
+          correlation_id: corrId,
+          saas_instance_id,
+          client_name,
+          email,
+          phone,
+          plan_tier,
+          niche,
+        },
+      });
+    } catch (err) {
+      // Step 1 failed — nothing to roll back
+      await step.run("log-provision-failure", async () => {
+        await supabase.from("agent_events").insert({
+          event_name: "saga/failure",
+          source_agent: "saas_event_handler",
+          payload: { step: "provision", saas_instance_id, error: String(err) },
+          priority: "critical",
+          correlation_id: corrId,
+        });
+      });
+      return { success: false, failed_step: "provision", saas_instance_id };
+    }
 
-    // Step 3: Notify director
-    await step.sendEvent("notify-director", {
-      name: "agent/d8_saas_director/task",
-      data: {
-        type: "new_client_notification",
-        source: "saas_event_handler",
-        saas_instance_id,
-        client_name,
-        plan_tier,
-      },
-    });
+    // ── Saga Step 2: Create CRM contact ─────────────────────────
+    // On failure → rollback subaccount provisioning
+    try {
+      await step.run("create-crm-contact", async () => {
+        await supabase.from("agent_events").insert({
+          event_name: "saga/step",
+          source_agent: "saas_event_handler",
+          target_agent: "d8_crm_ops",
+          payload: { step: "crm_contact", saas_instance_id },
+          priority: "high",
+          correlation_id: corrId,
+        });
+      });
+
+      await step.sendEvent("send-crm-task", {
+        name: "agent/d8_crm_ops/task",
+        data: {
+          type: "create_saas_client_contact",
+          source: "saas_event_handler",
+          correlation_id: corrId,
+          saas_instance_id,
+          client_name,
+          email,
+          phone,
+          tags: ["saas_client", `plan_${plan_tier}`, `niche_${niche || "general"}`],
+        },
+      });
+    } catch (err) {
+      // Compensate: rollback subaccount
+      await step.sendEvent("rollback-subaccount", {
+        name: "agent/d8_platform_architect/task",
+        data: {
+          type: "rollback_provision",
+          source: "saas_event_handler",
+          correlation_id: corrId,
+          saas_instance_id,
+          reason: `CRM contact creation failed: ${String(err)}`,
+        },
+      });
+
+      await step.run("log-crm-failure", async () => {
+        await supabase.from("agent_events").insert({
+          event_name: "saga/compensation",
+          source_agent: "saas_event_handler",
+          payload: { step: "crm_contact", compensated: "provision", saas_instance_id, error: String(err) },
+          priority: "critical",
+          correlation_id: corrId,
+        });
+      });
+
+      return { success: false, failed_step: "crm_contact", compensated: true, saas_instance_id };
+    }
+
+    // ── Saga Step 3: Notify director (non-critical) ─────────────
+    // On failure → log warning only, don't rollback
+    try {
+      await step.sendEvent("notify-director", {
+        name: "agent/d8_saas_director/task",
+        data: {
+          type: "new_client_notification",
+          source: "saas_event_handler",
+          saas_instance_id,
+          client_name,
+          plan_tier,
+        },
+      });
+    } catch (err) {
+      // Non-critical — log and continue
+      await step.run("log-notify-warning", async () => {
+        await supabase.from("agent_events").insert({
+          event_name: "saga/warning",
+          source_agent: "saas_event_handler",
+          payload: { step: "notify_director", saas_instance_id, error: String(err) },
+          priority: "normal",
+          correlation_id: corrId,
+        });
+      });
+    }
 
     return { success: true, client_name, plan_tier, saas_instance_id };
   }

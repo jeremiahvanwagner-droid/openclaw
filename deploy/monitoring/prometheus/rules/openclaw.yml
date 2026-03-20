@@ -1,0 +1,43 @@
+groups:
+  - name: openclaw_alerts
+    interval: 30s
+    rules:
+      # LLM p99 latency > 10 seconds
+      - alert: LLMLatencyHigh
+        expr: histogram_quantile(0.99, rate(openclaw_llm_request_duration_seconds_bucket[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "LLM p99 latency exceeds 10s"
+          description: "Provider {{ $labels.provider }} model {{ $labels.model }} p99 latency is {{ $value }}s"
+
+      # Circuit breaker OPEN > 5 minutes
+      - alert: CircuitBreakerOpen
+        expr: openclaw_circuit_breaker_state == 2
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Circuit breaker OPEN for {{ $labels.provider }}"
+          description: "Provider {{ $labels.provider }} circuit breaker has been open for >5 minutes"
+
+      # Budget > 90% consumed
+      - alert: BudgetNearCeiling
+        expr: (openclaw_budget_used_dollars / openclaw_budget_ceiling_dollars) > 0.9
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Budget >90% consumed for {{ $labels.provider }}"
+          description: "Provider {{ $labels.provider }} has used {{ $value | humanizePercentage }} of daily budget"
+
+      # Supervisor agent unhealthy > 15 minutes
+      - alert: SupervisorUnhealthy
+        expr: openclaw_agent_health{pod_id=~".*supervisor.*"} < 2
+        for: 15m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Supervisor {{ $labels.agent_id }} is unhealthy"
+          description: "Agent {{ $labels.agent_id }} in {{ $labels.division }} pod {{ $labels.pod_id }} health is {{ $value }} (expected 2=active)"

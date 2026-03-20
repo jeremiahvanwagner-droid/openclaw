@@ -15,6 +15,10 @@ devices/
 
 # ── Runtime Data (server-local, not version-controlled) ──────
 data/
+!data/
+data/**
+!data/business-registry.json
+!data/saas-instances.json
 logs/
 backups/
 browser/

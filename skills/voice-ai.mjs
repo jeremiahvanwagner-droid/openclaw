@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * OpenClaw Voice AI Integration
- * 
+ *
  * Features:
  *   - Twilio/Vapi integration for voice calls
  *   - AI-powered voice conversations
@@ -12,21 +12,17 @@
 
 import fs from 'fs/promises';
 import path from 'path';
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import https from 'https';
-
-const execAsync = promisify(exec);
+import { openclawSend } from '../lib/safe-exec.mjs';
 
 // Configuration
-const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR ||
   path.join(process.env.USERPROFILE || process.env.HOME, '.openclaw', 'data');
 const VOICE_DIR = path.join(DATA_DIR, 'voice');
 const CALLS_FILE = path.join(VOICE_DIR, 'calls.json');
 const CONFIG_FILE = path.join(VOICE_DIR, 'config.json');
 
-const GHL_API_KEY = process.env.GHL_TOKEN || '';
-const GHL_LOCATION_ID = process.env.GHL_LOCATION_ID || 'TW8JsPW5NMnA3tfK2XLn';
+const { token: GHL_API_KEY, locationId: GHL_LOCATION_ID } = (await import('../lib/ghl-tenant-resolver.mjs')).resolve();
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '7737707872';
 
 // Voice service credentials (set via config)
@@ -134,7 +130,7 @@ function ghlRequest(method, urlPath, body = null) {
         'Content-Type': 'application/json'
       }
     };
-    
+
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
@@ -146,13 +142,13 @@ function ghlRequest(method, urlPath, body = null) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(30000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
-    
+
     if (body) {
       req.write(JSON.stringify(body));
     }
@@ -165,8 +161,7 @@ function ghlRequest(method, urlPath, body = null) {
  */
 async function sendNotification(message) {
   try {
-    const escaped = message.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    await execAsync(`openclaw send --agent main --channel telegram --to ${TELEGRAM_CHAT_ID} "${escaped}"`);
+    await openclawSend({ agent: 'main', channel: 'telegram', to: TELEGRAM_CHAT_ID, message });
     return true;
   } catch {
     return false;
@@ -185,7 +180,7 @@ function httpRequest(hostname, urlPath, method, headers, body = null) {
       method,
       headers
     };
-    
+
     const req = https.request(options, (res) => {
       let data = '';
       res.on('data', chunk => { data += chunk; });
@@ -197,13 +192,13 @@ function httpRequest(hostname, urlPath, method, headers, body = null) {
         }
       });
     });
-    
+
     req.on('error', reject);
     req.setTimeout(60000, () => {
       req.destroy();
       reject(new Error('Request timeout'));
     });
-    
+
     if (body) {
       req.write(typeof body === 'string' ? body : JSON.stringify(body));
     }
@@ -216,19 +211,19 @@ function httpRequest(hostname, urlPath, method, headers, body = null) {
  */
 async function scheduleCallTwilio(phoneNumber, templateId, scheduledTime = null) {
   await loadConfig();
-  
+
   if (!TWILIO_SID || !TWILIO_TOKEN || !TWILIO_PHONE) {
     return { error: 'Twilio not configured. Run: voice-ai.mjs configure twilio' };
   }
-  
+
   const template = CALL_TEMPLATES[templateId];
   if (!template) {
     return { error: `Template not found: ${templateId}` };
   }
-  
+
   const callId = `call_${Date.now()}`;
   const calls = await loadCalls();
-  
+
   const callRecord = {
     id: callId,
     phoneNumber,
@@ -239,21 +234,21 @@ async function scheduleCallTwilio(phoneNumber, templateId, scheduledTime = null)
     provider: 'twilio',
     createdAt: new Date().toISOString()
   };
-  
+
   if (scheduledTime && new Date(scheduledTime) > new Date()) {
     // Future call - add to scheduled
     calls.scheduled.push(callRecord);
     await saveCalls(calls);
     return { success: true, callId, status: 'scheduled', scheduledAt: scheduledTime };
   }
-  
+
   // Immediate call
   try {
     const auth = Buffer.from(`${TWILIO_SID}:${TWILIO_TOKEN}`).toString('base64');
-    
+
     // Build TwiML for the call
     const twimlContent = buildTwiML(template);
-    
+
     // For production, you'd host this TwiML at a URL
     // For now, we'll use Twilio's raw TwiML parameter
     const params = new URLSearchParams({
@@ -261,7 +256,7 @@ async function scheduleCallTwilio(phoneNumber, templateId, scheduledTime = null)
       From: TWILIO_PHONE,
       Twiml: twimlContent
     });
-    
+
     const result = await httpRequest(
       'api.twilio.com',
       `/2010-04-01/Accounts/${TWILIO_SID}/Calls.json`,
@@ -272,22 +267,22 @@ async function scheduleCallTwilio(phoneNumber, templateId, scheduledTime = null)
       },
       params.toString()
     );
-    
+
     if (result.status >= 200 && result.status < 300) {
       callRecord.status = 'initiated';
       callRecord.twilioSid = result.data.sid;
       calls.completed.push(callRecord);
       await saveCalls(calls);
-      
+
       await sendNotification(`📞 Call initiated to ${phoneNumber}\nTemplate: ${template.name}`);
-      
+
       return { success: true, callId, status: 'initiated', twilioSid: result.data.sid };
     } else {
       callRecord.status = 'failed';
       callRecord.error = result.data;
       calls.failed.push(callRecord);
       await saveCalls(calls);
-      
+
       return { success: false, error: result.data };
     }
   } catch (error) {
@@ -295,7 +290,7 @@ async function scheduleCallTwilio(phoneNumber, templateId, scheduledTime = null)
     callRecord.error = error.message;
     calls.failed.push(callRecord);
     await saveCalls(calls);
-    
+
     return { success: false, error: error.message };
   }
 }
@@ -305,20 +300,20 @@ async function scheduleCallTwilio(phoneNumber, templateId, scheduledTime = null)
  */
 function buildTwiML(template) {
   let twiml = '<?xml version="1.0" encoding="UTF-8"?><Response>';
-  
+
   // Greeting
   twiml += `<Say voice="alice">${escapeXml(template.greeting)}</Say>`;
   twiml += '<Pause length="2"/>';
-  
+
   // Questions (if any)
   for (const question of template.questions) {
     twiml += `<Say voice="alice">${escapeXml(question)}</Say>`;
     twiml += '<Pause length="3"/>';
   }
-  
+
   // Closing
   twiml += `<Say voice="alice">${escapeXml(template.closing)}</Say>`;
-  
+
   twiml += '</Response>';
   return twiml;
 }
@@ -340,16 +335,16 @@ function escapeXml(str) {
  */
 async function scheduleCallVapi(phoneNumber, templateId, contactId = null) {
   await loadConfig();
-  
+
   if (!VAPI_KEY) {
     return { error: 'Vapi not configured. Run: voice-ai.mjs configure vapi' };
   }
-  
+
   const template = CALL_TEMPLATES[templateId];
   if (!template) {
     return { error: `Template not found: ${templateId}` };
   }
-  
+
   // Get contact info if provided
   let contactInfo = {};
   if (contactId) {
@@ -362,10 +357,10 @@ async function scheduleCallVapi(phoneNumber, templateId, contactId = null) {
       };
     } catch {}
   }
-  
+
   const callId = `vapi_${Date.now()}`;
   const calls = await loadCalls();
-  
+
   try {
     // Build Vapi assistant config
     const assistantConfig = {
@@ -375,7 +370,7 @@ async function scheduleCallVapi(phoneNumber, templateId, contactId = null) {
         messages: [
           {
             role: 'system',
-            content: `You are a friendly assistant calling on behalf of Truth J Blue's team. 
+            content: `You are a friendly assistant calling on behalf of Truth J Blue's team.
 Your goal is to have a natural conversation while gathering information.
 Be warm, empathetic, and professional.
 
@@ -394,14 +389,14 @@ Adapt naturally to the conversation while covering these points.`
         provider: '11labs',
         voiceId: 'rachel'
       },
-      firstMessage: template.greeting.replace("this is an assistant", 
+      firstMessage: template.greeting.replace("this is an assistant",
         `this is ${contactInfo.firstName ? `reaching out to ${contactInfo.firstName}` : 'reaching out'}`),
       transcriber: {
         provider: 'deepgram',
         model: 'nova-2'
       }
     };
-    
+
     const result = await httpRequest(
       'api.vapi.ai',
       '/call/phone',
@@ -415,7 +410,7 @@ Adapt naturally to the conversation while covering these points.`
         assistant: assistantConfig
       }
     );
-    
+
     const callRecord = {
       id: callId,
       phoneNumber,
@@ -427,19 +422,19 @@ Adapt naturally to the conversation while covering these points.`
       vapiId: result.data?.id,
       createdAt: new Date().toISOString()
     };
-    
+
     if (result.status < 300) {
       calls.completed.push(callRecord);
       await saveCalls(calls);
-      
+
       await sendNotification(`🤖 AI Call initiated to ${phoneNumber}\nTemplate: ${template.name}`);
-      
+
       return { success: true, callId, status: 'initiated', vapiId: result.data?.id };
     } else {
       callRecord.error = result.data;
       calls.failed.push(callRecord);
       await saveCalls(calls);
-      
+
       return { success: false, error: result.data };
     }
   } catch (error) {
@@ -454,13 +449,13 @@ async function callContact(contactId, templateId, provider = 'twilio') {
   // Get contact phone
   const contact = await ghlRequest('GET', `/contacts/${contactId}?locationId=${GHL_LOCATION_ID}`);
   const phone = contact.contact?.phone || contact.phone;
-  
+
   if (!phone) {
     return { error: 'Contact has no phone number' };
   }
-  
+
   console.log(`\n📞 Initiating ${provider} call to: ${phone}`);
-  
+
   if (provider === 'vapi') {
     return await scheduleCallVapi(phone, templateId, contactId);
   } else {
@@ -475,19 +470,19 @@ async function processScheduledCalls() {
   const calls = await loadCalls();
   const now = new Date();
   let processed = 0;
-  
+
   const stillScheduled = [];
-  
+
   for (const call of calls.scheduled) {
     const scheduledTime = new Date(call.scheduledAt);
-    
+
     if (scheduledTime <= now) {
       console.log(`\n⏰ Processing scheduled call: ${call.id}`);
-      
+
       const result = call.provider === 'vapi'
         ? await scheduleCallVapi(call.phoneNumber, call.templateId)
         : await scheduleCallTwilio(call.phoneNumber, call.templateId);
-      
+
       if (result.success) {
         call.status = 'initiated';
         calls.completed.push(call);
@@ -501,10 +496,10 @@ async function processScheduledCalls() {
       stillScheduled.push(call);
     }
   }
-  
+
   calls.scheduled = stillScheduled;
   await saveCalls(calls);
-  
+
   console.log(`\n✅ Processed ${processed} scheduled calls`);
   return processed;
 }
@@ -515,14 +510,14 @@ async function processScheduledCalls() {
 async function tagAfterCall(contactId, templateId, outcome = 'completed') {
   const template = CALL_TEMPLATES[templateId];
   if (!template) return;
-  
+
   const tags = [...template.tags];
   if (outcome === 'no-answer') {
     tags.push('voice-no-answer');
   } else if (outcome === 'voicemail') {
     tags.push('voice-voicemail');
   }
-  
+
   try {
     await ghlRequest('PUT', `/contacts/${contactId}`, {
       locationId: GHL_LOCATION_ID,
@@ -537,7 +532,7 @@ async function tagAfterCall(contactId, templateId, outcome = 'completed') {
  */
 async function configureProvider(provider, credentials) {
   const config = await loadConfig();
-  
+
   if (provider === 'twilio') {
     config.twilio = {
       sid: credentials.sid,
@@ -549,10 +544,10 @@ async function configureProvider(provider, credentials) {
       key: credentials.key
     };
   }
-  
+
   config.defaultProvider = provider;
   await saveConfig(config);
-  
+
   console.log(`\n✅ ${provider} configured successfully`);
 }
 
@@ -561,7 +556,7 @@ async function configureProvider(provider, credentials) {
  */
 function listTemplates() {
   console.log('\n📋 CALL TEMPLATES\n');
-  
+
   for (const [id, template] of Object.entries(CALL_TEMPLATES)) {
     console.log(`${id}:`);
     console.log(`  Name: ${template.name}`);
@@ -576,26 +571,26 @@ function listTemplates() {
  */
 async function showHistory() {
   const calls = await loadCalls();
-  
+
   console.log('\n' + '═'.repeat(60));
   console.log('📞 CALL HISTORY');
   console.log('═'.repeat(60) + '\n');
-  
+
   console.log(`Scheduled: ${calls.scheduled.length}`);
   console.log(`Completed: ${calls.completed.length}`);
   console.log(`Failed: ${calls.failed.length}\n`);
-  
+
   console.log('Recent Calls:');
   const recent = [...calls.completed, ...calls.failed]
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .slice(0, 10);
-  
+
   for (const call of recent) {
     const icon = call.status === 'initiated' ? '✅' : '❌';
     console.log(`  ${icon} ${call.phoneNumber} - ${call.templateName} (${call.provider})`);
     console.log(`     ${call.createdAt}`);
   }
-  
+
   if (calls.scheduled.length > 0) {
     console.log('\nUpcoming Scheduled:');
     for (const call of calls.scheduled.slice(0, 5)) {
@@ -616,7 +611,7 @@ switch (command) {
       const phone = args[0];
       const template = args[1];
       const provider = args[2] || 'twilio';
-      
+
       if (provider === 'vapi') {
         scheduleCallVapi(phone, template);
       } else {
@@ -624,7 +619,7 @@ switch (command) {
       }
     }
     break;
-    
+
   case 'call-contact':
     if (args.length < 2) {
       console.log('Usage: voice-ai.mjs call-contact <contactId> <templateId> [provider]');
@@ -632,7 +627,7 @@ switch (command) {
       callContact(args[0], args[1], args[2] || 'twilio').then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'schedule':
     if (args.length < 3) {
       console.log('Usage: voice-ai.mjs schedule <phone> <templateId> <datetime>');
@@ -641,19 +636,19 @@ switch (command) {
       scheduleCallTwilio(args[0], args[1], args[2]).then(r => console.log(JSON.stringify(r, null, 2)));
     }
     break;
-    
+
   case 'process':
     processScheduledCalls();
     break;
-    
+
   case 'templates':
     listTemplates();
     break;
-    
+
   case 'history':
     showHistory();
     break;
-    
+
   case 'configure':
     if (args[0] === 'twilio' && args.length >= 4) {
       configureProvider('twilio', { sid: args[1], token: args[2], phone: args[3] });
@@ -665,7 +660,7 @@ switch (command) {
       console.log('  voice-ai.mjs configure vapi <api-key>');
     }
     break;
-    
+
   case 'tag':
     if (args.length < 2) {
       console.log('Usage: voice-ai.mjs tag <contactId> <templateId> [outcome]');
@@ -673,7 +668,7 @@ switch (command) {
       tagAfterCall(args[0], args[1], args[2] || 'completed');
     }
     break;
-    
+
   default:
     console.log(`
 Voice AI Integration
@@ -703,11 +698,11 @@ Configuration:
 `);
 }
 
-export { 
-  scheduleCallTwilio, 
-  scheduleCallVapi, 
-  callContact, 
+export {
+  scheduleCallTwilio,
+  scheduleCallVapi,
+  callContact,
   processScheduledCalls,
   configureProvider,
-  tagAfterCall 
+  tagAfterCall
 };

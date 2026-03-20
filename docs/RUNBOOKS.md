@@ -58,7 +58,7 @@
 
 | Component | URL/Location | Purpose |
 |-----------|--------------|---------|
-| Supabase DB | `aagqvfwuixpxtdcrdxmv.supabase.co` | Agent state, memory, events |
+| Supabase DB | `your-project.supabase.co` | Agent state, memory, events |
 | Inngest Cloud | `app.inngest.com` | Event orchestration |
 | Dashboard | `localhost:3001` (dev) | Monitoring UI |
 | Telegram Bot | `@OpenClawAlertBot` | Critical alerts |
@@ -67,7 +67,7 @@
 
 ```bash
 # Required
-SUPABASE_URL=https://aagqvfwuixpxtdcrdxmv.supabase.co
+SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_SERVICE_ROLE_KEY=<secret>
 SUPABASE_ANON_KEY=<public>
 INNGEST_EVENT_KEY=<secret>
@@ -90,7 +90,7 @@ OPENAI_API_KEY=<secret>
 
 1. **Check Dashboard Health**
    - Open dashboard: `http://localhost:3001`
-   - Verify all 65 agents show "active" status
+   - Verify all 103 agents show "active" status
    - Check for overnight errors in Events tab
 
 2. **Review Telegram Alerts**
@@ -169,7 +169,7 @@ OPENAI_API_KEY=<secret>
 1. **Verify Infrastructure**
    ```bash
    # Check Supabase connectivity
-   curl -I https://aagqvfwuixpxtdcrdxmv.supabase.co/rest/v1/
+   curl -I https://your-project.supabase.co/rest/v1/
    
    # Check Inngest status
    curl -I https://api.inngest.com/health
@@ -457,11 +457,11 @@ VACUUM FULL agent_events;
 
 1. **Contact Supabase Support**
    - support@supabase.io
-   - Include project ID: `aagqvfwuixpxtdcrdxmv`
+   - Include your Supabase project ID
 
 2. **Restore from Backup**
    - Use most recent point-in-time recovery
-   - Verify agent count: should be 65
+   - Verify agent count: should be 103
 
 3. **Re-register Agents** (if backup unavailable)
    ```bash
@@ -503,7 +503,7 @@ VACUUM FULL agent_events;
 
 | Metric | Warning Threshold | Critical Threshold |
 |--------|-------------------|-------------------|
-| Active Agents | < 60/65 | < 50/65 |
+| Active Agents | < 96/103 | < 88/103 |
 | Event Success Rate | < 99% | < 95% |
 | Avg Latency | > 500ms | > 1000ms |
 | Memory Usage | > 70% | > 90% |

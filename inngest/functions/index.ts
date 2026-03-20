@@ -1,7 +1,7 @@
 /**
  * Inngest Functions Index
  * Open Claw Multi-Agent Network
- * 
+ *
  * Exports all Inngest functions for registration with the serve handler.
  */
 

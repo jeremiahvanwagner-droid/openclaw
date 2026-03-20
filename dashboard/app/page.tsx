@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { supabase } from "./supabase";
 
 interface DivisionStats {
@@ -29,30 +30,66 @@ interface EventStats {
   failed: number;
 }
 
-const DIVISION_NAMES: Record<string, string> = {
-  division_1_core_operations: "D1 • Core Operations",
-  division_2_ecommerce: "D2 • eCommerce",
-  division_3_consulting: "D3 • Consulting",
-  division_4_coaching: "D4 • Coaching",
-  division_5_publishing: "D5 • Publishing",
-  division_6_nonprofit: "D6 • Nonprofit",
-  division_7_shared_services: "D7 • Shared Services",
-};
+interface PortfolioBusinessSummary {
+  business_id: string;
+  pod_id: string;
+  business_name: string;
+  brand_name: string;
+  vertical: string;
+  status: string;
+  scope_family: string;
+  resolved_ghl_scope_type: string;
+  rollout_wave: number;
+  automation_target_rate: number;
+  blueprint_coverage_rate: number;
+  membership_enabled: boolean;
+  community_enabled: boolean;
+  owner_pod: string;
+}
 
-const DIVISION_COLORS: Record<string, string> = {
-  division_1_core_operations: "blue",
-  division_2_ecommerce: "purple",
-  division_3_consulting: "orange",
-  division_4_coaching: "pink",
-  division_5_publishing: "emerald",
-  division_6_nonprofit: "cyan",
-  division_7_shared_services: "yellow",
+interface PortfolioSummary {
+  portfolio_name: string;
+  total_businesses: number;
+  dedicated_scopes: number;
+  shared_scopes: number;
+  internal_scopes: number;
+  businesses_with_memberships: number;
+  businesses_with_communities: number;
+  automation_target_rate: number;
+  blueprint_coverage_rate: number;
+  rollout_wave_counts: Record<string, number>;
+  businesses: PortfolioBusinessSummary[];
+}
+
+const DIVISION_NAMES: Record<string, string> = {
+  division_1_core_operations: "D1 - Core Operations",
+  division_2_ecommerce: "D2 - eCommerce",
+  division_3_consulting: "D3 - Consulting",
+  division_4_coaching: "D4 - Coaching",
+  division_5_publishing: "D5 - Publishing",
+  division_6_nonprofit: "D6 - Nonprofit",
+  division_7_shared_services: "D7 - Shared Services",
+  division_8_saas_operations: "D8 - SaaS Ops",
+  division_9_online_store: "D9 - Online Store",
 };
 
 function getDivKey(orgUnit: string): string {
   if (orgUnit?.includes("shared")) return "shared";
-  const match = orgUnit?.match(/division_(\d)/);
+  const match = orgUnit?.match(/division_(\d+)/);
   return match ? `d${match[1]}` : "unknown";
+}
+
+function getScopeClasses(scopeFamily: string): string {
+  switch (scopeFamily) {
+    case "dedicated":
+      return "border-emerald-500/40 bg-emerald-500/10 text-emerald-200";
+    case "shared":
+      return "border-amber-500/40 bg-amber-500/10 text-amber-100";
+    case "internal":
+      return "border-sky-500/40 bg-sky-500/10 text-sky-100";
+    default:
+      return "border-slate-600 bg-slate-700/40 text-slate-200";
+  }
 }
 
 function MetricCard({
@@ -70,45 +107,49 @@ function MetricCard({
     <div className="card">
       <div className="metric-value">{value}</div>
       <div className="metric-label">{label}</div>
-      {trend && (
+      {trend ? (
         <div
-          className={`text-xs mt-2 ${
-            trendUp ? "text-green-400" : "text-red-400"
+          className={`mt-2 text-xs ${
+            trendUp === undefined
+              ? "text-slate-400"
+              : trendUp
+                ? "text-green-400"
+                : "text-red-400"
           }`}
         >
-          {trendUp ? "↑" : "↓"} {trend}
+          {trendUp === undefined ? "" : trendUp ? "+ " : "- "}
+          {trend}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
 
 function DivisionCard({ stats }: { stats: DivisionStats }) {
   const divisionKey = getDivKey(stats.division);
-  const color = DIVISION_COLORS[stats.division] || "gray";
   const name = DIVISION_NAMES[stats.division] || stats.division;
 
   return (
     <div className={`card division-${divisionKey}`}>
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <h3 className="font-semibold text-white">{name}</h3>
         <span className="text-2xl font-bold text-white">{stats.total}</span>
       </div>
       <div className="flex gap-4 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+          <div className="h-2 w-2 rounded-full bg-green-500" />
           <span className="text-slate-400">{stats.active} active</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+          <div className="h-2 w-2 rounded-full bg-yellow-500" />
           <span className="text-slate-400">{stats.idle} idle</span>
         </div>
-        {stats.error > 0 && (
+        {stats.error > 0 ? (
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+            <div className="h-2 w-2 rounded-full bg-red-500" />
             <span className="text-red-400">{stats.error} error</span>
           </div>
-        )}
+        ) : null}
       </div>
     </div>
   );
@@ -122,22 +163,20 @@ function RecentAgentActivity({ agents }: { agents: AgentSummary[] }) {
         {agents.slice(0, 8).map((agent) => (
           <div
             key={agent.agent_id}
-            className="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-0"
+            className="flex items-center justify-between border-b border-slate-700/50 py-2 last:border-0"
           >
             <div className="flex items-center gap-3">
               <div
-                className={`w-2 h-2 rounded-full ${
+                className={`h-2 w-2 rounded-full ${
                   agent.status === "active"
                     ? "bg-green-500"
                     : agent.status === "idle"
-                    ? "bg-yellow-500"
-                    : "bg-red-500"
+                      ? "bg-yellow-500"
+                      : "bg-red-500"
                 }`}
-              ></div>
+              />
               <div>
-                <div className="text-sm text-white font-medium">
-                  {agent.agent_id}
-                </div>
+                <div className="text-sm font-medium text-white">{agent.agent_id}</div>
                 <div className="text-xs text-slate-500">{agent.role}</div>
               </div>
             </div>
@@ -148,7 +187,7 @@ function RecentAgentActivity({ agents }: { agents: AgentSummary[] }) {
               <div className="text-xs text-slate-500">
                 {agent.metrics?.avg_latency_ms
                   ? `${agent.metrics.avg_latency_ms}ms avg`
-                  : "—"}
+                  : "n/a"}
               </div>
             </div>
           </div>
@@ -158,15 +197,25 @@ function RecentAgentActivity({ agents }: { agents: AgentSummary[] }) {
   );
 }
 
-function SystemHealth({
-  eventStats,
-}: {
-  eventStats: EventStats;
-}) {
+function SystemHealth({ eventStats }: { eventStats: EventStats }) {
   const successRate =
     eventStats.total > 0
       ? (((eventStats.total - eventStats.failed) / eventStats.total) * 100).toFixed(1)
       : "100.0";
+
+  const successClasses =
+    parseFloat(successRate) >= 99
+      ? "text-green-400"
+      : parseFloat(successRate) >= 95
+        ? "text-yellow-400"
+        : "text-red-400";
+
+  const successBarClasses =
+    parseFloat(successRate) >= 99
+      ? "bg-green-500"
+      : parseFloat(successRate) >= 95
+        ? "bg-yellow-500"
+        : "bg-red-500";
 
   return (
     <div className="card">
@@ -174,41 +223,21 @@ function SystemHealth({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <span className="text-slate-400">Event Success Rate</span>
-          <span
-            className={`font-semibold ${
-              parseFloat(successRate) >= 99
-                ? "text-green-400"
-                : parseFloat(successRate) >= 95
-                ? "text-yellow-400"
-                : "text-red-400"
-            }`}
-          >
-            {successRate}%
-          </span>
+          <span className={`font-semibold ${successClasses}`}>{successRate}%</span>
         </div>
-        <div className="w-full bg-slate-700 rounded-full h-2">
+        <div className="h-2 w-full rounded-full bg-slate-700">
           <div
-            className={`h-2 rounded-full ${
-              parseFloat(successRate) >= 99
-                ? "bg-green-500"
-                : parseFloat(successRate) >= 95
-                ? "bg-yellow-500"
-                : "bg-red-500"
-            }`}
+            className={`h-2 rounded-full ${successBarClasses}`}
             style={{ width: `${successRate}%` }}
-          ></div>
+          />
         </div>
         <div className="grid grid-cols-2 gap-4 pt-2">
           <div>
-            <div className="text-2xl font-bold text-white">
-              {eventStats.last_hour}
-            </div>
+            <div className="text-2xl font-bold text-white">{eventStats.last_hour}</div>
             <div className="text-xs text-slate-500">Events/hr</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-white">
-              {eventStats.failed}
-            </div>
+            <div className="text-2xl font-bold text-white">{eventStats.failed}</div>
             <div className="text-xs text-slate-500">Failed (24h)</div>
           </div>
         </div>
@@ -217,8 +246,65 @@ function SystemHealth({
   );
 }
 
+function PortfolioScopeCard({ business }: { business: PortfolioBusinessSummary }) {
+  return (
+    <div className="card">
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h3 className="font-semibold text-white">{business.business_name}</h3>
+          <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+            {business.pod_id} - Wave {business.rollout_wave}
+          </div>
+        </div>
+        <span
+          className={`rounded-full border px-3 py-1 text-xs font-medium ${getScopeClasses(
+            business.scope_family,
+          )}`}
+        >
+          {business.scope_family}
+        </span>
+      </div>
+      <div className="space-y-2 text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">GHL scope</span>
+          <span className="text-slate-200">{business.resolved_ghl_scope_type}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Vertical</span>
+          <span className="text-slate-200">{business.vertical}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Automation target</span>
+          <span className="text-slate-200">
+            {(business.automation_target_rate * 100).toFixed(0)}%
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Blueprint coverage</span>
+          <span className="text-slate-200">
+            {(business.blueprint_coverage_rate * 100).toFixed(0)}%
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Membership</span>
+          <span className="text-slate-200">
+            {business.membership_enabled ? "Enabled" : "Off"}
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-slate-400">Community</span>
+          <span className="text-slate-200">
+            {business.community_enabled ? "Enabled" : "Off"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [totalAgents, setTotalAgents] = useState(0);
   const [activeAgents, setActiveAgents] = useState(0);
   const [divisionStats, setDivisionStats] = useState<DivisionStats[]>([]);
@@ -228,59 +314,78 @@ export default function Dashboard() {
     last_hour: 0,
     failed: 0,
   });
+  const [portfolioSummary, setPortfolioSummary] = useState<PortfolioSummary | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       try {
+        const portfolioResponse = await fetch("/api/portfolio", { cache: "no-store" });
+        if (portfolioResponse.ok) {
+          const portfolio = (await portfolioResponse.json()) as PortfolioSummary;
+          setPortfolioSummary(portfolio);
+        }
+
         if (!supabase) {
-          setLoading(false);
+          setErrorMessage(
+            "Dashboard is missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+          );
           return;
         }
 
-        // Fetch all agents
         const { data: agents, error: agentsError } = await supabase
           .from("agents")
           .select("*");
 
         if (agentsError) throw agentsError;
+        setErrorMessage(null);
 
         if (agents) {
           setTotalAgents(agents.length);
-          setActiveAgents(agents.filter((a) => a.status === "active").length);
+          setActiveAgents(agents.filter((agent) => agent.status === "active").length);
 
-          // Calculate division stats (use org_unit column)
-          const divStats: Record<string, DivisionStats> = {};
+          const nextDivisionStats: Record<string, DivisionStats> = {};
           agents.forEach((agent) => {
-            const div = agent.org_unit || "unknown";
-            if (!divStats[div]) {
-              divStats[div] = { division: div, total: 0, active: 0, idle: 0, error: 0 };
+            const division = agent.org_unit || "unknown";
+            if (!nextDivisionStats[division]) {
+              nextDivisionStats[division] = {
+                division,
+                total: 0,
+                active: 0,
+                idle: 0,
+                error: 0,
+              };
             }
-            divStats[div].total++;
-            if (agent.status === "active") divStats[div].active++;
-            else if (agent.status === "idle") divStats[div].idle++;
-            else if (agent.status === "error") divStats[div].error++;
-          });
-          setDivisionStats(Object.values(divStats).sort((a, b) => a.division.localeCompare(b.division)));
 
-          // Recent agents with activity (use last_heartbeat_at column)
+            nextDivisionStats[division].total += 1;
+            if (agent.status === "active") nextDivisionStats[division].active += 1;
+            else if (agent.status === "idle") nextDivisionStats[division].idle += 1;
+            else if (agent.status === "error") nextDivisionStats[division].error += 1;
+          });
+
+          setDivisionStats(
+            Object.values(nextDivisionStats).sort((left, right) =>
+              left.division.localeCompare(right.division),
+            ),
+          );
+
           const agentSummaries: AgentSummary[] = agents
-            .map((a) => ({
-              agent_id: a.agent_id,
-              division: a.org_unit,
-              role: a.display_name || a.config?.role || "Agent",
-              status: a.status,
-              last_heartbeat: a.last_heartbeat_at,
-              metrics: a.config?.metrics || {},
+            .map((agent) => ({
+              agent_id: agent.agent_id,
+              division: agent.org_unit,
+              role: agent.display_name || agent.config?.role || "Agent",
+              status: agent.status,
+              last_heartbeat: agent.last_heartbeat_at,
+              metrics: agent.config?.metrics || {},
             }))
             .sort(
-              (a, b) =>
-                new Date(b.last_heartbeat || 0).getTime() -
-                new Date(a.last_heartbeat || 0).getTime()
+              (left, right) =>
+                new Date(right.last_heartbeat || 0).getTime() -
+                new Date(left.last_heartbeat || 0).getTime(),
             );
+
           setRecentAgents(agentSummaries);
         }
 
-        // Fetch event stats
         const { count: totalEvents } = await supabase
           .from("agent_events")
           .select("*", { count: "exact", head: true });
@@ -295,7 +400,7 @@ export default function Dashboard() {
         const { count: failedEvents } = await supabase
           .from("agent_events")
           .select("*", { count: "exact", head: true })
-          .eq("status", "failed")
+          .not("error_message", "is", null)
           .gte("created_at", oneDayAgo);
 
         setEventStats({
@@ -303,23 +408,24 @@ export default function Dashboard() {
           last_hour: recentEvents || 0,
           failed: failedEvents || 0,
         });
-      } catch (err) {
-        console.error("Error fetching dashboard data:", err);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+        const message =
+          error instanceof Error ? error.message : "Unknown dashboard data error";
+        setErrorMessage(`Failed to load dashboard data: ${message}`);
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-
-    // Refresh every 30 seconds
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-slate-400">Loading dashboard...</div>
       </div>
     );
@@ -327,26 +433,43 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {errorMessage ? (
+        <div className="card border border-red-500/40 bg-red-500/10 text-red-100">
+          <p className="text-sm">{errorMessage}</p>
+        </div>
+      ) : null}
       <div>
-        <h1 className="text-3xl font-bold text-white">Agent Network Overview</h1>
-        <p className="text-slate-400 mt-1">
-          Truth J Blue LLC • 7 Divisions • {totalAgents} Agents
+        <h1 className="text-3xl font-bold text-white">Portfolio Operations Overview</h1>
+        <p className="mt-1 text-slate-400">
+          Truth J Blue LLC - {portfolioSummary?.total_businesses ?? 0} business scopes -{" "}
+          {totalAgents} registered agents
         </p>
       </div>
 
-      {/* Top metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3 xl:grid-cols-6">
         <MetricCard value={totalAgents} label="Total Agents" />
         <MetricCard
           value={activeAgents}
           label="Active Agents"
-          trend={totalAgents > 0 ? `${((activeAgents / totalAgents) * 100).toFixed(0)}% healthy` : "—"}
+          trend={
+            totalAgents > 0
+              ? `${((activeAgents / totalAgents) * 100).toFixed(0)}% healthy`
+              : "n/a"
+          }
           trendUp={totalAgents > 0 && activeAgents / totalAgents >= 0.9}
         />
         <MetricCard
-          value={eventStats.total.toLocaleString()}
-          label="Total Events"
+          value={portfolioSummary?.total_businesses ?? 0}
+          label="Business Scopes"
+        />
+        <MetricCard
+          value={portfolioSummary?.dedicated_scopes ?? 0}
+          label="Dedicated GHL Scopes"
+        />
+        <MetricCard
+          value={`${((portfolioSummary?.automation_target_rate ?? 0) * 100).toFixed(0)}%`}
+          label="Automation Target"
+          trend="Portfolio target"
         />
         <MetricCard
           value={eventStats.last_hour}
@@ -355,18 +478,43 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* Division grid */}
+      {portfolioSummary ? (
+        <div className="space-y-4">
+          <div className="flex items-end justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-semibold text-white">Business Scope Map</h2>
+              <p className="mt-1 text-sm text-slate-400">
+                Mixed GHL tenancy with dedicated, shared incubator, and internal portfolio
+                control scopes.
+              </p>
+            </div>
+            <div className="text-right text-sm text-slate-400">
+              <div>
+                Membership-enabled: {portfolioSummary.businesses_with_memberships}
+              </div>
+              <div>
+                Community-enabled: {portfolioSummary.businesses_with_communities}
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {portfolioSummary.businesses.map((business) => (
+              <PortfolioScopeCard key={business.business_id} business={business} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <div>
-        <h2 className="text-xl font-semibold text-white mb-4">Division Status</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <h2 className="mb-4 text-xl font-semibold text-white">Division Status</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {divisionStats.map((stats) => (
             <DivisionCard key={stats.division} stats={stats} />
           ))}
         </div>
       </div>
 
-      {/* Bottom row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <RecentAgentActivity agents={recentAgents} />
         <SystemHealth eventStats={eventStats} />
       </div>

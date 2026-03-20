@@ -130,6 +130,20 @@ graph TB
     MO --> D5_PUB
     MO --> D6_ED
     MO --> D8_DIR
+    MO --> D9_DIR
+
+    subgraph "Division 9 — Online Store (Books & Merch)"
+        D9_DIR[d9_store_director<br/>Online Store Director]
+        D9_OS[d9_offer_strategist<br/>Offer & Pricing Psychologist]
+        D9_WD[d9_web_designer<br/>WordPress/Divi UX Designer]
+        D9_WPD[d9_wp_developer<br/>WordPress/WooCommerce Developer]
+        D9_SC[d9_sales_copywriter<br/>Sales Copywriter & Persuasion]
+        D9_MER[d9_merchandiser<br/>Book & Merch Catalog Manager]
+        D9_SP[d9_social_promoter<br/>Social Media & Promotions]
+        D9_CX[d9_customer_experience<br/>Store Customer Experience]
+        D9_AN[d9_analytics<br/>Store Analytics & Conversion]
+        D9_SEO[d9_seo_content<br/>Store SEO & Content]
+    end
 
     subgraph "Division 8 — SaaS Operations"
         D8_DIR[d8_saas_director<br/>SaaS Operations Director]
@@ -242,6 +256,29 @@ graph TB
     D8_CO --> D5_PUB
     D8_CA --> SH_LC
 
+    %% Division 9 hierarchy
+    D9_DIR --> D9_OS
+    D9_DIR --> D9_WD
+    D9_DIR --> D9_MER
+    D9_DIR --> D9_CX
+    D9_DIR --> D9_AN
+    D9_OS --> D9_SC
+    D9_OS --> D9_SP
+    D9_WD --> D9_WPD
+    D9_WD --> D9_SEO
+
+    %% Division 9 cross-division wiring
+    D9_DIR --> D1_CEO
+    D9_DIR --> D2_DIR
+    D9_DIR --> D5_PUB
+    D9_OS --> D4_CVO
+    D9_OS --> D5_BM
+    D9_MER --> D5_DD
+    D9_SP --> D4_SOC
+    D9_SP --> D2_DMM
+    D9_SEO --> D2_SEO
+    D9_WPD --> D1_FSD
+
     style MO fill:#ff6b6b,stroke:#333,stroke-width:3px
     style D1_CEO fill:#4ecdc4,stroke:#333,stroke-width:2px
     style D2_DIR fill:#45b7d1,stroke:#333,stroke-width:2px
@@ -250,6 +287,7 @@ graph TB
     style D5_PUB fill:#dda0dd,stroke:#333,stroke-width:2px
     style D6_ED fill:#98d8c8,stroke:#333,stroke-width:2px
     style D8_DIR fill:#ff9f43,stroke:#333,stroke-width:2px
+    style D9_DIR fill:#e056fd,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -470,6 +508,17 @@ d8_membership_director → d8_revenue_ops → d8_saas_director
 d8_compliance_auditor → shared_legal_compliance
 ```
 
+### Division 9 — Online Store (Books & Merch)
+```
+d9_customer_experience → d9_store_director → d1_ceo
+d9_seo_content → d9_web_designer → d9_store_director
+d9_wp_developer → d9_web_designer → d9_store_director
+d9_sales_copywriter → d9_offer_strategist → d9_store_director
+d9_social_promoter → d9_offer_strategist → d9_store_director
+d9_merchandiser → d9_store_director → d1_ceo
+d9_analytics → d9_store_director → d1_ceo
+```
+
 ---
 
 ## Agent Connectivity Matrix
@@ -486,6 +535,7 @@ d8_compliance_auditor → shared_legal_compliance
 | `d4_cvo` | 5 | 4 | 9 | ⭐⭐⭐ |
 | `d2_director` | 5 | 3 | 8 | ⭐⭐⭐ |
 | `d8_saas_director` | 12 | 5 | 17 | ⭐⭐⭐⭐⭐ |
+| `d9_store_director` | 6 | 5 | 11 | ⭐⭐⭐⭐ |
 
 ---
 

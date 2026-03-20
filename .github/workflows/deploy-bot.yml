@@ -14,14 +14,60 @@ on:
         description: 'Also upgrade openclaw CLI on server'
         type: boolean
         default: false
+      clean_server_checkout:
+        description: 'Clean /opt/openclaw when working tree is dirty (workflow_dispatch only)'
+        type: boolean
+        default: false
 
 jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint:source
+      - run: pnpm typecheck
+      - run: pnpm test
+
   deploy:
     name: Deploy to Hetzner
+    needs: test
     runs-on: ubuntu-latest
     environment: production
 
     steps:
+      - name: Preflight server checkout state
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -eu
+            CLEAN_SERVER_CHECKOUT="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.clean_server_checkout || 'false' }}"
+            cd /opt/openclaw
+            status="$(git status --porcelain)"
+            if [ -n "${status}" ]; then
+              echo "Remote checkout has local changes:"
+              git status --short
+              if [ "${CLEAN_SERVER_CHECKOUT}" = "true" ]; then
+                echo "Cleaning remote checkout because clean_server_checkout=true"
+                git reset --hard HEAD
+                git clean -fd
+              else
+                echo "::error::Remote checkout is dirty. Re-run workflow_dispatch with clean_server_checkout=true or clean /opt/openclaw manually."
+                exit 1
+              fi
+            fi
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
@@ -30,6 +76,8 @@ jobs:
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
             cd /opt/openclaw
+            # Ensure pnpm is available on the VPS
+            command -v pnpm >/dev/null 2>&1 || npm install -g pnpm
             if [ "${{ github.event.inputs.upgrade_cli }}" = "true" ]; then
               sudo bash deploy/hetzner/deploy.sh --upgrade
             else
