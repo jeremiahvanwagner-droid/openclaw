@@ -23,6 +23,26 @@ jobs:
         with:
           node-version: 22
 
+      - name: Validate required deploy secrets
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for secret in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
+            if [ -z "${!secret}" ]; then
+              missing+=("${secret}")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing required GitHub environment secrets: ${missing[*]}"
+            exit 1
+          fi
+
       - name: Install Vercel CLI
         run: npm install -g vercel
 
