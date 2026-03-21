@@ -32,6 +32,8 @@ jobs:
           cache: "pnpm"
       - name: Enable Corepack
         run: corepack enable
+      - name: Install pnpm (Corepack)
+        run: corepack prepare pnpm@10.32.1 --activate
       - name: Install dependencies
         run: corepack pnpm install --frozen-lockfile
       - name: Lint baseline gate

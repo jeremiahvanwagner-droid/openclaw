@@ -33,6 +33,8 @@ jobs:
 
       - name: Enable Corepack
         run: corepack enable
+      - name: Install pnpm (Corepack)
+        run: corepack prepare pnpm@10.32.1 --activate
 
       - name: Install Dependencies
         run: corepack pnpm install --frozen-lockfile
@@ -86,6 +88,8 @@ jobs:
 
       - name: Enable Corepack
         run: corepack enable
+      - name: Install pnpm (Corepack)
+        run: corepack prepare pnpm@10.32.1 --activate
 
       - name: Deploy to Vercel
         working-directory: dashboard
