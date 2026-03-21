@@ -17,7 +17,7 @@ const CARDS_DIR = path.join(TRAINING_DIR, "cards");
 
 // Initialize Supabase client (would use env vars in production)
 const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_SERVICE_KEY || "";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 
 interface DashboardData {
   timestamp: string;

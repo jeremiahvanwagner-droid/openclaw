@@ -40,11 +40,11 @@ function parseArgs(argv) {
 
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://aagqvfwuixpxtdcrdxmv.supabase.co";
 const SUPABASE_SERVICE_KEY =
-  process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 if (!SUPABASE_SERVICE_KEY) {
-  console.error("SUPABASE_SERVICE_KEY or SUPABASE_SERVICE_ROLE_KEY is required");
+  console.error("SUPABASE_SERVICE_ROLE_KEY is required");
   process.exit(1);
 }
 

@@ -20,7 +20,7 @@ const log = logger.child({ module: "agent-orchestrator" });
 // Initialize Supabase client
 const supabase = createClient(
   process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_KEY!
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 // ═══════════════════════════════════════════════════════════════════
@@ -531,7 +531,7 @@ export const telegramAlert = inngest.createFunction(
     const { channel, message, priority = "normal", agent_id } = event.data;
 
     const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    const TELEGRAM_CHAT_ID = process.env.TELEGRAM_ALERT_CHAT_ID;
 
     if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
       log.error("Telegram credentials not configured");

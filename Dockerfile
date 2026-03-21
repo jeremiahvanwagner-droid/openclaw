@@ -62,8 +62,6 @@ COPY handlers/ handlers/
 COPY skills/ skills/
 COPY agents/ agents/
 COPY config/ config/
-COPY workspaces/ workspaces/
-
 # Create runtime data directories and workspace dirs
 RUN mkdir -p data logs backups cron/runs delivery-queue media memory \
     workspace workspace-marketing workspace-sales workspace-support \
