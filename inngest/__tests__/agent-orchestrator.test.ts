@@ -84,7 +84,7 @@ vi.mock("../../lib/api-rate-governor", () => ({
 process.env.SUPABASE_URL = "https://test.supabase.co";
 process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-key";
 process.env.TELEGRAM_BOT_TOKEN = "test-bot-token";
-process.env.TELEGRAM_CHAT_ID = "123456";
+process.env.TELEGRAM_ALERT_CHAT_ID = "123456";
 
 // ─── Mock Inngest Step Utilities ─────────────────────────────────
 
