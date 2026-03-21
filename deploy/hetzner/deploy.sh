@@ -19,7 +19,7 @@ echo " OpenClaw Deploy — $(date '+%Y-%m-%d %H:%M:%S')"
 echo "══════════════════════════════════════════════════════"
 
 # ── 1. Pull latest code ──────────────────────────────────────
-echo "[1/6] Pulling latest code..."
+echo "[1/7] Pulling latest code..."
 CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
 if [[ "$CURRENT_BRANCH" != "main" ]]; then
     echo "  Refusing deploy from branch '$CURRENT_BRANCH'. Expected 'main'."
@@ -38,15 +38,15 @@ echo "  $(git log --oneline -1)"
 
 # ── 2. Optional: upgrade OpenClaw CLI ────────────────────────
 if [[ "${1:-}" == "--upgrade" ]]; then
-    echo "[2/6] Upgrading OpenClaw CLI..."
+    echo "[2/7] Upgrading OpenClaw CLI..."
     npm install -g openclaw@latest
     echo "  OpenClaw $(openclaw --version 2>/dev/null || echo 'updated')"
 else
-    echo "[2/6] Skipping CLI upgrade (use --upgrade to update)"
+    echo "[2/7] Skipping CLI upgrade (use --upgrade to update)"
 fi
 
 # ── 3. Install dependencies ──────────────────────────────────
-echo "[3/6] Installing dependencies..."
+echo "[3/7] Installing dependencies..."
 if command -v pnpm &>/dev/null; then
     pnpm install --frozen-lockfile --prod 2>/dev/null || pnpm install --prod
 elif command -v npm &>/dev/null; then
@@ -57,7 +57,7 @@ else
 fi
 
 # ── 4. Sync config files ────────────────────────────────────
-echo "[4/6] Syncing configuration..."
+echo "[4/7] Syncing configuration..."
 
 # Install production openclaw.json (Linux paths, env-based secrets)
 if [ -f config/openclaw.prod.json ]; then
@@ -80,25 +80,40 @@ cp deploy/hetzner/Caddyfile /etc/caddy/Caddyfile
 systemctl daemon-reload
 
 # ── 5. Build & deploy dashboard ──────────────────────────────
-echo "[5/8] Building dashboard..."
+echo "[5/7] Building dashboard..."
 if [ -f dashboard/package.json ]; then
-    cd dashboard
-    if command -v pnpm &>/dev/null; then
-        pnpm install --frozen-lockfile 2>/dev/null || pnpm install
-    else
-        npm install
+    # Load Supabase secrets from secrets file (never hardcode in scripts)
+    SECRETS_FILE="/etc/openclaw/secrets"
+    if [ -f "$SECRETS_FILE" ]; then
+        set -a
+        # shellcheck source=/dev/null
+        . "$SECRETS_FILE"
+        set +a
     fi
-    NEXT_PUBLIC_SUPABASE_URL="https://aagqvfwuixpxtdcrdxmv.supabase.co" \
-    NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhZ3F2Znd1aXhweHRkY3JkeG12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDc1NDQsImV4cCI6MjA4ODkyMzU0NH0.9FvkyIqKYnaUcJQt0sXammf35O1NSpC2Rwx3c6KouvQ" \
-    npx next build
-    cd "$OPENCLAW_HOME"
-    echo "  Dashboard built successfully"
+
+    if [ -z "${NEXT_PUBLIC_SUPABASE_URL:-}" ] || [ -z "${NEXT_PUBLIC_SUPABASE_ANON_KEY:-}" ]; then
+        echo "  [WARN] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY not set."
+        echo "  Set them in $SECRETS_FILE or as environment variables."
+        echo "  Skipping dashboard build."
+    else
+        cd dashboard
+        if command -v pnpm &>/dev/null; then
+            pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+        else
+            npm install
+        fi
+        NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
+        NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+        npx next build
+        cd "$OPENCLAW_HOME"
+        echo "  Dashboard built successfully"
+    fi
 else
     echo "  Skipping dashboard build (no package.json)"
 fi
 
 # ── 6. Restart services ─────────────────────────────────────
-echo "[6/8] Restarting services..."
+echo "[6/7] Restarting services..."
 systemctl restart openclaw
 systemctl restart openclaw-webhook
 systemctl restart openclaw-dashboard
@@ -106,7 +121,7 @@ systemctl enable openclaw-dashboard
 systemctl reload caddy
 
 # ── 7. Health check ──────────────────────────────────────────
-echo "[7/8] Running health check..."
+echo "[7/7] Running health check..."
 sleep 15
 
 GATEWAY_OK=false

@@ -50,9 +50,29 @@ jobs:
     name: Deploy to Hetzner
     needs: test
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment: production
 
     steps:
+      - name: Validate SSH secrets
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          HETZNER_USER: ${{ secrets.HETZNER_USER }}
+          HETZNER_SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for secret in HETZNER_HOST HETZNER_USER HETZNER_SSH_KEY; do
+            if [ -z "${!secret:-}" ]; then
+              missing+=("${secret}")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing required GitHub environment secrets: ${missing[*]}"
+            echo "::error::Configure these in Settings → Environments → production → Environment secrets"
+            exit 1
+          fi
+
       - name: Preflight server checkout state
         uses: appleboy/ssh-action@v1
         with:
@@ -61,6 +81,7 @@ jobs:
           key: ${{ secrets.HETZNER_SSH_KEY }}
           script: |
             set -eu
+            git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
             CLEAN_SERVER_CHECKOUT="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.clean_server_checkout || 'false' }}"
             cd /opt/openclaw
             status="$(git status --porcelain)"
@@ -83,6 +104,7 @@ jobs:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 20m
           script: |
             cd /opt/openclaw
             # Ensure pnpm is available on the VPS
@@ -99,10 +121,21 @@ jobs:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 3m
           script: |
-            sleep 5
-            curl -sf http://localhost:18789/health || (echo "Gateway health check failed" && exit 1)
-            curl -sf http://localhost:8788/health || (echo "Webhook health check failed" && exit 1)
+            sleep 10
+            for i in 1 2 3 4 5; do
+              curl -sf http://localhost:18789/health && break
+              echo "Gateway not ready, retrying ($i/5)..."
+              sleep 5
+            done
+            curl -sf http://localhost:18789/health || { echo "::error::Gateway health check failed"; exit 1; }
+            for i in 1 2 3; do
+              curl -sf http://localhost:8788/health && break
+              echo "Webhook not ready, retrying ($i/3)..."
+              sleep 3
+            done
+            curl -sf http://localhost:8788/health || { echo "::error::Webhook health check failed"; exit 1; }
             echo "All services healthy"
 
       - name: Notify Telegram
