@@ -47,6 +47,7 @@ WORKDIR /opt/openclaw
 
 # Install project dependencies (root only — dashboard deploys separately)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY dashboard/package.json dashboard/package.json
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy application files (order: least → most frequently changed)

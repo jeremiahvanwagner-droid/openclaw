@@ -11,7 +11,7 @@ WorkingDirectory=/opt/openclaw/dashboard
 
 # Supabase environment — loaded from secrets file (never hardcode keys)
 Environment=NODE_ENV=production
-EnvironmentFile=-/etc/openclaw/secrets
+EnvironmentFile=/etc/openclaw/secrets
 Environment=DASHBOARD_ADMIN_EMAILS=jeremiahvanwagner@icloud.com
 
 ExecStart=/usr/bin/node /opt/openclaw/dashboard/node_modules/.bin/next start -p 3001

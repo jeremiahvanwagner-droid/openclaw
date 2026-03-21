@@ -56,6 +56,7 @@ else
     echo "  No supported package manager found (expected pnpm or npm)."
     exit 1
 fi
+chown -R openclaw:openclaw "$OPENCLAW_HOME"
 
 # ── 4. Sync config files ────────────────────────────────────
 echo "[4/7] Syncing configuration..."
@@ -97,17 +98,19 @@ if [ -f dashboard/package.json ]; then
         echo "  Set them in $SECRETS_FILE or as environment variables."
         echo "  Skipping dashboard build."
     else
-        cd dashboard
-        if command -v pnpm &>/dev/null; then
-            pnpm install --frozen-lockfile 2>/dev/null || pnpm install
-        else
-            npm install
-        fi
-        NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
-        NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
-        npx next build
-        cd "$OPENCLAW_HOME"
-        echo "  Dashboard built successfully"
+        # Run in subshell so failure doesn't block bot/webhook restart
+        (
+            cd dashboard
+            if command -v pnpm &>/dev/null; then
+                pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+            else
+                npm install
+            fi
+            NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
+            NEXT_PUBLIC_SUPABASE_ANON_KEY="$NEXT_PUBLIC_SUPABASE_ANON_KEY" \
+            npx next build
+            echo "  Dashboard built successfully"
+        ) || echo "  [WARN] Dashboard build failed (non-blocking)"
     fi
 else
     echo "  Skipping dashboard build (no package.json)"

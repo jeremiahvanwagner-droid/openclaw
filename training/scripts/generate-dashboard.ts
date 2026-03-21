@@ -10,7 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { createClient } from "@supabase/supabase-js";
 
-const WORKSPACE_ROOT = "C:\\Users\\JeremiahVanWagner\\.openclaw";
+const WORKSPACE_ROOT = process.env.OPENCLAW_HOME || "/opt/openclaw";
 const TRAINING_DIR = path.join(WORKSPACE_ROOT, "training");
 const REPORTS_DIR = path.join(TRAINING_DIR, "reports");
 const CARDS_DIR = path.join(TRAINING_DIR, "cards");

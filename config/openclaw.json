@@ -23,183 +23,75 @@
     "providers": {
       "ghl_token_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_PRIVATE_INTEGRATION_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["GHL_PRIVATE_INTEGRATION_TOKEN"],
+        "timeoutMs": 3000
       },
       "ghl_location_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_LOCATION_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["GHL_LOCATION_ID"],
+        "timeoutMs": 3000
       },
       "telegram_token_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_TELEGRAM_BOT_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["OPENCLAW_TELEGRAM_BOT_TOKEN"],
+        "timeoutMs": 3000
       },
       "user_env_exec": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN"],
+        "timeoutMs": 3000
       },
       "supabase_url_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_URL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["SUPABASE_URL"],
+        "timeoutMs": 3000
       },
       "supabase_service_role_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_SERVICE_ROLE_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["SUPABASE_SERVICE_ROLE_KEY"],
+        "timeoutMs": 3000
       },
       "canva_client_id_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["CANVA_CLIENT_ID"],
+        "timeoutMs": 3000
       },
       "canva_client_secret_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_SECRET','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["CANVA_CLIENT_SECRET"],
+        "timeoutMs": 3000
       },
       "canva_brand_kit_id_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('CANVA_BRAND_KIT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["CANVA_BRAND_KIT_ID"],
+        "timeoutMs": 3000
       },
       "ghl_email_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_EMAIL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["GHL_EMAIL"],
+        "timeoutMs": 3000
       },
       "ghl_password_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('GHL_PASSWORD','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["GHL_PASSWORD"],
+        "timeoutMs": 3000
       },
       "openai_embeddings_key_env": {
         "source": "exec",
-        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
-        "args": [
-          "-NoProfile",
-          "-NonInteractive",
-          "-Command",
-          "$v=[Environment]::GetEnvironmentVariable('OPENAI_API_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
-        ],
-        "timeoutMs": 5000,
-        "noOutputTimeoutMs": 5000,
-        "maxOutputBytes": 65536,
-        "jsonOnly": false,
-        "allowInsecurePath": true
+        "command": "/usr/bin/printenv",
+        "args": ["OPENAI_API_KEY"],
+        "timeoutMs": 3000
       }
     }
   },

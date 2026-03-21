@@ -102,6 +102,15 @@ jobs:
               fi
             fi
 
+      - name: Validate sudo access
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            sudo -n true 2>/dev/null || { echo "::error::User $USER does not have passwordless sudo. deploy.sh requires sudo."; exit 1; }
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
