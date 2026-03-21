@@ -26,8 +26,8 @@ if [[ "$CURRENT_BRANCH" != "main" ]]; then
     exit 1
 fi
 
-if [[ -n "$(git status --porcelain)" ]]; then
-    echo "  Refusing deploy: working tree has local changes."
+if [[ -n "$(git status --porcelain --untracked-files=no)" ]]; then
+    echo "  Refusing deploy: working tree has tracked file changes."
     echo "  Commit, stash, or clean the server checkout before running deploy."
     exit 1
 fi

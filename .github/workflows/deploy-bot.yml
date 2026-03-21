@@ -84,7 +84,8 @@ jobs:
             git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
             CLEAN_SERVER_CHECKOUT="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.clean_server_checkout || 'false' }}"
             cd /opt/openclaw
-            status="$(git status --porcelain)"
+            # Only check tracked files — untracked dirs like .openclaw/ are created by deploy itself
+            status="$(git status --porcelain --untracked-files=no)"
             if [ -n "${status}" ]; then
               echo "Remote checkout has local changes:"
               git status --short
