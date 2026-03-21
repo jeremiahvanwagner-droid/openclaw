@@ -1,0 +1,8 @@
+[Unit]
+Description=OpenClaw Alert for %i
+
+[Service]
+Type=oneshot
+ExecStart=/opt/openclaw/scripts/send-alert.sh %i
+Environment=ALERT_SERVICE=%i
+EnvironmentFile=/etc/openclaw/.env

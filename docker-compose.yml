@@ -18,6 +18,8 @@ services:
       - ./backups:/opt/openclaw/backups
       - ./media:/opt/openclaw/media
       - ./memory:/opt/openclaw/memory
+    # Sandbox browser support
+    shm_size: "512m"
     restart: unless-stopped
 
   webhook:

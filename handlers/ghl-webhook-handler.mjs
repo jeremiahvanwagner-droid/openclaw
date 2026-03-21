@@ -83,7 +83,7 @@ async function loadPhase3Modules() {
 }
 
 const PORT = process.env.OPENCLAW_GHL_WEBHOOK_PORT || 8788;
-const HOST = process.env.OPENCLAW_GHL_WEBHOOK_HOST || '127.0.0.1';
+const HOST = process.env.OPENCLAW_GHL_WEBHOOK_HOST || '0.0.0.0';
 const WEBHOOK_SECRET = process.env.OPENCLAW_GHL_WEBHOOK_SECRET || '';
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '';
 const TEAMS_CHANNEL_ID = process.env.OPENCLAW_ALERT_TEAMS_CHANNEL_ID || '';
@@ -640,7 +640,10 @@ server.listen(PORT, HOST, async () => {
   }
 });
 
-process.on('SIGINT', () => {
+function gracefulShutdown() {
   log.info('Shutting down webhook handler');
   server.close(() => process.exit(0));
-});
+}
+
+process.on('SIGINT', gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);

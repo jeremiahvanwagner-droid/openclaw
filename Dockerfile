@@ -4,13 +4,34 @@
 # ═══════════════════════════════════════════════════════════════
 FROM node:22-slim AS base
 
-# System dependencies
+# System dependencies + Chromium for sandbox browser automation
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     ca-certificates \
     python3 \
+    chromium \
+    fonts-liberation \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxrandr2 \
+    libgbm1 \
+    libasound2 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libcups2 \
+    libxss1 \
+    libgtk-3-0 \
+    xdg-utils \
     && rm -rf /var/lib/apt/lists/*
 
+# Set Chromium path for Puppeteer/Playwright sandbox
+ENV CHROME_BIN=/usr/bin/chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium
+
+# Install OpenClaw CLI globally (pin version for reproducibility)
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@10.32.1 --activate
 
@@ -26,6 +47,7 @@ WORKDIR /opt/openclaw
 
 # Install project dependencies (root only — dashboard deploys separately)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY dashboard/package.json dashboard/package.json
 RUN pnpm install --frozen-lockfile --prod
 
 # Copy application files (order: least → most frequently changed)
@@ -41,8 +63,6 @@ COPY handlers/ handlers/
 COPY skills/ skills/
 COPY agents/ agents/
 COPY config/ config/
-COPY workspaces/ workspaces/
-
 # Create runtime data directories and workspace dirs
 RUN mkdir -p data logs backups cron/runs delivery-queue media memory \
     workspace workspace-marketing workspace-sales workspace-support \
