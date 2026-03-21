@@ -7,6 +7,7 @@
 #   --upgrade   Also update the openclaw npm package to latest
 # ═══════════════════════════════════════════════════════════════
 set -euo pipefail
+export CI=true
 
 OPENCLAW_HOME="/opt/openclaw"
 cd "$OPENCLAW_HOME"
