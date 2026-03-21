@@ -5,41 +5,55 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   bot:
     name: Bot Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 10.32.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint:source
-      - run: pnpm typecheck
-      - run: pnpm test
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint source
+        run: pnpm lint:source
+      - name: Type check
+        run: pnpm typecheck
+      - name: Run tests
+        run: pnpm test
 
   dashboard:
     name: Dashboard Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dashboard dependencies
-        working-directory: dashboard
-        run: npm ci
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Dashboard typecheck
-        working-directory: dashboard
-        run: npm run typecheck
+        run: pnpm --filter dashboard typecheck
       - name: Dashboard build
-        working-directory: dashboard
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://your-project.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: test_anon_key
-        run: npm run build
+        run: pnpm --filter dashboard build

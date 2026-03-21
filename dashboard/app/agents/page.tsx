@@ -134,6 +134,7 @@ function formatTimeAgo(date: Date): string {
 export default function AgentsPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [selectedDivision, setSelectedDivision] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -141,7 +142,13 @@ export default function AgentsPage() {
 
   useEffect(() => {
     async function fetchAgents() {
-      if (!supabase) { setLoading(false); return; }
+      if (!supabase) {
+        setErrorMessage(
+          "Dashboard is missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+        );
+        setLoading(false);
+        return;
+      }
       const { data, error } = await supabase
         .from("agents")
         .select("*")
@@ -150,8 +157,10 @@ export default function AgentsPage() {
 
       if (error) {
         console.error("Error fetching agents:", error);
+        setErrorMessage(`Failed to load agents: ${error.message}`);
       } else {
         setAgents(data || []);
+        setErrorMessage(null);
       }
       setLoading(false);
     }
@@ -214,8 +223,22 @@ export default function AgentsPage() {
     );
   }
 
+  if (errorMessage && agents.length === 0) {
+    return (
+      <div className="card border border-red-500/40 bg-red-500/10 text-red-100">
+        <h2 className="text-lg font-semibold">Agents unavailable</h2>
+        <p className="mt-2 text-sm">{errorMessage}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {errorMessage ? (
+        <div className="card border border-red-500/40 bg-red-500/10 text-red-100">
+          <p className="text-sm">{errorMessage}</p>
+        </div>
+      ) : null}
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

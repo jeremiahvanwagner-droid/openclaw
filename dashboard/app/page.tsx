@@ -304,6 +304,7 @@ function PortfolioScopeCard({ business }: { business: PortfolioBusinessSummary }
 
 export default function Dashboard() {
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [totalAgents, setTotalAgents] = useState(0);
   const [activeAgents, setActiveAgents] = useState(0);
   const [divisionStats, setDivisionStats] = useState<DivisionStats[]>([]);
@@ -325,6 +326,9 @@ export default function Dashboard() {
         }
 
         if (!supabase) {
+          setErrorMessage(
+            "Dashboard is missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+          );
           return;
         }
 
@@ -333,6 +337,7 @@ export default function Dashboard() {
           .select("*");
 
         if (agentsError) throw agentsError;
+        setErrorMessage(null);
 
         if (agents) {
           setTotalAgents(agents.length);
@@ -405,6 +410,9 @@ export default function Dashboard() {
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
+        const message =
+          error instanceof Error ? error.message : "Unknown dashboard data error";
+        setErrorMessage(`Failed to load dashboard data: ${message}`);
       } finally {
         setLoading(false);
       }
@@ -425,6 +433,11 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
+      {errorMessage ? (
+        <div className="card border border-red-500/40 bg-red-500/10 text-red-100">
+          <p className="text-sm">{errorMessage}</p>
+        </div>
+      ) : null}
       <div>
         <h1 className="text-3xl font-bold text-white">Portfolio Operations Overview</h1>
         <p className="mt-1 text-slate-400">

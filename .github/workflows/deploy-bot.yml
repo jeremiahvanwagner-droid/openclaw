@@ -14,38 +14,110 @@ on:
         description: 'Also upgrade openclaw CLI on server'
         type: boolean
         default: false
+      clean_server_checkout:
+        description: 'Clean /opt/openclaw when working tree is dirty (workflow_dispatch only)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-bot-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
     name: Run Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 10.32.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint:source
-      - run: pnpm typecheck
-      - run: pnpm test
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint source
+        run: pnpm lint:source
+      - name: Type check
+        run: pnpm typecheck
+      - name: Run tests
+        run: pnpm test
 
   deploy:
     name: Deploy to Hetzner
     needs: test
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     environment: production
 
     steps:
+      - name: Validate SSH secrets
+        env:
+          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
+          HETZNER_USER: ${{ secrets.HETZNER_USER }}
+          HETZNER_SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          missing=()
+          for secret in HETZNER_HOST HETZNER_USER HETZNER_SSH_KEY; do
+            if [ -z "${!secret:-}" ]; then
+              missing+=("${secret}")
+            fi
+          done
+          if [ "${#missing[@]}" -gt 0 ]; then
+            echo "::error::Missing required GitHub environment secrets: ${missing[*]}"
+            echo "::error::Configure these in Settings → Environments → production → Environment secrets"
+            exit 1
+          fi
+
+      - name: Preflight server checkout state
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -eu
+            git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
+            CLEAN_SERVER_CHECKOUT="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.clean_server_checkout || 'false' }}"
+            cd /opt/openclaw
+            # Only check tracked files — untracked dirs like .openclaw/ are created by deploy itself
+            status="$(git status --porcelain --untracked-files=no)"
+            if [ -n "${status}" ]; then
+              echo "Remote checkout has local changes:"
+              git status --short
+              if [ "${CLEAN_SERVER_CHECKOUT}" = "true" ]; then
+                echo "Cleaning remote checkout because clean_server_checkout=true"
+                git reset --hard HEAD
+                git clean -fd
+              else
+                echo "::error::Remote checkout is dirty. Re-run workflow_dispatch with clean_server_checkout=true or clean /opt/openclaw manually."
+                exit 1
+              fi
+            fi
+
+      - name: Validate sudo access
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            sudo -n true 2>/dev/null || { echo "::error::User $USER does not have passwordless sudo. deploy.sh requires sudo."; exit 1; }
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 20m
           script: |
             cd /opt/openclaw
             # Ensure pnpm is available on the VPS
@@ -62,10 +134,21 @@ jobs:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 3m
           script: |
-            sleep 5
-            curl -sf http://localhost:18789/health || (echo "Gateway health check failed" && exit 1)
-            curl -sf http://localhost:8788/health || (echo "Webhook health check failed" && exit 1)
+            sleep 10
+            for i in 1 2 3 4 5; do
+              curl -sf http://localhost:18789/health && break
+              echo "Gateway not ready, retrying ($i/5)..."
+              sleep 5
+            done
+            curl -sf http://localhost:18789/health || { echo "::error::Gateway health check failed"; exit 1; }
+            for i in 1 2 3; do
+              curl -sf http://localhost:8788/health && break
+              echo "Webhook not ready, retrying ($i/3)..."
+              sleep 3
+            done
+            curl -sf http://localhost:8788/health || { echo "::error::Webhook health check failed"; exit 1; }
             echo "All services healthy"
 
       - name: Notify Telegram
