@@ -19,21 +19,20 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Lint source
-        run: pnpm lint:source
+        run: corepack pnpm install --frozen-lockfile
+      - name: Lint baseline gate
+        run: corepack pnpm lint:ci
       - name: Type check
-        run: pnpm typecheck
+        run: corepack pnpm typecheck
       - name: Run tests
-        run: pnpm test
+        run: corepack pnpm test
 
   dashboard:
     name: Dashboard Checks
@@ -41,19 +40,18 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: "pnpm"
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Dashboard typecheck
-        run: pnpm --filter dashboard typecheck
+        run: corepack pnpm install --frozen-lockfile
       - name: Dashboard build
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://your-project.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: test_anon_key
-        run: pnpm --filter dashboard build
+        run: corepack pnpm --dir dashboard run build
+      - name: Dashboard typecheck
+        run: corepack pnpm --dir dashboard run typecheck

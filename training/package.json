@@ -9,7 +9,7 @@
     "assess": "npx tsx scripts/skill-assessment.ts",
     "training:monday": "npx tsx -e \"import { trainingWeeklyReview } from '../inngest/functions/training-protocol.js'\"",
     "training:tuesday": "npx tsx -e \"import { trainingSkillDevelopment } from '../inngest/functions/training-protocol.js'\"",
-    "training:full": "npm run init-cards && npm run assess && npm run dashboard"
+    "training:full": "corepack pnpm run init-cards && corepack pnpm run assess && corepack pnpm run dashboard"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0"

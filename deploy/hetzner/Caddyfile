@@ -1,19 +1,10 @@
-# ═══════════════════════════════════════════════════════════════
-# OpenClaw — Caddy Reverse Proxy (Auto-TLS via Let's Encrypt)
+# OpenClaw Caddy reverse proxy
 # Place at /etc/caddy/Caddyfile on the Hetzner VPS
-# Replace YOUR_DOMAIN with your actual domain
-# ═══════════════════════════════════════════════════════════════
 
-# Gateway API — OpenClaw bot endpoint
+# Gateway API endpoint
 api.truthjblue.dev {
     reverse_proxy localhost:18789
 
-    # Rate limiting
-    @rateLimit {
-        path /
-    }
-
-    # Security headers
     header {
         X-Content-Type-Options nosniff
         X-Frame-Options DENY
@@ -29,17 +20,15 @@ api.truthjblue.dev {
     }
 }
 
-# Webhook endpoint — GHL inbound webhooks
+# Webhook endpoint
 webhook.truthjblue.dev {
     reverse_proxy localhost:8788
 
-    # Only allow POST requests to webhook endpoint
     @notPost {
         not method POST
     }
     respond @notPost 405
 
-    # Security headers
     header {
         X-Content-Type-Options nosniff
         -Server
@@ -53,27 +42,7 @@ webhook.truthjblue.dev {
     }
 }
 
-# Tailscale private gateway — accessible only from your Tailnet
+# Tailscale private gateway
 http://100.84.3.71:19789 {
     reverse_proxy localhost:18789
-}
-
-# Dashboard — self-hosted Next.js on port 3001
-truthjblue.dev {
-    reverse_proxy localhost:3001
-
-    header {
-        X-Content-Type-Options nosniff
-        X-Frame-Options DENY
-        Referrer-Policy strict-origin-when-cross-origin
-        Strict-Transport-Security "max-age=31536000; includeSubDomains"
-        -Server
-    }
-
-    log {
-        output file /var/log/caddy/dashboard-access.log {
-            roll_size 50MiB
-            roll_keep 5
-        }
-    }
 }

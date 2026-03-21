@@ -64,7 +64,7 @@ npm install -g openclaw@latest
 
 # 2. Enable Corepack and install repo dependencies with pnpm
 corepack enable
-pnpm install --frozen-lockfile
+corepack pnpm install --frozen-lockfile
 
 # 3. Configure environment
 cp .env.example .env
@@ -91,7 +91,9 @@ powershell -ExecutionPolicy Bypass -File scripts/restart-local.ps1 -PrimaryTenan
 node --env-file=.env handlers/ghl-webhook-handler.mjs
 ```
 
-> **Important:** This repository is pnpm-managed (`pnpm-lock.yaml`); use `pnpm install` at the repo root instead of `npm install`.
+> **Important:** This repository is pnpm-managed (`pnpm-lock.yaml`); use `corepack pnpm ...` at the repo root instead of `npm install`.
+>
+> On Windows, do not use repo-root `node.cmd`/`node.json` shims because they shadow `node` and break build tooling. Use `powershell -ExecutionPolicy Bypass -File scripts/start-node-host.ps1` when you intentionally want to run the OpenClaw node host.
 
 ---
 
@@ -155,9 +157,9 @@ See [docs/deployment.md](docs/deployment.md) for the full production setup guide
 
 | Trigger | Target | Action |
 |---------|--------|--------|
-| Push to `main` (non-dashboard) | Hetzner VPS | Auto-deploy bot via SSH |
+| Manual dispatch (`Deploy Bot to Hetzner VPS (Manual)`) | Hetzner VPS | Run tests, then deploy bot/webhook |
 | Push to `main` (`dashboard/**`) | Vercel | Auto-deploy dashboard |
-| Manual dispatch | Either | Deploy with optional CLI upgrade |
+| Manual dispatch (`Deploy Dashboard to Vercel`) | Vercel | Manual dashboard deploy |
 
 ---
 

@@ -5,17 +5,20 @@
   "type": "module",
   "packageManager": "pnpm@10.32.1",
   "scripts": {
-    "build": "pnpm -r run build",
+    "build": "corepack pnpm -r --if-present run build",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "lint": "eslint .",
     "lint:source": "eslint handlers lib inngest scripts --ext .ts --ext .js --ext .mjs --ext .cjs",
+    "lint:ci": "node scripts/check-lint-warning-baseline.mjs",
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "validate": "pnpm lint:source && pnpm typecheck && pnpm test && pnpm --dir dashboard run typecheck && pnpm --dir dashboard run build"
+    "dashboard:typecheck": "corepack pnpm --dir dashboard run typecheck",
+    "dashboard:build": "corepack pnpm --dir dashboard run build",
+    "validate": "corepack pnpm lint:ci && corepack pnpm typecheck && corepack pnpm test && corepack pnpm dashboard:build && corepack pnpm dashboard:typecheck"
   },
   "devDependencies": {
     "@types/nodemailer": "^7.0.11",

@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'dashboard/**'
+      - "dashboard/**"
 
   workflow_dispatch:
 
@@ -29,21 +29,22 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: "pnpm"
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install Dependencies
-        working-directory: dashboard
-        run: npm ci
-
-      - name: Typecheck
-        working-directory: dashboard
-        run: npm run typecheck
+        run: corepack pnpm install --frozen-lockfile
 
       - name: Build
-        working-directory: dashboard
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://your-project.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: test_anon_key
-        run: npm run build
+        run: corepack pnpm --dir dashboard run build
+
+      - name: Typecheck
+        run: corepack pnpm --dir dashboard run typecheck
 
   deploy:
     name: Deploy to Vercel
@@ -55,11 +56,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
 
       - name: Validate required deploy secrets
         env:
@@ -78,17 +74,25 @@ jobs:
           done
           if [ "${#missing[@]}" -gt 0 ]; then
             echo "::error::Missing required GitHub environment secrets: ${missing[*]}"
-            echo "::error::Configure these in Settings → Environments → production → Environment secrets"
+            echo "::error::Configure these in Settings -> Environments -> production -> Environment secrets"
             exit 1
           fi
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "pnpm"
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Deploy to Vercel
         working-directory: dashboard
         env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: vercel deploy --prod --token=$VERCEL_TOKEN
+        run: corepack pnpm dlx vercel@latest deploy --prod --yes --token="$VERCEL_TOKEN"

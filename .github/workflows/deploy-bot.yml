@@ -1,21 +1,14 @@
-name: Deploy Bot to Hetzner VPS
+name: Deploy Bot to Hetzner VPS (Manual)
 
 on:
-  push:
-    branches: [main]
-    paths-ignore:
-      - 'dashboard/**'
-      - 'docs/**'
-      - '*.md'
-
   workflow_dispatch:
     inputs:
       upgrade_cli:
-        description: 'Also upgrade openclaw CLI on server'
+        description: "Also upgrade openclaw CLI on server"
         type: boolean
         default: false
       clean_server_checkout:
-        description: 'Clean /opt/openclaw when working tree is dirty (workflow_dispatch only)'
+        description: "Clean /opt/openclaw when working tree is dirty"
         type: boolean
         default: false
 
@@ -33,21 +26,20 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10.32.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-      - name: Lint source
-        run: pnpm lint:source
+        run: corepack pnpm install --frozen-lockfile
+      - name: Lint baseline gate
+        run: corepack pnpm lint:ci
       - name: Type check
-        run: pnpm typecheck
+        run: corepack pnpm typecheck
       - name: Run tests
-        run: pnpm test
+        run: corepack pnpm test
 
   deploy:
     name: Deploy to Hetzner
@@ -57,7 +49,8 @@ jobs:
     environment: production
 
     steps:
-      - name: Validate SSH secrets
+      - id: validate_ssh_secrets
+        name: Validate SSH secrets
         env:
           HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
           HETZNER_USER: ${{ secrets.HETZNER_USER }}
@@ -72,7 +65,7 @@ jobs:
           done
           if [ "${#missing[@]}" -gt 0 ]; then
             echo "::error::Missing required GitHub environment secrets: ${missing[*]}"
-            echo "::error::Configure these in Settings → Environments → production → Environment secrets"
+            echo "::error::Configure these in Settings -> Environments -> production -> Environment secrets"
             exit 1
           fi
 
@@ -85,9 +78,9 @@ jobs:
           script: |
             set -eu
             git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
-            CLEAN_SERVER_CHECKOUT="${{ github.event_name == 'workflow_dispatch' && github.event.inputs.clean_server_checkout || 'false' }}"
+            CLEAN_SERVER_CHECKOUT="${{ github.event.inputs.clean_server_checkout }}"
             cd /opt/openclaw
-            # Only check tracked files — untracked dirs like .openclaw/ are created by deploy itself
+            # Only check tracked files; untracked dirs like .openclaw/ are created by deploy itself
             status="$(git status --porcelain --untracked-files=no)"
             if [ -n "${status}" ]; then
               echo "Remote checkout has local changes:"
@@ -111,7 +104,8 @@ jobs:
           script: |
             sudo -n true 2>/dev/null || { echo "::error::User $USER does not have passwordless sudo. deploy.sh requires sudo."; exit 1; }
 
-      - name: Deploy via SSH
+      - id: deploy_ssh
+        name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HETZNER_HOST }}
@@ -120,8 +114,6 @@ jobs:
           command_timeout: 20m
           script: |
             cd /opt/openclaw
-            # Ensure pnpm is available on the VPS
-            command -v pnpm >/dev/null 2>&1 || npm install -g pnpm
             if [ "${{ github.event.inputs.upgrade_cli }}" = "true" ]; then
               sudo bash deploy/hetzner/deploy.sh --upgrade
             else
@@ -149,7 +141,26 @@ jobs:
               sleep 3
             done
             curl -sf http://localhost:8788/health || { echo "::error::Webhook health check failed"; exit 1; }
-            echo "All services healthy"
+            echo "Gateway and webhook healthy"
+
+      - name: Collect service diagnostics on failure
+        if: failure() && steps.validate_ssh_secrets.outcome == 'success'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 5m
+          script: |
+            set +e
+            echo "===== openclaw.service status ====="
+            sudo systemctl status openclaw --no-pager -l || true
+            echo "===== openclaw-webhook.service status ====="
+            sudo systemctl status openclaw-webhook --no-pager -l || true
+            echo "===== openclaw journal (last 200) ====="
+            sudo journalctl -u openclaw -n 200 --no-pager || true
+            echo "===== webhook journal (last 200) ====="
+            sudo journalctl -u openclaw-webhook -n 200 --no-pager || true
 
       - name: Notify Telegram
         if: always()
@@ -160,8 +171,8 @@ jobs:
           COMMIT: ${{ github.sha }}
           ACTOR: ${{ github.actor }}
         run: |
-          ICON=$( [ "$STATUS" = "success" ] && echo "✅" || echo "❌" )
-          MSG="${ICON} OpenClaw Deploy — ${STATUS}%0ACommit: ${COMMIT}%0ABy: ${ACTOR}"
+          ICON=$( [ "$STATUS" = "success" ] && echo "SUCCESS" || echo "FAIL" )
+          MSG="[${ICON}] OpenClaw Deploy - ${STATUS}%0ACommit: ${COMMIT}%0ABy: ${ACTOR}"
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
             -d text="${MSG}" \

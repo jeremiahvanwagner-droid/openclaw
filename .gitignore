@@ -43,6 +43,8 @@ test-pool-results.json
 update-check.json
 exec-approvals.json
 gateway.cmd
+node.cmd
+node.json
 subagents/runs.json
 
 # ── Cron Run History ──────────────────────────────────────────

@@ -106,8 +106,8 @@ All variables from `.env.example` must be filled in. Critical ones:
 ### 5. Configure Caddy
 
 ```bash
-# Replace YOUR_DOMAIN with your actual domain
-sudo sed -i 's/YOUR_DOMAIN/yourdomain.com/g' /etc/caddy/Caddyfile
+# Ensure api.truthjblue.dev and webhook.truthjblue.dev point to this VPS
+sudo nano /etc/caddy/Caddyfile
 ```
 
 ### 6. Start Services
@@ -157,9 +157,9 @@ Go to **Settings → Secrets and variables → Actions** in your GitHub repo:
 
 ### How It Works
 
-- **Push to `main`** (non-dashboard files) → auto-deploys bot to Hetzner VPS
-- **Push to `main`** (dashboard files) → auto-deploys dashboard to Vercel
-- **Manual trigger** → deploy with optional CLI upgrade via GitHub Actions UI
+- **Manual trigger (`Deploy Bot to Hetzner VPS (Manual)`)** -> test + deploy bot/webhook to Hetzner VPS
+- **Push to `main` (dashboard files)** -> auto-deploy dashboard to Vercel
+- **Manual trigger (`Deploy Dashboard to Vercel`)** -> manual dashboard deploy via GitHub Actions UI
 
 ---
 
