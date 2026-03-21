@@ -62,30 +62,36 @@ docker compose up
 # 1. Install Node.js 22.x and OpenClaw CLI
 npm install -g openclaw@latest
 
-# 2. Configure environment
+# 2. Enable Corepack and install repo dependencies with pnpm
+corepack enable
+pnpm install --frozen-lockfile
+
+# 3. Configure environment
 cp .env.example .env
 
-# 3. Sync the primary runtime-facing GHL env from .env
+# 4. Sync the primary runtime-facing GHL env from .env
 powershell -ExecutionPolicy Bypass -File scripts/sync-local-ghl-env.ps1 -PrimaryTenant TJB
 
-# 4. Verify GHL auth before boot
+# 5. Verify GHL auth before boot
 node scripts/check-ghl-auth.mjs
 
-# 5. Initialize database
+# 6. Initialize database
 npx supabase db push
 
-# 6. Generate agent workspaces
+# 7. Generate agent workspaces
 node scripts/generate-workspaces.mjs
 
-# 7. Register agents
+# 8. Register agents
 node scripts/register-agents.mjs
 
-# 8. Start the gateway
+# 9. Start the gateway
 powershell -ExecutionPolicy Bypass -File scripts/restart-local.ps1 -PrimaryTenant TJB
 
 # Manual webhook-only restart if needed (separate terminal)
 node --env-file=.env handlers/ghl-webhook-handler.mjs
 ```
+
+> **Important:** This repository is pnpm-managed (`pnpm-lock.yaml`); use `pnpm install` at the repo root instead of `npm install`.
 
 ---
 
