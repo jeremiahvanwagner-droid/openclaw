@@ -18,6 +18,12 @@ import { authenticateGhlWebhookRequest, normalizeGhlWebhookPayload } from '../li
 import { openclawSend, openclawMessage } from '../lib/safe-exec.mjs';
 import { childLogger } from '../lib/logger.mjs';
 import { registry, eventProcessedTotal, eventProcessingDuration } from '../lib/metrics.mjs';
+import {
+  parseTelegramApprovalCallback,
+  verifyTelegramApprovalCallback,
+  resolveHumanApproval,
+  answerTelegramCallback,
+} from '../lib/human-approval.mjs';
 
 const log = childLogger({ module: 'webhook-handler' });
 
@@ -93,6 +99,7 @@ const GHL_WEBHOOK_PUBLIC_KEY = process.env.OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY || un
 
 const MAX_BODY_SIZE = 1 * 1024 * 1024;
 const WEBHOOK_PATHS = new Set(['/webhook', '/webhook/ghl', '/webhooks/ghl']);
+const TELEGRAM_CALLBACK_PATH = '/webhook/telegram';
 
 const configuredTenants = listTenants();
 if (configuredTenants.length === 0) {
@@ -503,6 +510,69 @@ async function processEventAsync(eventType, payload, traceId, authStrategy) {
   }
 }
 
+async function handleTelegramCallback(req, res) {
+  let body;
+  try {
+    const raw = await collectRequestBody(req);
+    body = JSON.parse(raw.toString('utf8'));
+  } catch (err) {
+    log.warn({ err: err.message }, 'Failed to parse Telegram callback body');
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Invalid JSON' }));
+    return;
+  }
+
+  const callbackQuery = body?.callback_query;
+  if (!callbackQuery) {
+    // Not a callback query (e.g. a regular message update) — acknowledge silently
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  const callbackData = callbackQuery.data || '';
+  const callbackQueryId = callbackQuery.id;
+
+  const parsed = parseTelegramApprovalCallback(callbackData);
+  if (!parsed) {
+    log.warn({ callbackData }, 'Received unknown Telegram callback data');
+    await answerTelegramCallback(callbackQueryId, 'Unknown action').catch((err) => log.warn({ err: err.message }, 'Failed to answer unknown callback'));
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  if (!verifyTelegramApprovalCallback(parsed)) {
+    log.warn({ approvalId: parsed.approvalId }, 'Telegram approval callback HMAC verification failed');
+    await answerTelegramCallback(callbackQueryId, 'Invalid signature').catch((err) => log.warn({ err: err.message }, 'Failed to answer invalid signature callback'));
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ ok: true }));
+    return;
+  }
+
+  const fromUser = callbackQuery.from?.username || callbackQuery.from?.first_name || 'unknown';
+
+  try {
+    await resolveHumanApproval({
+      approvalId: parsed.approvalId,
+      decision: parsed.decision,
+      resolvedBy: fromUser,
+      channel: 'telegram',
+    });
+
+    const text = parsed.decision === 'approve' ? '✅ Approved' : '❌ Rejected';
+    await answerTelegramCallback(callbackQueryId, text).catch((err) => log.warn({ err: err.message }, 'Failed to answer approval callback'));
+
+    log.info({ approvalId: parsed.approvalId, decision: parsed.decision, resolvedBy: fromUser }, 'Telegram approval resolved');
+  } catch (error) {
+    log.error({ approvalId: parsed.approvalId, err: error.message }, 'Failed to resolve Telegram approval');
+    await answerTelegramCallback(callbackQueryId, 'Error processing approval').catch((err) => log.warn({ err: err.message }, 'Failed to answer error callback'));
+  }
+
+  res.writeHead(200, { 'Content-Type': 'application/json' });
+  res.end(JSON.stringify({ ok: true }));
+}
+
 const server = http.createServer(async (req, res) => {
   const pathname = getPathname(req.url);
 
@@ -511,6 +581,7 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({
       status: 'ok',
       timestamp: new Date().toISOString(),
+      telegramCallbackPath: TELEGRAM_CALLBACK_PATH,
       webhookAuthModes: {
         ghlEd25519: true,
         workflowBearer: Boolean(GATEWAY_AUTH_TOKEN),
@@ -542,6 +613,11 @@ const server = http.createServer(async (req, res) => {
         return;
       }
     }
+  }
+
+  if (req.method === 'POST' && pathname === TELEGRAM_CALLBACK_PATH) {
+    await handleTelegramCallback(req, res);
+    return;
   }
 
   if (req.method !== 'POST' || !isWebhookPath(req.url)) {
@@ -626,6 +702,7 @@ server.listen(PORT, HOST, async () => {
     port: PORT,
     tenants: configuredTenants,
     webhookPaths: Array.from(WEBHOOK_PATHS),
+    telegramCallbackPath: TELEGRAM_CALLBACK_PATH,
     webhookAuthModes: {
       ghlEd25519: true,
       workflowBearer: Boolean(GATEWAY_AUTH_TOKEN),
