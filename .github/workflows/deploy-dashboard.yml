@@ -8,13 +8,46 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-dashboard-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  test:
+    name: Dashboard CI Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        working-directory: dashboard
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: dashboard
+        run: npm run typecheck
+
+      - name: Build
+        working-directory: dashboard
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://your-project.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: test_anon_key
+        run: npm run build
+
   deploy:
     name: Deploy to Vercel
+    needs: [test]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     environment: production
@@ -51,21 +84,6 @@ jobs:
 
       - name: Install Vercel CLI
         run: npm install -g vercel
-
-      - name: Install Dependencies
-        working-directory: dashboard
-        run: npm ci
-
-      - name: Typecheck
-        working-directory: dashboard
-        run: npm run typecheck
-
-      - name: Build
-        working-directory: dashboard
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        run: npm run build
 
       - name: Deploy to Vercel
         working-directory: dashboard

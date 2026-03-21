@@ -16,7 +16,8 @@ import { createClient } from "@supabase/supabase-js";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://aagqvfwuixpxtdcrdxmv.supabase.co";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+if (!SUPABASE_URL) { console.error("❌ SUPABASE_URL environment variable is required"); process.exit(1); }
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const INNGEST_EVENT_KEY = process.env.INNGEST_EVENT_KEY;
 const OPENCLAW_ROOT = join(process.env.USERPROFILE || process.env.HOME || "", ".openclaw");

@@ -17,7 +17,7 @@ vi.mock("@supabase/supabase-js", () => ({
 }));
 
 process.env.SUPABASE_URL = "https://test.supabase.co";
-process.env.SUPABASE_SERVICE_KEY = "test-service-key";
+process.env.SUPABASE_SERVICE_ROLE_KEY = "test-service-key";
 
 // Capture Inngest function handlers
 

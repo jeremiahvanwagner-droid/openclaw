@@ -81,7 +81,7 @@ let costSupabase: SupabaseClient | null = null;
 function getCostSupabase(): SupabaseClient | null {
   if (costSupabase) return costSupabase;
   const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
   costSupabase = createClient(url, key);
   return costSupabase;
