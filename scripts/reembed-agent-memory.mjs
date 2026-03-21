@@ -38,7 +38,8 @@ function parseArgs(argv) {
   return args;
 }
 
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://aagqvfwuixpxtdcrdxmv.supabase.co";
+const SUPABASE_URL = process.env.SUPABASE_URL;
+if (!SUPABASE_URL) { console.error("SUPABASE_URL environment variable is required"); process.exit(1); }
 const SUPABASE_SERVICE_KEY =
   process.env.SUPABASE_SERVICE_ROLE_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;

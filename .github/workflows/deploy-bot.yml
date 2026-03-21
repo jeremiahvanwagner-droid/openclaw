@@ -19,6 +19,9 @@ on:
         type: boolean
         default: false
 
+permissions:
+  contents: read
+
 concurrency:
   group: deploy-bot-${{ github.ref }}
   cancel-in-progress: true
