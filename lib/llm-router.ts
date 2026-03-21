@@ -138,25 +138,25 @@ const MODEL_MAP = {
     provider: "anthropic" as const,
     model: "claude-opus-4-20250514",
     tier: "strategic",
-    maxTokens: 2048,
+    maxTokens: 4096,
   },
   "claude-sonnet-4.5": {
     provider: "anthropic" as const,
     model: "claude-sonnet-4-5-20250514",
     tier: "content",
-    maxTokens: 2048,
+    maxTokens: 4096,
   },
   "gpt-4o-mini": {
     provider: "openai" as const,
     model: "gpt-4o-mini",
     tier: "routine",
-    maxTokens: 1024,
+    maxTokens: 4096,
   },
   "gpt-4o": {
     provider: "openai" as const,
     model: "gpt-4o",
     tier: "content",
-    maxTokens: 2048,
+    maxTokens: 4096,
   },
 } as const;
 

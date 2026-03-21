@@ -5,10 +5,15 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   bot:
     name: Bot Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -18,14 +23,19 @@ jobs:
         with:
           node-version: 22
           cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm lint:source
-      - run: pnpm typecheck
-      - run: pnpm test
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Lint source
+        run: pnpm lint:source
+      - name: Type check
+        run: pnpm typecheck
+      - name: Run tests
+        run: pnpm test
 
   dashboard:
     name: Dashboard Checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

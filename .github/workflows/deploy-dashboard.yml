@@ -8,10 +8,15 @@ on:
 
   workflow_dispatch:
 
+concurrency:
+  group: deploy-dashboard-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: production
 
     steps:
@@ -34,12 +39,13 @@ jobs:
           set -euo pipefail
           missing=()
           for secret in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID; do
-            if [ -z "${!secret}" ]; then
+            if [ -z "${!secret:-}" ]; then
               missing+=("${secret}")
             fi
           done
           if [ "${#missing[@]}" -gt 0 ]; then
             echo "::error::Missing required GitHub environment secrets: ${missing[*]}"
+            echo "::error::Configure these in Settings → Environments → production → Environment secrets"
             exit 1
           fi
 
