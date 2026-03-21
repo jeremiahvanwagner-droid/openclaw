@@ -41,18 +41,19 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.32.1
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install dashboard dependencies
-        working-directory: dashboard
-        run: npm ci
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Dashboard typecheck
-        working-directory: dashboard
-        run: npm run typecheck
+        run: pnpm --filter dashboard typecheck
       - name: Dashboard build
-        working-directory: dashboard
         env:
           NEXT_PUBLIC_SUPABASE_URL: https://your-project.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: test_anon_key
-        run: npm run build
+        run: pnpm --filter dashboard build
