@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, "..");
 
 // Paths and config
-const CONFIG_PATH = path.join(ROOT_DIR, "config", "agents_config.json");
+const CONFIG_PATH = path.join(ROOT_DIR, "agents_config.json");
 
 // Supabase configuration
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://aagqvfwuixpxtdcrdxmv.supabase.co";

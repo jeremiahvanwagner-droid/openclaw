@@ -7,7 +7,6 @@ These tokens were previously present in local plaintext config and should be rev
 3. SAG/ElevenLabs API key (previous local skill key)
 4. Old local OpenClaw gateway token (already rotated locally, still revoke any externally shared copies)
 5. OpenClaw GHL webhook shared secret (`OPENCLAW_GHL_WEBHOOK_SECRET`) if previously exposed
-6. Any legacy `OPENCLAW_GATEWAY_TOKEN` values (keep it mapped to `OPENCLAW_GATEWAY_AUTH_TOKEN` only as compatibility alias)
 
 ## Procedure
 

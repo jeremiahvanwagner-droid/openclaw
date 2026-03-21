@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "../supabase";
 
 interface Agent {
   id: string;
@@ -52,18 +53,10 @@ function StatusBadge({ status }: { status: string }) {
   };
 
   return (
-    <span className={`rounded-full px-2 py-1 text-xs font-medium ${classes[status] || classes.idle}`}>
+    <span className={`px-2 py-1 rounded-full text-xs font-medium ${classes[status] || classes.idle}`}>
       {status}
     </span>
   );
-}
-
-function formatTimeAgo(date: Date): string {
-  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
-  if (seconds < 60) return `${seconds}s ago`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
 }
 
 function AgentCard({ agent, isUpdated }: { agent: Agent; isUpdated?: boolean }) {
@@ -74,12 +67,10 @@ function AgentCard({ agent, isUpdated }: { agent: Agent; isUpdated?: boolean }) 
 
   return (
     <div
-      className={`card cursor-pointer transition-colors hover:border-claw-500/50 ${
-        isUpdated ? "animate-pulse ring-2 ring-green-400/60" : ""
-      }`}
+      className={`card cursor-pointer hover:border-claw-500/50 transition-colors ${isUpdated ? "ring-2 ring-green-400/60 animate-pulse" : ""}`}
       onClick={() => router.push(`/agents/${agent.agent_id}`)}
     >
-      <div className="mb-3 flex items-start justify-between">
+      <div className="flex items-start justify-between mb-3">
         <div>
           <h3 className="font-semibold text-white">{agent.agent_id}</h3>
           <p className="text-sm text-slate-400">{agent.display_name || "Agent"}</p>
@@ -90,45 +81,54 @@ function AgentCard({ agent, isUpdated }: { agent: Agent; isUpdated?: boolean }) 
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div>
           <span className="text-slate-500">Division:</span>
-          <span className="ml-1 text-slate-300">{agent.org_unit?.replace(/_/g, " ")}</span>
+          <span className="text-slate-300 ml-1">{agent.org_unit?.replace(/_/g, " ")}</span>
         </div>
         <div>
           <span className="text-slate-500">Escalates to:</span>
-          <span className="ml-1 text-slate-300">
-            {agent.config?.escalation_path || "-"}
+          <span className="text-slate-300 ml-1">
+            {agent.config?.escalation_path || "—"}
           </span>
         </div>
         <div>
           <span className="text-slate-500">Events:</span>
-          <span className="ml-1 text-slate-300">
+          <span className="text-slate-300 ml-1">
             {agent.config?.metrics?.events_processed || 0}
           </span>
         </div>
         <div>
           <span className="text-slate-500">Last seen:</span>
-          <span className="ml-1 text-slate-300">{timeSinceHeartbeat}</span>
+          <span className="text-slate-300 ml-1">{timeSinceHeartbeat}</span>
         </div>
       </div>
 
-      {agent.config?.tools_required && agent.config.tools_required.length > 0 ? (
+      {agent.config?.tools_required && agent.config.tools_required.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-1">
-          {agent.config.tools_required.slice(0, 3).map((tool) => (
+          {agent.config.tools_required.slice(0, 3).map((cap) => (
             <span
-              key={tool}
-              className="rounded bg-slate-700/50 px-2 py-0.5 text-xs text-slate-400"
+              key={cap}
+              className="px-2 py-0.5 bg-slate-700/50 text-slate-400 text-xs rounded"
             >
-              {tool}
+              {cap}
             </span>
           ))}
-          {agent.config.tools_required.length > 3 ? (
-            <span className="px-2 py-0.5 text-xs text-slate-500">
+          {agent.config.tools_required.length > 3 && (
+            <span className="px-2 py-0.5 text-slate-500 text-xs">
               +{agent.config.tools_required.length - 3} more
             </span>
-          ) : null}
+          )}
         </div>
-      ) : null}
+      )}
     </div>
   );
+}
+
+function formatTimeAgo(date: Date): string {
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+
+  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
 }
 
 export default function AgentsPage() {
@@ -138,100 +138,77 @@ export default function AgentsPage() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [recentlyUpdated, setRecentlyUpdated] = useState<Set<string>>(new Set());
-  const previousAgentsRef = useRef<Agent[]>([]);
 
   useEffect(() => {
-    function flashUpdated(agentIds: string[]) {
-      if (agentIds.length === 0) return;
+    async function fetchAgents() {
+      if (!supabase) { setLoading(false); return; }
+      const { data, error } = await supabase
+        .from("agents")
+        .select("*")
+        .order("org_unit", { ascending: true })
+        .order("agent_id", { ascending: true });
 
-      setRecentlyUpdated((current) => {
-        const updated = new Set(current);
-        for (const agentId of agentIds) {
-          updated.add(agentId);
-        }
-        return updated;
-      });
-
-      setTimeout(() => {
-        setRecentlyUpdated((current) => {
-          const updated = new Set(current);
-          for (const agentId of agentIds) {
-            updated.delete(agentId);
-          }
-          return updated;
-        });
-      }, 2000);
-    }
-
-    async function fetchAgents(isPolling = false) {
-      try {
-        const response = await fetch("/api/agents", { cache: "no-store" });
-        if (!response.ok) {
-          throw new Error("Failed to fetch agents");
-        }
-
-        const data = (await response.json()) as { agents?: Agent[] };
-        const nextAgents = data.agents || [];
-
-        if (isPolling) {
-          const previousMap = new Map(
-            previousAgentsRef.current.map((agent) => [agent.id, JSON.stringify(agent)]),
-          );
-          const changedAgentIds = nextAgents
-            .filter((agent) => previousMap.get(agent.id) !== JSON.stringify(agent))
-            .map((agent) => agent.id);
-          flashUpdated(changedAgentIds);
-        }
-
-        previousAgentsRef.current = nextAgents;
-        setAgents(nextAgents);
-      } catch (error) {
+      if (error) {
         console.error("Error fetching agents:", error);
-        if (!isPolling) {
-          setAgents([]);
-        }
-      } finally {
-        if (!isPolling) {
-          setLoading(false);
-        }
+      } else {
+        setAgents(data || []);
       }
+      setLoading(false);
     }
 
-    void fetchAgents(false);
-    const interval = setInterval(() => {
-      void fetchAgents(true);
-    }, 15000);
+    fetchAgents();
 
-    return () => clearInterval(interval);
+    // Subscribe to real-time updates
+    if (!supabase) return;
+    const channel = supabase
+      .channel("agents-realtime")
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "agents" },
+        (payload) => {
+          const updated = payload.new as Agent;
+          setAgents((prev) =>
+            prev.map((a) => (a.id === updated.id ? updated : a))
+          );
+          // Flash animation
+          setRecentlyUpdated((prev) => new Set(prev).add(updated.id));
+          setTimeout(() => {
+            setRecentlyUpdated((prev) => {
+              const next = new Set(prev);
+              next.delete(updated.id);
+              return next;
+            });
+          }, 2000);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase?.removeChannel(channel);
+    };
   }, []);
 
-  const filteredAgents = useMemo(
-    () =>
-      agents.filter((agent) => {
-        if (selectedDivision !== "all" && !agent.org_unit?.startsWith(selectedDivision)) {
-          return false;
-        }
-
-        if (selectedStatus !== "all" && agent.status !== selectedStatus) {
-          return false;
-        }
-
-        if (searchQuery) {
-          const query = searchQuery.toLowerCase();
-          return (
-            agent.agent_id.toLowerCase().includes(query) ||
-            agent.display_name?.toLowerCase().includes(query)
-          );
-        }
-
-        return true;
-      }),
-    [agents, searchQuery, selectedDivision, selectedStatus],
-  );
+  // Filter agents
+  const filteredAgents = agents.filter((agent) => {
+    if (selectedDivision !== "all" && !agent.org_unit?.startsWith(selectedDivision)) {
+      return false;
+    }
+    if (selectedStatus !== "all" && agent.status !== selectedStatus) {
+      return false;
+    }
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        agent.agent_id.toLowerCase().includes(query) ||
+        agent.display_name?.toLowerCase().includes(query)
+      );
+    }
+    return true;
+  });
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
+      <div className="flex items-center justify-center h-64">
         <div className="text-slate-400">Loading agents...</div>
       </div>
     );
@@ -239,6 +216,7 @@ export default function AgentsPage() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Agents</h1>
@@ -248,39 +226,41 @@ export default function AgentsPage() {
         </div>
       </div>
 
+      {/* Filters */}
       <div className="flex flex-wrap gap-4">
         <input
           type="text"
           placeholder="Search agents..."
-          className="w-64 rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white placeholder-slate-500 focus:border-claw-500 focus:outline-none"
+          className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-claw-500 w-64"
           value={searchQuery}
-          onChange={(event) => setSearchQuery(event.target.value)}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <select
-          className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-claw-500 focus:outline-none"
+          className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-claw-500"
           value={selectedDivision}
-          onChange={(event) => setSelectedDivision(event.target.value)}
+          onChange={(e) => setSelectedDivision(e.target.value)}
         >
-          {DIVISIONS.map((division) => (
-            <option key={division.key} value={division.key}>
-              {division.label}
+          {DIVISIONS.map((div) => (
+            <option key={div.key} value={div.key}>
+              {div.label}
             </option>
           ))}
         </select>
         <select
-          className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-2 text-white focus:border-claw-500 focus:outline-none"
+          className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-claw-500"
           value={selectedStatus}
-          onChange={(event) => setSelectedStatus(event.target.value)}
+          onChange={(e) => setSelectedStatus(e.target.value)}
         >
-          {STATUSES.map((status) => (
-            <option key={status.key} value={status.key}>
-              {status.label}
+          {STATUSES.map((s) => (
+            <option key={s.key} value={s.key}>
+              {s.label}
             </option>
           ))}
         </select>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* Agent Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredAgents.map((agent) => (
           <AgentCard
             key={agent.id}
@@ -290,11 +270,11 @@ export default function AgentsPage() {
         ))}
       </div>
 
-      {filteredAgents.length === 0 ? (
-        <div className="py-12 text-center text-slate-500">
+      {filteredAgents.length === 0 && (
+        <div className="text-center py-12 text-slate-500">
           No agents found matching your filters
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

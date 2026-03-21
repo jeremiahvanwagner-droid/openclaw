@@ -5,6 +5,7 @@ After=network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=3600
 StartLimitBurst=100
+OnFailure=openclaw-alert@%n.service
 
 [Service]
 Type=simple
@@ -25,6 +26,9 @@ ExecStart=/usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js gateway --p
 # Auto-restart on failure
 Restart=always
 RestartSec=10
+
+# Watchdog: restart if unresponsive for 5 minutes
+WatchdogSec=300
 
 # Security hardening
 NoNewPrivileges=true

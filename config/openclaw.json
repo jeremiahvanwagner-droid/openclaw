@@ -7,11 +7,11 @@
     "lastRunAt": "2026-03-13T21:01:06.438Z",
     "lastRunVersion": "2026.3.8",
     "lastRunCommand": "configure",
-    "lastRunMode": "remote"
+    "lastRunMode": "local"
   },
   "browser": {
     "headless": true,
-    "defaultProfile": "chrome-relay",
+    "defaultProfile": "openclaw",
     "profiles": {
       "chrome": {
         "cdpPort": 9222,
@@ -479,20 +479,12 @@
   },
   "gateway": {
     "port": 18789,
-    "mode": "remote",
+    "mode": "local",
     "bind": "loopback",
-    "remote": {
-      "url": "https://api.truthjblue.dev",
-      "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
-    },
     "auth": {
       "mode": "token",
       "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
     },
-    "trustedProxies": [
-      "127.0.0.1/32",
-      "::1/128"
-    ],
     "tailscale": {
       "mode": "off",
       "resetOnExit": false

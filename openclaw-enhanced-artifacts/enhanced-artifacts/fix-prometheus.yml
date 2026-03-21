@@ -1,0 +1,191 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# fix-prometheus.yml
+# OpenClaw Multi-Agent Network — Complete Prometheus Scrape Configuration
+#
+# Fixes audit finding DEPLOY-04: "Prometheus Only Scrapes Webhook Handler"
+#
+# Problem:
+#   The current monitoring/prometheus.yml only targets:
+#     host.docker.internal:8788  (openclaw-webhook)
+#
+#   This means two of three services have zero metrics visibility:
+#     - Gateway (port 18789): no request latency, no circuit breaker state,
+#       no rate governor metrics, no LLM call counts
+#     - Dashboard (port 3001): no HTTP response times, no API route errors,
+#       no SSR rendering metrics
+#
+# Fix:
+#   Add scrape targets for all three services.
+#   Replace monitoring/prometheus.yml with this file.
+#
+# Additional improvements over the original:
+#   - Per-service scrape intervals tuned to their traffic patterns
+#   - Relabeling rules to add `service` and `environment` labels to all metrics
+#   - Alertmanager integration placeholder (configure your alertmanager endpoint)
+#   - Example alerting rules file reference for the alert rule templates
+#
+# HOW TO APPLY:
+#   cp enhanced-artifacts/fix-prometheus.yml monitoring/prometheus.yml
+#   docker compose -f deploy/docker-compose.monitoring.yml restart prometheus
+#
+# ALSO FIX DEPLOY-01 (port conflict):
+#   Grafana is mapped to 127.0.0.1:3001:3000 in docker-compose.monitoring.yml
+#   but Next.js dashboard also runs on port 3001. Change Grafana to port 3002:
+#     - "127.0.0.1:3002:3000"   # Grafana UI
+#   Then update the dashboard scrape target below to 3001 (Next.js metrics).
+# ═══════════════════════════════════════════════════════════════════════════════
+
+global:
+  # Default scrape interval for all jobs unless overridden
+  scrape_interval: 15s
+  # How often to evaluate alerting rules
+  evaluation_interval: 15s
+  # Timeout for individual scrapes
+  scrape_timeout: 10s
+  # Labels added to every time series and alert from this Prometheus instance
+  external_labels:
+    environment: "production"
+    cluster: "openclaw-hetzner"
+
+# ── Alertmanager (configure your alertmanager endpoint) ───────────────────────
+# Uncomment and set the correct address when Alertmanager is deployed.
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#             - "alertmanager:9093"
+
+# ── Alerting rule files ────────────────────────────────────────────────────────
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+# ── Scrape configurations ──────────────────────────────────────────────────────
+scrape_configs:
+
+  # ── 1. OpenClaw Gateway ─────────────────────────────────────────────────────
+  # The main Node.js gateway process (port 18789).
+  # Exposes: LLM call rates, circuit breaker states, rate governor budget
+  # metrics, agent invocation counts, concurrency gauges.
+  - job_name: "openclaw-gateway"
+    static_configs:
+      - targets: ["host.docker.internal:18789"]
+        labels:
+          service: "gateway"
+          component: "node"
+    metrics_path: /metrics
+    # Gateway is the highest-value target — scrape more frequently
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    # Add relabeling to normalize instance label
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "openclaw-gateway"
+
+  # ── 2. OpenClaw Webhook Handler ─────────────────────────────────────────────
+  # The GHL webhook ingest server (port 8788).
+  # Exposes: webhook processing rate, event type distribution,
+  # authentication failure counts, processing duration histograms.
+  - job_name: "openclaw-webhook"
+    static_configs:
+      - targets: ["host.docker.internal:8788"]
+        labels:
+          service: "webhook-handler"
+          component: "node"
+    metrics_path: /metrics
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "openclaw-webhook"
+
+  # ── 3. OpenClaw Dashboard ───────────────────────────────────────────────────
+  # The Next.js dashboard (port 3001).
+  # NOTE: Next.js does not expose a /metrics endpoint by default.
+  # To enable Prometheus metrics, add next-prometheus or @opentelemetry/sdk-node
+  # to the dashboard package. Until then, this job will fail scrapes but won't
+  # break Prometheus — it will just show as "down" in the targets page.
+  #
+  # Quick setup for Next.js metrics:
+  #   npm install @opentelemetry/sdk-node @opentelemetry/auto-instrumentations-node
+  #   Add instrumentation.ts to dashboard/ (see Next.js OpenTelemetry docs)
+  - job_name: "openclaw-dashboard"
+    static_configs:
+      - targets: ["host.docker.internal:3001"]
+        labels:
+          service: "dashboard"
+          component: "nextjs"
+    metrics_path: /metrics
+    # Dashboard metrics are less critical — scrape less frequently
+    scrape_interval: 30s
+    scrape_timeout: 15s
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "openclaw-dashboard"
+
+  # ── 4. Prometheus self-monitoring ───────────────────────────────────────────
+  # Always useful to have Prometheus monitor itself.
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+        labels:
+          service: "prometheus"
+          component: "monitoring"
+    scrape_interval: 30s
+
+  # ── 5. Node Exporter (host metrics) ─────────────────────────────────────────
+  # Uncomment if node_exporter is installed on the Hetzner VPS.
+  # Exposes: CPU, memory, disk, network for the host machine.
+  # Install: apt install prometheus-node-exporter
+  # - job_name: "node-exporter"
+  #   static_configs:
+  #     - targets: ["host.docker.internal:9100"]
+  #       labels:
+  #         service: "node-exporter"
+  #         component: "host"
+  #   scrape_interval: 30s
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RECOMMENDED ALERTING RULES
+# Save as /etc/prometheus/rules/openclaw.yml
+# ═══════════════════════════════════════════════════════════════════════════════
+#
+# groups:
+#   - name: openclaw-critical
+#     rules:
+#       - alert: WebhookHandlerDown
+#         expr: up{job="openclaw-webhook"} == 0
+#         for: 2m
+#         labels:
+#           severity: critical
+#         annotations:
+#           summary: "Webhook handler is down"
+#           description: "openclaw-webhook has been unreachable for 2 minutes"
+#
+#       - alert: GatewayDown
+#         expr: up{job="openclaw-gateway"} == 0
+#         for: 2m
+#         labels:
+#           severity: critical
+#         annotations:
+#           summary: "Gateway is down"
+#           description: "openclaw-gateway has been unreachable for 2 minutes"
+#
+#       - alert: BudgetNearCeiling
+#         expr: budget_used_dollars / budget_ceiling_dollars > 0.80
+#         for: 5m
+#         labels:
+#           severity: warning
+#         annotations:
+#           summary: "Provider {{ $labels.provider }} budget above 80%"
+#           description: "Daily API budget for {{ $labels.provider }} is {{ $value | humanizePercentage }} consumed"
+#
+#       - alert: CircuitBreakerOpen
+#         expr: circuit_breaker_state{state="open"} == 1
+#         for: 1m
+#         labels:
+#           severity: warning
+#         annotations:
+#           summary: "Circuit breaker open for {{ $labels.provider }}"

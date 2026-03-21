@@ -1,7 +1,6 @@
 param(
   [ValidateSet('TJB', 'MSL')]
-  [string]$PrimaryTenant = 'TJB',
-  [switch]$EnableLocalGateway
+  [string]$PrimaryTenant = 'TJB'
 )
 
 Set-StrictMode -Version Latest
@@ -101,16 +100,11 @@ if ($LASTEXITCODE -ne 0) {
 
 Stop-PortProcesses -Ports @($gatewayPort, $webhookPort)
 
-if ($EnableLocalGateway) {
-  $gateway = Start-DetachedProcess `
-    -FilePath $openclawCmd `
-    -ArgumentList @("gateway", "--allow-unconfigured", "--force", "--port", "$gatewayPort") `
-    -StdOutPath $gatewayLog `
-    -StdErrPath $gatewayErr
-} else {
-  Write-Host "Remote-first mode: local gateway startup is disabled. Use the Hetzner gateway at https://api.truthjblue.dev."
-  $gateway = $null
-}
+$gateway = Start-DetachedProcess `
+  -FilePath $openclawCmd `
+  -ArgumentList @("gateway", "--allow-unconfigured", "--force", "--port", "$gatewayPort") `
+  -StdOutPath $gatewayLog `
+  -StdErrPath $gatewayErr
 
 $webhook = Start-DetachedProcess `
   -FilePath $nodeExe `
@@ -120,18 +114,10 @@ $webhook = Start-DetachedProcess `
 
 Start-Sleep -Seconds 5
 
-$gatewayHealth = if ($EnableLocalGateway) {
-  Get-HealthJson -Url "http://localhost:$gatewayPort/health"
-} else {
-  Get-HealthJson -Url "https://api.truthjblue.dev/health"
-}
+$gatewayHealth = Get-HealthJson -Url "http://localhost:$gatewayPort/health"
 $webhookHealth = Get-HealthJson -Url "http://localhost:$webhookPort/health"
 
-if ($gateway) {
-  Write-Host "Gateway PID: $($gateway.Id)"
-} else {
-  Write-Host "Gateway PID: n/a (remote-first mode)"
-}
+Write-Host "Gateway PID: $($gateway.Id)"
 Write-Host "Webhook PID: $($webhook.Id)"
 
 if ($gatewayHealth) {

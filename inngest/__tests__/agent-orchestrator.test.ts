@@ -1,17 +1,9 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
-const {
-  mockSupabaseInsert,
-  mockSupabaseSelect,
-  mockSupabaseUpdate,
-  mockSupabaseRpc,
-  createHumanApprovalRequest,
-  getHumanApprovalRequest,
-  markHumanApprovalExecuting,
-  expireHumanApproval,
-  enforceAgentCapability,
-  capturedFunctions,
-} = vi.hoisted(() => {
+// ─── Mocks ──────────────────────────────────────────────────────
+
+// Use vi.hoisted() so these are available inside vi.mock() factories (which get hoisted)
+const { mockSupabaseInsert, mockSupabaseSelect, mockSupabaseUpdate, mockSupabaseRpc, capturedFunctions } = vi.hoisted(() => {
   const mockSupabaseInsert = vi.fn().mockReturnValue({
     select: vi.fn().mockReturnValue({
       single: vi.fn().mockResolvedValue({ data: { id: "evt-001" }, error: null }),
@@ -67,32 +59,9 @@ const {
 
   const mockSupabaseRpc = vi.fn().mockResolvedValue({ error: null });
 
-  return {
-    mockSupabaseInsert,
-    mockSupabaseSelect,
-    mockSupabaseUpdate,
-    mockSupabaseRpc,
-    createHumanApprovalRequest: vi.fn().mockResolvedValue({
-      id: "approval-001",
-      status: "pending",
-      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    }),
-    getHumanApprovalRequest: vi.fn().mockResolvedValue({
-      id: "approval-001",
-      status: "approved",
-      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    }),
-    markHumanApprovalExecuting: vi.fn().mockResolvedValue({
-      id: "approval-001",
-      status: "executing",
-    }),
-    expireHumanApproval: vi.fn().mockResolvedValue({
-      id: "approval-001",
-      status: "expired",
-    }),
-    enforceAgentCapability: vi.fn().mockResolvedValue({ allowed: true, mode: "warn" }),
-    capturedFunctions: {} as Record<string, any>,
-  };
+  const capturedFunctions: Record<string, any> = {};
+
+  return { mockSupabaseInsert, mockSupabaseSelect, mockSupabaseUpdate, mockSupabaseRpc, capturedFunctions };
 });
 
 vi.mock("@supabase/supabase-js", () => ({
@@ -106,32 +75,18 @@ vi.mock("@supabase/supabase-js", () => ({
   })),
 }));
 
+// Mock rate governor
 vi.mock("../../lib/api-rate-governor", () => ({
   reportFailure: vi.fn(),
 }));
 
-vi.mock("../../lib/security-governance", () => ({
-  enforceAgentCapability,
-}));
-
-vi.mock("../../lib/human-approval", () => ({
-  buildApprovalPreview: vi.fn(() => "approval preview"),
-  classifyApprovalCandidate: vi.fn((candidate: { payload?: Record<string, unknown> }) => {
-    if (candidate.payload?.action_domain === "finance") {
-      return { requiresApproval: true, actionFamily: "payment_action" };
-    }
-    return { requiresApproval: false, actionFamily: null };
-  }),
-  createHumanApprovalRequest,
-  getHumanApprovalRequest,
-  markHumanApprovalExecuting,
-  expireHumanApproval,
-}));
-
+// Set env vars
 process.env.SUPABASE_URL = "https://test.supabase.co";
 process.env.SUPABASE_SERVICE_KEY = "test-service-key";
 process.env.TELEGRAM_BOT_TOKEN = "test-bot-token";
-process.env.TELEGRAM_ALERT_CHAT_ID = "123456";
+process.env.TELEGRAM_CHAT_ID = "123456";
+
+// ─── Mock Inngest Step Utilities ─────────────────────────────────
 
 function createMockStep() {
   const sentEvents: Array<{ id: string; event: any }> = [];
@@ -147,11 +102,13 @@ function createMockStep() {
       sentEvents.push({ id: stepId, event });
       return { ids: [`test-${stepId}`] };
     }),
-    sleep: vi.fn(async () => undefined),
     getSentEvents: () => sentEvents,
     getStepResult: (id: string) => stepResults.get(id),
   };
 }
+
+// ─── Import the module under test ────────────────────────────────
+// We need to mock inngest.createFunction to capture the handlers
 
 vi.mock("../../inngest/client", () => ({
   inngest: {
@@ -161,155 +118,183 @@ vi.mock("../../inngest/client", () => ({
     }),
   },
   agentTaskName: vi.fn((agentId: string) => `agent/${agentId}/task`),
-  getDivisionHead: vi.fn((division: string) => {
+  getDivisionHead: vi.fn((div: string) => {
     const heads: Record<string, string> = {
       division_1_core_operations: "d1_ceo",
       division_2_ecommerce: "d2_director",
       division_8_saas_operations: "d8_saas_director",
     };
-    return heads[division] || "shared_exec_orchestrator";
+    return heads[div] || "shared_exec_orchestrator";
   }),
-  getPodLead: vi.fn((podId: string) => (podId.startsWith("biz_") ? `${podId}_pod_lead` : null)),
+  getPodLead: vi.fn((pod: string) => {
+    if (pod.startsWith("biz_")) return `${pod}_pod_lead`;
+    return null;
+  }),
   podTaskName: vi.fn((podId: string) => `pod/${podId}/task`),
 }));
 
+// Import triggers the createFunction calls
 import "../../inngest/functions/agent-orchestrator";
 
+// ═════════════════════════════════════════════════════════════════
+// TESTS
+// ═════════════════════════════════════════════════════════════════
+
 describe("agent-orchestrator", () => {
-  beforeEach(() => {
-    createHumanApprovalRequest.mockClear();
-    getHumanApprovalRequest.mockClear();
-    markHumanApprovalExecuting.mockClear();
-    expireHumanApproval.mockClear();
-    enforceAgentCapability.mockClear();
-
-    getHumanApprovalRequest.mockResolvedValue({
-      id: "approval-001",
-      status: "approved",
-      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+  describe("agentInvoke", () => {
+    it("is registered with id 'agent-invoke'", () => {
+      expect(capturedFunctions["agent-invoke"]).toBeDefined();
+      expect(capturedFunctions["agent-invoke"].config.name).toBe("Agent Invoke Router");
     });
-    markHumanApprovalExecuting.mockResolvedValue({
-      id: "approval-001",
-      status: "executing",
-    });
-  });
 
-  it("registers the agent invoke function", () => {
-    expect(capturedFunctions["agent-invoke"]).toBeDefined();
-  });
-
-  it("routes to a pod lead when the target agent is pod-assigned", async () => {
-    const step = createMockStep();
-    const handler = capturedFunctions["agent-invoke"].handler;
-
-    const result = await handler({
-      event: {
+    it("routes to target agent via pod lead when pod-assigned", async () => {
+      const step = createMockStep();
+      const event = {
         data: {
           source_agent: "d2_director",
           target_agent: "d2_copywriter",
           payload: { task: "write copy" },
           priority: "normal",
         },
-      },
-      step,
+      };
+
+      const handler = capturedFunctions["agent-invoke"].handler;
+      const result = await handler({ event, step });
+
+      expect(result.success).toBe(true);
+      expect(step.run).toHaveBeenCalled();
     });
 
-    expect(result.success).toBe(true);
-    expect(step.sendEvent).toHaveBeenCalled();
-  });
-
-  it("creates and waits on a human approval for irreversible actions", async () => {
-    const step = createMockStep();
-    const handler = capturedFunctions["agent-invoke"].handler;
-
-    const result = await handler({
-      event: {
+    it("escalates gated action domains to shared_exec_orchestrator", async () => {
+      const step = createMockStep();
+      const event = {
         data: {
           source_agent: "d8_revenue_ops",
           target_agent: "d8_billing",
           payload: { action_domain: "finance", amount: 5000 },
           priority: "high",
         },
-      },
-      step,
+      };
+
+      const handler = capturedFunctions["agent-invoke"].handler;
+      const result = await handler({ event, step });
+
+      expect(result.gated).toBe(true);
+      expect(result.routed_to).toBe("shared_exec_orchestrator");
     });
 
-    expect(createHumanApprovalRequest).toHaveBeenCalledTimes(1);
-    expect(markHumanApprovalExecuting).toHaveBeenCalledTimes(1);
-    expect(enforceAgentCapability).toHaveBeenCalledTimes(1);
-    expect(result.success).toBe(true);
-  });
-
-  it("fails closed when the approval is rejected", async () => {
-    getHumanApprovalRequest.mockResolvedValueOnce({
-      id: "approval-001",
-      status: "rejected",
-      expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    });
-
-    const step = createMockStep();
-    const handler = capturedFunctions["agent-invoke"].handler;
-
-    const result = await handler({
-      event: {
+    it("requires target_agent or target_division", async () => {
+      const step = createMockStep();
+      const event = {
         data: {
-          source_agent: "d8_revenue_ops",
-          target_agent: "d8_billing",
-          payload: { action_domain: "finance", amount: 5000 },
-          priority: "high",
+          source_agent: "d1_ceo",
+          payload: { task: "open-ended" },
         },
-      },
-      step,
+      };
+
+      const handler = capturedFunctions["agent-invoke"].handler;
+      await expect(handler({ event, step })).rejects.toThrow(
+        "Must specify either target_agent or target_division",
+      );
+    });
+  });
+
+  describe("agentEscalate", () => {
+    it("is registered with id 'agent-escalate'", () => {
+      expect(capturedFunctions["agent-escalate"]).toBeDefined();
     });
 
-    expect(result.success).toBe(false);
-    expect(result.approval_status).toBe("rejected");
-  });
-
-  it("requires target_agent or target_division", async () => {
-    const step = createMockStep();
-    const handler = capturedFunctions["agent-invoke"].handler;
-
-    await expect(
-      handler({
-        event: {
-          data: {
-            source_agent: "d1_ceo",
-            payload: { task: "open-ended" },
-          },
+    it("falls back to shared_exec_orchestrator after max retries", async () => {
+      const step = createMockStep();
+      const event = {
+        data: {
+          source_agent: "d2_marketing_lead",
+          payload: { issue: "blocked on approval" },
+          retry_count: 3,
+          reason: "Target unhealthy",
         },
-        step,
-      }),
-    ).rejects.toThrow("Must specify either target_agent or target_division");
+      };
+
+      const handler = capturedFunctions["agent-escalate"].handler;
+      const result = await handler({ event, step });
+
+      expect(result.fallback).toBe(true);
+      expect(result.routed_to).toBe("shared_exec_orchestrator");
+    });
+
+    it("routes to healthy target agent", async () => {
+      const step = createMockStep();
+      const event = {
+        data: {
+          source_agent: "d1_ceo",
+          escalation_path: "shared_exec_orchestrator",
+          payload: { issue: "need help" },
+          retry_count: 0,
+          reason: "Need executive input",
+        },
+      };
+
+      const handler = capturedFunctions["agent-escalate"].handler;
+      const result = await handler({ event, step });
+
+      expect(result.success).toBe(true);
+      expect(result.routed_to).toBe("shared_exec_orchestrator");
+    });
   });
 
-  it("registers the telegram alert function", () => {
-    expect(capturedFunctions["telegram-alert"]).toBeDefined();
+  describe("agentHealthCheck", () => {
+    it("is registered as hourly cron", () => {
+      expect(capturedFunctions["agent-health-check"]).toBeDefined();
+    });
   });
 
-  it("sends telegram alerts with fallback chat configuration", async () => {
-    const originalFetch = globalThis.fetch;
-    globalThis.fetch = vi.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ ok: true, result: { message_id: 999 } }),
-    }) as typeof fetch;
+  describe("telegramAlert", () => {
+    it("is registered with id 'telegram-alert'", () => {
+      expect(capturedFunctions["telegram-alert"]).toBeDefined();
+    });
 
-    const step = createMockStep();
-    const handler = capturedFunctions["telegram-alert"].handler;
-    const result = await handler({
-      event: {
+    it("formats urgent messages with 🚨 emoji", async () => {
+      // Mock fetch for Telegram API
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = vi.fn().mockResolvedValue({
+        json: () => Promise.resolve({ ok: true, result: { message_id: 999 } }),
+      });
+
+      const step = createMockStep();
+      const event = {
         data: {
           channel: "ops",
           message: "Server is down!",
           priority: "urgent",
           agent_id: "d1_ceo",
         },
-      },
-      step,
-    });
+      };
 
-    expect(result.success).toBe(true);
-    expect(result.message_id).toBe(999);
-    globalThis.fetch = originalFetch;
+      const handler = capturedFunctions["telegram-alert"].handler;
+      const result = await handler({ event, step });
+
+      expect(result.success).toBe(true);
+      expect(result.message_id).toBe(999);
+
+      globalThis.fetch = originalFetch;
+    });
+  });
+
+  describe("podQuarantine", () => {
+    it("is registered with id 'pod-quarantine'", () => {
+      expect(capturedFunctions["pod-quarantine"]).toBeDefined();
+    });
+  });
+
+  describe("podRestore", () => {
+    it("is registered with id 'pod-restore'", () => {
+      expect(capturedFunctions["pod-restore"]).toBeDefined();
+    });
+  });
+
+  describe("credentialHealthCheck", () => {
+    it("is registered with id 'credential-health-check'", () => {
+      expect(capturedFunctions["credential-health-check"]).toBeDefined();
+    });
   });
 });

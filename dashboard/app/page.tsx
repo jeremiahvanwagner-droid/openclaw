@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { supabase } from "./supabase";
+
 interface DivisionStats {
   division: string;
   total: number;
@@ -57,14 +59,6 @@ interface PortfolioSummary {
   blueprint_coverage_rate: number;
   rollout_wave_counts: Record<string, number>;
   businesses: PortfolioBusinessSummary[];
-}
-
-interface DashboardSummary {
-  totalAgents: number;
-  activeAgents: number;
-  divisionStats: DivisionStats[];
-  recentAgents: AgentSummary[];
-  eventStats: EventStats;
 }
 
 const DIVISION_NAMES: Record<string, string> = {
@@ -210,16 +204,16 @@ function SystemHealth({ eventStats }: { eventStats: EventStats }) {
       : "100.0";
 
   const successClasses =
-    Number.parseFloat(successRate) >= 99
+    parseFloat(successRate) >= 99
       ? "text-green-400"
-      : Number.parseFloat(successRate) >= 95
+      : parseFloat(successRate) >= 95
         ? "text-yellow-400"
         : "text-red-400";
 
   const successBarClasses =
-    Number.parseFloat(successRate) >= 99
+    parseFloat(successRate) >= 99
       ? "bg-green-500"
-      : Number.parseFloat(successRate) >= 95
+      : parseFloat(successRate) >= 95
         ? "bg-yellow-500"
         : "bg-red-500";
 
@@ -324,24 +318,91 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [dashboardResponse, portfolioResponse] = await Promise.all([
-          fetch("/api/dashboard", { cache: "no-store" }),
-          fetch("/api/portfolio", { cache: "no-store" }),
-        ]);
-
-        if (dashboardResponse.ok) {
-          const dashboard = (await dashboardResponse.json()) as DashboardSummary;
-          setTotalAgents(dashboard.totalAgents);
-          setActiveAgents(dashboard.activeAgents);
-          setDivisionStats(dashboard.divisionStats);
-          setRecentAgents(dashboard.recentAgents);
-          setEventStats(dashboard.eventStats);
-        }
-
+        const portfolioResponse = await fetch("/api/portfolio", { cache: "no-store" });
         if (portfolioResponse.ok) {
           const portfolio = (await portfolioResponse.json()) as PortfolioSummary;
           setPortfolioSummary(portfolio);
         }
+
+        if (!supabase) {
+          return;
+        }
+
+        const { data: agents, error: agentsError } = await supabase
+          .from("agents")
+          .select("*");
+
+        if (agentsError) throw agentsError;
+
+        if (agents) {
+          setTotalAgents(agents.length);
+          setActiveAgents(agents.filter((agent) => agent.status === "active").length);
+
+          const nextDivisionStats: Record<string, DivisionStats> = {};
+          agents.forEach((agent) => {
+            const division = agent.org_unit || "unknown";
+            if (!nextDivisionStats[division]) {
+              nextDivisionStats[division] = {
+                division,
+                total: 0,
+                active: 0,
+                idle: 0,
+                error: 0,
+              };
+            }
+
+            nextDivisionStats[division].total += 1;
+            if (agent.status === "active") nextDivisionStats[division].active += 1;
+            else if (agent.status === "idle") nextDivisionStats[division].idle += 1;
+            else if (agent.status === "error") nextDivisionStats[division].error += 1;
+          });
+
+          setDivisionStats(
+            Object.values(nextDivisionStats).sort((left, right) =>
+              left.division.localeCompare(right.division),
+            ),
+          );
+
+          const agentSummaries: AgentSummary[] = agents
+            .map((agent) => ({
+              agent_id: agent.agent_id,
+              division: agent.org_unit,
+              role: agent.display_name || agent.config?.role || "Agent",
+              status: agent.status,
+              last_heartbeat: agent.last_heartbeat_at,
+              metrics: agent.config?.metrics || {},
+            }))
+            .sort(
+              (left, right) =>
+                new Date(right.last_heartbeat || 0).getTime() -
+                new Date(left.last_heartbeat || 0).getTime(),
+            );
+
+          setRecentAgents(agentSummaries);
+        }
+
+        const { count: totalEvents } = await supabase
+          .from("agent_events")
+          .select("*", { count: "exact", head: true });
+
+        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        const { count: recentEvents } = await supabase
+          .from("agent_events")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", oneHourAgo);
+
+        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { count: failedEvents } = await supabase
+          .from("agent_events")
+          .select("*", { count: "exact", head: true })
+          .not("error_message", "is", null)
+          .gte("created_at", oneDayAgo);
+
+        setEventStats({
+          total: totalEvents || 0,
+          last_hour: recentEvents || 0,
+          failed: failedEvents || 0,
+        });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {

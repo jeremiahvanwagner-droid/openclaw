@@ -80,11 +80,8 @@ node scripts/generate-workspaces.mjs
 # 7. Register agents
 node scripts/register-agents.mjs
 
-# 8. Start local webhook/runtime helpers (remote-first mode leaves gateway on Hetzner)
+# 8. Start the gateway
 powershell -ExecutionPolicy Bypass -File scripts/restart-local.ps1 -PrimaryTenant TJB
-
-# Optional local-only gateway for isolated development (disabled by default)
-powershell -ExecutionPolicy Bypass -File scripts/restart-local.ps1 -PrimaryTenant TJB -EnableLocalGateway
 
 # Manual webhook-only restart if needed (separate terminal)
 node --env-file=.env handlers/ghl-webhook-handler.mjs
@@ -194,7 +191,7 @@ powershell -ExecutionPolicy Bypass -File scripts/approve-remote-device.ps1
 
 Requirements:
 
-- `OPENCLAW_GATEWAY_AUTH_TOKEN` (or `OPENCLAW_GATEWAY_TOKEN`) must be available in your shell environment.
+- `OPENCLAW_GATEWAY_AUTH_TOKEN` must be available in your shell environment.
 - SSH access to `root@87.99.138.98` with `~/.ssh/openclaw_hetzner`.
 
 ### Health Checks
@@ -205,27 +202,9 @@ openclaw health
 
 `openclaw health` should succeed against the remote gateway after `gateway.remote.token` is present in `openclaw.json`.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/check-gateway-topology.ps1
-```
-
-Use that guard to detect accidental local gateway listeners and remote/local mode drift.
-
 ### Known CLI Caveat
 
 Some OpenClaw CLI commands still prefer local loopback URLs in their status output, even when the remote gateway is healthy. If `openclaw dashboard --no-open` or `openclaw status` shows `127.0.0.1`, use `scripts/open-remote-control.ps1` for browser access instead of trusting the printed dashboard URL.
-
-### Relay Session Contract (Chrome Extension)
-
-For deterministic browser execution, enforce a single attached relay tab per session.
-
-- Keep exactly one active tab attached to the OpenClaw Browser Relay icon (badge ON).
-- Before browser actions, run `openclaw browser tabs --browser-profile chrome-relay --json` and verify the target tab is present.
-- Fast preflight helper: `powershell -ExecutionPolicy Bypass -File scripts/relay-preflight.ps1`
-- Single-tab lock helper (dry-run): `powershell -ExecutionPolicy Bypass -File scripts/relay-single-tab-lock.ps1`
-- Enforce close-extra-tabs lock: `powershell -ExecutionPolicy Bypass -File scripts/relay-single-tab-lock.ps1 -Apply`
-- If you see stale target errors, refresh tabs and explicitly reselect a valid `targetId` from the latest list.
-- If no tab is attached, do not retry blindly. Re-attach the tab first, then rerun the action.
 
 ### Host-Side Troubleshooting
 
@@ -411,10 +390,10 @@ Cross-functional agents serving all divisions.
         │       OPENCLAW RUNTIME         │
         │   (Workspace-Based Context)    │
         │                                │
-        │  SOUL.md → Generated posture   │
-        │  AGENTS.md → Generated registry │
-        │  MEMORY.md → Generated policy  │
-        │  TOOLS.md → Generated controls │
+        │  SOUL.md → Agent Identity      │
+        │  AGENTS.md → Operating Rules   │
+        │  MEMORY.md → Long-Term Memory  │
+        │  USER.md → Human Context       │
         └────────────────────────────────┘
 ```
 
@@ -559,9 +538,9 @@ Automated alerts for:
 
 ## Contributing
 
-1. Runtime and agent policy changes must be made in `config/agents_config.json`
-2. Regenerate governance docs with `node scripts/generate-governance-docs.mjs`
-3. Test escalation paths and run `pnpm validate:security` before deployment
+1. All agent changes require `SOUL.md` updates
+2. New agents must be added to `agents_config.json`
+3. Test escalation paths before deployment
 4. Document integration changes in `stack_setup.md`
 
 ---
