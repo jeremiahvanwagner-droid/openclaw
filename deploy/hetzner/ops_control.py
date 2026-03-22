@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 DEFAULT_DB_PATH = str(Path.home() / ".config" / "openclaw-prod" / "ops.db")
@@ -1195,8 +1195,15 @@ def summarize_skill_health(conn: sqlite3.Connection) -> Dict[str, Any]:
     return data
 
 
+def resolve_timezone(timezone_name: str) -> dt.tzinfo:
+    try:
+        return ZoneInfo(timezone_name)
+    except ZoneInfoNotFoundError:
+        return dt.timezone.utc
+
+
 def strategy_cadence_actions(timezone_name: str) -> List[str]:
-    day = now_utc().astimezone(ZoneInfo(timezone_name)).strftime("%A").lower()
+    day = now_utc().astimezone(resolve_timezone(timezone_name)).strftime("%A").lower()
     if day == "monday":
         return ["Monday strategy cadence: run KPI review and bottleneck diagnosis before noon."]
     if day == "wednesday":
@@ -1207,7 +1214,7 @@ def strategy_cadence_actions(timezone_name: str) -> List[str]:
 
 
 def next_window_times(timezone_name: str) -> Dict[str, str]:
-    tz = ZoneInfo(timezone_name)
+    tz = resolve_timezone(timezone_name)
     local_now = now_utc().astimezone(tz)
     morning = local_now.replace(hour=7, minute=0, second=0, microsecond=0)
     evening = local_now.replace(hour=21, minute=0, second=0, microsecond=0)
@@ -1260,7 +1267,15 @@ def compose_report(
     )
     retry_count = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status = 'retry_wait'").fetchone()["c"])
     unresolved_critical = int(
-        conn.execute("SELECT COUNT(*) AS c FROM alerts WHERE resolved_at IS NULL AND severity = 'RED'").fetchone()["c"]
+        conn.execute(
+            """
+            SELECT COUNT(*) AS c
+            FROM alerts
+            WHERE resolved_at IS NULL
+              AND severity = 'RED'
+              AND alert_type != 'sentinel_dispatch'
+            """
+        ).fetchone()["c"]
     )
 
     api_lines, quota_warning_count = summarize_api_usage(conn, since)
@@ -1329,9 +1344,10 @@ def compose_report(
 
     alerts = conn.execute(
         """
-        SELECT severity, message
+        SELECT alert_type, severity, message
         FROM alerts
         WHERE resolved_at IS NULL
+          AND alert_type != 'sentinel_dispatch'
         ORDER BY
           CASE severity WHEN 'RED' THEN 0 WHEN 'YELLOW' THEN 1 ELSE 2 END,
           last_seen_at DESC
@@ -1339,9 +1355,15 @@ def compose_report(
         """
     ).fetchall()
     action_required: List[str] = []
+    seen_action_required: set[tuple[str, str, str]] = set()
     for alert in alerts:
+        alert_type = str(alert["alert_type"])
         sev = str(alert["severity"])
         msg = str(alert["message"])
+        dedupe_key = (alert_type, sev, msg)
+        if dedupe_key in seen_action_required:
+            continue
+        seen_action_required.add(dedupe_key)
         marker = "[ACTION REQUIRED] " if sev == "RED" else ""
         action_required.append(f"{marker}{sev}: {msg}")
 
@@ -1427,7 +1449,7 @@ def generate_social_content_plan(
     offers = [part.strip() for part in os.getenv("OPENCLAW_ACTIVE_OFFERS", "").split(",") if part.strip()]
     primary_offer = offers[0] if offers else "Scorecard + Next Step Mapping"
 
-    now_local = now_utc().astimezone(ZoneInfo(timezone_name))
+    now_local = now_utc().astimezone(resolve_timezone(timezone_name))
     next_publish = now_local.replace(hour=11, minute=0, second=0, microsecond=0)
     if next_publish <= now_local:
         next_publish += dt.timedelta(days=1)
@@ -1596,7 +1618,9 @@ def collect_critical_conditions(conn: sqlite3.Connection) -> List[Dict[str, Any]
         """
         SELECT alert_id, alert_type, severity, message, details_json
         FROM alerts
-        WHERE resolved_at IS NULL AND severity = 'RED'
+                WHERE resolved_at IS NULL
+                    AND severity = 'RED'
+                    AND alert_type != 'sentinel_dispatch'
         ORDER BY last_seen_at DESC
         """
     ).fetchall()
@@ -1763,65 +1787,68 @@ def check_and_repair_gateway(conn: sqlite3.Connection) -> Dict[str, str]:
 def run_sentinel(args: argparse.Namespace) -> int:
     conn = connect_db(args.db_path)
     init_db(conn)
-    gateway_state = check_and_repair_gateway(conn)
-    critical = collect_critical_conditions(conn)
-    if gateway_state["status"] == "failed":
-        critical.append({"message": gateway_state["message"], "details": {"kind": "gateway"}})
-    if not critical:
-        print("NO_ALERT")
+    try:
+        gateway_state = check_and_repair_gateway(conn)
+        critical = collect_critical_conditions(conn)
+        if gateway_state["status"] == "failed":
+            critical.append({"message": gateway_state["message"], "details": {"kind": "gateway"}})
+        if not critical:
+            print("NO_ALERT")
+            return 0
+
+        lines = ["CRITICAL ALERT", "[ACTION REQUIRED]", "Immediate exception criteria matched:"]
+        for item in critical:
+            lines.append(f"- {item['message']}")
+        message = "\n".join(lines)
+
+        fingerprint = hashlib.sha256(message.encode("utf-8")).hexdigest()
+        row = conn.execute(
+            "SELECT alert_id, notified_at FROM alerts WHERE fingerprint = ?",
+            (f"sentinel:{fingerprint}",),
+        ).fetchone()
+        already_recent = False
+        if row and row["notified_at"]:
+            notified_at = parse_iso(str(row["notified_at"]))
+            already_recent = (now_utc() - notified_at) < dt.timedelta(minutes=args.min_notify_interval_minutes)
+
+        if not already_recent:
+            bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
+            chat_id = os.getenv("OPENCLAW_ALERT_TELEGRAM_CHAT_ID", "")
+            teams_url = os.getenv("OPENCLAW_ALERT_MSTEAMS_WEBHOOK_URL", "")
+            sent_count = 0
+
+            if bot_token and chat_id:
+                send_telegram_alert(bot_token, chat_id, message)
+                log_action(conn, "sentinel", "alert_telegram_sent", {"chat_id": chat_id})
+                sent_count += 1
+            if teams_url:
+                send_msteams_alert(teams_url, message)
+                log_action(conn, "sentinel", "alert_msteams_sent", {"has_url": True})
+                sent_count += 1
+
+            create_alert(
+                conn,
+                alert_type="sentinel_dispatch",
+                severity="RED",
+                message="Critical sentinel notification dispatched",
+                details={"critical_count": len(critical), "channels_sent": sent_count},
+                fingerprint=f"sentinel:{fingerprint}",
+            )
+            conn.execute(
+                "UPDATE alerts SET notified_at = ? WHERE fingerprint = ?",
+                (iso_utc(), f"sentinel:{fingerprint}"),
+            )
+            conn.commit()
+            if sent_count > 0:
+                print("CRITICAL_ALERT_SENT")
+            else:
+                print("CRITICAL_ALERT_QUEUED_NO_CHANNEL")
+            return 0
+
+        print("CRITICAL_ALERT_ALREADY_SENT")
         return 0
-
-    lines = ["CRITICAL ALERT", "[ACTION REQUIRED]", "Immediate exception criteria matched:"]
-    for item in critical:
-        lines.append(f"- {item['message']}")
-    message = "\n".join(lines)
-
-    fingerprint = hashlib.sha256(message.encode("utf-8")).hexdigest()
-    row = conn.execute(
-        "SELECT alert_id, notified_at FROM alerts WHERE fingerprint = ?",
-        (f"sentinel:{fingerprint}",),
-    ).fetchone()
-    already_recent = False
-    if row and row["notified_at"]:
-        notified_at = parse_iso(str(row["notified_at"]))
-        already_recent = (now_utc() - notified_at) < dt.timedelta(minutes=args.min_notify_interval_minutes)
-
-    if not already_recent:
-        bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
-        chat_id = os.getenv("OPENCLAW_ALERT_TELEGRAM_CHAT_ID", "")
-        teams_url = os.getenv("OPENCLAW_ALERT_MSTEAMS_WEBHOOK_URL", "")
-        sent_count = 0
-
-        if bot_token and chat_id:
-            send_telegram_alert(bot_token, chat_id, message)
-            log_action(conn, "sentinel", "alert_telegram_sent", {"chat_id": chat_id})
-            sent_count += 1
-        if teams_url:
-            send_msteams_alert(teams_url, message)
-            log_action(conn, "sentinel", "alert_msteams_sent", {"has_url": True})
-            sent_count += 1
-
-        create_alert(
-            conn,
-            alert_type="sentinel_dispatch",
-            severity="RED",
-            message="Critical sentinel notification dispatched",
-            details={"critical_count": len(critical), "channels_sent": sent_count},
-            fingerprint=f"sentinel:{fingerprint}",
-        )
-        conn.execute(
-            "UPDATE alerts SET notified_at = ? WHERE fingerprint = ?",
-            (iso_utc(), f"sentinel:{fingerprint}"),
-        )
-        conn.commit()
-        if sent_count > 0:
-            print("CRITICAL_ALERT_SENT")
-        else:
-            print("CRITICAL_ALERT_QUEUED_NO_CHANNEL")
-        return 0
-
-    print("CRITICAL_ALERT_ALREADY_SENT")
-    return 0
+    finally:
+        conn.close()
 
 
 class WebhookHandler(BaseHTTPRequestHandler):
@@ -1945,20 +1972,33 @@ def cmd_record_api_call(args: argparse.Namespace) -> int:
 def cmd_snapshot(args: argparse.Namespace) -> int:
     conn = connect_db(args.db_path)
     init_db(conn)
-    pending = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status IN ('pending','retry_wait')").fetchone()["c"])
-    failed = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status = 'failed'").fetchone()["c"])
-    critical = int(conn.execute("SELECT COUNT(*) AS c FROM alerts WHERE resolved_at IS NULL AND severity = 'RED'").fetchone()["c"])
-    print(
-        safe_json(
-            {
-                "pending_tasks": pending,
-                "failed_tasks": failed,
-                "critical_alerts": critical,
-                "db_path": str(Path(args.db_path).expanduser()),
-            }
+    try:
+        pending = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status IN ('pending','retry_wait')").fetchone()["c"])
+        failed = int(conn.execute("SELECT COUNT(*) AS c FROM task_queue WHERE status = 'failed'").fetchone()["c"])
+        critical = int(
+            conn.execute(
+                """
+                SELECT COUNT(*) AS c
+                FROM alerts
+                WHERE resolved_at IS NULL
+                  AND severity = 'RED'
+                  AND alert_type != 'sentinel_dispatch'
+                """
+            ).fetchone()["c"]
         )
-    )
-    return 0
+        print(
+            safe_json(
+                {
+                    "pending_tasks": pending,
+                    "failed_tasks": failed,
+                    "critical_alerts": critical,
+                    "db_path": str(Path(args.db_path).expanduser()),
+                }
+            )
+        )
+        return 0
+    finally:
+        conn.close()
 
 
 def cmd_init_governance(args: argparse.Namespace) -> int:

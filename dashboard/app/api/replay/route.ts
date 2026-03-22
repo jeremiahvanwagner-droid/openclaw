@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 import { createSupabaseServer } from "../../supabase-server";
 import { isUserAdmin } from "../../../lib/admin";
+import { getServiceSupabase } from "../../../lib/server-auth";
 
 export async function POST(req: NextRequest) {
   // Verify authenticated session
@@ -21,11 +21,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "event_id required" }, { status: 400 });
   }
 
-  // Use service role to read and write events
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  const supabase = await getServiceSupabase();
 
   // Fetch original event
   const { data: original, error: fetchErr } = await supabase

@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     100,
   );
 
-  const supabase = getServiceSupabase();
+  const supabase = await getServiceSupabase();
   let query = supabase
     .from("agent_events")
     .select(

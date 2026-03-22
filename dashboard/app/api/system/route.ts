@@ -8,7 +8,7 @@ export async function GET() {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const supabase = getServiceSupabase();
+  const supabase = await getServiceSupabase();
   const { error } = await supabase.from("agents").select("agent_id", { count: "exact", head: true });
 
   if (error) {

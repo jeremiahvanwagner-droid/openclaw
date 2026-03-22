@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 import { createSupabaseServer } from "../../supabase-server";
 import { isUserAdmin } from "../../../lib/admin";
+import { getServiceSupabase } from "../../../lib/server-auth";
 
 interface CostRecord {
   agent_id: string;
@@ -11,13 +11,6 @@ interface CostRecord {
   tokens_out: number;
   cost_usd: number;
   recorded_at: string;
-}
-
-function getServiceSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
 }
 
 export async function GET() {
@@ -30,7 +23,7 @@ export async function GET() {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const supabase = getServiceSupabase();
+  const supabase = await getServiceSupabase();
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 

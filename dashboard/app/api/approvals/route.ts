@@ -18,7 +18,7 @@ async function writeApprovalResolutionEvent(params: {
   note?: string;
   resolvedBy: string;
 }) {
-  const db = getServiceSupabase();
+  const db = await getServiceSupabase();
   await db.from("agent_events").insert({
     event_name: "approval/resolved",
     source_agent: params.resolvedBy,
@@ -46,7 +46,7 @@ async function resolveApproval(params: {
   note?: string;
   channel: string;
 }) {
-  const db = getServiceSupabase();
+  const db = await getServiceSupabase();
   const status = params.decision === "approve" ? "approved" : "rejected";
 
   const { data, error } = await db
@@ -100,7 +100,7 @@ export async function GET(req: NextRequest) {
     200,
   );
 
-  const db = getServiceSupabase();
+  const db = await getServiceSupabase();
   let query = db
     .from("human_approval_queue")
     .select("*")

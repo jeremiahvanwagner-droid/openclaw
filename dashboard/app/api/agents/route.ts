@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 
 import { createSupabaseServer } from "../../supabase-server";
 import { isUserAdmin } from "../../../lib/admin";
+import { getServiceSupabase } from "../../../lib/server-auth";
 
 const ALLOWED_CONFIG_PATCH_FIELDS = new Set(["model", "role", "escalation_path"]);
 
@@ -13,13 +13,6 @@ interface AgentMutationRequest {
   action: AgentAction;
   agent_id: string;
   config?: JsonObject;
-}
-
-function getServiceSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
 }
 
 async function requireAdmin() {
@@ -57,7 +50,7 @@ function sanitizeConfigPatch(config: unknown): JsonObject | null {
 }
 
 async function auditLog(
-  db: ReturnType<typeof getServiceSupabase>,
+  db: any,
   action: string,
   agentId: string,
   userEmail: string,
@@ -92,7 +85,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "agent_id required" }, { status: 400 });
   }
 
-  const db = getServiceSupabase();
+  const db = await getServiceSupabase();
 
   // Verify agent exists
   const { data: agent, error: fetchErr } = await db
