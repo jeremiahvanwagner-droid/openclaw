@@ -2284,6 +2284,80 @@ def cmd_queue_check(args: argparse.Namespace) -> int:
     return 0
 
 
+HETZNER_API_BASE = "https://api.hetzner.cloud/v1"
+
+
+def hetzner_reboot_server(token: str, server: str) -> Dict[str, Any]:
+    """Reboot a Hetzner server by name or numeric ID via the Hetzner Cloud API.
+
+    If *server* is a purely numeric string it is treated as a server ID,
+    otherwise a GET /v1/servers?name=<server> lookup is performed first.
+    Returns the JSON body returned by the reboot action endpoint.
+    """
+    auth_header = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    # Resolve name → ID when necessary
+    if server.isdigit():
+        server_id = int(server)
+    else:
+        list_url = f"{HETZNER_API_BASE}/servers?name={urllib.parse.quote(server, safe='')}"
+        req = urllib.request.Request(list_url, headers=auth_header, method="GET")
+        try:
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            raise RuntimeError(f"Hetzner API error {exc.code} looking up server '{server}': {body}") from exc
+
+        servers = data.get("servers", [])
+        if not servers:
+            raise ValueError(f"No Hetzner server found with name '{server}'")
+        server_id = servers[0]["id"]
+
+    # Issue reboot action
+    reboot_url = f"{HETZNER_API_BASE}/servers/{server_id}/actions/reboot"
+    req = urllib.request.Request(
+        reboot_url,
+        data=b"{}",
+        headers=auth_header,
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"Hetzner API error {exc.code} rebooting server {server_id}: {body}") from exc
+
+
+def cmd_hetzner_restart_server(args: argparse.Namespace) -> int:
+    token = getattr(args, "hetzner_token", None) or os.getenv("HETZNER_API_TOKEN", "")
+    if not token:
+        print(safe_json({"ok": False, "error": "HETZNER_API_TOKEN is not set"}))
+        return 1
+
+    server = args.server
+    conn = connect_db(args.db_path)
+    init_db(conn)
+    try:
+        result = hetzner_reboot_server(token, server)
+        action = result.get("action", {})
+        log_action(
+            conn,
+            "hetzner",
+            "server_reboot",
+            {"server": server, "action_id": action.get("id"), "status": action.get("status")},
+        )
+        print(safe_json({"ok": True, "server": server, "action": action}))
+        return 0
+    except (RuntimeError, ValueError) as exc:
+        log_action(conn, "hetzner", "server_reboot_failed", {"server": server, "error": str(exc)})
+        print(safe_json({"ok": False, "error": str(exc)}))
+        return 1
+    finally:
+        conn.close()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="OpenClaw low-API operations control")
     parser.add_argument("--db-path", default=os.getenv("OPENCLAW_OPS_DB_PATH", DEFAULT_DB_PATH))
@@ -2401,6 +2475,11 @@ def build_parser() -> argparse.ArgumentParser:
     queue_check.add_argument("--job-id", required=True, help="Cron job ID to check")
     queue_check.add_argument("--jobs-path", default=os.path.expanduser("~/.openclaw/cron/jobs.json"), help="Path to jobs.json")
     queue_check.set_defaults(func=cmd_queue_check)
+
+    hetzner_restart = sub.add_parser("hetzner-restart-server", help="Reboot a Hetzner Cloud server by name or ID")
+    hetzner_restart.add_argument("--server", required=True, help="Server name or numeric Hetzner server ID")
+    hetzner_restart.add_argument("--hetzner-token", default=None, help="Hetzner API token (defaults to HETZNER_API_TOKEN env var)")
+    hetzner_restart.set_defaults(func=cmd_hetzner_restart_server)
 
     return parser
 
