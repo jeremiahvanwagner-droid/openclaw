@@ -116,6 +116,10 @@ jobs:
           command_timeout: 20m
           script: |
             cd /opt/openclaw
+            # Pull code first so deploy.sh is always the latest version
+            sudo -u openclaw git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
+            sudo -u openclaw git fetch origin main
+            sudo -u openclaw git pull --ff-only origin main
             if [ "${{ github.event.inputs.upgrade_cli }}" = "true" ]; then
               sudo bash deploy/hetzner/deploy.sh --upgrade
             else
