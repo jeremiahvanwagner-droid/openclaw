@@ -211,15 +211,6 @@
         "name": "CEO",
         "workspace": "/opt/openclaw/workspaces/d1_ceo",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Operations / Reporting"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send messages to leads/clients",
-          "Never modify workflows or funnels directly",
-          "Read-only CRM access for executive briefings"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -257,15 +248,6 @@
         "id": "d1_cmo",
         "name": "Chief Marketing Officer (CMO)",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Marketing / Lead Nurture"
-        ],
-        "ghl_token_group": "token_marketing_nurture",
-        "operational_boundaries": [
-          "Never modify products, pricing, or payment links",
-          "Never bulk-delete contacts, tags, or fields",
-          "Never send financial details or links not whitelisted"
-        ],
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -372,15 +354,6 @@
         "id": "d1_customer_success",
         "name": "Customer Success Manager",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Support / Inbox"
-        ],
-        "ghl_token_group": "token_support_inbox",
-        "operational_boundaries": [
-          "Never issue refunds or invoice changes",
-          "Never promise custom pricing or contracts",
-          "Complex or emotional topics stay in draft-for-review status"
-        ],
         "skills": [
           "abandoned-cart-recovery",
           "analytics-dashboard",
@@ -556,15 +529,6 @@
         "id": "d1_sales_manager",
         "name": "Sales Manager",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Sales / Pipeline"
-        ],
-        "ghl_token_group": "token_sales_pipeline",
-        "operational_boundaries": [
-          "Never mark an opportunity Closed Won without explicit conditions",
-          "Never alter product/pricing; only reference existing offers",
-          "Escalate Beyond the Veil decisions to Jeremiah"
-        ],
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -750,15 +714,6 @@
         "name": "eCommerce Director",
         "workspace": "/opt/openclaw/workspaces/d2_director",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Operations / Reporting"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send messages to leads/clients",
-          "Never modify workflows or funnels directly",
-          "Read-only eCommerce analytics access"
-        ],
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -957,15 +912,6 @@
         "id": "d2_store_manager",
         "name": "eCommerce Store Manager",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Payment Monitor"
-        ],
-        "ghl_token_group": "token_payments_readonly",
-        "operational_boundaries": [
-          "Never charge cards, create invoices, or issue refunds",
-          "Never send payment links directly to contacts without whitelisting",
-          "Read-only product catalog access"
-        ],
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -1087,15 +1033,6 @@
         "id": "d3_biz_dev",
         "name": "Business Development Manager",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Sales / Pipeline"
-        ],
-        "ghl_token_group": "token_sales_pipeline",
-        "operational_boundaries": [
-          "Never mark an opportunity Closed Won without explicit conditions",
-          "Never alter product/pricing; only reference existing offers",
-          "Escalate high-value consulting deals to Jeremiah"
-        ],
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -1649,15 +1586,6 @@
         "id": "d4_enrollment",
         "name": "Client Enrollment Specialist (Sales)",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Sales / Pipeline"
-        ],
-        "ghl_token_group": "token_sales_pipeline",
-        "operational_boundaries": [
-          "Never mark an opportunity Closed Won without explicit conditions",
-          "Never bypass required BTV application steps",
-          "Escalate Beyond the Veil enrollment decisions to Jeremiah"
-        ],
         "skills": [
           "checkout-integrator",
           "coaching-adaptive-action-plan-generation",
@@ -1717,15 +1645,6 @@
         "id": "d4_funnel_strategist",
         "name": "Marketing & Funnel Strategist",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Marketing / Lead Nurture"
-        ],
-        "ghl_token_group": "token_marketing_nurture",
-        "operational_boundaries": [
-          "Never modify products, pricing, or payment links",
-          "Never bulk-delete contacts, tags, or fields",
-          "Funnel structure changes require HITL approval"
-        ],
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -2615,15 +2534,6 @@
         "name": "Truth J Blue Core Brand Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_01_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2675,15 +2585,6 @@
         "name": "Beyond the Veil Mentorship Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_02_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2738,15 +2639,6 @@
         "name": "Divine Path Walkers Community Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_03_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2801,15 +2693,6 @@
         "name": "Truth J Blue Publishing Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_04_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2850,15 +2733,6 @@
         "name": "Truth J Blue Consulting Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_05_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agency-automated-invoice-generation",
@@ -2910,15 +2784,6 @@
         "name": "Inspire Build Motivate, Inc. Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_06_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2973,15 +2838,6 @@
         "name": "Truth J Blue Online Store Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_07_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3038,15 +2894,6 @@
         "name": "Truth J Blue Primary SaaS Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_08_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "abandoned-cart-recovery",
           "access-control-manager",
@@ -3090,15 +2937,6 @@
         "name": "Incubator Shared Brands Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_09_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3138,15 +2976,6 @@
         "name": "Portfolio Control Pod Lead",
         "workspace": "/opt/openclaw/workspaces/biz_10_pod_lead",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Main Orchestrator"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send outbound messages to contacts",
-          "Never move deals between pipeline stages",
-          "Never change pricing, products, or funnel structure"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3197,15 +3026,6 @@
         "id": "browser_primary",
         "name": "Browser Automation Primary",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Operations / Reporting"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send messages to leads/clients via GHL API",
-          "Never modify workflows or funnels directly",
-          "Browser-based GHL actions require HITL approval"
-        ],
         "skills": [
           "asset-library-manager",
           "automation-logic-designer",
@@ -3515,15 +3335,6 @@
         "id": "d8_automation_architect",
         "name": "Workflow & Automation Architect",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Operations / Reporting"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never deploy workflows to production without HITL approval",
-          "Never modify live funnel or pipeline structure",
-          "Workflow changes must be staged and reviewed"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3692,15 +3503,6 @@
         "id": "d8_crm_ops",
         "name": "CRM & Conversational AI Ops",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Operations / Reporting"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send messages to leads/clients",
-          "Never modify pricing or payment configuration",
-          "CRM configuration changes require HITL approval"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3783,15 +3585,6 @@
         "id": "d8_funnel_engineer",
         "name": "Funnel & Website Engineer",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Marketing / Lead Nurture"
-        ],
-        "ghl_token_group": "token_marketing_nurture",
-        "operational_boundaries": [
-          "Never modify products, pricing, or payment links",
-          "Never bulk-delete funnels or pages",
-          "Funnel cloning requires HITL approval for production deployment"
-        ],
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -3939,15 +3732,6 @@
         "id": "d8_membership_director",
         "name": "Course & Membership Director",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Value Ladder"
-        ],
-        "ghl_token_group": "token_value_ladder",
-        "operational_boundaries": [
-          "Never bypass required application steps for BTV",
-          "Never take payment actions; redirect to existing checkout flows only",
-          "Value ladder position changes must follow defined criteria"
-        ],
         "skills": [
           "abandoned-cart-recovery",
           "checkout-integrator",
@@ -3999,15 +3783,6 @@
         "id": "d8_platform_architect",
         "name": "GHL Platform & Auth Architect",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Operations / Reporting"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never modify live integration credentials without HITL approval",
-          "OAuth token management requires explicit authorization",
-          "Never expose tokens or credentials in logs"
-        ],
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -4064,15 +3839,6 @@
         "id": "d8_revenue_ops",
         "name": "E-Commerce & Revenue Ops Manager",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Payment Monitor"
-        ],
-        "ghl_token_group": "token_payments_readonly",
-        "operational_boundaries": [
-          "Never charge cards, create invoices, or issue refunds",
-          "Never send payment links directly to contacts",
-          "Revenue data is read-only; alerts are internal only"
-        ],
         "skills": [
           "abandoned-cart-recovery",
           "analytics-dashboard",
@@ -4136,15 +3902,6 @@
         "name": "SaaS Operations Director",
         "workspace": "/opt/openclaw/workspaces/d8_saas_director",
         "model": "openai/gpt-5.3-codex",
-        "business_scope": [
-          "Operations / Reporting"
-        ],
-        "ghl_token_group": "token_insight_ops",
-        "operational_boundaries": [
-          "Never send messages to leads/clients",
-          "Never modify pricing or payment configuration",
-          "SaaS configuration changes require HITL approval"
-        ],
         "skills": [
           "abandoned-cart-recovery",
           "access-control-manager",
@@ -5370,19 +5127,6 @@
       "msteams": {
         "enabled": false
       }
-    }
-  },
-  "scopes": {
-    "version": "1.0.0",
-    "enforcement": "strict",
-    "scope_sets_file": "config/ghl-scope-sets.json",
-    "token_groups_file": "config/ghl-token-groups.json",
-    "enforcer_module": "lib/ghl-scope-enforcer.mjs",
-    "tenant": "TJB",
-    "policy": {
-      "deny_unscoped_ghl_calls": true,
-      "log_scope_violations": true,
-      "hitl_required_for_boundary_override": true
     }
   }
 }
