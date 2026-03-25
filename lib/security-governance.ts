@@ -71,3 +71,10 @@ export const getGovernanceSummary = runtime.getGovernanceSummary as () => Promis
   }>;
   skills: SkillRegistryEntry[];
 }>;
+export const enforceGhlScopePolicy = runtime.enforceGhlScopePolicy as (options: {
+  agentId: string;
+  resource: string;
+  operation: string;
+  correlationId?: string | null;
+  metadata?: Record<string, unknown>;
+}) => Promise<{ allowed: boolean; mode: string; tokenGroup?: string; permission?: string }>;

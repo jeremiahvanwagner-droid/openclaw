@@ -12,7 +12,8 @@
       "rationale": "Truth J Blue Core Brand execution space (space.shared.tjb.production)",
       "space_id": "space.business.biz_01.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.tjb.production"
+      "shared_tenant_space": "space.shared.tjb.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_02_pod_lead",
@@ -23,7 +24,8 @@
       "rationale": "Beyond the Veil Mentorship execution space (space.shared.msl.production)",
       "space_id": "space.business.biz_02.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.msl.production"
+      "shared_tenant_space": "space.shared.msl.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_03_pod_lead",
@@ -34,7 +36,8 @@
       "rationale": "Divine Path Walkers Community execution space (space.shared.msl.production)",
       "space_id": "space.business.biz_03.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.msl.production"
+      "shared_tenant_space": "space.shared.msl.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_04_pod_lead",
@@ -45,7 +48,8 @@
       "rationale": "Truth J Blue Publishing execution space (space.shared.tjb.production)",
       "space_id": "space.business.biz_04.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.tjb.production"
+      "shared_tenant_space": "space.shared.tjb.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_05_pod_lead",
@@ -56,7 +60,8 @@
       "rationale": "Truth J Blue Consulting execution space (space.shared.tjb.production)",
       "space_id": "space.business.biz_05.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.tjb.production"
+      "shared_tenant_space": "space.shared.tjb.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_06_pod_lead",
@@ -67,7 +72,8 @@
       "rationale": "Inspire Build Motivate, Inc. execution space (space.shared.msl.production)",
       "space_id": "space.business.biz_06.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.msl.production"
+      "shared_tenant_space": "space.shared.msl.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_07_pod_lead",
@@ -78,7 +84,8 @@
       "rationale": "Truth J Blue Online Store execution space (space.shared.tjb.production)",
       "space_id": "space.business.biz_07.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.tjb.production"
+      "shared_tenant_space": "space.shared.tjb.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_08_pod_lead",
@@ -89,7 +96,8 @@
       "rationale": "Truth J Blue Primary SaaS execution space (space.shared.tjb.production)",
       "space_id": "space.business.biz_08.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.tjb.production"
+      "shared_tenant_space": "space.shared.tjb.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_09_pod_lead",
@@ -100,7 +108,8 @@
       "rationale": "Incubator Shared Brands execution space (space.shared.tjb.production)",
       "space_id": "space.business.biz_09.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.tjb.production"
+      "shared_tenant_space": "space.shared.tjb.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "biz_10_pod_lead",
@@ -111,7 +120,8 @@
       "rationale": "Portfolio Control execution space (space.shared.tjb.production)",
       "space_id": "space.business.biz_10.production",
       "space_family": "business",
-      "shared_tenant_space": "space.shared.tjb.production"
+      "shared_tenant_space": "space.shared.tjb.production",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "browser_primary",
@@ -121,7 +131,8 @@
       "scope_family": "shared",
       "rationale": "Global control plane for runtime orchestration",
       "space_id": "space.global.control_plane",
-      "space_family": "global"
+      "space_family": "global",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "browser_secondary",
@@ -141,7 +152,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_1_core_operations",
       "space_id": "space.division.division_1_core_operations.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "d1_cmo",
@@ -151,7 +163,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_1_core_operations",
       "space_id": "space.division.division_1_core_operations.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_marketing_nurture"
     },
     {
       "agent_id": "d1_cto",
@@ -171,7 +184,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_1_core_operations",
       "space_id": "space.division.division_1_core_operations.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_support_inbox"
     },
     {
       "agent_id": "d1_data_analyst",
@@ -221,7 +235,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_1_core_operations",
       "space_id": "space.division.division_1_core_operations.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_sales_pipeline"
     },
     {
       "agent_id": "d1_ux_designer",
@@ -271,7 +286,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_2_ecommerce",
       "space_id": "space.division.division_2_ecommerce.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "d2_graphic_designer",
@@ -321,7 +337,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_2_ecommerce",
       "space_id": "space.division.division_2_ecommerce.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_payments_readonly"
     },
     {
       "agent_id": "d2_web_dev",
@@ -351,7 +368,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_3_consulting",
       "space_id": "space.division.division_3_consulting.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_sales_pipeline"
     },
     {
       "agent_id": "d3_business_analyst",
@@ -481,7 +499,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_4_coaching",
       "space_id": "space.division.division_4_coaching.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_sales_pipeline"
     },
     {
       "agent_id": "d4_funnel_strategist",
@@ -491,7 +510,8 @@
       "scope_family": "division",
       "rationale": "Division operations space for division_4_coaching",
       "space_id": "space.division.division_4_coaching.operations",
-      "space_family": "division"
+      "space_family": "division",
+      "ghl_token_group": "token_marketing_nurture"
     },
     {
       "agent_id": "d4_lead_coach",
@@ -741,7 +761,8 @@
       "scope_family": "shared",
       "rationale": "Shared SaaS enablement control space",
       "space_id": "space.shared.control.production",
-      "space_family": "shared"
+      "space_family": "shared",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "d8_community_manager",
@@ -781,7 +802,8 @@
       "scope_family": "shared",
       "rationale": "Shared SaaS enablement control space",
       "space_id": "space.shared.control.production",
-      "space_family": "shared"
+      "space_family": "shared",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "d8_customer_success",
@@ -801,7 +823,8 @@
       "scope_family": "shared",
       "rationale": "Shared SaaS enablement control space",
       "space_id": "space.shared.control.production",
-      "space_family": "shared"
+      "space_family": "shared",
+      "ghl_token_group": "token_marketing_nurture"
     },
     {
       "agent_id": "d8_integration_engineer",
@@ -831,7 +854,8 @@
       "scope_family": "shared",
       "rationale": "Shared SaaS enablement control space",
       "space_id": "space.shared.control.production",
-      "space_family": "shared"
+      "space_family": "shared",
+      "ghl_token_group": "token_value_ladder"
     },
     {
       "agent_id": "d8_platform_architect",
@@ -841,7 +865,8 @@
       "scope_family": "shared",
       "rationale": "Shared SaaS enablement control space",
       "space_id": "space.shared.control.production",
-      "space_family": "shared"
+      "space_family": "shared",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "d8_revenue_ops",
@@ -851,7 +876,8 @@
       "scope_family": "shared",
       "rationale": "Shared SaaS enablement control space",
       "space_id": "space.shared.control.production",
-      "space_family": "shared"
+      "space_family": "shared",
+      "ghl_token_group": "token_payments_readonly"
     },
     {
       "agent_id": "d8_saas_director",
@@ -861,7 +887,8 @@
       "scope_family": "shared",
       "rationale": "Shared SaaS enablement control space",
       "space_id": "space.shared.control.production",
-      "space_family": "shared"
+      "space_family": "shared",
+      "ghl_token_group": "token_insight_ops"
     },
     {
       "agent_id": "d9_analytics",

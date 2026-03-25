@@ -284,7 +284,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_02_pod_lead",
@@ -331,7 +340,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_03_pod_lead",
@@ -378,7 +396,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_04_pod_lead",
@@ -425,7 +452,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_05_pod_lead",
@@ -472,7 +508,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_06_pod_lead",
@@ -519,7 +564,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_07_pod_lead",
@@ -566,7 +620,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_08_pod_lead",
@@ -613,7 +676,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_09_pod_lead",
@@ -660,7 +732,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "biz_10_pod_lead",
@@ -707,7 +788,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "shared_exec_orchestrator"
+      "reports_to": "shared_exec_orchestrator",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send outbound messages to contacts",
+        "Never move deals between pipeline stages",
+        "Never change pricing, products, or funnel structure"
+      ]
     },
     {
       "agent_id": "browser_primary",
@@ -756,7 +846,16 @@
         "social-media-publisher",
         "design-generator"
       ],
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send messages to leads/clients via GHL API",
+        "Never modify workflows or funnels directly",
+        "Browser-based GHL actions require HITL approval"
+      ]
     },
     {
       "agent_id": "browser_secondary",
@@ -855,7 +954,16 @@
       "workspace_path": ".openclaw/workspaces/d1_ceo",
       "cron_schedule": null,
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send messages to leads/clients",
+        "Never modify workflows or funnels directly",
+        "Read-only CRM access for executive briefings"
+      ]
     },
     {
       "agent_id": "d1_cmo",
@@ -901,7 +1009,16 @@
       "workspace_path": ".openclaw/workspaces/d1_cmo",
       "cron_schedule": "0 9 * * 1",
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Marketing / Lead Nurture"
+      ],
+      "ghl_token_group": "token_marketing_nurture",
+      "operational_boundaries": [
+        "Never modify products, pricing, or payment links",
+        "Never bulk-delete contacts, tags, or fields",
+        "Never send financial details or links not whitelisted"
+      ]
     },
     {
       "agent_id": "d1_cto",
@@ -995,7 +1112,16 @@
       "workspace_path": ".openclaw/workspaces/d1_customer_success",
       "cron_schedule": "0 8 * * *",
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Support / Inbox"
+      ],
+      "ghl_token_group": "token_support_inbox",
+      "operational_boundaries": [
+        "Never issue refunds or invoice changes",
+        "Never promise custom pricing or contracts",
+        "Complex or emotional topics stay in draft-for-review status"
+      ]
     },
     {
       "agent_id": "d1_data_analyst",
@@ -1203,7 +1329,16 @@
       "workspace_path": ".openclaw/workspaces/d1_sales_manager",
       "cron_schedule": "0 7 * * *",
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Sales / Pipeline"
+      ],
+      "ghl_token_group": "token_sales_pipeline",
+      "operational_boundaries": [
+        "Never mark an opportunity Closed Won without explicit conditions",
+        "Never alter product/pricing; only reference existing offers",
+        "Escalate Beyond the Veil decisions to Jeremiah"
+      ]
     },
     {
       "agent_id": "d1_ux_designer",
@@ -1411,7 +1546,16 @@
       "workspace_path": ".openclaw/workspaces/d2_director",
       "cron_schedule": "0 7 * * *",
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send messages to leads/clients",
+        "Never modify workflows or funnels directly",
+        "Read-only eCommerce analytics access"
+      ]
     },
     {
       "agent_id": "d2_graphic_designer",
@@ -1613,7 +1757,16 @@
       ],
       "workspace_path": ".openclaw/workspaces/d2_store_manager",
       "telegram_delivery": false,
-      "teams_delivery": false
+      "teams_delivery": false,
+      "business_scope": [
+        "Payment Monitor"
+      ],
+      "ghl_token_group": "token_payments_readonly",
+      "operational_boundaries": [
+        "Never charge cards, create invoices, or issue refunds",
+        "Never send payment links directly to contacts without whitelisting",
+        "Read-only product catalog access"
+      ]
     },
     {
       "agent_id": "d2_web_dev",
@@ -1734,7 +1887,16 @@
       "workspace_path": ".openclaw/workspaces/d3_biz_dev",
       "cron_schedule": "0 8 * * *",
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Sales / Pipeline"
+      ],
+      "ghl_token_group": "token_sales_pipeline",
+      "operational_boundaries": [
+        "Never mark an opportunity Closed Won without explicit conditions",
+        "Never alter product/pricing; only reference existing offers",
+        "Escalate high-value consulting deals to Jeremiah"
+      ]
     },
     {
       "agent_id": "d3_business_analyst",
@@ -2265,7 +2427,16 @@
       "workspace_path": ".openclaw/workspaces/d4_enrollment",
       "cron_schedule": "0 7 * * *",
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Sales / Pipeline"
+      ],
+      "ghl_token_group": "token_sales_pipeline",
+      "operational_boundaries": [
+        "Never mark an opportunity Closed Won without explicit conditions",
+        "Never bypass required BTV application steps",
+        "Escalate Beyond the Veil enrollment decisions to Jeremiah"
+      ]
     },
     {
       "agent_id": "d4_funnel_strategist",
@@ -2306,7 +2477,16 @@
       ],
       "workspace_path": ".openclaw/workspaces/d4_funnel_strategist",
       "telegram_delivery": true,
-      "teams_delivery": true
+      "teams_delivery": true,
+      "business_scope": [
+        "Marketing / Lead Nurture"
+      ],
+      "ghl_token_group": "token_marketing_nurture",
+      "operational_boundaries": [
+        "Never modify products, pricing, or payment links",
+        "Never bulk-delete contacts, tags, or fields",
+        "Funnel structure changes require HITL approval"
+      ]
     },
     {
       "agent_id": "d4_lead_coach",
@@ -3322,7 +3502,16 @@
       "cron_schedule": null,
       "telegram_delivery": false,
       "teams_delivery": false,
-      "reports_to": "d8_saas_director"
+      "reports_to": "d8_saas_director",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never deploy workflows to production without HITL approval",
+        "Never modify live funnel or pipeline structure",
+        "Workflow changes must be staged and reviewed"
+      ]
     },
     {
       "agent_id": "d8_community_manager",
@@ -3495,7 +3684,16 @@
       "cron_schedule": null,
       "telegram_delivery": false,
       "teams_delivery": false,
-      "reports_to": "d8_saas_director"
+      "reports_to": "d8_saas_director",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send messages to leads/clients",
+        "Never modify pricing or payment configuration",
+        "CRM configuration changes require HITL approval"
+      ]
     },
     {
       "agent_id": "d8_customer_success",
@@ -3581,7 +3779,16 @@
       "cron_schedule": null,
       "telegram_delivery": false,
       "teams_delivery": false,
-      "reports_to": "d8_platform_architect"
+      "reports_to": "d8_platform_architect",
+      "business_scope": [
+        "Marketing / Lead Nurture"
+      ],
+      "ghl_token_group": "token_marketing_nurture",
+      "operational_boundaries": [
+        "Never modify products, pricing, or payment links",
+        "Never bulk-delete funnels or pages",
+        "Funnel cloning requires HITL approval for production deployment"
+      ]
     },
     {
       "agent_id": "d8_integration_engineer",
@@ -3705,7 +3912,16 @@
       "cron_schedule": null,
       "telegram_delivery": false,
       "teams_delivery": false,
-      "reports_to": "d8_saas_director"
+      "reports_to": "d8_saas_director",
+      "business_scope": [
+        "Value Ladder"
+      ],
+      "ghl_token_group": "token_value_ladder",
+      "operational_boundaries": [
+        "Never bypass required application steps for BTV",
+        "Never take payment actions; redirect to existing checkout flows only",
+        "Value ladder position changes must follow defined criteria"
+      ]
     },
     {
       "agent_id": "d8_platform_architect",
@@ -3747,7 +3963,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "d8_saas_director"
+      "reports_to": "d8_saas_director",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never modify live integration credentials without HITL approval",
+        "OAuth token management requires explicit authorization",
+        "Never expose tokens or credentials in logs"
+      ]
     },
     {
       "agent_id": "d8_revenue_ops",
@@ -3791,7 +4016,16 @@
       "cron_schedule": null,
       "telegram_delivery": true,
       "teams_delivery": false,
-      "reports_to": "d8_saas_director"
+      "reports_to": "d8_saas_director",
+      "business_scope": [
+        "Payment Monitor"
+      ],
+      "ghl_token_group": "token_payments_readonly",
+      "operational_boundaries": [
+        "Never charge cards, create invoices, or issue refunds",
+        "Never send payment links directly to contacts",
+        "Revenue data is read-only; alerts are internal only"
+      ]
     },
     {
       "agent_id": "d8_saas_director",
@@ -3840,7 +4074,16 @@
       "cron_schedule": "0 7 * * *",
       "telegram_delivery": true,
       "teams_delivery": true,
-      "reports_to": "shared_master_orchestrator"
+      "reports_to": "shared_master_orchestrator",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "ghl_token_group": "token_insight_ops",
+      "operational_boundaries": [
+        "Never send messages to leads/clients",
+        "Never modify pricing or payment configuration",
+        "SaaS configuration changes require HITL approval"
+      ]
     },
     {
       "agent_id": "d9_analytics",

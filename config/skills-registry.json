@@ -5,224 +5,416 @@
   },
   "skills": [
     {
-      "skill_id": "abandoned-cart-recovery",
-      "owner": "growth-automation",
-      "risk_tier": "write_safe",
-      "side_effects": ["telegram_alert", "agent_message"],
-      "external_systems": ["telegram", "openclaw-agent"],
-      "idempotency_key_strategy": "cart_id + workflow_step",
-      "approval_policy": "hitl for payment_action only",
-      "replay_policy": "dedupe by cart and sequence step",
-      "required_tests": ["safe-exec capability policy", "notification dedupe"]
-    },
-    {
       "skill_id": "ab-testing",
       "owner": "growth-ops",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "experiment_id + summary_window",
       "approval_policy": "none",
       "replay_policy": "dedupe by experiment summary interval",
-      "required_tests": ["alert routing"]
+      "required_tests": [
+        "alert routing"
+      ]
+    },
+    {
+      "skill_id": "abandoned-cart-recovery",
+      "owner": "growth-automation",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "telegram_alert",
+        "agent_message"
+      ],
+      "external_systems": [
+        "telegram",
+        "openclaw-agent"
+      ],
+      "idempotency_key_strategy": "cart_id + workflow_step",
+      "approval_policy": "hitl for payment_action only",
+      "replay_policy": "dedupe by cart and sequence step",
+      "required_tests": [
+        "safe-exec capability policy",
+        "notification dedupe"
+      ]
     },
     {
       "skill_id": "anomaly-detection",
       "owner": "runtime-ops",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "anomaly_fingerprint + hour_bucket",
       "approval_policy": "none",
       "replay_policy": "dedupe by anomaly fingerprint",
-      "required_tests": ["alert routing"]
+      "required_tests": [
+        "alert routing"
+      ]
     },
     {
       "skill_id": "assessment-handler",
       "owner": "consulting-ops",
       "risk_tier": "write_safe",
-      "side_effects": ["telegram_alert", "agent_message"],
-      "external_systems": ["telegram", "openclaw-agent"],
+      "side_effects": [
+        "telegram_alert",
+        "agent_message"
+      ],
+      "external_systems": [
+        "telegram",
+        "openclaw-agent"
+      ],
       "idempotency_key_strategy": "assessment_id + action",
       "approval_policy": "none",
       "replay_policy": "dedupe by assessment_id",
-      "required_tests": ["notification dedupe"]
+      "required_tests": [
+        "notification dedupe"
+      ]
     },
     {
       "skill_id": "backup-manager",
       "owner": "platform-ops",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "backup_target + date",
       "approval_policy": "none",
       "replay_policy": "dedupe by backup target and day",
-      "required_tests": ["backup alerting"]
+      "required_tests": [
+        "backup alerting"
+      ]
     },
     {
       "skill_id": "browser-controller",
       "owner": "platform-ops",
       "risk_tier": "irreversible",
-      "side_effects": ["browser_automation", "ghl_ui_action", "social_post"],
-      "external_systems": ["browser"],
+      "side_effects": [
+        "browser_automation",
+        "ghl_ui_action",
+        "social_post"
+      ],
+      "external_systems": [
+        "browser"
+      ],
       "idempotency_key_strategy": "session_name + target_url + action",
       "approval_policy": "hitl for ghl_write and payment_action",
       "replay_policy": "manual replay only with operation ledger",
-      "required_tests": ["sandbox launch", "session persistence"]
+      "required_tests": [
+        "sandbox launch",
+        "session persistence"
+      ],
+      "ghl_scope_requirement": [
+        "contacts:read",
+        "conversations:read"
+      ]
     },
     {
       "skill_id": "browser-core",
       "owner": "platform-ops",
       "risk_tier": "write_safe",
-      "side_effects": ["browser_launch", "cookie_persistence"],
-      "external_systems": ["browser"],
+      "side_effects": [
+        "browser_launch",
+        "cookie_persistence"
+      ],
+      "external_systems": [
+        "browser"
+      ],
       "idempotency_key_strategy": "platform + session_name + command",
       "approval_policy": "none",
       "replay_policy": "recreate browser instance when dedupe key changes",
-      "required_tests": ["sandbox launch", "cookie persistence"]
+      "required_tests": [
+        "sandbox launch",
+        "cookie persistence"
+      ]
     },
     {
       "skill_id": "browser-pool-manager",
       "owner": "platform-ops",
       "risk_tier": "write_safe",
-      "side_effects": ["browser_pool_task_dispatch"],
-      "external_systems": ["browser"],
+      "side_effects": [
+        "browser_pool_task_dispatch"
+      ],
+      "external_systems": [
+        "browser"
+      ],
       "idempotency_key_strategy": "task_id",
       "approval_policy": "inherit task policy",
       "replay_policy": "dedupe by task id",
-      "required_tests": ["pool dedupe", "sandbox launch"]
+      "required_tests": [
+        "pool dedupe",
+        "sandbox launch"
+      ]
     },
     {
       "skill_id": "churn-prevention",
       "owner": "customer-success",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "customer_id + risk_window",
       "approval_policy": "none",
       "replay_policy": "dedupe by customer and risk window",
-      "required_tests": ["alert routing"]
+      "required_tests": [
+        "alert routing"
+      ]
     },
     {
       "skill_id": "cohort-analysis",
       "owner": "analytics",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "cohort_id + report_date",
       "approval_policy": "none",
       "replay_policy": "dedupe by cohort and report date",
-      "required_tests": ["report alerting"]
+      "required_tests": [
+        "report alerting"
+      ]
     },
     {
       "skill_id": "design-generator",
       "owner": "creative-ops",
       "risk_tier": "write_safe",
-      "side_effects": ["design_asset_generation", "social_publish_handoff"],
-      "external_systems": ["browser"],
+      "side_effects": [
+        "design_asset_generation",
+        "social_publish_handoff"
+      ],
+      "external_systems": [
+        "browser"
+      ],
       "idempotency_key_strategy": "design_request_id + variant",
       "approval_policy": "inherit downstream publish policy",
       "replay_policy": "dedupe by design request and variant",
-      "required_tests": ["generation dedupe", "publish handoff policy"]
+      "required_tests": [
+        "generation dedupe",
+        "publish handoff policy"
+      ]
     },
     {
       "skill_id": "ebook-buyer-automation",
       "owner": "publishing-ops",
       "risk_tier": "write_safe",
-      "side_effects": ["telegram_alert", "agent_message"],
-      "external_systems": ["telegram", "openclaw-agent"],
+      "side_effects": [
+        "telegram_alert",
+        "agent_message"
+      ],
+      "external_systems": [
+        "telegram",
+        "openclaw-agent"
+      ],
       "idempotency_key_strategy": "buyer_id + book_id + lifecycle_step",
       "approval_policy": "none",
       "replay_policy": "dedupe by buyer/book/lifecycle step",
-      "required_tests": ["notification dedupe"]
+      "required_tests": [
+        "notification dedupe"
+      ]
+    },
+    {
+      "skill_id": "ghl-api",
+      "owner": "platform-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [
+        "ghl"
+      ],
+      "idempotency_key_strategy": "location_id + resource + action + entity_id",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "dedupe by resource action and entity",
+      "required_tests": [
+        "scope enforcement",
+        "token group resolution"
+      ],
+      "ghl_scope_requirement": "dynamic"
     },
     {
       "skill_id": "ghl-browser-control",
       "owner": "revenue-ops",
       "risk_tier": "irreversible",
-      "side_effects": ["ghl_ui_write"],
-      "external_systems": ["browser"],
+      "side_effects": [
+        "ghl_ui_write"
+      ],
+      "external_systems": [
+        "browser"
+      ],
       "idempotency_key_strategy": "location_id + workflow_action + entity_id",
       "approval_policy": "hitl for ghl_write",
       "replay_policy": "manual replay only with operation ledger",
-      "required_tests": ["sandbox launch", "ghl approval gate"]
+      "required_tests": [
+        "sandbox launch",
+        "ghl approval gate"
+      ],
+      "ghl_scope_requirement": [
+        "contacts:read",
+        "workflows:read",
+        "workflows:write",
+        "opportunities:read",
+        "opportunities:write"
+      ]
     },
     {
       "skill_id": "nlp-query",
       "owner": "analytics",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "query_hash + reporting_window",
       "approval_policy": "none",
       "replay_policy": "dedupe by query hash",
-      "required_tests": ["alert routing"]
+      "required_tests": [
+        "alert routing"
+      ]
     },
     {
       "skill_id": "predictive-scoring",
       "owner": "analytics",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "entity_id + model_version + score_window",
       "approval_policy": "none",
       "replay_policy": "dedupe by model version and score window",
-      "required_tests": ["alert routing"]
+      "required_tests": [
+        "alert routing"
+      ]
     },
     {
       "skill_id": "sequence-orchestrator",
       "owner": "growth-automation",
       "risk_tier": "write_safe",
-      "side_effects": ["telegram_alert", "email_send"],
-      "external_systems": ["telegram", "email"],
+      "side_effects": [
+        "telegram_alert",
+        "email_send"
+      ],
+      "external_systems": [
+        "telegram",
+        "email"
+      ],
       "idempotency_key_strategy": "sequence_id + recipient + step",
       "approval_policy": "hitl for email_send when irreversible",
       "replay_policy": "dedupe by sequence step",
-      "required_tests": ["message dedupe", "capability policy"]
+      "required_tests": [
+        "message dedupe",
+        "capability policy"
+      ]
     },
     {
       "skill_id": "social-media-publisher",
       "owner": "distribution-ops",
       "risk_tier": "irreversible",
-      "side_effects": ["social_post", "browser_automation"],
-      "external_systems": ["browser"],
+      "side_effects": [
+        "social_post",
+        "browser_automation"
+      ],
+      "external_systems": [
+        "browser"
+      ],
       "idempotency_key_strategy": "platform + asset_hash + scheduled_at",
       "approval_policy": "hitl for irreversible publish flows",
       "replay_policy": "dedupe by platform/asset/schedule",
-      "required_tests": ["sandbox launch", "publish dedupe"]
+      "required_tests": [
+        "sandbox launch",
+        "publish dedupe"
+      ]
     },
     {
       "skill_id": "voice-ai",
       "owner": "support-automation",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "conversation_id + alert_type",
       "approval_policy": "none",
       "replay_policy": "dedupe by conversation and alert type",
-      "required_tests": ["alert routing"]
+      "required_tests": [
+        "alert routing"
+      ]
+    },
+    {
+      "skill_id": "webhook-listener-config",
+      "owner": "platform-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_webhook_registration"
+      ],
+      "external_systems": [
+        "ghl"
+      ],
+      "idempotency_key_strategy": "location_id + webhook_url",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "dedupe by webhook registration",
+      "required_tests": [
+        "scope enforcement"
+      ],
+      "ghl_scope_requirement": [
+        "contacts:read",
+        "workflows:read"
+      ]
     },
     {
       "skill_id": "webhook-resilience",
       "owner": "platform-ops",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "event_id + remediation_type",
       "approval_policy": "none",
       "replay_policy": "dedupe by event and remediation type",
-      "required_tests": ["alert routing"]
+      "required_tests": [
+        "alert routing"
+      ]
     },
     {
       "skill_id": "weekly-report",
       "owner": "ops-reporting",
       "risk_tier": "draft_only",
-      "side_effects": ["telegram_alert"],
-      "external_systems": ["telegram"],
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "telegram"
+      ],
       "idempotency_key_strategy": "report_date + audience",
       "approval_policy": "none",
       "replay_policy": "dedupe by report_date and audience",
-      "required_tests": ["report alerting"]
+      "required_tests": [
+        "report alerting"
+      ]
     }
   ]
 }

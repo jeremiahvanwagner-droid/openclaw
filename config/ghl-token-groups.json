@@ -1,0 +1,54 @@
+{
+  "version": "1.0.0",
+  "description": "Maps token groups to GHL scope sets and environment variable names. Each token group represents one GHL Private Integration.",
+  "token_groups": {
+    "token_insight_ops": {
+      "description": "Orchestrators + Operations + Reporting agents — read-heavy, limited write (notes/logs only)",
+      "scope_sets": ["read_only_insight", "operations_reporting"],
+      "env_var": "GHL_TOKEN_INSIGHT_OPS_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – Insight & Ops",
+      "rotation_days": 90
+    },
+    "token_marketing_nurture": {
+      "description": "Marketing / Lead Nurture + Re-engagement agents",
+      "scope_sets": ["lead_nurture", "re_engagement"],
+      "env_var": "GHL_TOKEN_MARKETING_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – Marketing Nurture",
+      "rotation_days": 90
+    },
+    "token_sales_pipeline": {
+      "description": "Sales / Pipeline agents — opportunity management + calendar access",
+      "scope_sets": ["sales_pipeline"],
+      "env_var": "GHL_TOKEN_SALES_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – Sales Pipeline",
+      "rotation_days": 90
+    },
+    "token_support_inbox": {
+      "description": "Support / Inbox agents — conversation + contact access",
+      "scope_sets": ["support_inbox"],
+      "env_var": "GHL_TOKEN_SUPPORT_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – Support Inbox",
+      "rotation_days": 90
+    },
+    "token_value_ladder": {
+      "description": "Value Ladder + Community Migration agents",
+      "scope_sets": ["value_ladder_ascension", "community_migration"],
+      "env_var": "GHL_TOKEN_VALUE_LADDER_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – Value Ladder",
+      "rotation_days": 90
+    },
+    "token_payments_readonly": {
+      "description": "Payment Monitor agents — read-only finance access",
+      "scope_sets": ["payment_monitor"],
+      "env_var": "GHL_TOKEN_PAYMENTS_RO_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – Payments ReadOnly",
+      "rotation_days": 90
+    }
+  }
+}

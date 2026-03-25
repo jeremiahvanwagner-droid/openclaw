@@ -153,6 +153,28 @@
         },
         "capability_policy": {
           "$ref": "#/$defs/capabilityPolicy"
+        },
+        "business_scope": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Business scope archetypes assigned to this agent (e.g. 'Main Orchestrator', 'Sales / Pipeline')"
+        },
+        "ghl_token_group": {
+          "type": "string",
+          "enum": [
+            "token_insight_ops",
+            "token_marketing_nurture",
+            "token_sales_pipeline",
+            "token_support_inbox",
+            "token_value_ladder",
+            "token_payments_readonly"
+          ],
+          "description": "GHL token group determining which Private Integration token and scope set this agent uses"
+        },
+        "operational_boundaries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Hard operational constraints enforced at runtime (e.g. 'Never send outbound messages to contacts')"
         }
       },
       "additionalProperties": true

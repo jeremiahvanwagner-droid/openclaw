@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "Canonical GHL API scope sets for OpenClaw token groups. Each scope set maps to a set of GHL API resource:operation pairs.",
+  "scope_sets": {
+    "read_only_insight": {
+      "description": "Analytics/reporting agents, main orchestrator read access",
+      "permissions": [
+        "contacts:read",
+        "conversations:read",
+        "calendars:read",
+        "opportunities:read",
+        "custom_fields:read",
+        "forms:read",
+        "transactions:read",
+        "workflows:read",
+        "funnels:read",
+        "users:read"
+      ]
+    },
+    "lead_nurture": {
+      "description": "Marketing/lead nurture agents, Divine Seeker nurture automation",
+      "permissions": [
+        "contacts:read",
+        "contacts:write",
+        "conversations:read",
+        "conversations:write",
+        "custom_fields:read",
+        "custom_fields:write",
+        "workflows:read",
+        "workflows:write",
+        "forms:read",
+        "funnels:read",
+        "opportunities:read"
+      ]
+    },
+    "sales_pipeline": {
+      "description": "Pipeline management, discovery call prep, no-show handling",
+      "permissions": [
+        "contacts:read",
+        "contacts:write",
+        "opportunities:read",
+        "opportunities:write",
+        "conversations:read",
+        "conversations:write",
+        "calendars:read",
+        "calendars:write",
+        "custom_fields:read",
+        "custom_fields:write",
+        "transactions:read",
+        "workflows:read",
+        "forms:read"
+      ]
+    },
+    "support_inbox": {
+      "description": "Support email/SMS drafters, low-risk auto-responses",
+      "permissions": [
+        "contacts:read",
+        "contacts:write",
+        "conversations:read",
+        "conversations:write",
+        "custom_fields:read",
+        "custom_fields:write",
+        "workflows:read",
+        "forms:read"
+      ]
+    },
+    "operations_reporting": {
+      "description": "Daily briefings, weekly performance reports, token rotation reminders",
+      "permissions": [
+        "contacts:read",
+        "contacts:write",
+        "opportunities:read",
+        "funnels:read",
+        "workflows:read",
+        "transactions:read",
+        "calendars:read",
+        "forms:read",
+        "users:read"
+      ]
+    },
+    "re_engagement": {
+      "description": "Cold database reactivation, long-term nurture",
+      "permissions": [
+        "contacts:read",
+        "contacts:write",
+        "opportunities:read",
+        "opportunities:write",
+        "conversations:read",
+        "conversations:write",
+        "custom_fields:read",
+        "custom_fields:write",
+        "workflows:read",
+        "workflows:write"
+      ]
+    },
+    "community_migration": {
+      "description": "Skool to GHL migration helper",
+      "permissions": [
+        "contacts:read",
+        "contacts:write",
+        "custom_fields:read",
+        "custom_fields:write",
+        "conversations:read",
+        "conversations:write",
+        "workflows:read",
+        "workflows:write"
+      ]
+    },
+    "value_ladder_ascension": {
+      "description": "Scorecard to Audit to Toolkit to Group to Coaching to BTV recommendations",
+      "permissions": [
+        "contacts:read",
+        "contacts:write",
+        "custom_fields:read",
+        "custom_fields:write",
+        "opportunities:read",
+        "opportunities:write",
+        "workflows:read",
+        "workflows:write",
+        "forms:read",
+        "transactions:read"
+      ]
+    },
+    "payment_monitor": {
+      "description": "Revenue reporting, alerts — no financial write-actions",
+      "permissions": [
+        "transactions:read",
+        "contacts:read",
+        "contacts:write",
+        "opportunities:read",
+        "opportunities:write",
+        "funnels:read"
+      ]
+    }
+  }
+}
