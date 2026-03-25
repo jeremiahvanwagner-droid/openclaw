@@ -18,6 +18,8 @@ print_service_diagnostics() {
 
 restart_service() {
     local service_name="$1"
+    # Clear systemd start-rate limiter so restart works after crash-loops
+    systemctl reset-failed "${service_name}" 2>/dev/null || true
     if ! systemctl restart "${service_name}"; then
         echo "  Failed to restart ${service_name}"
         print_service_diagnostics "${service_name}"
