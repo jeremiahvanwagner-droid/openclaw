@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://truthjblue.dev/schemas/canonical-space.schema.json",
+  "title": "OpenClaw Canonical Space Schema",
+  "description": "Canonical schema for execution/data spaces (U15).",
+  "type": "object",
+  "required": ["version", "mappings"],
+  "properties": {
+    "version": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent_id", "space_id", "space_family"],
+        "properties": {
+          "agent_id": { "type": "string", "minLength": 1 },
+          "space_id": {
+            "type": "string",
+            "pattern": "^space\\.(global\\.control_plane|shared\\.(tjb|msl|control)\\.production|division\\.[a-z0-9_]+\\.operations|business\\.[a-z0-9_]+\\.production)$"
+          },
+          "space_family": {
+            "type": "string",
+            "enum": ["global", "shared", "division", "business"]
+          },
+          "rationale": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
