@@ -24,73 +24,97 @@
       "ghl_token_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_PRIVATE_INTEGRATION_TOKEN"],
+        "args": [
+          "GHL_PRIVATE_INTEGRATION_TOKEN"
+        ],
         "timeoutMs": 3000
       },
       "ghl_location_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_LOCATION_ID"],
+        "args": [
+          "GHL_LOCATION_ID"
+        ],
         "timeoutMs": 3000
       },
       "telegram_token_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["OPENCLAW_TELEGRAM_BOT_TOKEN"],
+        "args": [
+          "OPENCLAW_TELEGRAM_BOT_TOKEN"
+        ],
         "timeoutMs": 3000
       },
       "user_env_exec": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN"],
+        "args": [
+          "OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN"
+        ],
         "timeoutMs": 3000
       },
       "supabase_url_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["SUPABASE_URL"],
+        "args": [
+          "SUPABASE_URL"
+        ],
         "timeoutMs": 3000
       },
       "supabase_service_role_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["SUPABASE_SERVICE_ROLE_KEY"],
+        "args": [
+          "SUPABASE_SERVICE_ROLE_KEY"
+        ],
         "timeoutMs": 3000
       },
       "canva_client_id_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["CANVA_CLIENT_ID"],
+        "args": [
+          "CANVA_CLIENT_ID"
+        ],
         "timeoutMs": 3000
       },
       "canva_client_secret_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["CANVA_CLIENT_SECRET"],
+        "args": [
+          "CANVA_CLIENT_SECRET"
+        ],
         "timeoutMs": 3000
       },
       "canva_brand_kit_id_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["CANVA_BRAND_KIT_ID"],
+        "args": [
+          "CANVA_BRAND_KIT_ID"
+        ],
         "timeoutMs": 3000
       },
       "ghl_email_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_EMAIL"],
+        "args": [
+          "GHL_EMAIL"
+        ],
         "timeoutMs": 3000
       },
       "ghl_password_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["GHL_PASSWORD"],
+        "args": [
+          "GHL_PASSWORD"
+        ],
         "timeoutMs": 3000
       },
       "openai_embeddings_key_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
-        "args": ["OPENAI_API_KEY"],
+        "args": [
+          "OPENAI_API_KEY"
+        ],
         "timeoutMs": 3000
       }
     }
@@ -396,7 +420,11 @@
     },
     "nodes": {
       "denyCommands": []
-    }
+    },
+    "trustedProxies": [
+      "127.0.0.1/32",
+      "::1/128"
+    ]
   },
   "skills": {
     "entries": {

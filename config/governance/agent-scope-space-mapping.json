@@ -1,0 +1,1047 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-03-25T16:48:55.462Z",
+  "total_agents": 103,
+  "mappings": [
+    {
+      "agent_id": "biz_01_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_01",
+      "scope_id": "scope.business.biz_01",
+      "scope_family": "business",
+      "rationale": "Truth J Blue Core Brand execution space (space.shared.tjb.production)",
+      "space_id": "space.business.biz_01.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.tjb.production"
+    },
+    {
+      "agent_id": "biz_02_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_02",
+      "scope_id": "scope.business.biz_02",
+      "scope_family": "business",
+      "rationale": "Beyond the Veil Mentorship execution space (space.shared.msl.production)",
+      "space_id": "space.business.biz_02.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.msl.production"
+    },
+    {
+      "agent_id": "biz_03_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_03",
+      "scope_id": "scope.business.biz_03",
+      "scope_family": "business",
+      "rationale": "Divine Path Walkers Community execution space (space.shared.msl.production)",
+      "space_id": "space.business.biz_03.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.msl.production"
+    },
+    {
+      "agent_id": "biz_04_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_04",
+      "scope_id": "scope.business.biz_04",
+      "scope_family": "business",
+      "rationale": "Truth J Blue Publishing execution space (space.shared.tjb.production)",
+      "space_id": "space.business.biz_04.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.tjb.production"
+    },
+    {
+      "agent_id": "biz_05_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_05",
+      "scope_id": "scope.business.biz_05",
+      "scope_family": "business",
+      "rationale": "Truth J Blue Consulting execution space (space.shared.tjb.production)",
+      "space_id": "space.business.biz_05.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.tjb.production"
+    },
+    {
+      "agent_id": "biz_06_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_06",
+      "scope_id": "scope.business.biz_06",
+      "scope_family": "business",
+      "rationale": "Inspire Build Motivate, Inc. execution space (space.shared.msl.production)",
+      "space_id": "space.business.biz_06.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.msl.production"
+    },
+    {
+      "agent_id": "biz_07_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_07",
+      "scope_id": "scope.business.biz_07",
+      "scope_family": "business",
+      "rationale": "Truth J Blue Online Store execution space (space.shared.tjb.production)",
+      "space_id": "space.business.biz_07.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.tjb.production"
+    },
+    {
+      "agent_id": "biz_08_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_08",
+      "scope_id": "scope.business.biz_08",
+      "scope_family": "business",
+      "rationale": "Truth J Blue Primary SaaS execution space (space.shared.tjb.production)",
+      "space_id": "space.business.biz_08.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.tjb.production"
+    },
+    {
+      "agent_id": "biz_09_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_09",
+      "scope_id": "scope.business.biz_09",
+      "scope_family": "business",
+      "rationale": "Incubator Shared Brands execution space (space.shared.tjb.production)",
+      "space_id": "space.business.biz_09.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.tjb.production"
+    },
+    {
+      "agent_id": "biz_10_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "biz_10",
+      "scope_id": "scope.business.biz_10",
+      "scope_family": "business",
+      "rationale": "Portfolio Control execution space (space.shared.tjb.production)",
+      "space_id": "space.business.biz_10.production",
+      "space_family": "business",
+      "shared_tenant_space": "space.shared.tjb.production"
+    },
+    {
+      "agent_id": "browser_primary",
+      "org_unit": "division_7_shared_services",
+      "pod_id": null,
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "browser_secondary",
+      "org_unit": "division_7_shared_services",
+      "pod_id": null,
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "d1_ceo",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_cmo",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_cto",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_customer_success",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_data_analyst",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_devops",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_fullstack_dev",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_product_dev_manager",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_sales_manager",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d1_ux_designer",
+      "org_unit": "division_1_core_operations",
+      "pod_id": null,
+      "scope_id": "scope.division.division_1_core_operations",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_1_core_operations",
+      "space_id": "space.division.division_1_core_operations.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_copywriter",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_customer_service",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_digital_marketing",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_director",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_graphic_designer",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_inventory_specialist",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_paid_ads",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_seo_strategist",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_store_manager",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d2_web_dev",
+      "org_unit": "division_2_ecommerce",
+      "pod_id": null,
+      "scope_id": "scope.division.division_2_ecommerce",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_2_ecommerce",
+      "space_id": "space.division.division_2_ecommerce.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_admin_coordinator",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_biz_dev",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_business_analyst",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_ceo",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_client_relations",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_lead_strategist",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_marketing_brand",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_ops_manager",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_sales_closer",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d3_thought_leadership",
+      "org_unit": "division_3_consulting",
+      "pod_id": null,
+      "scope_id": "scope.division.division_3_consulting",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_3_consulting",
+      "space_id": "space.division.division_3_consulting.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_client_experience",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_community_manager",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_curriculum_head",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_cvo",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_enrollment",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_funnel_strategist",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_lead_coach",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_social_creator",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_tech_automation",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d4_video_production",
+      "org_unit": "division_4_coaching",
+      "pod_id": null,
+      "scope_id": "scope.division.division_4_coaching",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_4_coaching",
+      "space_id": "space.division.division_4_coaching.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_acquisitions",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_author_relations",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_book_marketing",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_copywriter",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_cover_artist",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_digital_distribution",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_managing_editor",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_pr_media",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_publisher",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d5_sales_affiliate",
+      "org_unit": "division_5_publishing",
+      "pod_id": null,
+      "scope_id": "scope.division.division_5_publishing",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_5_publishing",
+      "space_id": "space.division.division_5_publishing.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_board_liaison",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_communications",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_coo",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_dev_director",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_executive_director",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_finance",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_grant_writer",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_outreach",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_program_director",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d6_volunteer",
+      "org_unit": "division_6_nonprofit",
+      "pod_id": null,
+      "scope_id": "scope.division.division_6_nonprofit",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_6_nonprofit",
+      "space_id": "space.division.division_6_nonprofit.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d8_automation_architect",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_community_manager",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_compliance_auditor",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_content_ops",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_crm_ops",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_customer_success",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_funnel_engineer",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_integration_engineer",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_marketing_automation",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_membership_director",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_platform_architect",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_revenue_ops",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d8_saas_director",
+      "org_unit": "division_8_saas_operations",
+      "pod_id": null,
+      "scope_id": "scope.shared.saas",
+      "scope_family": "shared",
+      "rationale": "Shared SaaS enablement control space",
+      "space_id": "space.shared.control.production",
+      "space_family": "shared"
+    },
+    {
+      "agent_id": "d9_analytics",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_customer_experience",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_merchandiser",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_offer_strategist",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_sales_copywriter",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_seo_content",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_social_promoter",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_store_director",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_web_designer",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "d9_wp_developer",
+      "org_unit": "division_9_online_store",
+      "pod_id": null,
+      "scope_id": "scope.division.division_9_online_store",
+      "scope_family": "division",
+      "rationale": "Division operations space for division_9_online_store",
+      "space_id": "space.division.division_9_online_store.operations",
+      "space_family": "division"
+    },
+    {
+      "agent_id": "shared_api_gateway",
+      "org_unit": "division_7_shared_services",
+      "pod_id": null,
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "shared_data_analytics",
+      "org_unit": "division_7_shared_services",
+      "pod_id": null,
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "shared_data_control",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "shared",
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "shared_exec_orchestrator",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "shared",
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "shared_knowledge_base",
+      "org_unit": "division_7_shared_services",
+      "pod_id": null,
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "shared_legal_compliance",
+      "org_unit": "division_7_shared_services",
+      "pod_id": null,
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "shared_master_orchestrator",
+      "org_unit": "division_7_shared_services",
+      "pod_id": null,
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    },
+    {
+      "agent_id": "shared_runtime_ops",
+      "org_unit": "division_7_shared_services",
+      "pod_id": "shared",
+      "scope_id": "scope.shared.runtime",
+      "scope_family": "shared",
+      "rationale": "Global control plane for runtime orchestration",
+      "space_id": "space.global.control_plane",
+      "space_family": "global"
+    }
+  ]
+}

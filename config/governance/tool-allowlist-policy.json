@@ -1,0 +1,1132 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-03-25T16:48:55.495Z",
+  "enforcement_mode": "fail",
+  "default_policy": {
+    "allow": false,
+    "reason": "deny-by-default policy enabled; explicit allowlist required per agent"
+  },
+  "agent_policies": [
+    {
+      "agent_id": "biz_01_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_02_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_03_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_04_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_05_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_06_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_07_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_08_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_09_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "biz_10_pod_lead",
+      "allowed_tools": [
+        "agent_events",
+        "agent_metrics",
+        "agent_sessions",
+        "ghl_contacts",
+        "ghl_workflows",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "browser_primary",
+      "allowed_tools": [
+        "browser_core",
+        "design_generator",
+        "ghl_browser_control",
+        "screenshot_capture",
+        "social_media_publisher",
+        "teams_alerts",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "browser_secondary",
+      "allowed_tools": [
+        "browser_core",
+        "design_generator",
+        "metrics_collector",
+        "session_manager",
+        "social_media_publisher"
+      ]
+    },
+    {
+      "agent_id": "d1_ceo",
+      "allowed_tools": [
+        "calendar_api",
+        "ghl_contacts",
+        "ghl_opportunities",
+        "slack_executive_channel",
+        "stripe_dashboard",
+        "supabase_analytics",
+        "teams_alerts",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "d1_cmo",
+      "allowed_tools": [
+        "buffer_social",
+        "canva_api",
+        "ghl_marketing",
+        "google_analytics",
+        "google_search_console",
+        "mailchimp_api",
+        "meta_ads_api"
+      ]
+    },
+    {
+      "agent_id": "d1_cto",
+      "allowed_tools": [
+        "cloudflare_api",
+        "docker_registry",
+        "github_api",
+        "inngest_dashboard",
+        "sentry_monitoring",
+        "supabase_admin",
+        "vercel_dashboard"
+      ]
+    },
+    {
+      "agent_id": "d1_customer_success",
+      "allowed_tools": [
+        "customer_health_dashboard",
+        "ghl_contacts",
+        "ghl_conversations",
+        "helpdesk_system",
+        "intercom_api",
+        "nps_survey_system"
+      ]
+    },
+    {
+      "agent_id": "d1_data_analyst",
+      "allowed_tools": [
+        "google_analytics",
+        "metabase_api",
+        "python_jupyter",
+        "spreadsheet_api",
+        "stripe_reporting",
+        "supabase_analytics"
+      ]
+    },
+    {
+      "agent_id": "d1_devops",
+      "allowed_tools": [
+        "aws_cli",
+        "cloudflare_api",
+        "datadog_monitoring",
+        "docker_cli",
+        "github_actions",
+        "sentry_api",
+        "vercel_api"
+      ]
+    },
+    {
+      "agent_id": "d1_fullstack_dev",
+      "allowed_tools": [
+        "docker_cli",
+        "github_api",
+        "npm_registry",
+        "supabase_client",
+        "testing_framework",
+        "vercel_cli",
+        "vscode_api"
+      ]
+    },
+    {
+      "agent_id": "d1_product_dev_manager",
+      "allowed_tools": [
+        "analytics_dashboard",
+        "figma_api",
+        "github_projects",
+        "notion_api",
+        "roadmap_tool",
+        "user_feedback_system"
+      ]
+    },
+    {
+      "agent_id": "d1_sales_manager",
+      "allowed_tools": [
+        "calendar_api",
+        "call_recording_system",
+        "ghl_opportunities",
+        "ghl_pipelines",
+        "sales_analytics",
+        "stripe_dashboard"
+      ]
+    },
+    {
+      "agent_id": "d1_ux_designer",
+      "allowed_tools": [
+        "accessibility_checker",
+        "canva_api",
+        "design_system_docs",
+        "figma_api",
+        "hotjar_analytics",
+        "user_testing_platform"
+      ]
+    },
+    {
+      "agent_id": "d2_copywriter",
+      "allowed_tools": [
+        "ab_testing_copy_tool",
+        "content_editor",
+        "email_template_builder",
+        "grammarly_api",
+        "seo_writing_assistant"
+      ]
+    },
+    {
+      "agent_id": "d2_customer_service",
+      "allowed_tools": [
+        "canned_responses",
+        "customer_notes",
+        "ghl_conversations",
+        "helpdesk_system",
+        "order_lookup_tool",
+        "refund_processing"
+      ]
+    },
+    {
+      "agent_id": "d2_digital_marketing",
+      "allowed_tools": [
+        "campaign_calendar",
+        "email_marketing_platform",
+        "google_ads_api",
+        "google_analytics",
+        "meta_ads_manager",
+        "utm_tracking_system"
+      ]
+    },
+    {
+      "agent_id": "d2_director",
+      "allowed_tools": [
+        "ghl_ecommerce",
+        "google_analytics_ecommerce",
+        "inventory_management",
+        "pricing_tool",
+        "shopify_admin",
+        "stripe_dashboard"
+      ]
+    },
+    {
+      "agent_id": "d2_graphic_designer",
+      "allowed_tools": [
+        "brand_asset_library",
+        "canva_api",
+        "figma_api",
+        "image_optimization_tool",
+        "mockup_generator",
+        "photoshop_api"
+      ]
+    },
+    {
+      "agent_id": "d2_inventory_specialist",
+      "allowed_tools": [
+        "barcode_scanner",
+        "inventory_management_system",
+        "returns_management",
+        "shipping_api",
+        "shopify_fulfillment",
+        "supplier_portal"
+      ]
+    },
+    {
+      "agent_id": "d2_paid_ads",
+      "allowed_tools": [
+        "attribution_platform",
+        "audience_builder",
+        "creative_testing_tool",
+        "google_ads_api",
+        "meta_ads_api",
+        "pixel_management"
+      ]
+    },
+    {
+      "agent_id": "d2_seo_strategist",
+      "allowed_tools": [
+        "ahrefs_api",
+        "content_management_system",
+        "google_analytics",
+        "google_search_console",
+        "keyword_tracker",
+        "semrush_api"
+      ]
+    },
+    {
+      "agent_id": "d2_store_manager",
+      "allowed_tools": [
+        "ghl_products",
+        "order_management_system",
+        "product_catalog_editor",
+        "shipping_integration",
+        "shopify_admin"
+      ]
+    },
+    {
+      "agent_id": "d2_web_dev",
+      "allowed_tools": [
+        "css_framework",
+        "javascript_runtime",
+        "liquid_templating",
+        "page_speed_tools",
+        "security_scanner",
+        "shopify_api"
+      ]
+    },
+    {
+      "agent_id": "d3_admin_coordinator",
+      "allowed_tools": [
+        "calendar_api",
+        "document_storage",
+        "email_management",
+        "expense_system",
+        "task_management",
+        "travel_booking"
+      ]
+    },
+    {
+      "agent_id": "d3_biz_dev",
+      "allowed_tools": [
+        "calendar_api",
+        "email_sequences",
+        "ghl_opportunities",
+        "linkedin_sales_navigator",
+        "meeting_scheduler",
+        "proposal_software"
+      ]
+    },
+    {
+      "agent_id": "d3_business_analyst",
+      "allowed_tools": [
+        "data_visualization",
+        "financial_modeling",
+        "process_mapping",
+        "research_databases",
+        "spreadsheet_advanced",
+        "survey_analysis"
+      ]
+    },
+    {
+      "agent_id": "d3_ceo",
+      "allowed_tools": [
+        "calendar_api",
+        "client_portal",
+        "contract_management",
+        "crm_system",
+        "proposal_generator",
+        "video_conferencing"
+      ]
+    },
+    {
+      "agent_id": "d3_client_relations",
+      "allowed_tools": [
+        "client_portal",
+        "crm_system",
+        "email_platform",
+        "renewal_tracker",
+        "satisfaction_dashboard",
+        "survey_tool"
+      ]
+    },
+    {
+      "agent_id": "d3_lead_strategist",
+      "allowed_tools": [
+        "client_collaboration_platform",
+        "data_analysis_tools",
+        "document_generator",
+        "presentation_software",
+        "research_databases",
+        "strategic_frameworks"
+      ]
+    },
+    {
+      "agent_id": "d3_marketing_brand",
+      "allowed_tools": [
+        "analytics_dashboard",
+        "brand_guidelines",
+        "content_management",
+        "marketing_automation",
+        "social_media_scheduler",
+        "webinar_platform"
+      ]
+    },
+    {
+      "agent_id": "d3_ops_manager",
+      "allowed_tools": [
+        "budget_tracker",
+        "process_documentation",
+        "project_management_tool",
+        "resource_scheduler",
+        "time_tracking",
+        "vendor_management"
+      ]
+    },
+    {
+      "agent_id": "d3_sales_closer",
+      "allowed_tools": [
+        "calendar_api",
+        "call_recording",
+        "contract_system",
+        "ghl_opportunities",
+        "proposal_software",
+        "video_conferencing"
+      ]
+    },
+    {
+      "agent_id": "d3_thought_leadership",
+      "allowed_tools": [
+        "content_calendar",
+        "content_management",
+        "seo_tools",
+        "social_scheduler",
+        "video_editing",
+        "writing_assistant"
+      ]
+    },
+    {
+      "agent_id": "d4_client_experience",
+      "allowed_tools": [
+        "calendar_api",
+        "client_portal",
+        "crm_system",
+        "email_automation",
+        "feedback_system",
+        "onboarding_checklist"
+      ]
+    },
+    {
+      "agent_id": "d4_community_manager",
+      "allowed_tools": [
+        "community_moderation",
+        "content_scheduler",
+        "engagement_tracker",
+        "member_directory",
+        "skool_api",
+        "welcome_sequences"
+      ]
+    },
+    {
+      "agent_id": "d4_curriculum_head",
+      "allowed_tools": [
+        "assessment_tools",
+        "content_library",
+        "course_platform",
+        "curriculum_builder",
+        "learning_management",
+        "outcome_tracker"
+      ]
+    },
+    {
+      "agent_id": "d4_cvo",
+      "allowed_tools": [
+        "calendar_api",
+        "community_platform",
+        "content_studio",
+        "skool_api",
+        "telegram_direct",
+        "video_conferencing"
+      ]
+    },
+    {
+      "agent_id": "d4_enrollment",
+      "allowed_tools": [
+        "calendar_api",
+        "call_tracking",
+        "enrollment_forms",
+        "ghl_opportunities",
+        "payment_processing",
+        "video_conferencing"
+      ]
+    },
+    {
+      "agent_id": "d4_funnel_strategist",
+      "allowed_tools": [
+        "ab_testing",
+        "analytics_dashboard",
+        "email_automation",
+        "ghl_funnels",
+        "ghl_workflows",
+        "landing_page_builder"
+      ]
+    },
+    {
+      "agent_id": "d4_lead_coach",
+      "allowed_tools": [
+        "calendar_api",
+        "client_notes_system",
+        "community_platform",
+        "messaging_system",
+        "progress_tracker",
+        "video_conferencing"
+      ]
+    },
+    {
+      "agent_id": "d4_social_creator",
+      "allowed_tools": [
+        "canva_api",
+        "caption_writer",
+        "content_calendar",
+        "engagement_tracker",
+        "social_media_scheduler",
+        "video_editing"
+      ]
+    },
+    {
+      "agent_id": "d4_tech_automation",
+      "allowed_tools": [
+        "ghl_api",
+        "skool_api",
+        "stripe_api",
+        "webhook_management",
+        "zapier_api",
+        "zoom_api"
+      ]
+    },
+    {
+      "agent_id": "d4_video_production",
+      "allowed_tools": [
+        "heygen_api",
+        "suno_ai",
+        "thumbnail_creator",
+        "transcription_service",
+        "video_editing_software",
+        "video_hosting"
+      ]
+    },
+    {
+      "agent_id": "d5_acquisitions",
+      "allowed_tools": [
+        "author_database",
+        "communication_platform",
+        "contract_templates",
+        "manuscript_reader",
+        "market_research",
+        "submission_portal"
+      ]
+    },
+    {
+      "agent_id": "d5_author_relations",
+      "allowed_tools": [
+        "author_portal",
+        "calendar_coordination",
+        "communication_platform",
+        "feedback_collection",
+        "onboarding_checklist",
+        "royalty_system"
+      ]
+    },
+    {
+      "agent_id": "d5_book_marketing",
+      "allowed_tools": [
+        "analytics_dashboard",
+        "email_campaigns",
+        "influencer_outreach",
+        "launch_planner",
+        "marketing_automation",
+        "social_media_tools"
+      ]
+    },
+    {
+      "agent_id": "d5_copywriter",
+      "allowed_tools": [
+        "collaboration_docs",
+        "copy_templates",
+        "email_builder",
+        "media_kit_system",
+        "seo_tools",
+        "writing_assistant"
+      ]
+    },
+    {
+      "agent_id": "d5_cover_artist",
+      "allowed_tools": [
+        "cover_templates",
+        "design_software",
+        "mockup_generator",
+        "print_specs",
+        "stock_images",
+        "typography_library"
+      ]
+    },
+    {
+      "agent_id": "d5_digital_distribution",
+      "allowed_tools": [
+        "distribution_tracker",
+        "ingramspark_portal",
+        "isbn_system",
+        "kdp_dashboard",
+        "metadata_manager",
+        "sales_analytics"
+      ]
+    },
+    {
+      "agent_id": "d5_managing_editor",
+      "allowed_tools": [
+        "collaboration_platform",
+        "editing_workflow",
+        "manuscript_management",
+        "production_calendar",
+        "quality_checklist",
+        "style_guide"
+      ]
+    },
+    {
+      "agent_id": "d5_pr_media",
+      "allowed_tools": [
+        "calendar_coordination",
+        "media_database",
+        "media_monitoring",
+        "podcast_outreach",
+        "press_kit_builder",
+        "press_release_platform"
+      ]
+    },
+    {
+      "agent_id": "d5_publisher",
+      "allowed_tools": [
+        "author_contracts",
+        "distribution_platforms",
+        "editorial_calendar",
+        "manuscript_management",
+        "publishing_dashboard",
+        "royalty_tracking"
+      ]
+    },
+    {
+      "agent_id": "d5_sales_affiliate",
+      "allowed_tools": [
+        "affiliate_platform",
+        "bulk_order_system",
+        "commission_tracker",
+        "partnership_crm",
+        "promo_material_library",
+        "reporting_dashboard"
+      ]
+    },
+    {
+      "agent_id": "d6_board_liaison",
+      "allowed_tools": [
+        "action_item_tracker",
+        "board_portal",
+        "calendar_coordination",
+        "document_preparation",
+        "governance_docs",
+        "meeting_management"
+      ]
+    },
+    {
+      "agent_id": "d6_communications",
+      "allowed_tools": [
+        "analytics_dashboard",
+        "content_management",
+        "design_platform",
+        "email_marketing",
+        "newsletter_system",
+        "social_media_tools"
+      ]
+    },
+    {
+      "agent_id": "d6_coo",
+      "allowed_tools": [
+        "budget_management",
+        "compliance_tracker",
+        "hr_management",
+        "operations_dashboard",
+        "process_documentation",
+        "volunteer_system"
+      ]
+    },
+    {
+      "agent_id": "d6_dev_director",
+      "allowed_tools": [
+        "analytics_dashboard",
+        "campaign_management",
+        "donor_crm",
+        "fundraising_platform",
+        "prospect_research",
+        "stewardship_tracker"
+      ]
+    },
+    {
+      "agent_id": "d6_executive_director",
+      "allowed_tools": [
+        "board_portal",
+        "donor_management",
+        "grant_tracker",
+        "nonprofit_dashboard",
+        "program_metrics",
+        "stakeholder_communications"
+      ]
+    },
+    {
+      "agent_id": "d6_finance",
+      "allowed_tools": [
+        "accounting_software",
+        "audit_preparation",
+        "budget_management",
+        "compliance_tracker",
+        "grant_financials",
+        "reporting_system"
+      ]
+    },
+    {
+      "agent_id": "d6_grant_writer",
+      "allowed_tools": [
+        "deadline_tracker",
+        "document_collaboration",
+        "grant_database",
+        "proposal_templates",
+        "reporting_system",
+        "research_tools"
+      ]
+    },
+    {
+      "agent_id": "d6_outreach",
+      "allowed_tools": [
+        "calendar_coordination",
+        "community_database",
+        "event_management",
+        "feedback_system",
+        "outreach_tracker",
+        "partner_directory"
+      ]
+    },
+    {
+      "agent_id": "d6_program_director",
+      "allowed_tools": [
+        "beneficiary_tracker",
+        "impact_measurement",
+        "outcomes_database",
+        "partner_management",
+        "program_management",
+        "reporting_dashboard"
+      ]
+    },
+    {
+      "agent_id": "d6_volunteer",
+      "allowed_tools": [
+        "communication_platform",
+        "hours_tracker",
+        "recognition_program",
+        "scheduling_system",
+        "training_materials",
+        "volunteer_management"
+      ]
+    },
+    {
+      "agent_id": "d8_automation_architect",
+      "allowed_tools": [
+        "automation_logic_designer",
+        "ghl_workflow_builder",
+        "pipeline_manager",
+        "webhook_listener_config"
+      ]
+    },
+    {
+      "agent_id": "d8_community_manager",
+      "allowed_tools": [
+        "community_group_builder",
+        "community_moderator",
+        "content_scheduler"
+      ]
+    },
+    {
+      "agent_id": "d8_compliance_auditor",
+      "allowed_tools": [
+        "broken_link_checker",
+        "deliverability_auditor",
+        "duplicate_contact_merger",
+        "sms_compliance_checker",
+        "split_test_monitor",
+        "workflow_loop_detector"
+      ]
+    },
+    {
+      "agent_id": "d8_content_ops",
+      "allowed_tools": [
+        "asset_library_manager",
+        "blog_post_publisher",
+        "email_newsletter_designer",
+        "video_script_writer"
+      ]
+    },
+    {
+      "agent_id": "d8_crm_ops",
+      "allowed_tools": [
+        "calendar_booking_bot",
+        "contact_synchronizer",
+        "ghl_api",
+        "opportunity_mover",
+        "tagging_engine"
+      ]
+    },
+    {
+      "agent_id": "d8_customer_success",
+      "allowed_tools": [
+        "faq_knowledge_retriever",
+        "review_request_engine",
+        "sentiment_analyzer",
+        "support_ticket_router"
+      ]
+    },
+    {
+      "agent_id": "d8_funnel_engineer",
+      "allowed_tools": [
+        "copywriting_formatting_engine",
+        "domain_connector",
+        "form_and_survey_builder",
+        "funnel_blueprint_architect",
+        "ghl_funnel_cloner"
+      ]
+    },
+    {
+      "agent_id": "d8_integration_engineer",
+      "allowed_tools": [
+        "domain_connector",
+        "executive_dashboarder",
+        "webhook_payload_formatter"
+      ]
+    },
+    {
+      "agent_id": "d8_marketing_automation",
+      "allowed_tools": [
+        "ad_audience_sync",
+        "lead_scoring_algorithm",
+        "seo_metadata_optimizer",
+        "utm_tracking_generator"
+      ]
+    },
+    {
+      "agent_id": "d8_membership_director",
+      "allowed_tools": [
+        "access_control_manager",
+        "curriculum_generator",
+        "ghl_offer_creator",
+        "membership_content_uploader"
+      ]
+    },
+    {
+      "agent_id": "d8_platform_architect",
+      "allowed_tools": [
+        "custom_value_manager",
+        "ghl_oauth_manager",
+        "ghl_setup_validator",
+        "snapshot_deployer",
+        "subaccount_provisioner"
+      ]
+    },
+    {
+      "agent_id": "d8_revenue_ops",
+      "allowed_tools": [
+        "affiliate_campaign_manager",
+        "coupon_and_promo_creator",
+        "invoice_generator",
+        "proposal_and_contract_sender",
+        "subscription_dunning_manager"
+      ]
+    },
+    {
+      "agent_id": "d8_saas_director",
+      "allowed_tools": [
+        "campaign_analyst",
+        "executive_dashboarder",
+        "ghl_api",
+        "saas_instance_registry",
+        "stripe_dashboard"
+      ]
+    },
+    {
+      "agent_id": "d9_analytics",
+      "allowed_tools": [
+        "ab_testing_tool",
+        "cohort_analysis",
+        "executive_dashboarder",
+        "google_analytics_ecommerce",
+        "heatmap_tool",
+        "woocommerce_reports"
+      ]
+    },
+    {
+      "agent_id": "d9_customer_experience",
+      "allowed_tools": [
+        "email_marketing_platform",
+        "ghl_conversations",
+        "helpdesk_system",
+        "refund_processing",
+        "review_management",
+        "woocommerce_orders"
+      ]
+    },
+    {
+      "agent_id": "d9_merchandiser",
+      "allowed_tools": [
+        "inventory_management_system",
+        "print_on_demand_api",
+        "product_photography_tool",
+        "supplier_portal",
+        "woocommerce_product_editor"
+      ]
+    },
+    {
+      "agent_id": "d9_offer_strategist",
+      "allowed_tools": [
+        "ab_testing_tool",
+        "analytics_dashboard",
+        "campaign_calendar",
+        "customer_segmentation",
+        "pricing_optimizer",
+        "woocommerce_coupons"
+      ]
+    },
+    {
+      "agent_id": "d9_sales_copywriter",
+      "allowed_tools": [
+        "ab_testing_copy_tool",
+        "content_editor",
+        "email_template_builder",
+        "seo_writing_assistant",
+        "woocommerce_product_editor"
+      ]
+    },
+    {
+      "agent_id": "d9_seo_content",
+      "allowed_tools": [
+        "ahrefs_api",
+        "google_search_console",
+        "keyword_tracker",
+        "schema_generator",
+        "wordpress_editor",
+        "yoast_seo"
+      ]
+    },
+    {
+      "agent_id": "d9_social_promoter",
+      "allowed_tools": [
+        "affiliate_manager",
+        "analytics_dashboard",
+        "campaign_calendar",
+        "canva_api",
+        "social_poster",
+        "utm_tracking_system"
+      ]
+    },
+    {
+      "agent_id": "d9_store_director",
+      "allowed_tools": [
+        "campaign_analyst",
+        "executive_dashboarder",
+        "google_analytics_ecommerce",
+        "stripe_dashboard",
+        "woocommerce_admin",
+        "wordpress_admin"
+      ]
+    },
+    {
+      "agent_id": "d9_web_designer",
+      "allowed_tools": [
+        "browser_controller",
+        "divi_builder",
+        "figma_api",
+        "image_optimization_tool",
+        "page_speed_tools",
+        "wordpress_admin"
+      ]
+    },
+    {
+      "agent_id": "d9_wp_developer",
+      "allowed_tools": [
+        "browser_controller",
+        "divi_builder",
+        "php_runtime",
+        "security_scanner",
+        "woocommerce_api",
+        "wordpress_admin"
+      ]
+    },
+    {
+      "agent_id": "shared_api_gateway",
+      "allowed_tools": [
+        "api_gateway",
+        "credential_vault",
+        "error_tracker",
+        "health_monitor",
+        "rate_limiter",
+        "request_router"
+      ]
+    },
+    {
+      "agent_id": "shared_data_analytics",
+      "allowed_tools": [
+        "alert_system",
+        "analytics_aggregator",
+        "dashboard_builder",
+        "data_warehouse",
+        "query_engine",
+        "visualization_tools"
+      ]
+    },
+    {
+      "agent_id": "shared_data_control",
+      "allowed_tools": [
+        "agent_memory",
+        "agent_metrics",
+        "agent_sessions",
+        "supabase_admin",
+        "supabase_analytics"
+      ]
+    },
+    {
+      "agent_id": "shared_exec_orchestrator",
+      "allowed_tools": [
+        "agent_events",
+        "approval_queue",
+        "inngest_orchestration",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    },
+    {
+      "agent_id": "shared_knowledge_base",
+      "allowed_tools": [
+        "context_retrieval",
+        "document_indexer",
+        "documentation_tracker",
+        "embedding_engine",
+        "knowledge_base_system",
+        "semantic_search"
+      ]
+    },
+    {
+      "agent_id": "shared_legal_compliance",
+      "allowed_tools": [
+        "compliance_database",
+        "contract_review_system",
+        "document_analysis",
+        "legal_research",
+        "regulation_tracker",
+        "risk_assessment"
+      ]
+    },
+    {
+      "agent_id": "shared_master_orchestrator",
+      "allowed_tools": [
+        "agent_health_monitor",
+        "cross_division_tracker",
+        "escalation_engine",
+        "event_router",
+        "inngest_orchestration",
+        "telegram_master_channel"
+      ]
+    },
+    {
+      "agent_id": "shared_runtime_ops",
+      "allowed_tools": [
+        "agent_events",
+        "agent_sessions",
+        "supabase_admin",
+        "supabase_analytics",
+        "telegram_alerts"
+      ]
+    }
+  ]
+}

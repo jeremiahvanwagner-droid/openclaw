@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://truthjblue.dev/schemas/canonical-scope.schema.json",
+  "title": "OpenClaw Canonical Scope Schema",
+  "description": "Canonical schema for agent scope assignments (U14).",
+  "type": "object",
+  "required": ["version", "mappings"],
+  "properties": {
+    "version": { "type": "string" },
+    "generated_at": { "type": "string" },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent_id", "scope_id", "scope_family"],
+        "properties": {
+          "agent_id": { "type": "string", "minLength": 1 },
+          "scope_id": {
+            "type": "string",
+            "pattern": "^scope\\.(global|shared\\.[a-z0-9_]+|division\\.[a-z0-9_]+|business\\.[a-z0-9_]+)$"
+          },
+          "scope_family": {
+            "type": "string",
+            "enum": ["global", "shared", "division", "business"]
+          },
+          "rationale": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

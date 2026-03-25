@@ -18,7 +18,14 @@
     "format:check": "prettier --check .",
     "dashboard:typecheck": "corepack pnpm --dir dashboard run typecheck",
     "dashboard:build": "corepack pnpm --dir dashboard run build",
-    "validate": "corepack pnpm lint:ci && corepack pnpm typecheck && corepack pnpm test && corepack pnpm dashboard:build && corepack pnpm dashboard:typecheck"
+    "validate": "corepack pnpm lint:ci && corepack pnpm typecheck && corepack pnpm test && corepack pnpm dashboard:build && corepack pnpm dashboard:typecheck",
+    "upgrade:hardening": "node scripts/upgrade/validate-filesystem-hardening.mjs --root /opt/openclaw/.openclaw && node scripts/upgrade/check-operator-scope.mjs && node scripts/upgrade/check-trusted-proxies.mjs --config config/openclaw.prod.json",
+    "upgrade:tokens": "node scripts/upgrade/revalidate-sensitive-tokens.mjs",
+    "upgrade:governance:generate": "node scripts/upgrade/generate-agent-scope-space-mapping.mjs && node scripts/upgrade/generate-tool-allowlist-policy.mjs",
+    "upgrade:governance:drift": "node scripts/upgrade/check-governance-drift.mjs",
+    "upgrade:runtime": "node scripts/upgrade/post-update-smoke.mjs && node scripts/upgrade/validate-worker-env.mjs --expected production",
+    "upgrade:revenue": "node scripts/upgrade/validate-offer-matrix.mjs && node scripts/upgrade/validate-funnel-telemetry.mjs --hours 24",
+    "upgrade:pilot": "node scripts/upgrade/pilot-monitor.mjs --hours 72"
   },
   "devDependencies": {
     "@types/nodemailer": "^7.0.11",
