@@ -36,6 +36,10 @@ import {
   saasUsageThreshold,
   saasFunnelPublished,
 } from "./functions/d8-saas-operations";
+import {
+  weeklyInterDivisionMeeting,
+  onDemandMeeting,
+} from "./functions/weekly-meeting";
 
 export const handler = serve({
   client: inngest,
@@ -62,5 +66,7 @@ export const handler = serve({
     saasSubscriptionCancelled,
     saasUsageThreshold,
     saasFunnelPublished,
+    weeklyInterDivisionMeeting,
+    onDemandMeeting,
   ],
 });

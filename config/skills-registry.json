@@ -42,6 +42,571 @@
       ]
     },
     {
+      "skill_id": "access-control-manager",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "system_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "access-control-manager_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ad-audience-sync",
+      "owner": "ads-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "ad-audience-sync_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-campaign-manager",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-campaign-manager_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-manager",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-manager_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-ai-overviews-tracking",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-ai-overviews-tracking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-autonomous-web-scraping",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-autonomous-web-scraping_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-backlink-prospecting",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-backlink-prospecting_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-competitor-authority-tracking",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-competitor-authority-tracking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-content-decay-detection",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-content-decay-detection_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-dynamic-link-injection",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-dynamic-link-injection_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-headless-browser-automation",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-headless-browser-automation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-onpage-optimization",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-onpage-optimization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-programmatic-page-deployment",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-programmatic-page-deployment_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-schema-markup-generation",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-schema-markup-generation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-semantic-keyword-clustering",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-semantic-keyword-clustering_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "affiliate-seo-serp-volatility-analysis",
+      "owner": "affiliate-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "affiliate-seo-serp-volatility-analysis_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-automated-invoice-generation",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-automated-invoice-generation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-autonomous-client-onboarding",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-autonomous-client-onboarding_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-client-meeting-summarization",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-client-meeting-summarization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-contract-risk-extraction",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-contract-risk-extraction_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-crossfunctional-agent-handoff",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-crossfunctional-agent-handoff_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-custom-workflow-orchestration",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-custom-workflow-orchestration_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-multistep-proposal-drafting",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-multistep-proposal-drafting_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-pipeline-velocity-tracking",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-pipeline-velocity-tracking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-project-dependency-mapping",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-project-dependency-mapping_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-resource-utilization-tracking",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-resource-utilization-tracking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-scope-creep-detection",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-scope-creep-detection_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agency-sla-monitoring",
+      "owner": "agency-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "agency-sla-monitoring_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agent-coordinator",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "system_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "agent-coordinator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "agent-performance",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "system_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "agent-performance_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-api-rate-limit-handling",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-api-rate-limit-handling_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-autonomous-debugging",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-autonomous-debugging_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-cicd-execution",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-cicd-execution_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-codebase-dependency-resolution",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-codebase-dependency-resolution_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-llm-gateway-routing",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-llm-gateway-routing_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-model-context-protocol-management",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-model-context-protocol-management_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-multimodal-input-processing",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-multimodal-input-processing_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-prompt-caching-optimization",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-prompt-caching-optimization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-rag-indexing-retrieval",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-rag-indexing-retrieval_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-semantic-payload-parsing",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-semantic-payload-parsing_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-system-state-persistence",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-system-state-persistence_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "aisaas-token-expenditure-tracking",
+      "owner": "aisaas-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "aisaas-token-expenditure-tracking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "analytics-dashboard",
+      "owner": "analytics-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "analytics-dashboard_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "anomaly-detection",
       "owner": "runtime-ops",
       "risk_tier": "draft_only",
@@ -56,6 +621,19 @@
       "replay_policy": "dedupe by anomaly fingerprint",
       "required_tests": [
         "alert routing"
+      ]
+    },
+    {
+      "skill_id": "approval-rubric",
+      "owner": "assessment-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "approval-rubric_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
       ]
     },
     {
@@ -78,6 +656,47 @@
       ]
     },
     {
+      "skill_id": "asset-library-manager",
+      "owner": "design-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "asset-library-manager_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "audience-analyzer",
+      "owner": "ads-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "audience-analyzer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "automation-logic-designer",
+      "owner": "automation-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "workflow_trigger"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "automation-logic-designer_id + timestamp",
+      "approval_policy": "hitl for production workflow",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "backup-manager",
       "owner": "platform-ops",
       "risk_tier": "draft_only",
@@ -92,6 +711,203 @@
       "replay_policy": "dedupe by backup target and day",
       "required_tests": [
         "backup alerting"
+      ]
+    },
+    {
+      "skill_id": "blog-post-publisher",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "blog-post-publisher_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-audiovisual-script-formatting",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-audiovisual-script-formatting_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-competitor-campaign-synthesis",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-competitor-campaign-synthesis_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-content-atomization",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-content-atomization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-dm-qualification",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-dm-qualification_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-dynamic-sponsorship-pricing",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-dynamic-sponsorship-pricing_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-governance-enforcement",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-governance-enforcement_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-growth-trend-extrapolation",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-growth-trend-extrapolation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-newsletter-template-population",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-newsletter-template-population_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-omnichannel-analytics",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-omnichannel-analytics_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-social-listening-alerting",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-social-listening-alerting_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-viral-hook-pattern-recognition",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-viral-hook-pattern-recognition_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "brand-voice-consistency-enforcement",
+      "owner": "brand-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "brand-voice-consistency-enforcement_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "broken-link-checker",
+      "owner": "seo-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "broken-link-checker_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "browser-automation",
+      "owner": "browser-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "browser_automation"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "browser-automation_id + timestamp",
+      "approval_policy": "hitl for ghl_ui_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
       ]
     },
     {
@@ -156,6 +972,91 @@
       ]
     },
     {
+      "skill_id": "browser-security",
+      "owner": "browser-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "browser_automation"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "browser-security_id + timestamp",
+      "approval_policy": "hitl for ghl_ui_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "calendar-booking-bot",
+      "owner": "scheduling-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "calendar-booking-bot_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "campaign-analyst",
+      "owner": "analytics-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "campaign-analyst_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "canva-auth",
+      "owner": "design-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "canva-auth_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "checkout-integrator",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "checkout-integrator_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "churn-predictor",
+      "owner": "subscription-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "churn-predictor_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "churn-prevention",
       "owner": "customer-success",
       "risk_tier": "draft_only",
@@ -173,6 +1074,162 @@
       ]
     },
     {
+      "skill_id": "coaching-adaptive-action-plan-generation",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-adaptive-action-plan-generation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-asynchronous-progress-tracking",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-asynchronous-progress-tracking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-automated-accountability",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-automated-accountability_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-behavioral-data-integration",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-behavioral-data-integration_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-client-readiness-analysis",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-client-readiness-analysis_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-custom-capability-mapping",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-custom-capability-mapping_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-goal-directed-workflow-adjustment",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-goal-directed-workflow-adjustment_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-interactive-calendar-management",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-interactive-calendar-management_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-intervention-triggering",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-intervention-triggering_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-objections-handling-simulation",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-objections-handling-simulation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-session-transcript-extraction",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-session-transcript-extraction_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coaching-transition-state-prompting",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "coaching-transition-state-prompting_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "cohort-analysis",
       "owner": "analytics",
       "risk_tier": "draft_only",
@@ -187,6 +1244,444 @@
       "replay_policy": "dedupe by cohort and report date",
       "required_tests": [
         "report alerting"
+      ]
+    },
+    {
+      "skill_id": "comment-moderation-sop",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "comment-moderation-sop_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-automated-event-scheduling",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-automated-event-scheduling_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-billing-reconciliation",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-billing-reconciliation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-dynamic-tagging-categorization",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-dynamic-tagging-categorization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-engagement-dropoff-flagging",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-engagement-dropoff-flagging_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-gamification-metric-tracking",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-gamification-metric-tracking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-group-builder",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-group-builder_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-member-matchmaking",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-member-matchmaking_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-moderator",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-moderator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-omnichannel-routing",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-omnichannel-routing_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-real-time-sentiment-analysis",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-real-time-sentiment-analysis_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-reengagement-prompting",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-reengagement-prompting_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-toxic-content-moderation",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-toxic-content-moderation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-trend-surfacing",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-trend-surfacing_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "community-welcome-sequence-orchestration",
+      "owner": "community-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "community-welcome-sequence-orchestration_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "competitor-watch",
+      "owner": "ads-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "competitor-watch_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "contact-synchronizer",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "contact-synchronizer_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "content-analyzer",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "content-analyzer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "content-gap-finder",
+      "owner": "research-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "content-gap-finder_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "content-personalization",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "content-personalization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "content-pipeline",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "content-pipeline_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "content-repurposer",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "content-repurposer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "content-scheduler",
+      "owner": "scheduling-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "content-scheduler_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "content-writer",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "content-writer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "copywriter",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "copywriter_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "copywriting-formatting-engine",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "copywriting-formatting-engine_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "coupon-and-promo-creator",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "coupon-and-promo-creator_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "course-builder",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "course-builder_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "csat-collector",
+      "owner": "support-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "csat-collector_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "curriculum-generator",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "curriculum-generator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "custom-value-manager",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "custom-value-manager_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "deal-closer",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "deal-closer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "deliverability-auditor",
+      "owner": "email-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "email_send"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "deliverability-auditor_id + timestamp",
+      "approval_policy": "hitl for bulk_send",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
       ]
     },
     {
@@ -209,6 +1704,133 @@
       ]
     },
     {
+      "skill_id": "digital-asset-formatting",
+      "owner": "design-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "digital-asset-formatting_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "digital-checkout-friction-reduction",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "digital-checkout-friction-reduction_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "digital-content-gap-analysis",
+      "owner": "research-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "digital-content-gap-analysis_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "digital-customer-avatar-synthesis",
+      "owner": "research-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "digital-customer-avatar-synthesis_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "digital-funnel-conversion-rate-calibration",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "digital-funnel-conversion-rate-calibration_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "digital-market-trend-aggregation",
+      "owner": "research-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "digital-market-trend-aggregation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "digital-product-ecosystem-mapping",
+      "owner": "research-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "digital-product-ecosystem-mapping_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "domain-connector",
+      "owner": "integration-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "external_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "domain-connector_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "duplicate-contact-merger",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "duplicate-contact-merger_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "ebook-buyer-automation",
       "owner": "publishing-ops",
       "risk_tier": "write_safe",
@@ -225,6 +1847,715 @@
       "replay_policy": "dedupe by buyer/book/lifecycle step",
       "required_tests": [
         "notification dedupe"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-algorithmic-cross-selling",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-algorithmic-cross-selling_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-cart-abandonment-recovery",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-cart-abandonment-recovery_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-dynamic-description-generation",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-dynamic-description-generation_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-fraudulent-transaction-flagging",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-fraudulent-transaction-flagging_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-multilingual-support-resolution",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-multilingual-support-resolution_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-predictive-inventory-restocking",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-predictive-inventory-restocking_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-return-refund-authorization",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-return-refund-authorization_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-review-sentiment-extraction",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-review-sentiment-extraction_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-shipping-route-optimization",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-shipping-route-optimization_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-supply-chain-anomaly-detection",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-supply-chain-anomaly-detection_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-visual-search-processing",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-visual-search-processing_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ecommerce-voice-commerce-processing",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ecommerce-voice-commerce-processing_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-adaptive-curriculum-sequencing",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-adaptive-curriculum-sequencing_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-automated-assessment-generation",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-automated-assessment-generation_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-cohort-pacing-synchronization",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-cohort-pacing-synchronization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-competency-framework-mapping",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-competency-framework-mapping_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-conversational-role-play",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-conversational-role-play_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-interactive-assignment-grading",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-interactive-assignment-grading_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-knowledge-decay-prediction",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-knowledge-decay-prediction_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-lms-data-synchronization",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-lms-data-synchronization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-micro-lesson-atomization",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-micro-lesson-atomization_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-performance-rubric-application",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-performance-rubric-application_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-real-time-skill-gap-detection",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-real-time-skill-gap-detection_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "education-student-churn-prediction",
+      "owner": "education-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "education-student-churn-prediction_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "email-broadcaster",
+      "owner": "email-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "email_send"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "email-broadcaster_id + timestamp",
+      "approval_policy": "hitl for bulk_send",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "email-newsletter-designer",
+      "owner": "email-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "email_send"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "email-newsletter-designer_id + timestamp",
+      "approval_policy": "hitl for bulk_send",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "email-sequence",
+      "owner": "email-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "email_send"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "email-sequence_id + timestamp",
+      "approval_policy": "hitl for bulk_send",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "executive-dashboarder",
+      "owner": "analytics-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "executive-dashboarder_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-anomaly-pattern-detection",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-anomaly-pattern-detection_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-autonomous-quality-assurance",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-autonomous-quality-assurance_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-distributed-event-polling",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-distributed-event-polling_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-fundamental-data-extraction",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-fundamental-data-extraction_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-hierarchical-consensus-building",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-hierarchical-consensus-building_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-high-frequency-execution",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-high-frequency-execution_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-multi-model-execution",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-multi-model-execution_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-portfolio-rebalancing",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-portfolio-rebalancing_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-real-time-liquidity-positioning",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-real-time-liquidity-positioning_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-regulatory-enforcement",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-regulatory-enforcement_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-smart-contract-triggering",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-smart-contract-triggering_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "finance-volatility-stress-testing",
+      "owner": "finance-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "finance-volatility-stress-testing_id + timestamp",
+      "approval_policy": "hitl for all financial actions",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "form-and-survey-builder",
+      "owner": "integration-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "external_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "form-and-survey-builder_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "form-field-mapper",
+      "owner": "integration-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "external_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "form-field-mapper_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "funnel-blueprint-architect",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "funnel-blueprint-architect_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "funnel-blueprint-generator",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "funnel-blueprint-generator_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "funnel-builder",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "funnel-builder_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "funnel-cloner",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "funnel-cloner_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "funnel-qa-checklist",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "funnel-qa-checklist_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ga4-report-generator",
+      "owner": "analytics-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "ga4-report-generator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
       ]
     },
     {
@@ -272,6 +2603,292 @@
       ]
     },
     {
+      "skill_id": "ghl-funnel-cloner",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-funnel-cloner_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ghl-oauth-manager",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-oauth-manager_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ghl-offer-creator",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-offer-creator_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ghl-setup-validator",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-setup-validator_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ghl-workflow-builder",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-workflow-builder_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "google-drive-manager",
+      "owner": "integration-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "external_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "google-drive-manager_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "guarantee-designer",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "guarantee-designer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "headline-generator",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "headline-generator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "hubspot-contact-updater",
+      "owner": "integration-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "external_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "hubspot-contact-updater_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "idempotency-practices",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "system_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "idempotency-practices_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "invoice-generator",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "invoice-generator_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "keyword-finder",
+      "owner": "seo-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "keyword-finder_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "knowledge-base-builder",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "system_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "knowledge-base-builder_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "landing-page-builder",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "landing-page-builder_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "lead-magnet-creator",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "lead-magnet-creator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "lead-scoring-algorithm",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "lead-scoring-algorithm_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "mailchimp-campaign-drafter",
+      "owner": "email-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "email_send"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "mailchimp-campaign-drafter_id + timestamp",
+      "approval_policy": "hitl for bulk_send",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "market-intel",
+      "owner": "ads-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "market-intel_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "membership-content-uploader",
+      "owner": "coaching-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "membership-content-uploader_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "niche-validator",
+      "owner": "ads-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "niche-validator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "nlp-query",
       "owner": "analytics",
       "risk_tier": "draft_only",
@@ -289,6 +2906,106 @@
       ]
     },
     {
+      "skill_id": "notion-workspace-synchronizer",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "system_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "notion-workspace-synchronizer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "objection-handler",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "objection-handler_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "offer-architect",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "offer-architect_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "offer-psychology-engine",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "offer-psychology-engine_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "opportunity-mover",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "opportunity-mover_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "page-builder",
+      "owner": "funnel-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call",
+        "page_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "page-builder_id + timestamp",
+      "approval_policy": "hitl for production deploy",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "pipeline-manager",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "pipeline-manager_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "predictive-scoring",
       "owner": "analytics",
       "risk_tier": "draft_only",
@@ -303,6 +3020,153 @@
       "replay_policy": "dedupe by model version and score window",
       "required_tests": [
         "alert routing"
+      ]
+    },
+    {
+      "skill_id": "price-researcher",
+      "owner": "research-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "price-researcher_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "pricing-strategist",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "pricing-strategist_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "proposal-and-contract-sender",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "proposal-and-contract-sender_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "proposal-generator",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "proposal-generator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "retry-backoff-wrapper",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "system_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "retry-backoff-wrapper_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "revenue-attribution",
+      "owner": "analytics-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "revenue-attribution_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "sales-page-optimizer",
+      "owner": "sales-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "sales-page-optimizer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "salesforce-lead-creator",
+      "owner": "integration-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "external_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "salesforce-lead-creator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "script-writer",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "script-writer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "seo-metadata-optimizer",
+      "owner": "seo-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "seo-metadata-optimizer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "seo-optimizer",
+      "owner": "seo-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "seo-optimizer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
       ]
     },
     {
@@ -326,6 +3190,66 @@
       ]
     },
     {
+      "skill_id": "slack-channel-broadcaster",
+      "owner": "integration-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "external_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "slack-channel-broadcaster_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "snapshot-deployer",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "snapshot-deployer_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "social-content",
+      "owner": "social-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "social_post"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "social-content_id + timestamp",
+      "approval_policy": "hitl for public post",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "social-distributor",
+      "owner": "social-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "social_post"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "social-distributor_id + timestamp",
+      "approval_policy": "hitl for public post",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "social-media-publisher",
       "owner": "distribution-ops",
       "risk_tier": "irreversible",
@@ -342,6 +3266,160 @@
       "required_tests": [
         "sandbox launch",
         "publish dedupe"
+      ]
+    },
+    {
+      "skill_id": "social-poster",
+      "owner": "social-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "social_post"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "social-poster_id + timestamp",
+      "approval_policy": "hitl for public post",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "split-test-monitor",
+      "owner": "ads-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "split-test-monitor_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "stripe-transaction-exporter",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "stripe-transaction-exporter_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "subaccount-provisioner",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "subaccount-provisioner_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "subscription-dunning-manager",
+      "owner": "subscription-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "subscription-dunning-manager_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "tagging-engine",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "tagging-engine_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "testimonial-collector",
+      "owner": "support-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "testimonial-collector_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ticket-router",
+      "owner": "support-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "ticket-router_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "trend-spotter",
+      "owner": "ads-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "trend-spotter_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "utm-tracking-generator",
+      "owner": "seo-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "utm-tracking-generator_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "video-script-writer",
+      "owner": "content-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "video-script-writer_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
       ]
     },
     {
@@ -383,6 +3461,36 @@
       ]
     },
     {
+      "skill_id": "webhook-payload-formatter",
+      "owner": "automation-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "workflow_trigger"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "webhook-payload-formatter_id + timestamp",
+      "approval_policy": "hitl for production workflow",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "webhook-replay-tooling",
+      "owner": "automation-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "workflow_trigger"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "webhook-replay-tooling_id + timestamp",
+      "approval_policy": "hitl for production workflow",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "webhook-resilience",
       "owner": "platform-ops",
       "risk_tier": "draft_only",
@@ -414,6 +3522,81 @@
       "replay_policy": "dedupe by report_date and audience",
       "required_tests": [
         "report alerting"
+      ]
+    },
+    {
+      "skill_id": "woocommerce-manager",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "woocommerce-manager_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "wordpress-divi-manager",
+      "owner": "ecommerce-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "payment_action",
+        "product_modification"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "wordpress-divi-manager_id + timestamp",
+      "approval_policy": "hitl for payment_action",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "workflow-loop-detector",
+      "owner": "automation-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "workflow_trigger"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "workflow-loop-detector_id + timestamp",
+      "approval_policy": "hitl for production workflow",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "youtube-manager",
+      "owner": "social-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "social_post"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "youtube-manager_id + timestamp",
+      "approval_policy": "hitl for public post",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "zendesk-ticket-router",
+      "owner": "support-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [],
+      "external_systems": [],
+      "idempotency_key_strategy": "zendesk-ticket-router_id + timestamp",
+      "approval_policy": "none",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
       ]
     }
   ]

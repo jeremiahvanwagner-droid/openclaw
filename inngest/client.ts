@@ -497,6 +497,23 @@ type OpenClawEvent =
         mrr_lost: number;
         correlation_id?: string;
       };
+    }
+  | {
+      name: "meeting/executive.request";
+      data: {
+        requested_by: string;
+        focus_divisions?: string[];
+        lookback_days?: number;
+      };
+    }
+  | {
+      name: "weekly_meeting.completed";
+      data: {
+        week_of: string;
+        divisions_reported: number;
+        total_revenue: number;
+        total_leads: number;
+      };
     };
 
 export const inngest = new Inngest({
