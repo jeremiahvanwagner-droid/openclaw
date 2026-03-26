@@ -14,10 +14,16 @@ interface DriftItem { severity: string; agent_id: string; reason: string }
 interface BrokenItem { failure_type: string; provider: string }
 interface ProbeResult { provider: string; status: string }
 
-// Dynamic .mjs imports
-declare module "../../skills/cross-business-scope-governor/index.mjs";
-declare module "../../skills/self-healing-integrations/index.mjs";
-declare module "../../skills/autonomous-qa-compliance/index.mjs";
+// Typed loaders for dynamic .mjs skill imports
+// @ts-expect-error — .mjs skills are untyped by design
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const loadScopeGovernor = () => import("../../skills/cross-business-scope-governor/index.mjs") as Promise<any>;
+// @ts-expect-error — .mjs skills are untyped by design
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const loadSelfHealing = () => import("../../skills/self-healing-integrations/index.mjs") as Promise<any>;
+// @ts-expect-error — .mjs skills are untyped by design
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const loadQaCompliance = () => import("../../skills/autonomous-qa-compliance/index.mjs") as Promise<any>;
 
 // ═══════════════════════════════════════════════════════════════════
 // SKILL 3: Cross-Business Scope Governor
@@ -38,7 +44,7 @@ export const scopeAuditScheduled = inngest.createFunction(
   async ({ step }) => {
     const { auditScopeCompliance, detectScopeDrift, crossBusinessIsolationCheck, policyGuardrailEnforcement } =
       await step.run("load-scope-governor", async () => {
-        const mod = await import("../../skills/cross-business-scope-governor/index.mjs");
+        const mod = await loadScopeGovernor();
         return mod;
       });
 
@@ -116,7 +122,7 @@ export const scopeDriftDetected = inngest.createFunction(
   { event: "scope/drift.detected" },
   async ({ event, step }) => {
     const { autoCorrectDrift } = await step.run("load-scope-governor", async () => {
-      return import("../../skills/cross-business-scope-governor/index.mjs");
+      return loadScopeGovernor();
     });
 
     const result = await step.run("auto-correct", async () => {
@@ -156,7 +162,7 @@ export const scopeViolationAttempted = inngest.createFunction(
   { event: "scope/violation.attempted" },
   async ({ event, step }) => {
     const { logScopeViolation } = await step.run("load-scope-governor", async () => {
-      return import("../../skills/cross-business-scope-governor/index.mjs");
+      return loadScopeGovernor();
     });
 
     await step.run("log-violation", async () => {
@@ -196,7 +202,7 @@ export const integrationHealthCheck = inngest.createFunction(
   async ({ step }) => {
     const { probeAllWebhooks, detectBrokenIntegrations, selfHealCircuitBreaker } =
       await step.run("load-self-healing", async () => {
-        return import("../../skills/self-healing-integrations/index.mjs");
+        return loadSelfHealing();
       });
 
     // Step 1: Probe all endpoints
@@ -267,7 +273,7 @@ export const integrationFailureDetected = inngest.createFunction(
     const { autoRetryTransient } = await step.run(
       "load-self-healing",
       async () => {
-        return import("../../skills/self-healing-integrations/index.mjs");
+        return loadSelfHealing();
       }
     );
 
@@ -369,10 +375,9 @@ export const qaScheduledAudit = inngest.createFunction(
     const {
       runFunnelAudit,
       runTrackingIntegrityCheck,
-      runBrandComplianceCheck: _runBrandComplianceCheck,
       generateComplianceScorecard,
     } = await step.run("load-qa-compliance", async () => {
-      return import("../../skills/autonomous-qa-compliance/index.mjs");
+      return loadQaCompliance();
     });
 
     // Load business registry to get all locations
@@ -411,8 +416,6 @@ export const qaScheduledAudit = inngest.createFunction(
       results.push({
         location_id: locationId,
         business: biz.name || biz.business_id,
-        funnel_score: funnel.score,
-        tracking_score: tracking.score,
         overall_score: scorecard.overall_score,
       });
 
@@ -451,7 +454,7 @@ export const qaFunnelPublished = inngest.createFunction(
       runTrackingIntegrityCheck,
       generateComplianceScorecard,
     } = await step.run("load-qa-compliance", async () => {
-      return import("../../skills/autonomous-qa-compliance/index.mjs");
+      return loadQaCompliance();
     });
 
     const locationId = event.data.location_id;
