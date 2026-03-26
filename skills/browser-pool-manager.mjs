@@ -35,6 +35,7 @@ const POOL_CONFIG = {
   taskTimeout: 120000, // 2 minutes
   healthCheckInterval: 60000, // 1 minute
   maxRetries: 3,
+  maxProvisionRetries: 3,
   rateLimits: {
     ghl: { requests: 100, period: 60000 }, // 100/min
     tiktok: { requests: 10, period: 60000 },
@@ -140,6 +141,7 @@ class BrowserPool extends EventEmitter {
       ...task,
       addedAt: Date.now(),
       retries: 0,
+      provisionFailures: 0,
       status: 'queued'
     };
     
@@ -167,13 +169,31 @@ class BrowserPool extends EventEmitter {
     
     if (!task) return;
     
-    const instance = await this.getOrCreateInstance(task.platform, task.account);
+    const allocation = await this.getOrCreateInstance(task.platform, task.account);
     
-    if (!instance) {
-      // All instances busy or at capacity, try again later
+    if (allocation.status !== 'ok') {
+      if (allocation.status === 'provision-failed') {
+        task.provisionFailures = (task.provisionFailures || 0) + 1;
+        if (task.provisionFailures >= this.config.maxProvisionRetries) {
+          this.queue.shift();
+          task.status = 'failed';
+          task.error = `Failed to provision browser instance for ${task.platform} after ${task.provisionFailures} attempt(s)`;
+          task.completedAt = Date.now();
+          this.stats.failedTasks++;
+          const err = new Error(task.error);
+          this.emit('taskFailed', task, err);
+          console.error(`❌ ${task.error}`);
+          this.processQueue();
+          return;
+        }
+      }
+
+      // Rate-limited or at-capacity pools retry naturally.
       setTimeout(() => this.processQueue(), 1000);
       return;
     }
+    
+    const instance = allocation.instance;
     
     // Remove from queue and execute
     this.queue.shift();
@@ -189,7 +209,7 @@ class BrowserPool extends EventEmitter {
   async getOrCreateInstance(platform, accountId = null) {
     // Check rate limits
     if (!this.checkRateLimit(platform)) {
-      return null;
+      return { status: 'rate-limited' };
     }
     
     // Try to find idle instance for this platform
@@ -199,7 +219,7 @@ class BrowserPool extends EventEmitter {
           (!accountId || instance.account === accountId)) {
         instance.status = 'busy';
         instance.lastUsed = Date.now();
-        return instance;
+        return { status: 'ok', instance };
       }
     }
     
@@ -209,10 +229,14 @@ class BrowserPool extends EventEmitter {
     
     if (this.instances.size >= this.config.maxInstances ||
         platformInstanceCount >= this.config.maxInstancesPerPlatform) {
-      return null; // At capacity
+      return { status: 'capacity' };
     }
     
-    return await this.createInstance(platform, accountId);
+    const instance = await this.createInstance(platform, accountId);
+    if (!instance) {
+      return { status: 'provision-failed' };
+    }
+    return { status: 'ok', instance };
   }
   
   /**

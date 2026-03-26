@@ -19,10 +19,14 @@
 import { getBrowserPool } from './browser-pool-manager.mjs';
 import { generateThumbnail, generateSocialPost } from './design-generator.mjs';
 import https from 'https';
+import path from 'path';
+import fs from 'fs/promises';
 
 // Telegram notification
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '';
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '';
+const OPENCLAW_HOME = process.env.USERPROFILE || process.env.HOME || process.cwd();
+const DATA_DIR = process.env.OPENCLAW_DATA_DIR || path.join(OPENCLAW_HOME, '.openclaw', 'data');
 
 /**
  * Send Telegram notification
@@ -355,7 +359,9 @@ const args = process.argv.slice(3);
             await page.goto('https://app.gohighlevel.com/', { waitUntil: 'networkidle' });
             
             // Take screenshot
-            const screenshotPath = `${process.env.USERPROFILE}/.openclaw/data/screenshots/test-${Date.now()}.png`;
+            const screenshotDir = path.join(DATA_DIR, 'screenshots');
+            await fs.mkdir(screenshotDir, { recursive: true });
+            const screenshotPath = path.join(screenshotDir, `test-${Date.now()}.png`);
             await page.screenshot({ path: screenshotPath, fullPage: false });
             console.log(`  📸 Screenshot saved: ${screenshotPath}`);
             
@@ -423,6 +429,11 @@ Examples:
     console.log(`  Active instances: ${stats.activeInstances}`);
     
     await pool.shutdown();
+
+    if (command === 'test' && stats.failedTasks > 0) {
+      process.exit(1);
+    }
+
     process.exit(0);
     
   } catch (error) {

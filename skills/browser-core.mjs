@@ -24,6 +24,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import { existsSync } from 'fs';
 
 // Configuration
 const DATA_DIR = process.env.OPENCLAW_DATA_DIR || 
@@ -44,6 +45,25 @@ const BROWSER_CONFIG = {
     height: parseInt(process.env.BROWSER_HEIGHT || '1080')
   }
 };
+
+const PLAYWRIGHT_EXECUTABLE_CANDIDATES = [
+  process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+  process.env.PUPPETEER_EXECUTABLE_PATH,
+  process.env.CHROME_BIN,
+  '/usr/bin/chromium',
+  '/usr/bin/chromium-browser',
+  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+  '/Applications/Chromium.app/Contents/MacOS/Chromium'
+].filter(Boolean);
+
+function resolveChromiumExecutablePath() {
+  for (const candidate of PLAYWRIGHT_EXECUTABLE_CANDIDATES) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return null;
+}
 
 // Platform to engine mapping
 const PLATFORM_ENGINES = {
@@ -76,6 +96,7 @@ async function initDirs() {
 async function getPlaywrightBrowser(options = {}) {
   try {
     const { chromium } = await import('playwright');
+    const executablePath = resolveChromiumExecutablePath();
     
     const launchOptions = {
       headless: options.headless ?? BROWSER_CONFIG.headless,
@@ -87,6 +108,9 @@ async function getPlaywrightBrowser(options = {}) {
         '--disable-blink-features=AutomationControlled'
       ]
     };
+    if (executablePath) {
+      launchOptions.executablePath = executablePath;
+    }
     
     // Load persistent context if session exists
     // If explicit userDataDir is provided (e.g. from pool manager), use it directly
@@ -116,7 +140,9 @@ async function getPlaywrightBrowser(options = {}) {
     return { browser, context, type: 'standard' };
   } catch (error) {
     console.error('Playwright not available:', error.message);
-    throw new Error('Playwright not installed. Run: npm install playwright && npx playwright install chromium');
+    throw new Error(
+      'Playwright runtime unavailable. Run: pnpm --dir skills exec playwright install chromium, or set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH/CHROME_BIN to a valid Chromium binary.',
+    );
   }
 }
 

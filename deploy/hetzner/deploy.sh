@@ -66,16 +66,15 @@ fi
 
 # 3. Install dependencies
 echo "[3/6] Installing dependencies..."
-if command -v corepack >/dev/null 2>&1; then
-    corepack enable
-    corepack pnpm install --frozen-lockfile --prod 2>/dev/null || corepack pnpm install --prod
-elif command -v pnpm >/dev/null 2>&1; then
-    pnpm install --frozen-lockfile --prod 2>/dev/null || pnpm install --prod
-else
-    echo "  No supported package manager found (expected corepack/pnpm)."
-    exit 1
-fi
+node scripts/pnpm.mjs install --frozen-lockfile --prod 2>/dev/null || node scripts/pnpm.mjs install --prod
 chown -R openclaw:openclaw "$OPENCLAW_HOME"
+
+echo "  Ensuring Playwright Chromium runtime..."
+if sudo -u openclaw bash -lc "cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --dir skills exec playwright install chromium"; then
+    echo "  Playwright Chromium runtime is ready."
+else
+    echo "  Warning: Playwright Chromium install failed. Browser automation tasks may fail until this succeeds."
+fi
 
 # 4. Sync config and service files
 echo "[4/6] Syncing configuration..."
