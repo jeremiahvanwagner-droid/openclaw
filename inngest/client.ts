@@ -781,6 +781,49 @@ type OpenClawEvent =
   | {
       name: "offer/performance.collected";
       data: { date: string };
+    }
+  // ── Self-Healing & Advanced Coding ──────────────────────────
+  | {
+      name: "healing/run.requested";
+      data: {
+        logs: Array<{ source: string; message: string; stack?: string; timestamp?: string }>;
+        model?: string;
+      };
+    }
+  | {
+      name: "healing/run.completed";
+      data: {
+        run_id: string;
+        patches_applied: number;
+        patches_skipped: number;
+        clusters_found: number;
+        escalations: number;
+      };
+    }
+  | {
+      name: "healing/escalation.needed";
+      data: {
+        run_id?: string;
+        escalations?: string[];
+        source?: string;
+        escalated?: string[];
+        overall?: string;
+      };
+    }
+  | {
+      name: "healing/integration.health_check";
+      data: {
+        triggered_by?: string;
+      };
+    }
+  | {
+      name: "ci/run.failed";
+      data: {
+        owner: string;
+        repo: string;
+        branch?: string;
+        run_id?: number;
+      };
     };
 
 export const inngest = new Inngest({

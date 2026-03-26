@@ -89,3 +89,14 @@ export {
   offerPerformanceCollected,
   phase3Functions,
 } from "./phase3-execution";
+
+// Self-Healing & Advanced Coding
+export {
+  selfHealingScheduled,
+  selfHealingOnDemand,
+  supervisorIntegrationCheck,
+  healingEscalationHandler,
+  ciAutoFix,
+  ciDailyCheck,
+  selfHealingCodingFunctions,
+} from "./self-healing-coding";
