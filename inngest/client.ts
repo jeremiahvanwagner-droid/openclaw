@@ -673,6 +673,114 @@ type OpenClawEvent =
         message: string;
         severity: "critical";
       };
+    }
+  // ── Phase 3: Native GHL Build / Refactor ─────────────────────
+  | {
+      name: "ghl-build/create.requested";
+      data: {
+        business_id: string;
+        entity_type: "funnel" | "workflow" | "payment_link";
+        template?: string;
+        config: Record<string, unknown>;
+      };
+    }
+  | {
+      name: "ghl-build/snapshot.created";
+      data: {
+        location_id: string;
+        entity_type: string;
+        entity_id: string;
+        agent_id: string;
+      };
+    }
+  | {
+      name: "ghl-build/rollback.requested";
+      data: {
+        snapshot_id: string;
+        current_snapshot_id?: string;
+        reason: string;
+      };
+    }
+  // ── Phase 3: Experiment Engine ──────────────────────────────
+  | {
+      name: "experiment/created";
+      data: {
+        business_id: string;
+        name: string;
+        type: "offer" | "copy" | "page" | "automation" | "prompt";
+        variants?: string[];
+        success_metric: string;
+        min_sample?: number;
+        variant_labels?: Record<string, string>;
+        variant_configs?: Record<string, Record<string, unknown>>;
+        traffic_split?: Record<string, number>;
+        max_duration_days?: number;
+      };
+    }
+  | {
+      name: "experiment/evaluation.scheduled";
+      data: { date: string };
+    }
+  | {
+      name: "experiment/significant";
+      data: {
+        experiment_id: string;
+        winner_variant: string;
+        significance: string;
+        z_score: number;
+      };
+    }
+  | {
+      name: "experiment/promoted";
+      data: {
+        experiment_id: string;
+      };
+    }
+  // ── Phase 3: Content-to-Campaign Factory ────────────────────
+  | {
+      name: "campaign/idea.submitted";
+      data: {
+        business_id: string;
+        core_idea: string;
+        channels?: string[];
+      };
+    }
+  | {
+      name: "campaign/bundle.ready";
+      data: {
+        campaign_id: string;
+        business_id: string;
+        total_assets: number;
+        compliant: boolean;
+      };
+    }
+  | {
+      name: "campaign/approved";
+      data: {
+        campaign_id: string;
+        assets?: Array<{ id: string; channel: string; content: Record<string, unknown> }>;
+        calendar?: Record<string, unknown>;
+      };
+    }
+  | {
+      name: "campaign/performance.collect";
+      data: { date: string };
+    }
+  // ── Phase 3: Offer Engineering ──────────────────────────────
+  | {
+      name: "offer/analysis.scheduled";
+      data: { date: string };
+    }
+  | {
+      name: "offer/optimization.suggested";
+      data: {
+        total_recommendations: number;
+        businesses_with_recommendations: number;
+      };
+    }
+  | {
+      name: "offer/performance.collected";
+      data: { date: string };
     };
 
 export const inngest = new Inngest({

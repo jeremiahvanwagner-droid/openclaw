@@ -1503,7 +1503,8 @@
         "revenue-attribution",
         "weekly-report",
         "autonomous-revenue-ops",
-        "executive-command-center"
+        "executive-command-center",
+        "offer-engineering"
       ]
     },
     {
@@ -1613,7 +1614,9 @@
         "video-script-writer",
         "weekly-report",
         "youtube-manager",
-        "customer-journey-intelligence"
+        "customer-journey-intelligence",
+        "experiment-engine",
+        "content-to-campaign-factory"
       ]
     },
     {
@@ -6527,7 +6530,8 @@
         "subaccount-provisioner",
         "tagging-engine",
         "trend-spotter",
-        "weekly-report"
+        "weekly-report",
+        "native-ghl-build-refactor"
       ]
     },
     {
@@ -6896,7 +6900,8 @@
         "webhook-payload-formatter",
         "webhook-replay-tooling",
         "webhook-resilience",
-        "workflow-loop-detector"
+        "workflow-loop-detector",
+        "native-ghl-build-refactor"
       ]
     },
     {
@@ -7008,7 +7013,8 @@
         "woocommerce-manager",
         "wordpress-divi-manager",
         "autonomous-revenue-ops",
-        "customer-journey-intelligence"
+        "customer-journey-intelligence",
+        "offer-engineering"
       ]
     },
     {

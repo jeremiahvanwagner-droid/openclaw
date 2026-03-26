@@ -70,3 +70,22 @@ export {
   commandCenterCriticalAlert,
   phase2Functions,
 } from "./phase2-intelligence";
+
+// Phase 3 — Execution Skills
+export {
+  ghlBuildCreateRequested,
+  ghlSnapshotCreated,
+  ghlRollbackRequested,
+  experimentCreated,
+  experimentEvaluationScheduled,
+  experimentSignificant,
+  experimentPromoted,
+  campaignIdeaSubmitted,
+  campaignBundleReady,
+  campaignApproved,
+  campaignPerformanceCollect,
+  offerAnalysisScheduled,
+  offerOptimizationSuggested,
+  offerPerformanceCollected,
+  phase3Functions,
+} from "./phase3-execution";

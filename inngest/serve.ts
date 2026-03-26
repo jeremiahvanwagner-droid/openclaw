@@ -65,6 +65,22 @@ import {
   commandCenterWeeklyDigest,
   commandCenterCriticalAlert,
 } from "./functions/phase2-intelligence";
+import {
+  ghlBuildCreateRequested,
+  ghlSnapshotCreated,
+  ghlRollbackRequested,
+  experimentCreated,
+  experimentEvaluationScheduled,
+  experimentSignificant,
+  experimentPromoted,
+  campaignIdeaSubmitted,
+  campaignBundleReady,
+  campaignApproved,
+  campaignPerformanceCollect,
+  offerAnalysisScheduled,
+  offerOptimizationSuggested,
+  offerPerformanceCollected,
+} from "./functions/phase3-execution";
 
 export const handler = serve({
   client: inngest,
@@ -116,5 +132,20 @@ export const handler = serve({
     commandCenterDailyBriefing,
     commandCenterWeeklyDigest,
     commandCenterCriticalAlert,
+    // Phase 3: Execution Skills
+    ghlBuildCreateRequested,
+    ghlSnapshotCreated,
+    ghlRollbackRequested,
+    experimentCreated,
+    experimentEvaluationScheduled,
+    experimentSignificant,
+    experimentPromoted,
+    campaignIdeaSubmitted,
+    campaignBundleReady,
+    campaignApproved,
+    campaignPerformanceCollect,
+    offerAnalysisScheduled,
+    offerOptimizationSuggested,
+    offerPerformanceCollected,
   ],
 });

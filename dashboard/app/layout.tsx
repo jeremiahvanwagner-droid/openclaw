@@ -27,6 +27,10 @@ function Nav() {
           <a href="/revenue-ops" className="text-slate-400 hover:text-white transition">Revenue</a>
           <a href="/journey" className="text-slate-400 hover:text-white transition">Journey</a>
           <a href="/command-center" className="text-slate-400 hover:text-white transition">Command</a>
+          <a href="/ghl-builder" className="text-slate-400 hover:text-white transition">GHL Build</a>
+          <a href="/experiments" className="text-slate-400 hover:text-white transition">Experiments</a>
+          <a href="/campaigns" className="text-slate-400 hover:text-white transition">Campaigns</a>
+          <a href="/offers" className="text-slate-400 hover:text-white transition">Offers</a>
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
             <ConnectionStatus />
           </div>

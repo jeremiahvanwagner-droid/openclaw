@@ -3745,6 +3745,105 @@
         "risk surfacing",
         "telegram delivery"
       ]
+    },
+    {
+      "skill_id": "native-ghl-build-refactor",
+      "owner": "ops-ops",
+      "risk_tier": "irreversible",
+      "side_effects": [
+        "write_supabase",
+        "ghl_api_mutation",
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase",
+        "ghl",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "entity_type + entity_id + operation",
+      "approval_policy": "human approval required for destructive operations",
+      "replay_policy": "snapshot before mutation; rollback available",
+      "required_tests": [
+        "funnel creation",
+        "workflow creation",
+        "snapshot capture",
+        "rollback execution",
+        "diff generation"
+      ],
+      "ghl_scope_requirement": [
+        "funnels:write",
+        "workflows:write",
+        "payments:write"
+      ]
+    },
+    {
+      "skill_id": "experiment-engine",
+      "owner": "growth-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "write_supabase",
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "experiment_id + variant + contact_id",
+      "approval_policy": "auto-promote requires significance threshold",
+      "replay_policy": "safe to replay (assignment is deterministic by hash)",
+      "required_tests": [
+        "experiment creation",
+        "deterministic variant assignment",
+        "conversion recording",
+        "significance evaluation",
+        "auto-promote winner"
+      ]
+    },
+    {
+      "skill_id": "content-to-campaign-factory",
+      "owner": "content-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "write_supabase",
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "idea_id + channel + asset_type",
+      "approval_policy": "human approval before distribution",
+      "replay_policy": "safe to replay (asset generation is idempotent)",
+      "required_tests": [
+        "idea atomization",
+        "asset bundle generation",
+        "business scope alignment",
+        "distribution scheduling",
+        "performance tracking"
+      ]
+    },
+    {
+      "skill_id": "offer-engineering",
+      "owner": "growth-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "write_supabase",
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "offer_id + analysis_date",
+      "approval_policy": "pricing changes require human approval",
+      "replay_policy": "safe to replay (analytics are recalculated)",
+      "required_tests": [
+        "offer analysis",
+        "stack design",
+        "pricing optimization",
+        "upsell sequence design",
+        "revenue simulation"
+      ]
     }
   ]
 }
