@@ -40,6 +40,19 @@ import {
   weeklyInterDivisionMeeting,
   onDemandMeeting,
 } from "./functions/weekly-meeting";
+import {
+  scopeAuditScheduled,
+  scopeDriftDetected,
+  scopeViolationAttempted,
+  integrationHealthCheck,
+  integrationFailureDetected,
+  integrationHealed,
+  integrationEscalation,
+  qaScheduledAudit,
+  qaFunnelPublished,
+  qaComplianceAlert,
+  qaTrackingBroken,
+} from "./functions/phase1-foundation";
 
 export const handler = serve({
   client: inngest,
@@ -68,5 +81,17 @@ export const handler = serve({
     saasFunnelPublished,
     weeklyInterDivisionMeeting,
     onDemandMeeting,
+    // Phase 1: Foundation Skills
+    scopeAuditScheduled,
+    scopeDriftDetected,
+    scopeViolationAttempted,
+    integrationHealthCheck,
+    integrationFailureDetected,
+    integrationHealed,
+    integrationEscalation,
+    qaScheduledAudit,
+    qaFunnelPublished,
+    qaComplianceAlert,
+    qaTrackingBroken,
   ],
 });

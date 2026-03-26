@@ -514,6 +514,75 @@ type OpenClawEvent =
         total_revenue: number;
         total_leads: number;
       };
+    }
+  // ── Phase 1: Cross-Business Scope Governor ──────────────────
+  | {
+      name: "scope/drift.detected";
+      data: {
+        drift_count: number;
+        critical_count: number;
+        drifts: Array<{ agent_id: string; field: string; severity: string; [key: string]: unknown }>;
+      };
+    }
+  | {
+      name: "scope/violation.attempted";
+      data: {
+        agent_id: string;
+        resource: string;
+        operation: string;
+        business_id?: string;
+        blocked: boolean;
+      };
+    }
+  // ── Phase 1: Self-Healing Integrations ──────────────────────
+  | {
+      name: "integration/failure.detected";
+      data: {
+        broken: Array<{ provider: string; reason: string; failure_type: string }>;
+        dlq_depth: number;
+      };
+    }
+  | {
+      name: "integration/healed";
+      data: {
+        providers: string[];
+        healed_at: string;
+      };
+    }
+  | {
+      name: "integration/escalation.needed";
+      data: {
+        dead_providers: Array<{ provider: string; reason: string; failure_type: string }>;
+        dlq_depth: number;
+      };
+    }
+  // ── Phase 1: Autonomous QA & Compliance ────────────────────
+  | {
+      name: "qa/funnel.published";
+      data: {
+        location_id: string;
+        funnel_id: string;
+        funnel_name: string;
+        page_count?: number;
+        correlation_id?: string;
+      };
+    }
+  | {
+      name: "qa/compliance.alert";
+      data: {
+        location_id: string;
+        business_id: string;
+        overall_score: number;
+        categories: Record<string, { score: number; status: string }>;
+      };
+    }
+  | {
+      name: "qa/tracking.broken";
+      data: {
+        location_id: string;
+        broken_params?: string[];
+        correlation_id?: string;
+      };
     };
 
 export const inngest = new Inngest({

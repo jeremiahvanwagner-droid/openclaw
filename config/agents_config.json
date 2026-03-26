@@ -337,7 +337,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -441,7 +443,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -545,7 +549,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -635,7 +641,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -736,7 +744,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -840,7 +850,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -946,7 +958,9 @@
         "tagging-engine",
         "weekly-report",
         "woocommerce-manager",
-        "wordpress-divi-manager"
+        "wordpress-divi-manager",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -1039,7 +1053,9 @@
         "subaccount-provisioner",
         "subscription-dunning-manager",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -1128,7 +1144,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -1229,7 +1247,9 @@
         "snapshot-deployer",
         "subaccount-provisioner",
         "tagging-engine",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -1880,7 +1900,8 @@
         "webhook-payload-formatter",
         "webhook-replay-tooling",
         "webhook-resilience",
-        "workflow-loop-detector"
+        "workflow-loop-detector",
+        "self-healing-integrations"
       ]
     },
     {
@@ -6000,7 +6021,7 @@
       "primary_responsibilities": [
         "Set up and manage GHL Community groups, channels, and rules",
         "Schedule and publish content to GHL Social Planner and Community groups",
-        "Moderate community posts — flag spam and generate contextual replies",
+        "Moderate community posts \u2014 flag spam and generate contextual replies",
         "Drive engagement through initiatives, challenges, and recognition programs",
         "Report community health metrics and sentiment trends"
       ],
@@ -6140,7 +6161,8 @@
         "retry-backoff-wrapper",
         "snapshot-deployer",
         "subaccount-provisioner",
-        "tagging-engine"
+        "tagging-engine",
+        "autonomous-qa-compliance"
       ]
     },
     {
@@ -7065,7 +7087,7 @@
       "org_unit": "division_9_online_store",
       "role_type": "specialist",
       "primary_responsibilities": [
-        "Track and analyze store KPIs — revenue, AOV, conversion rate, cart abandonment",
+        "Track and analyze store KPIs \u2014 revenue, AOV, conversion rate, cart abandonment",
         "Run heatmap and session recording analysis for UX optimization",
         "Build dashboards for store performance visibility",
         "Identify which books/merch drive the most cross-sells and lifetime value",
@@ -7228,7 +7250,7 @@
       "org_unit": "division_9_online_store",
       "role_type": "specialist",
       "primary_responsibilities": [
-        "Manage the full product catalog — books, apparel, accessories, digital products",
+        "Manage the full product catalog \u2014 books, apparel, accessories, digital products",
         "Coordinate with D5 Publishing for new book releases and inventory",
         "Source, price, and list new merchandise aligned with the brand",
         "Manage product photography, descriptions, and category taxonomy",
@@ -7396,7 +7418,7 @@
         "Craft sales page copy using proven persuasion frameworks (AIDA, PAS, StoryBrand)",
         "Create email sequences for abandoned carts, post-purchase upsells, and launch campaigns",
         "Develop offers copy that connects products to customer transformation journeys",
-        "Ensure all copy reflects Truth J Blue brand voice — warm, spiritual, empowering"
+        "Ensure all copy reflects Truth J Blue brand voice \u2014 warm, spiritual, empowering"
       ],
       "tools_required": [
         "content_editor",
@@ -7558,7 +7580,7 @@
       "role_type": "specialist",
       "primary_responsibilities": [
         "Coordinate with social media divisions to promote books and merch",
-        "Create social-first promotional content — reels, stories, carousels, TikToks",
+        "Create social-first promotional content \u2014 reels, stories, carousels, TikToks",
         "Plan and execute product launches on social channels",
         "Manage influencer/affiliate partnerships for book and merch promotions",
         "Track social-to-store conversion and optimize UTM-tagged campaigns"
@@ -8152,7 +8174,8 @@
         "notion-workspace-synchronizer",
         "retry-backoff-wrapper",
         "revenue-attribution",
-        "weekly-report"
+        "weekly-report",
+        "cross-business-scope-governor"
       ]
     },
     {
@@ -8429,7 +8452,8 @@
         "webhook-payload-formatter",
         "webhook-replay-tooling",
         "webhook-resilience",
-        "workflow-loop-detector"
+        "workflow-loop-detector",
+        "self-healing-integrations"
       ]
     }
   ]

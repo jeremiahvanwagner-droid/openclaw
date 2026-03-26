@@ -3598,6 +3598,77 @@
       "required_tests": [
         "scope enforcement"
       ]
+    },
+    {
+      "skill_id": "cross-business-scope-governor",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "modify_agent_config",
+        "write_supabase",
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase"
+      ],
+      "idempotency_key_strategy": "audit_type + date",
+      "approval_policy": "auto for safe corrections; hitl for token group changes",
+      "replay_policy": "safe to replay (audit is idempotent)",
+      "required_tests": [
+        "scope enforcement",
+        "drift detection",
+        "isolation check"
+      ],
+      "ghl_scope_requirement": []
+    },
+    {
+      "skill_id": "self-healing-integrations",
+      "owner": "ops-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "retry_failed_events",
+        "reset_circuit_breaker",
+        "write_supabase",
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase",
+        "ghl",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "provider + check_timestamp",
+      "approval_policy": "hitl for production endpoint remapping",
+      "replay_policy": "safe to replay (health checks are idempotent)",
+      "required_tests": [
+        "health probe",
+        "failure classification",
+        "auto-retry"
+      ],
+      "ghl_scope_requirement": []
+    },
+    {
+      "skill_id": "autonomous-qa-compliance",
+      "owner": "ops-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [
+        "write_supabase",
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase",
+        "ghl"
+      ],
+      "idempotency_key_strategy": "location_id + audit_type + date",
+      "approval_policy": "none (read-only audits)",
+      "replay_policy": "safe to replay (audits are idempotent)",
+      "required_tests": [
+        "funnel audit",
+        "tracking integrity",
+        "scorecard generation"
+      ],
+      "ghl_scope_requirement": [
+        "contacts:read"
+      ]
     }
   ]
 }

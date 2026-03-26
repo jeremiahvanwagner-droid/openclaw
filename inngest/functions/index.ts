@@ -39,3 +39,19 @@ export {
   saasFunnelPublished,
   d8Functions,
 } from "./d8-saas-operations";
+
+// Phase 1 — Foundation Skills
+export {
+  scopeAuditScheduled,
+  scopeDriftDetected,
+  scopeViolationAttempted,
+  integrationHealthCheck,
+  integrationFailureDetected,
+  integrationHealed,
+  integrationEscalation,
+  qaScheduledAudit,
+  qaFunnelPublished,
+  qaComplianceAlert,
+  qaTrackingBroken,
+  phase1Functions,
+} from "./phase1-foundation";

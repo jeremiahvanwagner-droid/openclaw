@@ -21,6 +21,9 @@ function Nav() {
           <a href="/agents" className="text-slate-400 hover:text-white transition">Agents</a>
           <a href="/events" className="text-slate-400 hover:text-white transition">Events</a>
           <a href="/costs" className="text-slate-400 hover:text-white transition">Costs</a>
+          <a href="/scope-governor" className="text-slate-400 hover:text-white transition">Scope</a>
+          <a href="/integrations" className="text-slate-400 hover:text-white transition">Integrations</a>
+          <a href="/compliance" className="text-slate-400 hover:text-white transition">Compliance</a>
           <div className="flex items-center gap-2 ml-4 pl-4 border-l border-slate-700">
             <ConnectionStatus />
           </div>
