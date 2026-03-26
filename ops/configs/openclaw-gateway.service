@@ -1,0 +1,41 @@
+# ============================================================================
+# openclaw-gateway.service — systemd user unit for OpenClaw Gateway
+# Install: ~/.config/systemd/user/openclaw-gateway.service
+# Enable:  systemctl --user daemon-reload && systemctl --user enable --now openclaw-gateway
+# ============================================================================
+[Unit]
+Description=OpenClaw Gateway (local loopback)
+Documentation=https://docs.openclaw.ai/gateway
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/openclaw
+EnvironmentFile=/opt/openclaw/.openclaw/openclaw.env
+
+# Startup optimization (recommended by openclaw doctor)
+Environment=NODE_COMPILE_CACHE=/var/tmp/openclaw-compile-cache
+Environment=OPENCLAW_NO_RESPAWN=1
+
+ExecStartPre=/usr/bin/mkdir -p /var/tmp/openclaw-compile-cache
+ExecStart=/usr/local/bin/openclaw gateway --port 18789
+ExecReload=/bin/kill -HUP $MAINPID
+
+Restart=on-failure
+RestartSec=10
+WatchdogSec=120
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/openclaw
+ReadWritePaths=/var/tmp/openclaw-compile-cache
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=2G
+
+[Install]
+WantedBy=default.target
