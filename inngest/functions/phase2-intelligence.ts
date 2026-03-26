@@ -151,7 +151,7 @@ export const revenueBriefingReady = inngest.createFunction(
     retries: 2,
   },
   { event: "revenue/briefing.ready" },
-  async ({ event, step }) => {
+  async ({ step }) => {
     const mod = await step.run("load-revenue-ops", () => loadRevenueOps());
 
     const pulse = await step.run("portfolio-pulse", () => mod.portfolioPulse()) as {
