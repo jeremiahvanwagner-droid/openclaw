@@ -583,6 +583,96 @@ type OpenClawEvent =
         broken_params?: string[];
         correlation_id?: string;
       };
+    }
+  // ── Phase 2: Autonomous Revenue Ops ─────────────────────────
+  | {
+      name: "revenue/daily.collection";
+      data: { date: string };
+    }
+  | {
+      name: "revenue/anomaly.detected";
+      data: {
+        anomaly_id?: string;
+        business_id: string;
+        kpi_name: string;
+        severity: "warning" | "critical";
+        z_score: number;
+        current_value: number;
+        baseline_avg: number;
+      };
+    }
+  | {
+      name: "revenue/playbook.executed";
+      data: {
+        playbook_id: string;
+        business_id: string;
+        anomaly_id?: string;
+        actions_taken: string[];
+      };
+    }
+  | {
+      name: "revenue/briefing.ready";
+      data: {
+        businesses_collected: number;
+        anomalies_found: number;
+        date: string;
+      };
+    }
+  // ── Phase 2: Customer Journey Intelligence ──────────────────
+  | {
+      name: "journey/touchpoint.recorded";
+      data: {
+        contact_id: string;
+        business_id: string;
+        event_type: string;
+        channel?: string;
+        funnel_stage?: string;
+        metadata?: Record<string, unknown>;
+      };
+    }
+  | {
+      name: "journey/stall.detected";
+      data: {
+        contact_id: string;
+        stalled_at: string;
+        days_stalled: number;
+      };
+    }
+  | {
+      name: "journey/intent.high";
+      data: {
+        contact_id: string;
+        business_id: string;
+        intent_score: number;
+        factors: Record<string, number>;
+      };
+    }
+  | {
+      name: "journey/next-offer.triggered";
+      data: {
+        contact_id: string;
+        recommendation: {
+          recommended_offer_id: string;
+          reason: string;
+        };
+      };
+    }
+  // ── Phase 2: Executive Command Center ───────────────────────
+  | {
+      name: "command-center/daily.briefing";
+      data: { date: string };
+    }
+  | {
+      name: "command-center/weekly.digest";
+      data: { week: string };
+    }
+  | {
+      name: "command-center/alert.critical";
+      data: {
+        source: string;
+        message: string;
+        severity: "critical";
+      };
     };
 
 export const inngest = new Inngest({

@@ -53,6 +53,18 @@ import {
   qaComplianceAlert,
   qaTrackingBroken,
 } from "./functions/phase1-foundation";
+import {
+  revenueDailyCollection,
+  revenueAnomalyDetected,
+  revenueBriefingReady,
+  journeyTouchpointRecorded,
+  journeyStallDetection,
+  journeyHighIntent,
+  journeyNextOfferTriggered,
+  commandCenterDailyBriefing,
+  commandCenterWeeklyDigest,
+  commandCenterCriticalAlert,
+} from "./functions/phase2-intelligence";
 
 export const handler = serve({
   client: inngest,
@@ -93,5 +105,16 @@ export const handler = serve({
     qaFunnelPublished,
     qaComplianceAlert,
     qaTrackingBroken,
+    // Phase 2: Intelligence Skills
+    revenueDailyCollection,
+    revenueAnomalyDetected,
+    revenueBriefingReady,
+    journeyTouchpointRecorded,
+    journeyStallDetection,
+    journeyHighIntent,
+    journeyNextOfferTriggered,
+    commandCenterDailyBriefing,
+    commandCenterWeeklyDigest,
+    commandCenterCriticalAlert,
   ],
 });

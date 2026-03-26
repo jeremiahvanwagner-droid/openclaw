@@ -1,0 +1,80 @@
+{
+  "version": "1.0.0",
+  "owner": "d8_revenue_ops",
+  "playbooks": [
+    {
+      "playbook_id": "conversion_drop",
+      "trigger_kpi": "conversions",
+      "trigger_severity": "warning",
+      "description": "Conversion rate dropped below baseline",
+      "actions": [
+        { "action": "alert_growth_team", "channel": "telegram", "auto_execute": true },
+        { "action": "pause_ad_spend", "condition": "z_score < -2.5", "requires_hitl": true },
+        { "action": "trigger_ab_review", "auto_execute": true }
+      ],
+      "risk_tier": "write_safe"
+    },
+    {
+      "playbook_id": "churn_spike",
+      "trigger_kpi": "churn",
+      "trigger_severity": "warning",
+      "description": "Churn rate spiked above baseline",
+      "actions": [
+        { "action": "activate_winback_sequence", "auto_execute": true },
+        { "action": "alert_ceo", "condition": "mrr_impact_pct > 15", "channel": "telegram", "auto_execute": true },
+        { "action": "pause_offboarding", "requires_hitl": true }
+      ],
+      "risk_tier": "write_safe"
+    },
+    {
+      "playbook_id": "revenue_anomaly_positive",
+      "trigger_kpi": "revenue",
+      "trigger_severity": "warning",
+      "trigger_direction": "positive",
+      "description": "Revenue unexpectedly high — investigate source",
+      "actions": [
+        { "action": "congratulation_alert", "channel": "telegram", "auto_execute": true },
+        { "action": "attribute_source", "auto_execute": true },
+        { "action": "recommend_double_down", "auto_execute": true }
+      ],
+      "risk_tier": "draft_only"
+    },
+    {
+      "playbook_id": "lead_volume_drop",
+      "trigger_kpi": "leads",
+      "trigger_severity": "warning",
+      "description": "Lead volume dropped below baseline",
+      "actions": [
+        { "action": "check_ad_platform_health", "auto_execute": true },
+        { "action": "review_funnel_conversion", "auto_execute": true },
+        { "action": "alert_marketing", "channel": "telegram", "auto_execute": true }
+      ],
+      "risk_tier": "draft_only"
+    },
+    {
+      "playbook_id": "appointment_no_show_spike",
+      "trigger_kpi": "appointments",
+      "trigger_severity": "warning",
+      "trigger_direction": "negative",
+      "description": "Appointment no-show rate spiked",
+      "actions": [
+        { "action": "adjust_reminder_cadence", "auto_execute": true },
+        { "action": "review_booking_ux", "auto_execute": true },
+        { "action": "alert_ops", "channel": "telegram", "auto_execute": true }
+      ],
+      "risk_tier": "write_safe"
+    },
+    {
+      "playbook_id": "aov_decline",
+      "trigger_kpi": "aov",
+      "trigger_severity": "warning",
+      "description": "Average order value declining",
+      "actions": [
+        { "action": "review_upsell_flow", "auto_execute": true },
+        { "action": "check_discount_abuse", "auto_execute": true },
+        { "action": "alert_revenue_ops", "channel": "telegram", "auto_execute": true }
+      ],
+      "risk_tier": "draft_only"
+    }
+  ]
+}

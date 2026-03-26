@@ -55,3 +55,18 @@ export {
   qaTrackingBroken,
   phase1Functions,
 } from "./phase1-foundation";
+
+// Phase 2 — Intelligence Skills
+export {
+  revenueDailyCollection,
+  revenueAnomalyDetected,
+  revenueBriefingReady,
+  journeyTouchpointRecorded,
+  journeyStallDetection,
+  journeyHighIntent,
+  journeyNextOfferTriggered,
+  commandCenterDailyBriefing,
+  commandCenterWeeklyDigest,
+  commandCenterCriticalAlert,
+  phase2Functions,
+} from "./phase2-intelligence";

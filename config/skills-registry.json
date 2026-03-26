@@ -3669,6 +3669,82 @@
       "ghl_scope_requirement": [
         "contacts:read"
       ]
+    },
+    {
+      "skill_id": "autonomous-revenue-ops",
+      "owner": "growth-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "write_supabase",
+        "telegram_alert",
+        "ghl_workflow_trigger"
+      ],
+      "external_systems": [
+        "supabase",
+        "ghl",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "business_id + date",
+      "approval_policy": "auto for warning; hitl for critical playbook actions",
+      "replay_policy": "safe to replay (KPI collection is idempotent)",
+      "required_tests": [
+        "kpi collection",
+        "anomaly detection z-score",
+        "playbook matching",
+        "briefing generation"
+      ],
+      "ghl_scope_requirement": [
+        "contacts:read",
+        "opportunities:read"
+      ]
+    },
+    {
+      "skill_id": "customer-journey-intelligence",
+      "owner": "growth-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "write_supabase",
+        "telegram_alert",
+        "ghl_workflow_trigger"
+      ],
+      "external_systems": [
+        "supabase",
+        "ghl",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "contact_id + event_type + timestamp",
+      "approval_policy": "none (analysis only; actions are recommendations)",
+      "replay_policy": "safe to replay (touchpoints are append-only)",
+      "required_tests": [
+        "touchpoint recording",
+        "intent scoring",
+        "stall detection",
+        "next offer recommendation"
+      ],
+      "ghl_scope_requirement": [
+        "contacts:read"
+      ]
+    },
+    {
+      "skill_id": "executive-command-center",
+      "owner": "ops-ops",
+      "risk_tier": "draft_only",
+      "side_effects": [
+        "telegram_alert"
+      ],
+      "external_systems": [
+        "supabase",
+        "telegram"
+      ],
+      "idempotency_key_strategy": "briefing_type + date",
+      "approval_policy": "none (read-only briefings)",
+      "replay_policy": "safe to replay (aggregation is idempotent)",
+      "required_tests": [
+        "portfolio briefing generation",
+        "bottleneck identification",
+        "risk surfacing",
+        "telegram delivery"
+      ]
     }
   ]
 }
