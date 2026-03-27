@@ -77,6 +77,17 @@ async function findOrCreatePipelineStage(locationId, token) {
   return { pipelineId: dpw.id, stageId: stage?.id || null };
 }
 
+async function createTask(token, locationId, contactId, firstName) {
+  const dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
+  const result = await apiCall('POST', `/contacts/${contactId}/tasks`, token, {
+    locationId,
+    title: `Check in with ${firstName} — Divine Path Walkers Day 3`,
+    dueDate,
+    status: 'incompleted'
+  });
+  return { taskId: result.task?.id || result.id || null, dueDate };
+}
+
 async function welcome(locationId, contactId) {
   const token = findTokenForLocation(locationId);
 
@@ -124,16 +135,7 @@ async function welcome(locationId, contactId) {
     emailSent = true;
   }
 
-  let taskCreated = false;
-  const dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
-  await apiCall('POST', '/contacts/tasks', token, {
-    locationId,
-    contactId,
-    title: `Check in with ${firstName} — Divine Path Walkers Day 3`,
-    dueDate,
-    status: 'incompleted'
-  });
-  taskCreated = true;
+  const { taskId, dueDate } = await createTask(token, locationId, contactId, firstName);
 
   console.log(JSON.stringify({
     action: 'welcome',
@@ -142,7 +144,9 @@ async function welcome(locationId, contactId) {
     pipelineUpdated: !!(pipelineId && stageId),
     smsSent,
     emailSent,
-    taskCreated,
+    taskCreated: !!taskId,
+    taskId,
+    dueDate,
     timestamp: new Date().toISOString()
   }, null, 2));
 }
@@ -181,21 +185,14 @@ async function taskFollowup(locationId, contactId) {
   const contactData = await apiCall('GET', `/contacts/${contactId}`, token);
   const c = contactData.contact || contactData;
   const firstName = c.firstName || 'friend';
-  const dueDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString();
 
-  const result = await apiCall('POST', '/contacts/tasks', token, {
-    locationId,
-    contactId,
-    title: `Check in with ${firstName} — Divine Path Walkers Day 3`,
-    dueDate,
-    status: 'incompleted'
-  });
+  const { taskId, dueDate } = await createTask(token, locationId, contactId, firstName);
 
   console.log(JSON.stringify({
     action: 'task-followup',
     contactId,
     firstName,
-    taskId: result.task?.id || result.id || null,
+    taskId,
     dueDate,
     title: `Check in with ${firstName} — Divine Path Walkers Day 3`,
     timestamp: new Date().toISOString()
