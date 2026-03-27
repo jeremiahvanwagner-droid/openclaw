@@ -11,11 +11,11 @@
   },
   "browser": {
     "headless": true,
-    "defaultProfile": "openclaw",
+    "defaultProfile": "chrome-relay",
     "profiles": {
-      "chrome": {
+      "chrome-relay": {
         "cdpPort": 9222,
-        "color": "#00AA00"
+        "color": "#1E90FF"
       }
     }
   },

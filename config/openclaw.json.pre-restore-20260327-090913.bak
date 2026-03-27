@@ -1,21 +1,37 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.3.13",
-    "lastTouchedAt": "2026-03-19T00:59:08.373Z"
+    "lastTouchedAt": "2026-03-19T00:59:08.372Z"
   },
   "wizard": {
-    "lastRunAt": "2026-03-15T18:00:00.000Z",
-    "lastRunVersion": "2026.3.13",
+    "lastRunAt": "2026-03-13T21:01:06.438Z",
+    "lastRunVersion": "2026.3.8",
     "lastRunCommand": "configure",
     "lastRunMode": "local"
   },
   "browser": {
     "headless": true,
-    "defaultProfile": "chrome-relay",
+    "defaultProfile": "openclaw",
     "profiles": {
-      "chrome-relay": {
+      "openclaw": {
         "cdpPort": 9222,
-        "color": "#1E90FF"
+        "color": "#00AA00"
+      },
+      "ghl-live": {
+        "cdpPort": 9223,
+        "color": "#008844"
+      },
+      "social-live": {
+        "cdpPort": 9224,
+        "color": "#0055AA"
+      },
+      "content-live": {
+        "cdpPort": 9225,
+        "color": "#AA6600"
+      },
+      "sandbox-test": {
+        "cdpPort": 9226,
+        "color": "#666666"
       }
     }
   },
@@ -147,8 +163,7 @@
         "openai/gpt-5.3-codex": {},
         "openai/gpt-4o-mini": {}
       },
-      "workspace": "/opt/openclaw/workspace",
-      "timeFormat": "24",
+      "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace",
       "contextTokens": 240000,
       "memorySearch": {
         "enabled": true,
@@ -181,28 +196,28 @@
       {
         "id": "marketing",
         "name": "marketing",
-        "workspace": "/opt/openclaw/workspace-marketing",
-        "agentDir": "/opt/openclaw/agents/marketing/agent",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-marketing",
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\marketing\\agent",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "sales",
         "name": "sales",
-        "workspace": "/opt/openclaw/workspace-sales",
-        "agentDir": "/opt/openclaw/agents/sales/agent",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-sales",
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\sales\\agent",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "support",
         "name": "support",
-        "workspace": "/opt/openclaw/workspace-support",
-        "agentDir": "/opt/openclaw/agents/support/agent",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-support",
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\support\\agent",
         "model": "openai/gpt-5.3-codex"
       },
       {
         "id": "d1_ceo",
         "name": "CEO",
-        "workspace": "/opt/openclaw/workspaces/d1_ceo",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ceo",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -299,7 +314,7 @@
       {
         "id": "d1_cto",
         "name": "CTO",
-        "workspace": "/opt/openclaw/workspaces/d1_cto",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cto",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -383,7 +398,7 @@
       {
         "id": "d1_data_analyst",
         "name": "Data Analyst",
-        "workspace": "/opt/openclaw/workspaces/d1_data_analyst",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_data_analyst",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -412,7 +427,7 @@
       {
         "id": "d1_devops",
         "name": "DevOps / Infrastructure Engineer",
-        "workspace": "/opt/openclaw/workspaces/d1_devops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_devops",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -447,7 +462,7 @@
       {
         "id": "d1_fullstack_dev",
         "name": "Software Engineer / Full-Stack Developer",
-        "workspace": "/opt/openclaw/workspaces/d1_fullstack_dev",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_fullstack_dev",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -489,7 +504,7 @@
       {
         "id": "d1_product_dev_manager",
         "name": "Product Development Manager",
-        "workspace": "/opt/openclaw/workspaces/d1_product_dev_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_product_dev_manager",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -572,7 +587,7 @@
       {
         "id": "d1_ux_designer",
         "name": "UX/UI Designer",
-        "workspace": "/opt/openclaw/workspaces/d1_ux_designer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ux_designer",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -597,7 +612,7 @@
       {
         "id": "d2_copywriter",
         "name": "Copywriter / Product Descriptions Writer",
-        "workspace": "/opt/openclaw/workspaces/d2_copywriter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_copywriter",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -634,7 +649,7 @@
       {
         "id": "d2_customer_service",
         "name": "Customer Service Representative",
-        "workspace": "/opt/openclaw/workspaces/d2_customer_service",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_customer_service",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "abandoned-cart-recovery",
@@ -667,7 +682,7 @@
       {
         "id": "d2_digital_marketing",
         "name": "Digital Marketing Manager",
-        "workspace": "/opt/openclaw/workspaces/d2_digital_marketing",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_digital_marketing",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -705,7 +720,7 @@
       {
         "id": "d2_director",
         "name": "eCommerce Director",
-        "workspace": "/opt/openclaw/workspaces/d2_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_director",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -772,7 +787,7 @@
       {
         "id": "d2_graphic_designer",
         "name": "Graphic Designer",
-        "workspace": "/opt/openclaw/workspaces/d2_graphic_designer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_graphic_designer",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "asset-library-manager",
@@ -801,7 +816,7 @@
       {
         "id": "d2_inventory_specialist",
         "name": "Inventory & Fulfillment Specialist",
-        "workspace": "/opt/openclaw/workspaces/d2_inventory_specialist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_inventory_specialist",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "coupon-and-promo-creator",
@@ -826,7 +841,7 @@
       {
         "id": "d2_paid_ads",
         "name": "Paid Ads Specialist (PPC/Meta)",
-        "workspace": "/opt/openclaw/workspaces/d2_paid_ads",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_paid_ads",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -859,7 +874,7 @@
       {
         "id": "d2_seo_strategist",
         "name": "SEO / Content Strategist",
-        "workspace": "/opt/openclaw/workspaces/d2_seo_strategist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_seo_strategist",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "affiliate-campaign-manager",
@@ -950,7 +965,7 @@
       {
         "id": "d2_web_dev",
         "name": "Web Developer / Platform Technician",
-        "workspace": "/opt/openclaw/workspaces/d2_web_dev",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_web_dev",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "aisaas-api-rate-limit-handling",
@@ -999,7 +1014,7 @@
       {
         "id": "d3_admin_coordinator",
         "name": "Administrative Coordinator",
-        "workspace": "/opt/openclaw/workspaces/d3_admin_coordinator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_admin_coordinator",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "access-control-manager",
@@ -1071,7 +1086,7 @@
       {
         "id": "d3_business_analyst",
         "name": "Business Analyst",
-        "workspace": "/opt/openclaw/workspaces/d3_business_analyst",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_business_analyst",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -1104,7 +1119,7 @@
       {
         "id": "d3_ceo",
         "name": "Consulting CEO",
-        "workspace": "/opt/openclaw/workspaces/d3_ceo",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ceo",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "agency-automated-invoice-generation",
@@ -1155,7 +1170,7 @@
       {
         "id": "d3_client_relations",
         "name": "Client Relations Manager",
-        "workspace": "/opt/openclaw/workspaces/d3_client_relations",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_client_relations",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "abandoned-cart-recovery",
@@ -1183,7 +1198,7 @@
       {
         "id": "d3_lead_strategist",
         "name": "Lead Strategy Consultant",
-        "workspace": "/opt/openclaw/workspaces/d3_lead_strategist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_lead_strategist",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "agency-automated-invoice-generation",
@@ -1218,7 +1233,7 @@
       {
         "id": "d3_marketing_brand",
         "name": "Marketing & Brand Manager",
-        "workspace": "/opt/openclaw/workspaces/d3_marketing_brand",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_marketing_brand",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -1269,7 +1284,7 @@
       {
         "id": "d3_ops_manager",
         "name": "Operations Manager",
-        "workspace": "/opt/openclaw/workspaces/d3_ops_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ops_manager",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -1305,7 +1320,7 @@
       {
         "id": "d3_sales_closer",
         "name": "Sales Consultant / Closer",
-        "workspace": "/opt/openclaw/workspaces/d3_sales_closer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_sales_closer",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -1347,7 +1362,7 @@
       {
         "id": "d3_thought_leadership",
         "name": "Content & Thought Leadership Manager",
-        "workspace": "/opt/openclaw/workspaces/d3_thought_leadership",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_thought_leadership",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -1388,7 +1403,7 @@
       {
         "id": "d4_client_experience",
         "name": "Client Experience Coordinator",
-        "workspace": "/opt/openclaw/workspaces/d4_client_experience",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_client_experience",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "calendar-booking-bot",
@@ -1432,7 +1447,7 @@
       {
         "id": "d4_community_manager",
         "name": "Community Manager",
-        "workspace": "/opt/openclaw/workspaces/d4_community_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_community_manager",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -1471,7 +1486,7 @@
       {
         "id": "d4_curriculum_head",
         "name": "Head of Curriculum & Program Design",
-        "workspace": "/opt/openclaw/workspaces/d4_curriculum_head",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_curriculum_head",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -1517,7 +1532,7 @@
       {
         "id": "d4_cvo",
         "name": "Chief Visionary Officer",
-        "workspace": "/opt/openclaw/workspaces/d4_cvo",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_cvo",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -1689,7 +1704,7 @@
       {
         "id": "d4_lead_coach",
         "name": "Lead Coach / Mentor",
-        "workspace": "/opt/openclaw/workspaces/d4_lead_coach",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_lead_coach",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "coaching-adaptive-action-plan-generation",
@@ -1727,7 +1742,7 @@
       {
         "id": "d4_social_creator",
         "name": "Social Media & Content Creator",
-        "workspace": "/opt/openclaw/workspaces/d4_social_creator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_social_creator",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "asset-library-manager",
@@ -1767,7 +1782,7 @@
       {
         "id": "d4_tech_automation",
         "name": "Tech & Automation Specialist",
-        "workspace": "/opt/openclaw/workspaces/d4_tech_automation",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_tech_automation",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "automation-logic-designer",
@@ -1813,7 +1828,7 @@
       {
         "id": "d4_video_production",
         "name": "Video Production Specialist",
-        "workspace": "/opt/openclaw/workspaces/d4_video_production",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_video_production",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "asset-library-manager",
@@ -1841,7 +1856,7 @@
       {
         "id": "d5_acquisitions",
         "name": "Acquisitions Editor",
-        "workspace": "/opt/openclaw/workspaces/d5_acquisitions",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_acquisitions",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "agency-automated-invoice-generation",
@@ -1869,7 +1884,7 @@
       {
         "id": "d5_author_relations",
         "name": "Author Relations Coordinator",
-        "workspace": "/opt/openclaw/workspaces/d5_author_relations",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_author_relations",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "calendar-booking-bot",
@@ -1888,7 +1903,7 @@
       {
         "id": "d5_book_marketing",
         "name": "Book Marketing Director",
-        "workspace": "/opt/openclaw/workspaces/d5_book_marketing",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_book_marketing",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -1932,7 +1947,7 @@
       {
         "id": "d5_copywriter",
         "name": "Copywriter / Content Writer",
-        "workspace": "/opt/openclaw/workspaces/d5_copywriter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_copywriter",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -1968,7 +1983,7 @@
       {
         "id": "d5_cover_artist",
         "name": "Graphic Designer / Cover Artist",
-        "workspace": "/opt/openclaw/workspaces/d5_cover_artist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_cover_artist",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "asset-library-manager",
@@ -1992,7 +2007,7 @@
       {
         "id": "d5_digital_distribution",
         "name": "Digital Distribution Manager",
-        "workspace": "/opt/openclaw/workspaces/d5_digital_distribution",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_digital_distribution",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -2029,7 +2044,7 @@
       {
         "id": "d5_managing_editor",
         "name": "Managing Editor",
-        "workspace": "/opt/openclaw/workspaces/d5_managing_editor",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_managing_editor",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "approval-rubric",
@@ -2052,7 +2067,7 @@
       {
         "id": "d5_pr_media",
         "name": "PR & Media Relations Specialist",
-        "workspace": "/opt/openclaw/workspaces/d5_pr_media",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_pr_media",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -2088,7 +2103,7 @@
       {
         "id": "d5_publisher",
         "name": "Publisher",
-        "workspace": "/opt/openclaw/workspaces/d5_publisher",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_publisher",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -2127,7 +2142,7 @@
       {
         "id": "d5_sales_affiliate",
         "name": "Sales & Affiliate Manager",
-        "workspace": "/opt/openclaw/workspaces/d5_sales_affiliate",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_sales_affiliate",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "affiliate-campaign-manager",
@@ -2185,7 +2200,7 @@
       {
         "id": "d6_board_liaison",
         "name": "Board Relations & Administrative Liaison",
-        "workspace": "/opt/openclaw/workspaces/d6_board_liaison",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_board_liaison",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "access-control-manager",
@@ -2206,7 +2221,7 @@
       {
         "id": "d6_communications",
         "name": "Communications & Marketing Manager",
-        "workspace": "/opt/openclaw/workspaces/d6_communications",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_communications",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "asset-library-manager",
@@ -2251,7 +2266,7 @@
       {
         "id": "d6_coo",
         "name": "Chief Operating Officer (COO)",
-        "workspace": "/opt/openclaw/workspaces/d6_coo",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_coo",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2277,7 +2292,7 @@
       {
         "id": "d6_dev_director",
         "name": "Development Director (Fundraising)",
-        "workspace": "/opt/openclaw/workspaces/d6_dev_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_dev_director",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -2303,7 +2318,7 @@
       {
         "id": "d6_executive_director",
         "name": "Nonprofit Executive Director",
-        "workspace": "/opt/openclaw/workspaces/d6_executive_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_executive_director",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2341,7 +2356,7 @@
       {
         "id": "d6_finance",
         "name": "Finance & Compliance Officer",
-        "workspace": "/opt/openclaw/workspaces/d6_finance",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_finance",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -2368,7 +2383,7 @@
       {
         "id": "d6_grant_writer",
         "name": "Grant Writer",
-        "workspace": "/opt/openclaw/workspaces/d6_grant_writer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_grant_writer",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "blog-post-publisher",
@@ -2405,7 +2420,7 @@
       {
         "id": "d6_outreach",
         "name": "Community Outreach Coordinator",
-        "workspace": "/opt/openclaw/workspaces/d6_outreach",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_outreach",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -2449,7 +2464,7 @@
       {
         "id": "d6_program_director",
         "name": "Program Director",
-        "workspace": "/opt/openclaw/workspaces/d6_program_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_program_director",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -2491,7 +2506,7 @@
       {
         "id": "d6_volunteer",
         "name": "Volunteer Coordinator",
-        "workspace": "/opt/openclaw/workspaces/d6_volunteer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_volunteer",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "access-control-manager",
@@ -2525,7 +2540,7 @@
       {
         "id": "biz_01_pod_lead",
         "name": "Truth J Blue Core Brand Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_01_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_01_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2576,7 +2591,7 @@
       {
         "id": "biz_02_pod_lead",
         "name": "Beyond the Veil Mentorship Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_02_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_02_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2630,7 +2645,7 @@
       {
         "id": "biz_03_pod_lead",
         "name": "Divine Path Walkers Community Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_03_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_03_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2684,7 +2699,7 @@
       {
         "id": "biz_04_pod_lead",
         "name": "Truth J Blue Publishing Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_04_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_04_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2724,7 +2739,7 @@
       {
         "id": "biz_05_pod_lead",
         "name": "Truth J Blue Consulting Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_05_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_05_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2775,7 +2790,7 @@
       {
         "id": "biz_06_pod_lead",
         "name": "Inspire Build Motivate, Inc. Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_06_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_06_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2829,7 +2844,7 @@
       {
         "id": "biz_07_pod_lead",
         "name": "Truth J Blue Online Store Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_07_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_07_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2885,7 +2900,7 @@
       {
         "id": "biz_08_pod_lead",
         "name": "Truth J Blue Primary SaaS Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_08_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_08_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "abandoned-cart-recovery",
@@ -2928,7 +2943,7 @@
       {
         "id": "biz_09_pod_lead",
         "name": "Incubator Shared Brands Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_09_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_09_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -2967,7 +2982,7 @@
       {
         "id": "biz_10_pod_lead",
         "name": "Portfolio Control Pod Lead",
-        "workspace": "/opt/openclaw/workspaces/biz_10_pod_lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_10_pod_lead",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3055,7 +3070,7 @@
       {
         "id": "browser_secondary",
         "name": "Browser Automation Secondary",
-        "workspace": "/opt/openclaw/workspaces/browser_secondary",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\browser_secondary",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "automation-logic-designer",
@@ -3074,7 +3089,7 @@
       {
         "id": "shared_api_gateway",
         "name": "API & Integration Gateway Agent",
-        "workspace": "/opt/openclaw/workspaces/shared_api_gateway",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_api_gateway",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3116,7 +3131,7 @@
       {
         "id": "shared_data_analytics",
         "name": "Data & Analytics Hub Agent",
-        "workspace": "/opt/openclaw/workspaces/shared_data_analytics",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_analytics",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3146,7 +3161,7 @@
       {
         "id": "shared_data_control",
         "name": "Shared Data Control",
-        "workspace": "/opt/openclaw/workspaces/shared_data_control",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_control",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3171,7 +3186,7 @@
       {
         "id": "shared_exec_orchestrator",
         "name": "Shared Executive Orchestrator",
-        "workspace": "/opt/openclaw/workspaces/shared_exec_orchestrator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_exec_orchestrator",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3197,7 +3212,7 @@
       {
         "id": "shared_knowledge_base",
         "name": "Internal Knowledge Base Agent",
-        "workspace": "/opt/openclaw/workspaces/shared_knowledge_base",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_knowledge_base",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "access-control-manager",
@@ -3231,7 +3246,7 @@
       {
         "id": "shared_legal_compliance",
         "name": "Legal & Compliance Advisor Agent",
-        "workspace": "/opt/openclaw/workspaces/shared_legal_compliance",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_legal_compliance",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3262,7 +3277,7 @@
       {
         "id": "shared_master_orchestrator",
         "name": "Master Orchestrator",
-        "workspace": "/opt/openclaw/workspaces/shared_master_orchestrator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_master_orchestrator",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3292,7 +3307,7 @@
       {
         "id": "shared_runtime_ops",
         "name": "Shared Runtime Ops",
-        "workspace": "/opt/openclaw/workspaces/shared_runtime_ops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_runtime_ops",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3374,7 +3389,7 @@
       {
         "id": "d8_community_manager",
         "name": "Community & Engagement Manager",
-        "workspace": "/opt/openclaw/workspaces/d8_community_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_community_manager",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "comment-moderation-sop",
@@ -3417,7 +3432,7 @@
       {
         "id": "d8_compliance_auditor",
         "name": "System Auditing & Compliance",
-        "workspace": "/opt/openclaw/workspaces/d8_compliance_auditor",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_compliance_auditor",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -3451,7 +3466,7 @@
       {
         "id": "d8_content_ops",
         "name": "Content & Asset Operations",
-        "workspace": "/opt/openclaw/workspaces/d8_content_ops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_content_ops",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "blog-post-publisher",
@@ -3485,8 +3500,10 @@
           "social-content",
           "social-distributor",
           "social-media-publisher",
+          "skool-browser-control",
           "social-poster",
           "subaccount-provisioner",
+          "substack-browser-control",
           "tagging-engine",
           "video-script-writer",
           "youtube-manager"
@@ -3539,7 +3556,7 @@
       {
         "id": "d8_customer_success",
         "name": "Customer Support & Success",
-        "workspace": "/opt/openclaw/workspaces/d8_customer_success",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_customer_success",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "abandoned-cart-recovery",
@@ -3624,7 +3641,7 @@
       {
         "id": "d8_integration_engineer",
         "name": "External Orchestration & Integration",
-        "workspace": "/opt/openclaw/workspaces/d8_integration_engineer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_integration_engineer",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "aisaas-api-rate-limit-handling",
@@ -3672,7 +3689,7 @@
       {
         "id": "d8_marketing_automation",
         "name": "Advanced Marketing & Lead Gen",
-        "workspace": "/opt/openclaw/workspaces/d8_marketing_automation",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_marketing_automation",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "ab-testing",
@@ -3766,6 +3783,7 @@
           "opportunity-mover",
           "page-builder",
           "pipeline-manager",
+          "skool-browser-control",
           "snapshot-deployer",
           "subaccount-provisioner",
           "subscription-dunning-manager",
@@ -3893,7 +3911,7 @@
       {
         "id": "d8_saas_director",
         "name": "SaaS Operations Director",
-        "workspace": "/opt/openclaw/workspaces/d8_saas_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_saas_director",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "abandoned-cart-recovery",
@@ -3936,7 +3954,7 @@
       {
         "id": "d9_analytics",
         "name": "Store Analytics & Conversion Optimizer",
-        "workspace": "/opt/openclaw/workspaces/d9_analytics",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_analytics",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -3979,7 +3997,7 @@
       {
         "id": "d9_customer_experience",
         "name": "Store Customer Experience Specialist",
-        "workspace": "/opt/openclaw/workspaces/d9_customer_experience",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_customer_experience",
         "model": "openai/gpt-4o-mini",
         "skills": [
           "comment-moderation-sop",
@@ -4023,7 +4041,7 @@
       {
         "id": "d9_merchandiser",
         "name": "Book & Merch Catalog Manager",
-        "workspace": "/opt/openclaw/workspaces/d9_merchandiser",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_merchandiser",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -4059,7 +4077,7 @@
       {
         "id": "d9_offer_strategist",
         "name": "Offer & Pricing Psychologist",
-        "workspace": "/opt/openclaw/workspaces/d9_offer_strategist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_offer_strategist",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "analytics-dashboard",
@@ -4109,7 +4127,7 @@
       {
         "id": "d9_sales_copywriter",
         "name": "Sales Copywriter & Persuasion Specialist",
-        "workspace": "/opt/openclaw/workspaces/d9_sales_copywriter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_sales_copywriter",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "blog-post-publisher",
@@ -4155,7 +4173,7 @@
       {
         "id": "d9_seo_content",
         "name": "Store SEO & Content Marketer",
-        "workspace": "/opt/openclaw/workspaces/d9_seo_content",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_seo_content",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "affiliate-campaign-manager",
@@ -4200,7 +4218,7 @@
       {
         "id": "d9_social_promoter",
         "name": "Store Social Media & Promotions Coordinator",
-        "workspace": "/opt/openclaw/workspaces/d9_social_promoter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_social_promoter",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "ab-testing",
@@ -4239,7 +4257,7 @@
       {
         "id": "d9_store_director",
         "name": "Online Store Director",
-        "workspace": "/opt/openclaw/workspaces/d9_store_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_store_director",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "access-control-manager",
@@ -4292,7 +4310,7 @@
       {
         "id": "d9_web_designer",
         "name": "WordPress/Divi UX Designer",
-        "workspace": "/opt/openclaw/workspaces/d9_web_designer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_web_designer",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "asset-library-manager",
@@ -4326,7 +4344,7 @@
       {
         "id": "d9_wp_developer",
         "name": "WordPress/WooCommerce Developer",
-        "workspace": "/opt/openclaw/workspaces/d9_wp_developer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_wp_developer",
         "model": "openai/gpt-5.3-codex",
         "skills": [
           "aisaas-api-rate-limit-handling",
@@ -4380,7 +4398,7 @@
   "commands": {
     "native": "auto",
     "nativeSkills": "auto",
-    "restart": false,
+    "restart": true,
     "ownerDisplay": "raw"
   },
   "session": {
@@ -4417,6 +4435,22 @@
         "${TELEGRAM_ALERT_CHAT_ID}"
       ],
       "groupPolicy": "allowlist"
+    },
+    "email": {
+      "enabled": true,
+      "provider": "microsoft365",
+      "fromAddress": "${M365_EMAIL_FROM}",
+      "defaultTo": "${M365_EMAIL_OWNER}",
+      "auth": {
+        "tenantId": "${MSTEAMS_TENANT_ID}",
+        "clientId": "${M365_EMAIL_CLIENT_ID}",
+        "clientSecret": "${M365_EMAIL_CLIENT_SECRET}"
+      },
+      "graphApiEndpoint": "https://graph.microsoft.com/v1.0",
+      "dmPolicy": "allowlist",
+      "allowTo": [
+        "${M365_EMAIL_OWNER}"
+      ]
     }
   },
   "gateway": {
