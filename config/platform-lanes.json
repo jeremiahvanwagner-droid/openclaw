@@ -1,0 +1,231 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-03-26T00:00:00.000Z",
+  "description": "Platform lane definitions. Each lane declares its trigger conditions, required inputs, output format, audit fields, rollback path, and browser profile.",
+
+  "lanes": {
+
+    "ghl": {
+      "lane_id": "ghl",
+      "display_name": "GoHighLevel Operations",
+      "browser_profile": "ghl-live",
+      "division": "division_8_saas_operations",
+      "primary_agents": ["d8_crm_ops", "d8_funnel_engineer", "d8_automation_architect"],
+
+      "trigger_conditions": [
+        { "type": "webhook", "source": "ghl", "events": ["contact.created", "contact.updated", "contact.tag.added", "opportunity.created", "payment.received", "appointment.created", "form.submitted"] },
+        { "type": "cron", "description": "Daily pipeline health check" },
+        { "type": "agent_event", "event": "agent/invoke", "filter": { "target_division": "division_8_saas_operations" } },
+        { "type": "manual", "description": "Operator-initiated via chat or Telegram" }
+      ],
+
+      "operations": {
+        "contact_read":        { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "contact_write":       { "risk": "medium", "requires_approval": false, "idempotent": false },
+        "bulk_tag_add":        { "risk": "medium", "requires_approval": false, "idempotent": true,  "idempotency_key": "tag_name+contact_segment" },
+        "opportunity_move":    { "risk": "medium", "requires_approval": false, "idempotent": false },
+        "workflow_create":     { "risk": "medium", "requires_approval": false, "idempotent": false },
+        "workflow_edit":       { "risk": "high",   "requires_approval": true,  "idempotent": false },
+        "workflow_delete":     { "risk": "high",   "requires_approval": true,  "idempotent": false },
+        "funnel_launch":       { "risk": "medium", "requires_approval": false, "idempotent": true },
+        "bulk_contact_delete": { "risk": "critical","requires_approval": true, "idempotent": false },
+        "offer_delete":        { "risk": "critical","requires_approval": true, "idempotent": false },
+        "subaccount_config":   { "risk": "high",   "requires_approval": true,  "idempotent": false }
+      },
+
+      "required_inputs": {
+        "contact_write":    ["contact_id", "field_updates"],
+        "opportunity_move": ["opportunity_id", "target_stage_id"],
+        "workflow_create":  ["workflow_config"],
+        "workflow_edit":    ["workflow_id", "change_set", "change_reason"],
+        "workflow_delete":  ["workflow_id", "confirmed_by", "backup_ref"],
+        "funnel_launch":    ["funnel_id"]
+      },
+
+      "output_format": {
+        "success": { "status": "ok", "action": "string", "entity_id": "string", "timestamp": "ISO8601", "correlation_id": "string" },
+        "failure":  { "status": "error", "action": "string", "error_code": "string", "message": "string", "retry_eligible": "boolean" }
+      },
+
+      "audit_log_fields": ["lane", "action", "entity_id", "agent_id", "correlation_id", "risk_tier", "approval_by", "timestamp", "result"],
+
+      "rollback": {
+        "contact_write":    "Re-apply previous field values from audit log",
+        "bulk_tag_add":     "Remove tags using same segment filter",
+        "workflow_create":  "Delete created workflow by id",
+        "workflow_edit":    "Restore workflow from pre-edit snapshot stored in audit log",
+        "funnel_launch":    "Unpublish funnel via API"
+      },
+
+      "anti_loop_config": {
+        "enabled": true,
+        "window_seconds": 300,
+        "max_identical_ops": 3,
+        "fingerprint_fields": ["action", "entity_id", "agent_id"]
+      }
+    },
+
+    "social": {
+      "lane_id": "social",
+      "display_name": "Social Media Operations",
+      "browser_profile": "social-live",
+      "division": "division_1_core_operations",
+      "primary_agents": ["d1_cmo", "d8_marketing_automation", "d8_content_ops"],
+
+      "trigger_conditions": [
+        { "type": "cron", "description": "Scheduled post from content calendar" },
+        { "type": "agent_event", "event": "agent/invoke", "filter": { "payload.lane": "social" } },
+        { "type": "manual", "description": "Operator-approved from draft queue" }
+      ],
+
+      "operations": {
+        "analytics_read":      { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "post_draft":          { "risk": "low",    "requires_approval": false, "idempotent": false },
+        "post_schedule":       { "risk": "low",    "requires_approval": false, "idempotent": true, "idempotency_key": "platform+scheduled_at+content_hash" },
+        "post_publish":        { "risk": "high",   "requires_approval": true,  "idempotent": true, "idempotency_key": "platform+content_hash" },
+        "comment_moderate":    { "risk": "medium", "requires_approval": false, "idempotent": true },
+        "comment_reply_send":  { "risk": "high",   "requires_approval": true,  "idempotent": true, "idempotency_key": "comment_id+reply_hash" },
+        "dm_send":             { "risk": "high",   "requires_approval": true,  "idempotent": true, "idempotency_key": "recipient_id+message_hash" },
+        "post_delete":         { "risk": "critical","requires_approval": true, "idempotent": false },
+        "bulk_delete_posts":   { "risk": "critical","requires_approval": true, "idempotent": false }
+      },
+
+      "required_inputs": {
+        "post_publish":       ["platform", "content", "media_urls", "approved_by"],
+        "comment_reply_send": ["platform", "comment_id", "reply_text", "approved_by"],
+        "dm_send":            ["platform", "recipient_id", "message_text", "approved_by"]
+      },
+
+      "output_format": {
+        "success": { "status": "ok", "platform": "string", "post_id": "string", "url": "string", "timestamp": "ISO8601" },
+        "failure":  { "status": "error", "platform": "string", "error_code": "string", "message": "string" }
+      },
+
+      "audit_log_fields": ["lane", "platform", "action", "content_hash", "agent_id", "approved_by", "post_id", "timestamp", "result"],
+
+      "rollback": {
+        "post_publish":   "Delete post via platform API or browser control",
+        "comment_reply_send": "Delete reply via platform API",
+        "dm_send":        "Delete DM if platform supports; log for manual review otherwise"
+      },
+
+      "anti_loop_config": {
+        "enabled": true,
+        "window_seconds": 3600,
+        "max_identical_ops": 1,
+        "fingerprint_fields": ["action", "platform", "content_hash"]
+      }
+    },
+
+    "skool": {
+      "lane_id": "skool",
+      "display_name": "Skool Community Operations",
+      "browser_profile": "content-live",
+      "division": "division_4_coaching",
+      "primary_agents": ["d4_cvo", "d8_community_manager", "d8_membership_director"],
+
+      "trigger_conditions": [
+        { "type": "cron", "description": "Daily community health scan" },
+        { "type": "agent_event", "event": "agent/invoke", "filter": { "payload.lane": "skool" } },
+        { "type": "manual", "description": "Operator-triggered moderation or engagement action" }
+      ],
+
+      "operations": {
+        "community_read":          { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "member_read":             { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "analytics_read":          { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "post_moderate_approve":   { "risk": "low",    "requires_approval": false, "idempotent": true, "idempotency_key": "post_id+action" },
+        "post_moderate_reject":    { "risk": "medium", "requires_approval": false, "idempotent": true, "idempotency_key": "post_id+action" },
+        "engagement_prompt_draft": { "risk": "low",    "requires_approval": false, "idempotent": false },
+        "community_post_publish":  { "risk": "high",   "requires_approval": true,  "idempotent": true, "idempotency_key": "content_hash+scheduled_at" },
+        "member_ban":              { "risk": "critical","requires_approval": true, "idempotent": true, "idempotency_key": "member_id+action" },
+        "member_dm_send":          { "risk": "high",   "requires_approval": true,  "idempotent": true, "idempotency_key": "member_id+message_hash" }
+      },
+
+      "required_inputs": {
+        "community_post_publish": ["content", "approved_by", "scheduled_at"],
+        "member_ban":             ["member_id", "reason", "approved_by"],
+        "member_dm_send":         ["member_id", "message_text", "approved_by"]
+      },
+
+      "output_format": {
+        "success": { "status": "ok", "action": "string", "entity_id": "string", "timestamp": "ISO8601" },
+        "failure":  { "status": "error", "action": "string", "message": "string" }
+      },
+
+      "audit_log_fields": ["lane", "action", "entity_id", "agent_id", "approved_by", "timestamp", "result"],
+
+      "rollback": {
+        "community_post_publish": "Delete post via browser; restore from draft audit log",
+        "post_moderate_reject":   "Re-approve post manually",
+        "member_ban":             "Unban member via admin panel"
+      },
+
+      "anti_loop_config": {
+        "enabled": true,
+        "window_seconds": 1800,
+        "max_identical_ops": 2,
+        "fingerprint_fields": ["action", "entity_id"]
+      }
+    },
+
+    "substack": {
+      "lane_id": "substack",
+      "display_name": "Substack Editorial Pipeline",
+      "browser_profile": "content-live",
+      "division": "division_5_publishing",
+      "primary_agents": ["d5_publisher", "d8_content_ops"],
+
+      "trigger_conditions": [
+        { "type": "cron", "description": "Weekly editorial pipeline run" },
+        { "type": "agent_event", "event": "agent/invoke", "filter": { "payload.lane": "substack" } },
+        { "type": "manual", "description": "Operator-triggered publish or QA check" }
+      ],
+
+      "operations": {
+        "draft_read":      { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "draft_create":    { "risk": "low",    "requires_approval": false, "idempotent": false },
+        "draft_update":    { "risk": "low",    "requires_approval": false, "idempotent": false },
+        "draft_preview":   { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "draft_qa_check":  { "risk": "low",    "requires_approval": false, "idempotent": true },
+        "issue_schedule":  { "risk": "medium", "requires_approval": false, "idempotent": true, "idempotency_key": "draft_id+scheduled_at" },
+        "issue_publish":   { "risk": "critical","requires_approval": true, "idempotent": true, "idempotency_key": "draft_id" },
+        "post_delete":     { "risk": "critical","requires_approval": true, "idempotent": false }
+      },
+
+      "required_inputs": {
+        "issue_publish":  ["draft_id", "qa_passed", "approved_by", "publish_at"],
+        "issue_schedule": ["draft_id", "scheduled_at"],
+        "post_delete":    ["post_id", "confirmed_by", "reason"]
+      },
+
+      "qa_gates": [
+        { "gate": "word_count_min", "value": 200,    "block_on_fail": true },
+        { "gate": "no_placeholder_text", "pattern": "\\[TODO\\]|\\[INSERT\\]|\\[TBD\\]", "block_on_fail": true },
+        { "gate": "subject_line_present", "block_on_fail": true },
+        { "gate": "preview_text_present", "block_on_fail": false },
+        { "gate": "links_valid", "block_on_fail": false }
+      ],
+
+      "output_format": {
+        "success": { "status": "ok", "action": "string", "draft_id": "string", "url": "string", "timestamp": "ISO8601" },
+        "failure":  { "status": "error", "action": "string", "qa_failures": ["string"], "message": "string" }
+      },
+
+      "audit_log_fields": ["lane", "action", "draft_id", "agent_id", "approved_by", "qa_passed", "timestamp", "result"],
+
+      "rollback": {
+        "issue_publish":  "Unpublish via Settings > Archive; notify subscriber list with correction note",
+        "issue_schedule": "Remove scheduled time; revert to draft status",
+        "draft_update":   "Restore from pre-update content snapshot in audit log"
+      },
+
+      "anti_loop_config": {
+        "enabled": true,
+        "window_seconds": 86400,
+        "max_identical_ops": 1,
+        "fingerprint_fields": ["action", "draft_id"]
+      }
+    }
+  }
+}

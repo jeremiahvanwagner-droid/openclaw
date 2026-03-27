@@ -1,0 +1,175 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-03-26T00:00:00.000Z",
+  "description": "Named browser profile definitions for OpenClaw multi-browser runtime. Each profile provides session isolation, allowed-platform enforcement, and risk controls.",
+
+  "profiles": {
+    "ghl-live": {
+      "purpose": "GoHighLevel live operations — CRM, pipelines, workflows, funnels",
+      "session_dir": "profiles/ghl-live",
+      "allowed_platforms": ["ghl"],
+      "browser_engine": "playwright",
+      "headless": true,
+      "session_policy": {
+        "persist": true,
+        "reuse_across_tasks": true,
+        "max_session_age_hours": 24,
+        "re_login_on_expiry": true
+      },
+      "rate_limits": {
+        "requests_per_minute": 20,
+        "max_concurrent_tasks": 2
+      },
+      "timeout_ms": 60000,
+      "max_retries": 2,
+      "allowed_actions": [
+        "contact_read", "contact_write",
+        "opportunity_list", "opportunity_move",
+        "pipeline_read",
+        "workflow_read", "workflow_create",
+        "funnel_read", "funnel_launch",
+        "membership_read", "membership_create",
+        "subaccount_switch", "screenshot",
+        "bulk_tag_add"
+      ],
+      "gated_actions": [
+        "workflow_delete", "workflow_bulk_edit",
+        "contact_delete", "bulk_contact_delete",
+        "funnel_delete", "offer_delete",
+        "membership_delete", "subaccount_delete"
+      ],
+      "forbidden_actions": [
+        "account_billing_change", "user_role_change"
+      ],
+      "risk_tier": "high",
+      "audit_log": true,
+      "telegram_alert_on_failure": true
+    },
+
+    "social-live": {
+      "purpose": "Social media publishing, moderation, and response drafting",
+      "session_dir": "profiles/social-live",
+      "allowed_platforms": ["facebook", "instagram", "linkedin", "twitter", "tiktok", "youtube"],
+      "browser_engine": "puppeteer-stealth",
+      "headless": true,
+      "session_policy": {
+        "persist": true,
+        "reuse_across_tasks": true,
+        "max_session_age_hours": 48,
+        "re_login_on_expiry": false,
+        "alert_on_expiry": true
+      },
+      "rate_limits": {
+        "per_platform": {
+          "instagram": { "requests_per_hour": 20, "max_concurrent_tasks": 1 },
+          "facebook":  { "requests_per_hour": 30, "max_concurrent_tasks": 1 },
+          "twitter":   { "requests_per_hour": 50, "max_concurrent_tasks": 1 },
+          "linkedin":  { "requests_per_hour": 20, "max_concurrent_tasks": 1 },
+          "tiktok":    { "requests_per_hour": 10, "max_concurrent_tasks": 1 },
+          "youtube":   { "requests_per_hour": 10, "max_concurrent_tasks": 1 }
+        }
+      },
+      "timeout_ms": 90000,
+      "max_retries": 1,
+      "allowed_actions": [
+        "post_read", "comment_read", "dm_read",
+        "post_create_draft", "post_schedule",
+        "comment_moderate", "comment_reply_draft",
+        "analytics_read", "hashtag_generate"
+      ],
+      "gated_actions": [
+        "post_publish", "post_delete",
+        "dm_send", "comment_reply_send",
+        "account_follow", "account_unfollow"
+      ],
+      "forbidden_actions": [
+        "account_password_change", "account_email_change",
+        "bulk_unfollow", "bulk_delete_posts"
+      ],
+      "risk_tier": "high",
+      "audit_log": true,
+      "telegram_alert_on_failure": true
+    },
+
+    "content-live": {
+      "purpose": "Substack editorial pipeline and Skool community operations",
+      "session_dir": "profiles/content-live",
+      "allowed_platforms": ["substack", "skool"],
+      "browser_engine": "playwright",
+      "headless": true,
+      "session_policy": {
+        "persist": true,
+        "reuse_across_tasks": true,
+        "max_session_age_hours": 72,
+        "re_login_on_expiry": true
+      },
+      "rate_limits": {
+        "per_platform": {
+          "substack": { "requests_per_hour": 15, "max_concurrent_tasks": 1 },
+          "skool":    { "requests_per_hour": 20, "max_concurrent_tasks": 1 }
+        }
+      },
+      "timeout_ms": 60000,
+      "max_retries": 2,
+      "allowed_actions": [
+        "draft_read", "draft_create", "draft_update",
+        "draft_preview", "draft_qa_check",
+        "post_read", "community_read",
+        "member_read", "moderation_queue_read",
+        "post_moderate_approve", "post_moderate_reject",
+        "community_post_create_draft",
+        "engagement_prompt_create_draft",
+        "analytics_read"
+      ],
+      "gated_actions": [
+        "draft_publish", "post_delete",
+        "community_post_publish", "member_ban",
+        "member_dm_send"
+      ],
+      "forbidden_actions": [
+        "payment_tier_change", "subscriber_bulk_delete",
+        "community_delete"
+      ],
+      "risk_tier": "medium",
+      "audit_log": true,
+      "telegram_alert_on_failure": true
+    },
+
+    "sandbox-test": {
+      "purpose": "Safe test rehearsals — all actions are dry-run only",
+      "session_dir": "profiles/sandbox-test",
+      "allowed_platforms": ["ghl", "facebook", "instagram", "linkedin", "twitter", "tiktok", "youtube", "substack", "skool"],
+      "browser_engine": "playwright",
+      "headless": true,
+      "dry_run": true,
+      "session_policy": {
+        "persist": false,
+        "reuse_across_tasks": false,
+        "max_session_age_hours": 1,
+        "re_login_on_expiry": false
+      },
+      "rate_limits": {
+        "requests_per_minute": 5,
+        "max_concurrent_tasks": 1
+      },
+      "timeout_ms": 30000,
+      "max_retries": 1,
+      "allowed_actions": ["*"],
+      "gated_actions": [],
+      "forbidden_actions": [],
+      "risk_tier": "low",
+      "audit_log": true,
+      "simulate_only": true,
+      "telegram_alert_on_failure": false
+    }
+  },
+
+  "default_profile": "sandbox-test",
+
+  "risk_tier_approval": {
+    "low":      { "require_approval": false },
+    "medium":   { "require_approval": false, "audit_required": true },
+    "high":     { "require_approval": true,  "approval_channels": ["telegram", "exec_socket"] },
+    "critical": { "require_approval": true,  "approval_channels": ["telegram", "exec_socket"], "minimum_wait_seconds": 30 }
+  }
+}
