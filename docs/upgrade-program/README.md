@@ -18,6 +18,8 @@ This folder operationalizes the 2026-03-25 upgrade program into executable check
 12. `node scripts/upgrade/daily-heartbeat-summary.mjs --send-alert`
 13. `node scripts/upgrade/validate-funnel-telemetry.mjs --hours 24`
 14. `node scripts/upgrade/pilot-monitor.mjs --hours 72`
+15. `node scripts/upgrade/platform-ops-diagnostic.mjs`
+16. `node scripts/upgrade/validate-platform-ops-foundation.mjs`
 
 ## Program Artifacts
 
@@ -29,6 +31,17 @@ This folder operationalizes the 2026-03-25 upgrade program into executable check
 - `data/tjb-offer-matrix.json` (U19 + U21)
 - `data/ghl-funnel-paths.json` (U20)
 - `data/recovery-automation-policies.json` (U22)
+- `config/browser-profiles.json` (platform ops v1)
+- `config/platform-lanes.json` (platform ops v1)
+- `config/approval-policies.json` (platform ops v1)
+- `config/governance/platform-routing-policy.json` (platform ops v1)
+- `config/governance/platform-risk-tier-matrix.json` (platform ops v1)
+- `docs/upgrade-program/PLATFORM-OPS-ARCHITECTURE-v1.md`
+- `docs/upgrade-program/LANE-PLAYBOOKS.md`
+- `docs/upgrade-program/APPROVAL-POLICY-TEMPLATES.md`
+- `docs/upgrade-program/PLATFORM-OPS-RUNBOOK.md`
+- `docs/upgrade-program/FUTURE-PLATFORM-ONBOARDING-TEMPLATE.md`
+- `docs/upgrade-program/PLATFORM-OPS-GO-LIVE-CHECKLIST.md`
 
 ## Approval Gates (J VW required)
 

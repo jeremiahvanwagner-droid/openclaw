@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-03-26T00:00:00.000Z",
+  "description": "Task routing rules for platform lanes with deterministic matching and safety fallback.",
+  "default_profile": "sandbox-test",
+  "rules": [
+    {
+      "id": "manual-lane-override",
+      "priority": 100,
+      "match": {
+        "field": "lane",
+        "operator": "in",
+        "values": [
+          "ghl",
+          "social",
+          "skool",
+          "substack"
+        ]
+      },
+      "route_to_lane_field_value": true
+    },
+    {
+      "id": "ghl-webhook-events",
+      "priority": 90,
+      "match": {
+        "field": "source",
+        "operator": "equals",
+        "value": "ghl"
+      },
+      "route_to_lane": "ghl"
+    },
+    {
+      "id": "social-platform-events",
+      "priority": 80,
+      "match": {
+        "field": "source",
+        "operator": "in",
+        "values": [
+          "facebook",
+          "instagram",
+          "linkedin",
+          "twitter",
+          "tiktok",
+          "youtube",
+          "social"
+        ]
+      },
+      "route_to_lane": "social"
+    },
+    {
+      "id": "skool-events",
+      "priority": 70,
+      "match": {
+        "field": "source",
+        "operator": "equals",
+        "value": "skool"
+      },
+      "route_to_lane": "skool"
+    },
+    {
+      "id": "substack-events",
+      "priority": 70,
+      "match": {
+        "field": "source",
+        "operator": "equals",
+        "value": "substack"
+      },
+      "route_to_lane": "substack"
+    }
+  ],
+  "fallback": {
+    "route_to_lane": "social",
+    "force_profile": "sandbox-test",
+    "require_human_confirmation": true,
+    "reason": "No deterministic route matched"
+  }
+}

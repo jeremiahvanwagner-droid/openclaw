@@ -1,78 +1,121 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "generated_at": "2026-03-26T00:00:00.000Z",
-  "description": "Risk-tiered approval policies for all platform lanes. Maps risk tiers to approval channels, timeouts, and escalation paths.",
-
+  "description": "Risk tier approval and execution guard policies for platform lanes.",
   "risk_tiers": {
     "low": {
       "label": "Low Risk",
-      "description": "Read-only, idempotent, or fully reversible operations with no external posting.",
+      "description": "Read-only or fully reversible actions with no external posting.",
       "requires_approval": false,
       "audit_required": false,
-      "examples": ["contact_read", "analytics_read", "draft_read", "community_read"]
+      "examples": [
+        "contact_read",
+        "analytics_read",
+        "draft_read",
+        "community_read"
+      ]
     },
     "medium": {
       "label": "Medium Risk",
-      "description": "Write operations with clear rollback. No external publishing or mass actions.",
+      "description": "Write operations with clear rollback and limited blast radius.",
       "requires_approval": false,
       "audit_required": true,
       "alert_on_execute": false,
-      "examples": ["contact_write", "opportunity_move", "workflow_create", "issue_schedule", "bulk_tag_add"]
+      "examples": [
+        "contact_write",
+        "opportunity_move",
+        "workflow_create",
+        "issue_schedule",
+        "bulk_tag_add"
+      ]
     },
     "high": {
       "label": "High Risk",
-      "description": "External publishing, agent-initiated sends, workflow changes, or user-visible mutations.",
+      "description": "External posting, visible changes, or customer messaging.",
       "requires_approval": true,
       "audit_required": true,
       "alert_on_execute": true,
       "approval": {
-        "channels": ["telegram"],
+        "channels": [
+          "telegram"
+        ],
         "timeout_seconds": 120,
         "on_timeout": "reject",
-        "approval_message_template": "⚠️ Approval Required\nAgent: {agent_id}\nAction: {action}\nLane: {lane}\nEntity: {entity_id}\nReply YES to approve or NO to reject within 120s."
+        "approval_message_template": "APPROVAL REQUIRED\nAgent: {agent_id}\nAction: {action}\nLane: {lane}\nEntity: {entity_id}\nReply YES to approve or NO to reject within 120s."
       },
-      "examples": ["post_publish", "workflow_edit", "community_post_publish", "workflow_delete", "member_dm_send"]
+      "examples": [
+        "post_publish",
+        "workflow_edit",
+        "community_post_publish",
+        "workflow_delete",
+        "member_dm_send"
+      ]
     },
     "critical": {
       "label": "Critical Risk",
-      "description": "Irreversible or high-blast-radius operations. Hard human gate required.",
+      "description": "High blast radius or difficult rollback operations.",
       "requires_approval": true,
       "audit_required": true,
       "alert_on_execute": true,
       "minimum_wait_seconds": 30,
       "approval": {
-        "channels": ["telegram", "exec_socket"],
+        "channels": [
+          "telegram",
+          "exec_socket"
+        ],
         "timeout_seconds": 300,
         "on_timeout": "reject",
         "require_explicit_confirmation_phrase": true,
         "confirmation_phrase_key": "CONFIRM_{action_upper}",
-        "approval_message_template": "🚨 CRITICAL ACTION REQUIRED\nAgent: {agent_id}\nAction: {action}\nLane: {lane}\nEntity: {entity_id}\nDetails: {details}\n\nType CONFIRM_{action_upper} to proceed.\nThis request expires in 5 minutes."
+        "approval_message_template": "CRITICAL ACTION REQUIRED\nAgent: {agent_id}\nAction: {action}\nLane: {lane}\nEntity: {entity_id}\nDetails: {details}\n\nType CONFIRM_{action_upper} to proceed. Request expires in 5 minutes."
       },
-      "examples": ["bulk_contact_delete", "offer_delete", "post_delete", "member_ban", "issue_publish"]
+      "examples": [
+        "bulk_contact_delete",
+        "offer_delete",
+        "post_delete",
+        "member_ban",
+        "issue_publish"
+      ]
     }
   },
-
   "agent_overrides": {
     "d1_ceo": {
-      "note": "CEO can self-approve high-risk actions. Critical still requires explicit confirmation.",
-      "can_self_approve_tiers": ["high"]
+      "note": "CEO can self-approve high risk actions. Critical still requires explicit confirmation.",
+      "can_self_approve_tiers": [
+        "high"
+      ]
     },
     "shared_exec_orchestrator": {
       "note": "Exec orchestrator can approve medium and forward high to Telegram.",
-      "can_self_approve_tiers": ["medium"]
+      "can_self_approve_tiers": [
+        "medium"
+      ]
     }
   },
-
   "global_circuit_breaker": {
-    "description": "If >3 high or critical actions are rejected within 60 minutes, pause all high/critical operations and alert operator.",
+    "description": "If more than 3 high or critical actions are rejected in 60 minutes, pause all high and critical operations.",
     "rejection_window_minutes": 60,
     "rejection_threshold": 3,
     "pause_duration_minutes": 30,
     "alert_channel": "telegram"
   },
-
+  "anti_loop_defaults": {
+    "enabled": true,
+    "window_seconds": 300,
+    "max_identical_ops": 3
+  },
+  "idempotency_defaults": {
+    "enabled": true,
+    "dedupe_ttl_hours": 72,
+    "reject_on_duplicate": true
+  },
+  "rate_limit_defaults": {
+    "enabled": true,
+    "burst_multiplier": 1.0,
+    "on_limit_reached": "reject_and_alert"
+  },
   "human_override_switch": {
-    "description": "Operator can disable all autonomous execution across all lanes.",
+    "description": "Operator can disable autonomous execution across all lanes.",
     "env_var": "OPENCLAW_AUTONOMOUS_PAUSED",
     "value_to_pause": "1",
     "resume_command": "openclaw resume-autonomous",

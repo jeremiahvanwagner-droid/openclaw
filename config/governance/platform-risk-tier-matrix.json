@@ -1,0 +1,52 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-03-26T00:00:00.000Z",
+  "description": "Risk tier matrix for platform lane action governance.",
+  "tiers": {
+    "low": {
+      "approval_required": false,
+      "external_posting_allowed": false,
+      "destructive_allowed": false,
+      "examples": [
+        "read",
+        "list",
+        "preview",
+        "analytics"
+      ]
+    },
+    "medium": {
+      "approval_required": false,
+      "external_posting_allowed": false,
+      "destructive_allowed": false,
+      "examples": [
+        "update",
+        "schedule",
+        "pipeline_move",
+        "tag_add"
+      ]
+    },
+    "high": {
+      "approval_required": true,
+      "external_posting_allowed": true,
+      "destructive_allowed": false,
+      "examples": [
+        "publish",
+        "dm_send",
+        "workflow_edit",
+        "community_post_publish"
+      ]
+    },
+    "critical": {
+      "approval_required": true,
+      "external_posting_allowed": true,
+      "destructive_allowed": true,
+      "minimum_wait_seconds": 30,
+      "examples": [
+        "delete",
+        "ban",
+        "bulk_delete",
+        "issue_publish"
+      ]
+    }
+  }
+}
