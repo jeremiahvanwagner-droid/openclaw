@@ -123,11 +123,12 @@ async function respond(locationId, contactId, args) {
 
 async function checkPending(locationId) {
   const token = findTokenForLocation(locationId);
-  const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+  // GHL requires startAfter as a Unix timestamp in milliseconds (number), not ISO string
+  const sinceMs = Date.now() - 30 * 60 * 1000;
 
   const result = await apiCall(
     'GET',
-    `/contacts/?locationId=${locationId}&startAfter=${encodeURIComponent(since)}&limit=100`,
+    `/contacts/?locationId=${locationId}&startAfter=${sinceMs}&limit=100`,
     token
   );
 
