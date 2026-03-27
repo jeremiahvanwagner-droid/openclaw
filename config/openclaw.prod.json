@@ -13,25 +13,9 @@
     "headless": true,
     "defaultProfile": "openclaw",
     "profiles": {
-      "openclaw": {
+      "chrome": {
         "cdpPort": 9222,
         "color": "#00AA00"
-      },
-      "ghl-live": {
-        "cdpPort": 9223,
-        "color": "#008844"
-      },
-      "social-live": {
-        "cdpPort": 9224,
-        "color": "#0055AA"
-      },
-      "content-live": {
-        "cdpPort": 9225,
-        "color": "#AA6600"
-      },
-      "sandbox-test": {
-        "cdpPort": 9226,
-        "color": "#666666"
       }
     }
   },

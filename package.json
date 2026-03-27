@@ -26,10 +26,7 @@
     "upgrade:governance:drift": "node scripts/upgrade/check-governance-drift.mjs",
     "upgrade:runtime": "node scripts/upgrade/post-update-smoke.mjs && node scripts/upgrade/validate-worker-env.mjs --expected production",
     "upgrade:revenue": "node scripts/upgrade/validate-offer-matrix.mjs && node scripts/upgrade/validate-funnel-telemetry.mjs --hours 24",
-    "upgrade:pilot": "node scripts/upgrade/pilot-monitor.mjs --hours 72",
-    "upgrade:platform:diagnostic": "node scripts/upgrade/platform-ops-diagnostic.mjs",
-    "upgrade:platform:validate": "node scripts/upgrade/validate-platform-ops-foundation.mjs",
-    "upgrade:platform:simulate": "node scripts/upgrade/simulate-platform-operation.mjs"
+    "upgrade:pilot": "node scripts/upgrade/pilot-monitor.mjs --hours 72"
   },
   "devDependencies": {
     "@types/nodemailer": "^7.0.11",
