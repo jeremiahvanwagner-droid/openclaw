@@ -1,0 +1,45 @@
+[Unit]
+Description=OpenClaw Dashboard (Next.js)
+Documentation=https://github.com/truthjblue/openclaw
+After=network-online.target
+Wants=network-online.target
+StartLimitIntervalSec=3600
+StartLimitBurst=20
+OnFailure=openclaw-alert@%n.service
+
+[Service]
+Type=simple
+User=openclaw
+Group=openclaw
+WorkingDirectory=/opt/openclaw/dashboard
+
+# Load shared environment (Supabase keys etc.)
+EnvironmentFile=/etc/openclaw/.env
+Environment=NODE_ENV=production
+Environment=PORT=3001
+
+# Start the Next.js production server
+ExecStart=/usr/bin/node /opt/openclaw/dashboard/node_modules/.bin/next start -p 3001
+
+# Auto-restart on failure
+Restart=always
+RestartSec=10
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/openclaw/dashboard/.next /opt/openclaw/logs
+PrivateTmp=true
+
+# Resource limits
+LimitNOFILE=65536
+MemoryMax=512M
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=openclaw-dashboard
+
+[Install]
+WantedBy=multi-user.target

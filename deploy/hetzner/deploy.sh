@@ -92,13 +92,27 @@ chown -h openclaw:openclaw /opt/openclaw/handlers/workspace/skills || true
 
 cp deploy/hetzner/openclaw.service /etc/systemd/system/
 cp deploy/hetzner/webhook.service /etc/systemd/system/openclaw-webhook.service
+cp deploy/hetzner/openclaw-dashboard.service /etc/systemd/system/
 cp deploy/hetzner/Caddyfile /etc/caddy/Caddyfile
 systemctl daemon-reload
+
+# 4b. Build the Next.js dashboard
+echo "[4b] Building Next.js dashboard..."
+cd dashboard
+# Install dashboard deps as openclaw user (node_modules are in the dashboard dir)
+sudo -u openclaw bash -lc "cd /opt/openclaw/dashboard && node /opt/openclaw/scripts/pnpm.mjs install --frozen-lockfile" 2>/dev/null \
+    || sudo -u openclaw bash -lc "cd /opt/openclaw/dashboard && npm ci"
+sudo -u openclaw bash -lc "cd /opt/openclaw/dashboard && node_modules/.bin/next build"
+chown -R openclaw:openclaw /opt/openclaw/dashboard
+cd ..
+echo "  Dashboard build complete."
 
 # 5. Restart canonical services
 echo "[5/6] Restarting services..."
 restart_service openclaw
 restart_service openclaw-webhook
+systemctl enable openclaw-dashboard 2>/dev/null || true
+restart_service openclaw-dashboard
 systemctl reload caddy || echo "  Warning: failed to reload caddy"
 
 # 6. Health checks
@@ -107,6 +121,7 @@ sleep 10
 
 GATEWAY_OK=false
 WEBHOOK_OK=false
+DASHBOARD_OK=false
 
 for i in 1 2 3 4 5 6; do
     if curl -sf http://localhost:18789/health >/dev/null 2>&1; then
@@ -124,10 +139,19 @@ for i in 1 2 3; do
     sleep 3
 done
 
+for i in 1 2 3 4 5 6; do
+    if curl -sf http://localhost:3001 >/dev/null 2>&1; then
+        DASHBOARD_OK=true
+        break
+    fi
+    sleep 5
+done
+
 echo ""
-if $GATEWAY_OK && $WEBHOOK_OK; then
-    echo "  [OK] Gateway: HEALTHY"
-    echo "  [OK] Webhook: HEALTHY"
+if $GATEWAY_OK && $WEBHOOK_OK && $DASHBOARD_OK; then
+    echo "  [OK] Gateway:   HEALTHY"
+    echo "  [OK] Webhook:   HEALTHY"
+    echo "  [OK] Dashboard: HEALTHY"
     echo ""
     echo "========================================================"
     echo " Deploy Complete"
@@ -135,8 +159,9 @@ if $GATEWAY_OK && $WEBHOOK_OK; then
     exit 0
 fi
 
-$GATEWAY_OK && echo "  [OK] Gateway: HEALTHY" || echo "  [FAIL] Gateway: UNHEALTHY"
-$WEBHOOK_OK && echo "  [OK] Webhook: HEALTHY" || echo "  [FAIL] Webhook: UNHEALTHY"
+$GATEWAY_OK   && echo "  [OK]   Gateway:   HEALTHY" || echo "  [FAIL] Gateway:   UNHEALTHY"
+$WEBHOOK_OK   && echo "  [OK]   Webhook:   HEALTHY" || echo "  [FAIL] Webhook:   UNHEALTHY"
+$DASHBOARD_OK && echo "  [OK]   Dashboard: HEALTHY" || echo "  [FAIL] Dashboard: UNHEALTHY"
 echo ""
 echo "========================================================"
 echo " Deploy completed with health check failures"
@@ -148,6 +173,10 @@ fi
 
 if ! $WEBHOOK_OK; then
     print_service_diagnostics openclaw-webhook
+fi
+
+if ! $DASHBOARD_OK; then
+    print_service_diagnostics openclaw-dashboard
 fi
 
 exit 1

@@ -1,6 +1,25 @@
 # OpenClaw Caddy reverse proxy
 # Place at /etc/caddy/Caddyfile on the Hetzner VPS
 
+# Dashboard (Next.js — port 3001)
+truthjblue.dev, www.truthjblue.dev {
+    reverse_proxy localhost:3001
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+
+    log {
+        output file /var/log/caddy/dashboard-access.log {
+            roll_size 50MiB
+            roll_keep 5
+        }
+    }
+}
+
 # Gateway API endpoint
 api.truthjblue.dev {
     reverse_proxy localhost:18789
