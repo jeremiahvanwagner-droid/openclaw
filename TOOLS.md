@@ -1,6 +1,6 @@
 # TOOLS
 
-Generated from [config/agents_config.json](./config/agents_config.json) and [config/skills-registry.json](./config/skills-registry.json). Do not edit manually.
+Generated from [config/agents_config.json](./config/agents_config.json) and [config/skills-registry.json](./config/skills-registry.json).
 
 ## Tool to Channel Map
 
@@ -15,6 +15,9 @@ Generated from [config/agents_config.json](./config/agents_config.json) and [con
 | email_dispatcher | email |
 | email_marketing | email |
 | m365_email | email |
+| ghl_speed_to_lead | ghl |
+| btv_discovery_call_prep | ghl |
+| divine_path_walkers_welcome | ghl |
 
 ## Tool to Action Family Map
 
@@ -33,6 +36,9 @@ Generated from [config/agents_config.json](./config/agents_config.json) and [con
 | checkout_integrator | payment_action |
 | payment_plans | payment_action |
 | refunds | payment_action |
+| ghl_speed_to_lead | ghl_write |
+| btv_discovery_call_prep | ghl_write |
+| divine_path_walkers_welcome | ghl_write |
 
 ## Risky Skills
 
@@ -46,5 +52,16 @@ Generated from [config/agents_config.json](./config/agents_config.json) and [con
 | design-generator | write_safe | browser | design_request_id + variant |
 | ebook-buyer-automation | write_safe | telegram, openclaw-agent | buyer_id + book_id + lifecycle_step |
 | ghl-browser-control | irreversible | browser | location_id + workflow_action + entity_id |
-| sequence-orchestrator | write_safe | telegram, email | sequence_id + recipient + step |
+| sequence-orchestrator | write_safe | email, telegram | sequence_id + recipient + step |
 | social-media-publisher | irreversible | browser | platform + asset_hash + scheduled_at |
+| ghl-speed-to-lead | write_safe | ghl | location_id + contact_id |
+| btv-discovery-call-prep | read_only | ghl | location_id + contact_id |
+| divine-path-walkers-welcome | write_safe | ghl | location_id + contact_id |
+
+## New Skills — Truth J Blue Ecosystem
+
+| Skill | File | Agent Alias | Purpose |
+| --- | --- | --- | --- |
+| ghl-speed-to-lead | skills/ghl-speed-to-lead.mjs | sales | Contact new leads within 5 min via SMS + email |
+| btv-discovery-call-prep | skills/btv-discovery-call-prep.mjs | sales | Pre-call intelligence brief for BTV discovery calls |
+| divine-path-walkers-welcome | skills/divine-path-walkers-welcome.mjs | support | Welcome sequence for new DPW community members |
