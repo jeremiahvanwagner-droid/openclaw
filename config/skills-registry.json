@@ -3844,6 +3844,51 @@
         "upsell sequence design",
         "revenue simulation"
       ]
+    },
+    {
+      "skill_id": "skool-browser-control",
+      "owner": "d8_membership_director",
+      "risk_tier": "high",
+      "side_effects": [
+        "skool_ui_write",
+        "community_post_publish",
+        "member_moderation"
+      ],
+      "external_systems": [
+        "browser",
+        "skool"
+      ],
+      "idempotency_key_strategy": "lane + action + entity_id + content_hash",
+      "approval_policy": "hitl for gated_actions",
+      "replay_policy": "manual replay only with operation ledger",
+      "required_tests": [
+        "governance gate check",
+        "sandbox dry_run",
+        "skool login session"
+      ]
+    },
+    {
+      "skill_id": "substack-browser-control",
+      "owner": "d8_content_ops",
+      "risk_tier": "high",
+      "side_effects": [
+        "substack_ui_write",
+        "issue_publish",
+        "subscriber_email_send"
+      ],
+      "external_systems": [
+        "browser",
+        "substack"
+      ],
+      "idempotency_key_strategy": "lane + action + draft_id",
+      "approval_policy": "hitl for gated_actions",
+      "replay_policy": "manual replay only — subscriber emails cannot be unsent",
+      "required_tests": [
+        "governance gate check",
+        "qa_gates enforcement",
+        "sandbox dry_run",
+        "substack login session"
+      ]
     }
   ]
 }

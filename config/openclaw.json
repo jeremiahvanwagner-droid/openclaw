@@ -3500,8 +3500,10 @@
           "social-content",
           "social-distributor",
           "social-media-publisher",
+          "skool-browser-control",
           "social-poster",
           "subaccount-provisioner",
+          "substack-browser-control",
           "tagging-engine",
           "video-script-writer",
           "youtube-manager"
@@ -3781,6 +3783,7 @@
           "opportunity-mover",
           "page-builder",
           "pipeline-manager",
+          "skool-browser-control",
           "snapshot-deployer",
           "subaccount-provisioner",
           "subscription-dunning-manager",

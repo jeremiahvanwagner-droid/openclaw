@@ -1,0 +1,227 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "OpenClaw Platform Onboarding Template v1.0.0",
+  "description": "Checklist + config skeleton for adding any new platform to the OpenClaw multi-browser runtime. Copy + fill to onboard a new platform in <1 day.",
+  "_onboarding_instructions": [
+    "1. Copy this file to config/schemas/<platform-slug>-onboarding.json",
+    "2. Fill all REQUIRED fields (marked with // REQUIRED)",
+    "3. Complete the connector_checklist items in order",
+    "4. Run smoke tests, then integration tests, then safety tests",
+    "5. Add the platform lane to config/platform-lanes.json",
+    "6. Add or update a browser profile in config/browser-profiles.json",
+    "7. Register new skill in config/skills-registry.json",
+    "8. Add skill to owning agent in config/openclaw.json",
+    "9. Update AGENTS.md to reflect new capabilities"
+  ],
+
+  "platform": {
+    "slug": "PLATFORM_SLUG",
+    "display_name": "Platform Display Name",
+    "url": "https://platform.example.com",
+    "category": "social | crm | content | community | ecommerce | analytics | other",
+    "api_available": false,
+    "api_type": "REST | GraphQL | none",
+    "api_docs_url": "",
+    "browser_required": true,
+    "browser_engine": "playwright | puppeteer-stealth",
+    "fingerprint_evasion_required": false,
+    "login_type": "email_password | oauth2 | sso | magic_link | api_key",
+    "mfa_possible": true,
+    "session_persistence": "cookie | localStorage | both",
+    "session_ttl_hours": 24
+  },
+
+  "credentials": {
+    "env_vars_required": [
+      "PLATFORM_SLUG_EMAIL",
+      "PLATFORM_SLUG_PASSWORD"
+    ],
+    "optional_env_vars": [
+      "PLATFORM_SLUG_API_KEY",
+      "PLATFORM_SLUG_WORKSPACE_ID"
+    ],
+    "notes": "Never hardcode credentials. Use env vars only."
+  },
+
+  "browser_profile": {
+    "_ref": "config/browser-profiles.json",
+    "use_existing_profile": "content-live | social-live | ghl-live | sandbox-test | NEW",
+    "new_profile_required": false,
+    "new_profile_id": null,
+    "new_profile_engine": "playwright",
+    "new_profile_risk_tier": "medium",
+    "allowed_actions": [],
+    "gated_actions": [],
+    "forbidden_actions": []
+  },
+
+  "platform_lane": {
+    "_ref": "config/platform-lanes.json",
+    "lane_id": "PLATFORM_SLUG",
+    "trigger_types": ["manual", "cron", "agent_event"],
+    "cron_schedule": null,
+    "operations": [
+      {
+        "id": "read_dashboard",
+        "risk": "low",
+        "requires_approval": false,
+        "idempotent": true,
+        "idempotency_key": "lane + action + date"
+      },
+      {
+        "id": "create_content",
+        "risk": "medium",
+        "requires_approval": false,
+        "idempotent": false,
+        "idempotency_key": "lane + action + content_hash"
+      },
+      {
+        "id": "publish_content",
+        "risk": "high",
+        "requires_approval": true,
+        "idempotent": false,
+        "idempotency_key": "lane + action + entity_id"
+      },
+      {
+        "id": "delete_or_ban",
+        "risk": "critical",
+        "requires_approval": true,
+        "idempotent": false,
+        "idempotency_key": "lane + action + entity_id + approved_by"
+      }
+    ],
+    "anti_loop_config": {
+      "max_same_action_per_window": 5,
+      "window_minutes": 60,
+      "fingerprint_fields": ["lane", "action", "entity_id"]
+    },
+    "rollback": {
+      "strategy": "describe rollback approach (e.g. archive vs delete, unpublish vs delete)",
+      "automated": false,
+      "manual_steps": []
+    },
+    "qa_gates": []
+  },
+
+  "skill_file": {
+    "path": "skills/PLATFORM_SLUG-browser-control.mjs",
+    "template_based_on": "skills/ghl-browser-control.mjs",
+    "required_imports": [
+      "evaluatePlatformOperation from lib/platform-ops-governance.mjs",
+      "recordPlatformOperationOutcome from lib/platform-ops-governance.mjs",
+      "buildBrowserLaunchArgs from skills/browser-security.mjs"
+    ],
+    "required_commands": [
+      "login",
+      "analytics-read",
+      "screenshot"
+    ],
+    "selectors_source": "Inspect platform DOM manually in sandbox profile. Document in SELECTORS object.",
+    "governance_gate_required_for": ["all write operations", "all publish operations", "all delete/ban/remove operations"]
+  },
+
+  "skills_registry_entry": {
+    "_ref": "config/skills-registry.json",
+    "skill_id": "PLATFORM_SLUG-browser-control",
+    "owner": "AGENT_ID",
+    "risk_tier": "high",
+    "side_effects": ["PLATFORM_SLUG_ui_write"],
+    "external_systems": ["browser", "PLATFORM_SLUG"],
+    "idempotency_key_strategy": "lane + action + entity_id",
+    "approval_policy": "hitl for gated_actions",
+    "replay_policy": "manual replay only with operation ledger",
+    "required_tests": ["governance gate check", "sandbox dry_run", "login session"]
+  },
+
+  "connector_checklist": {
+    "phase_1_discovery": [
+      { "id": "d1_1", "task": "Identify all platform operations needed (read/write/admin)", "done": false },
+      { "id": "d1_2", "task": "Confirm login flow (email+pass, OAuth, MFA)", "done": false },
+      { "id": "d1_3", "task": "Confirm if API exists and what it covers vs browser-only gaps", "done": false },
+      { "id": "d1_4", "task": "Determine session TTL and cookie scope", "done": false },
+      { "id": "d1_5", "task": "Identify risk tier for each operation", "done": false }
+    ],
+    "phase_2_config": [
+      { "id": "d2_1", "task": "Add platform lane to config/platform-lanes.json", "done": false },
+      { "id": "d2_2", "task": "Assign or create browser profile in config/browser-profiles.json", "done": false },
+      { "id": "d2_3", "task": "Verify approval-policies.json covers all risk tiers used", "done": false },
+      { "id": "d2_4", "task": "Run platform-ops-governance validation: node -e 'import(\"./lib/platform-ops-governance.mjs\").then(m=>m.validatePlatformOpsBundle(m.loadPlatformOpsBundle()))'", "done": false }
+    ],
+    "phase_3_skill_implementation": [
+      { "id": "d3_1", "task": "Create skills/PLATFORM_SLUG-browser-control.mjs from template", "done": false },
+      { "id": "d3_2", "task": "Inspect platform DOM in sandbox, fill SELECTORS object", "done": false },
+      { "id": "d3_3", "task": "Implement login command with session save/load", "done": false },
+      { "id": "d3_4", "task": "Implement all read commands (no approval required)", "done": false },
+      { "id": "d3_5", "task": "Implement all write commands behind governance gate", "done": false },
+      { "id": "d3_6", "task": "Implement critical/destructive commands with approvedBy param", "done": false },
+      { "id": "d3_7", "task": "Add recordPlatformOperationOutcome() after each write", "done": false },
+      { "id": "d3_8", "task": "Add Telegram notify() on all destructive/publish operations", "done": false }
+    ],
+    "phase_4_registry_and_agents": [
+      { "id": "d4_1", "task": "Add skill entry to config/skills-registry.json", "done": false },
+      { "id": "d4_2", "task": "Add skill to owning agent's skills[] in config/openclaw.json", "done": false },
+      { "id": "d4_3", "task": "Rebuild AGENTS.md: node scripts/generate-agents-md.mjs (or equivalent)", "done": false }
+    ],
+    "phase_5_testing": [
+      { "id": "d5_1", "task": "Smoke test: run login command against sandbox-test profile", "done": false },
+      { "id": "d5_2", "task": "Smoke test: run screenshot command and confirm Telegram notification", "done": false },
+      { "id": "d5_3", "task": "Smoke test: run analytics-read command", "done": false },
+      { "id": "d5_4", "task": "Integration test: trigger a gated write — confirm governance blocks it without approval", "done": false },
+      { "id": "d5_5", "task": "Integration test: grant approval via Telegram, confirm write executes", "done": false },
+      { "id": "d5_6", "task": "Safety test: trigger same action 6x to verify anti-loop kicks in at max_same_action_per_window", "done": false },
+      { "id": "d5_7", "task": "Safety test: set OPENCLAW_AUTONOMOUS_PAUSED=1, confirm all write ops block", "done": false },
+      { "id": "d5_8", "task": "Verify audit trail: check logs/platform-ops-audit.jsonl for all test ops", "done": false }
+    ],
+    "phase_6_go_live": [
+      { "id": "d6_1", "task": "Set live env vars (PLATFORM_SLUG_EMAIL, PLATFORM_SLUG_PASSWORD, etc.)", "done": false },
+      { "id": "d6_2", "task": "Run login command against live profile — confirm session persists", "done": false },
+      { "id": "d6_3", "task": "Run one low-risk read op against live profile", "done": false },
+      { "id": "d6_4", "task": "Confirm Telegram channel is active for the platform's approval routing", "done": false },
+      { "id": "d6_5", "task": "Document rollback plan: how to undo first N ops if something goes wrong", "done": false },
+      { "id": "d6_6", "task": "Update SOUL.md or MEMORY.md with platform summary and key selectors", "done": false }
+    ]
+  },
+
+  "test_matrix": {
+    "smoke_tests": [
+      { "id": "sm_1", "name": "Login + session save", "command": "node skills/PLATFORM_SLUG-browser-control.mjs login", "expected": "{ ok: true }" },
+      { "id": "sm_2", "name": "Screenshot", "command": "node skills/PLATFORM_SLUG-browser-control.mjs screenshot", "expected": "{ ok: true, file: /path/to/screenshot.png }" },
+      { "id": "sm_3", "name": "Analytics read", "command": "node skills/PLATFORM_SLUG-browser-control.mjs analytics-read", "expected": "{ ok: true, ... }" }
+    ],
+    "integration_tests": [
+      { "id": "int_1", "name": "Governance blocks unapproved write", "expected_error": "Approval required" },
+      { "id": "int_2", "name": "Approved write executes and is recorded in audit log", "expected": "audit log entry with correlation_id" },
+      { "id": "int_3", "name": "Idempotency dedup on repeated identical op", "expected_error": "idempotency: duplicate op detected" }
+    ],
+    "safety_tests": [
+      { "id": "saf_1", "name": "Anti-loop triggers after max_same_action_per_window", "expected_error": "anti_loop: rate exceeded" },
+      { "id": "saf_2", "name": "OPENCLAW_AUTONOMOUS_PAUSED=1 blocks all writes", "expected_error": "human_override: autonomous ops paused" },
+      { "id": "saf_3", "name": "Critical op with wrong confirmation phrase is rejected", "expected_error": "approval: invalid confirmation phrase" }
+    ]
+  },
+
+  "security_checklist": [
+    { "id": "sec_1", "check": "No credentials hardcoded — all from env vars", "done": false },
+    { "id": "sec_2", "check": "Session files stored in data/browser-sessions/ (not commited to git)", "done": false },
+    { "id": "sec_3", "check": "buildBrowserLaunchArgs() called on every browser launch", "done": false },
+    { "id": "sec_4", "check": "No eval(), no dynamic import of untrusted input", "done": false },
+    { "id": "sec_5", "check": "All user-provided strings sanitized before use in page.fill()", "done": false },
+    { "id": "sec_6", "check": "Audit log entries contain no raw credentials or session tokens", "done": false },
+    { "id": "sec_7", "check": "Telegram channel is private and token is not publicly exposed", "done": false }
+  ],
+
+  "rollback_plan": {
+    "first_24h": "Keep sandbox-test profile active; run all writes in dry_run mode first",
+    "if_session_corrupted": "Delete data/browser-sessions/PLATFORM_SLUG-session.json and re-run login",
+    "if_audit_log_overflows": "Rotate logs/platform-ops-audit.jsonl to a dated archive file",
+    "if_anti_loop_fires_in_prod": "Set OPENCLAW_AUTONOMOUS_PAUSED=1, investigate root cause, clear data/runtime/platform-anti-loop-ledger.json, unpause",
+    "if_bad_publish": "Manually revert via platform UI; record corrective action in audit log under correlation_id"
+  },
+
+  "_meta": {
+    "template_version": "1.0.0",
+    "created_at": "2026-03-27",
+    "expected_onboard_time_hours": 8,
+    "minimum_qa_hours_before_live": 2
+  }
+}
