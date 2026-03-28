@@ -120,6 +120,7 @@ fi
 echo "[11/12] Installing systemd services..."
 cp "$OPENCLAW_HOME/deploy/hetzner/openclaw.service" /etc/systemd/system/
 cp "$OPENCLAW_HOME/deploy/hetzner/webhook.service" /etc/systemd/system/openclaw-webhook.service
+cp "$OPENCLAW_HOME/deploy/hetzner/openclaw-dashboard.service" /etc/systemd/system/
 
 # Compatibility path for legacy webhook skill imports
 mkdir -p "$OPENCLAW_HOME/handlers/workspace"
@@ -129,8 +130,25 @@ chown -h "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME/handlers/workspace/sk
 # Install Caddyfile
 cp "$OPENCLAW_HOME/deploy/hetzner/Caddyfile" /etc/caddy/Caddyfile
 
+# Build the Next.js dashboard
+# --prod was used for the bot above; dashboard needs devDeps (next, typescript)
+echo "  Building Next.js dashboard..."
+sudo -u "$OPENCLAW_USER" bash -lc "
+    export CI=true
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs install --filter openclaw-dashboard --no-frozen-lockfile
+" || echo "  Warning: dashboard dep install failed — build may fail"
+sudo -u "$OPENCLAW_USER" bash -lc "
+    export CI=true
+    set -a
+    [ -f /etc/openclaw/.env ] && source /etc/openclaw/.env
+    set +a
+    cd \"$OPENCLAW_HOME/dashboard\" && ../node_modules/.bin/next build
+" || echo "  Warning: dashboard build failed — service will be disabled until fixed"
+chown -R "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME/dashboard"
+echo "  Dashboard build step complete."
+
 systemctl daemon-reload
-systemctl enable openclaw openclaw-webhook caddy
+systemctl enable openclaw openclaw-webhook openclaw-dashboard caddy
 
 # ── 12. Configure firewall ──────────────────────────────────
 echo "[12/12] Configuring firewall..."
@@ -154,9 +172,10 @@ echo "    sudo nano /etc/openclaw/.env"
 echo ""
 echo " 2. Verify Caddy hostnames:"
 echo "    sudo nano /etc/caddy/Caddyfile"
-echo "    (Ensure api.truthjblue.dev and webhook.truthjblue.dev point to this VPS)"
+echo "    (Ensure truthjblue.dev, api.truthjblue.dev, webhook.truthjblue.dev point to this VPS)"
 echo ""
 echo " 3. Point DNS A records to this server's IP:"
+echo "    truthjblue.dev      → $(curl -4s ifconfig.me)"
 echo "    api.yourdomain.com  → $(curl -4s ifconfig.me)"
 echo "    webhook.yourdomain.com → $(curl -4s ifconfig.me)"
 echo ""
@@ -164,8 +183,10 @@ echo " 4. Start services:"
 echo "    sudo systemctl start caddy"
 echo "    sudo systemctl start openclaw"
 echo "    sudo systemctl start openclaw-webhook"
+echo "    sudo systemctl start openclaw-dashboard"
 echo ""
 echo " 5. Verify:"
 echo "    sudo systemctl status openclaw"
 echo "    curl http://localhost:18789/health"
+echo "    curl http://localhost:3001"
 echo ""
