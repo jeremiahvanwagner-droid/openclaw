@@ -20,6 +20,9 @@ EnvironmentFile=/etc/openclaw/.env
 Environment=HOME=/opt/openclaw
 Environment=OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw
 
+# Strip invalid keys written by agent sessions before starting
+ExecStartPre=/opt/openclaw/deploy/hetzner/openclaw-pre-start.sh
+
 # Start the gateway
 ExecStart=/usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js gateway --port 18789 --allow-unconfigured
 

@@ -35,7 +35,8 @@ FAILURES=""
 # Check gateway
 if ! curl -sf --max-time 10 "$GATEWAY_URL" >/dev/null 2>&1; then
     FAILURES="${FAILURES}Gateway DOWN\n"
-    # Attempt auto-restart
+    # Attempt auto-restart — reset-failed first so StartLimitBurst doesn't block us
+    systemctl reset-failed openclaw 2>/dev/null || true
     systemctl restart openclaw 2>/dev/null || true
 fi
 
