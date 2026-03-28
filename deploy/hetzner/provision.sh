@@ -142,7 +142,7 @@ sudo -u "$OPENCLAW_USER" bash -lc "
     set -a
     [ -f /etc/openclaw/.env ] && source /etc/openclaw/.env
     set +a
-    cd \"$OPENCLAW_HOME/dashboard\" && ../node_modules/.bin/next build
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --filter openclaw-dashboard run build
 " || echo "  Warning: dashboard build failed — service will be disabled until fixed"
 chown -R "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME/dashboard"
 echo "  Dashboard build step complete."

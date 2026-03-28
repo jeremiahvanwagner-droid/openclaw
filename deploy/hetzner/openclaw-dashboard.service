@@ -11,15 +11,15 @@ OnFailure=openclaw-alert@%n.service
 Type=simple
 User=openclaw
 Group=openclaw
-WorkingDirectory=/opt/openclaw/dashboard
+WorkingDirectory=/opt/openclaw
 
 # Load shared environment (Supabase keys etc.)
 EnvironmentFile=/etc/openclaw/.env
 Environment=NODE_ENV=production
 Environment=PORT=3001
 
-# Start the Next.js production server (next binary is in the root workspace node_modules)
-ExecStart=/usr/bin/node /opt/openclaw/node_modules/.bin/next start -p 3001
+# Use pnpm run so it resolves the next binary through the pnpm virtual store
+ExecStart=/usr/bin/node /opt/openclaw/scripts/pnpm.mjs --filter openclaw-dashboard run start
 
 # Auto-restart on failure
 Restart=always

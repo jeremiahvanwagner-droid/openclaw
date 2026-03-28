@@ -112,7 +112,7 @@ sudo -u openclaw bash -lc "
     set -a
     [ -f /etc/openclaw/.env ] && source /etc/openclaw/.env
     set +a
-    cd \"$DASH_DIR\" && ../node_modules/.bin/next build
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --filter openclaw-dashboard run build
 "
 chown -R openclaw:openclaw "$DASH_DIR"
 echo "  Dashboard build complete."
