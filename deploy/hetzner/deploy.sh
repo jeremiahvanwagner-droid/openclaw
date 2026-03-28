@@ -97,14 +97,24 @@ cp deploy/hetzner/Caddyfile /etc/caddy/Caddyfile
 systemctl daemon-reload
 
 # 4b. Build the Next.js dashboard
+# NEXT_PUBLIC_* vars must be available at build time so Next.js can embed them.
 echo "[4b] Building Next.js dashboard..."
-cd dashboard
-# Install dashboard deps as openclaw user (node_modules are in the dashboard dir)
-sudo -u openclaw bash -lc "cd /opt/openclaw/dashboard && node /opt/openclaw/scripts/pnpm.mjs install --frozen-lockfile" 2>/dev/null \
-    || sudo -u openclaw bash -lc "cd /opt/openclaw/dashboard && npm ci"
-sudo -u openclaw bash -lc "cd /opt/openclaw/dashboard && node_modules/.bin/next build"
-chown -R openclaw:openclaw /opt/openclaw/dashboard
-cd ..
+DASH_DIR="$OPENCLAW_HOME/dashboard"
+# Install only dashboard workspace package deps — non-interactive, no lockfile enforcement
+# (--filter scopes to the dashboard package only; CI=true suppresses interactive prompts)
+sudo -u openclaw bash -lc "
+    export CI=true
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs install --filter openclaw-dashboard --no-frozen-lockfile
+"
+# Build — source shared env so NEXT_PUBLIC_ vars are embedded in the bundle
+sudo -u openclaw bash -lc "
+    export CI=true
+    set -a
+    [ -f /etc/openclaw/.env ] && source /etc/openclaw/.env
+    set +a
+    cd \"$DASH_DIR\" && ../node_modules/.bin/next build
+"
+chown -R openclaw:openclaw "$DASH_DIR"
 echo "  Dashboard build complete."
 
 # 5. Restart canonical services

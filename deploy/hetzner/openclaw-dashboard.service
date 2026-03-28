@@ -18,8 +18,8 @@ EnvironmentFile=/etc/openclaw/.env
 Environment=NODE_ENV=production
 Environment=PORT=3001
 
-# Start the Next.js production server
-ExecStart=/usr/bin/node /opt/openclaw/dashboard/node_modules/.bin/next start -p 3001
+# Start the Next.js production server (next binary is in the root workspace node_modules)
+ExecStart=/usr/bin/node /opt/openclaw/node_modules/.bin/next start -p 3001
 
 # Auto-restart on failure
 Restart=always
