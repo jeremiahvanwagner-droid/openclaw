@@ -108,33 +108,61 @@ export interface ProviderLimits {
   maxRetries: number;
 }
 
+/**
+ * 5-AGENT PURE ANTHROPIC RATE LIMITS (2026-03-29 Migration)
+ *
+ * Tier Rate Limits:
+ * - Strategist: 30/min (P1, Opus, Sovereign)
+ * - Executor: 60/min (P1, Sonnet)
+ * - Communicator: 90/min (P2, Sonnet)
+ * - Analyst: 120/min (P3, Haiku)
+ * - Guardian: 40/min (P0, Haiku, Sovereign)
+ */
 const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
-  "openai-codex": {
-    requestsPerMinute: 40,       // conservative vs. burst capacity
-    requestsPerHour: 800,
-    dailyBudgetCents: 2500,      // $25/day hard ceiling (reduced from $50)
-    dailyBudgetWarningPct: 0.75,
-    maxConcurrent: 8,
-    retryAfterMs: 2000,
-    maxRetries: 3,
-  },
-  anthropic: {
+  "anthropic-strategist": {
     requestsPerMinute: 30,
-    requestsPerHour: 600,
-    dailyBudgetCents: 2000,      // $20/day (reduced from $40)
-    dailyBudgetWarningPct: 0.75,
-    maxConcurrent: 6,
-    retryAfterMs: 3000,
-    maxRetries: 3,
-  },
-  openai: {
-    requestsPerMinute: 50,
-    requestsPerHour: 1000,
-    dailyBudgetCents: 1500,      // $15/day (reduced from $30)
-    dailyBudgetWarningPct: 0.75,
-    maxConcurrent: 8,
+    requestsPerHour: 1800,
+    dailyBudgetCents: 3000,      // $30/day (Opus is expensive: $30/1M tokens)
+    dailyBudgetWarningPct: 0.8,
+    maxConcurrent: 5,
     retryAfterMs: 2000,
     maxRetries: 3,
+  },
+  "anthropic-executor": {
+    requestsPerMinute: 60,
+    requestsPerHour: 3600,
+    dailyBudgetCents: 2000,      // $20/day (Sonnet is moderate)
+    dailyBudgetWarningPct: 0.75,
+    maxConcurrent: 10,
+    retryAfterMs: 1500,
+    maxRetries: 3,
+  },
+  "anthropic-communicator": {
+    requestsPerMinute: 90,
+    requestsPerHour: 5400,
+    dailyBudgetCents: 1500,      // $15/day (High volume, cost-conscious)
+    dailyBudgetWarningPct: 0.7,
+    maxConcurrent: 15,
+    retryAfterMs: 1000,
+    maxRetries: 3,
+  },
+  "anthropic-analyst": {
+    requestsPerMinute: 120,
+    requestsPerHour: 7200,
+    dailyBudgetCents: 800,       // $8/day (Haiku is cheap: $0.80/1M tokens)
+    dailyBudgetWarningPct: 0.65,
+    maxConcurrent: 20,
+    retryAfterMs: 500,
+    maxRetries: 5,
+  },
+  "anthropic-guardian": {
+    requestsPerMinute: 40,
+    requestsPerHour: 2400,
+    dailyBudgetCents: 1000,      // $10/day (Compliance is critical, cannot be cheap)
+    dailyBudgetWarningPct: 0.75,
+    maxConcurrent: 3,
+    retryAfterMs: 3000,
+    maxRetries: 4,
   },
   ghl: {
     requestsPerMinute: 20,       // GoHighLevel is aggressive on limits
@@ -164,6 +192,12 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
     maxRetries: 2,
   },
 };
+
+// Legacy provider entries (removed from production)
+// const LEGACY_PROVIDERS = {
+//   "openai": { ... },            // REMOVED per 2026-03-29 migration
+//   "openai-codex": { ... },      // REMOVED per 2026-03-29 migration
+// };
 
 // ═══════════════════════════════════════════════════════════════════
 // CIRCUIT BREAKER

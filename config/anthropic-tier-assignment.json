@@ -1,0 +1,220 @@
+{
+  "$schema": "https://schema.truthjblue.co/anthropic-tier-assignment.json",
+  "version": "1.0.0",
+  "description": "5-Agent Pure Anthropic Architecture — Tier Assignments (OpenClaw 2026-03-29 Migration)",
+  "generated_at": "2026-03-29T00:00:00.000Z",
+  "migration_status": "active",
+
+  "tier_assignments": {
+    "anthropic-strategist": {
+      "tier_name": "Strategist",
+      "model": "claude-opus-4-latest",
+      "rate_limit_per_min": 30,
+      "max_concurrent": 5,
+      "queue_class": "P1",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "sovereign_isolation": true,
+      "use_case": "Executive decisions, complex reasoning, multi-step planning",
+      "agents": [
+        {
+          "agent_id": "d1_ceo",
+          "name": "Chief Executive Officer",
+          "division": "division_1_core_operations",
+          "responsibility": "Strategic decisions"
+        },
+        {
+          "agent_id": "d1_cto",
+          "name": "Chief Technology Officer",
+          "division": "division_1_core_operations",
+          "responsibility": "Technical strategy and architecture"
+        },
+        {
+          "agent_id": "d1_product_dev_manager",
+          "name": "Product Development Manager",
+          "division": "division_1_core_operations",
+          "responsibility": "Product development planning"
+        }
+      ]
+    },
+
+    "anthropic-executor": {
+      "tier_name": "Executor",
+      "model": "claude-sonnet-4.5-latest",
+      "rate_limit_per_min": 60,
+      "max_concurrent": 10,
+      "queue_class": "P1",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "sovereign_isolation": false,
+      "use_case": "Code generation, workflow execution, integration handling",
+      "agents": [
+        {
+          "agent_id": "d1_fullstack_dev",
+          "name": "Full-Stack Developer",
+          "division": "division_1_core_operations",
+          "responsibility": "Code generation and implementation"
+        },
+        {
+          "agent_id": "d1_devops",
+          "name": "DevOps Engineer",
+          "division": "division_1_core_operations",
+          "responsibility": "Infrastructure and deployment"
+        },
+        {
+          "agent_id": "d8_integration_engineer",
+          "name": "Integration Engineer",
+          "division": "division_8_saas_operations",
+          "responsibility": "API integrations and workflow execution"
+        },
+        {
+          "agent_id": "d8_funnel_engineer",
+          "name": "Funnel Engineer",
+          "division": "division_8_saas_operations",
+          "responsibility": "Sales funnel and conversion optimization"
+        }
+      ]
+    },
+
+    "anthropic-communicator": {
+      "tier_name": "Communicator",
+      "model": "claude-sonnet-4.5-latest",
+      "rate_limit_per_min": 90,
+      "max_concurrent": 15,
+      "queue_class": "P2",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "sovereign_isolation": false,
+      "use_case": "Customer support, content generation, messaging",
+      "agents": [
+        {
+          "agent_id": "d1_cmo",
+          "name": "Chief Marketing Officer",
+          "division": "division_1_core_operations",
+          "responsibility": "Marketing and communications content"
+        },
+        {
+          "agent_id": "d1_customer_success",
+          "name": "Customer Success Manager",
+          "division": "division_1_core_operations",
+          "responsibility": "Customer support and success"
+        }
+      ]
+    },
+
+    "anthropic-analyst": {
+      "tier_name": "Analyst",
+      "model": "claude-haiku-4.5-latest",
+      "rate_limit_per_min": 120,
+      "max_concurrent": 20,
+      "queue_class": "P3",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "sovereign_isolation": false,
+      "use_case": "Data analysis, reporting, batch processing",
+      "agents": [
+        {
+          "agent_id": "d1_data_analyst",
+          "name": "Data Analyst",
+          "division": "division_1_core_operations",
+          "responsibility": "Data analysis and reporting"
+        },
+        {
+          "agent_id": "d8_revenue_ops",
+          "name": "Revenue Operations Manager",
+          "division": "division_8_saas_operations",
+          "responsibility": "Revenue operations and analytics"
+        },
+        {
+          "agent_id": "d8_crm_ops",
+          "name": "CRM Operations Manager",
+          "division": "division_8_saas_operations",
+          "responsibility": "CRM data processing and enrichment"
+        }
+      ]
+    },
+
+    "anthropic-guardian": {
+      "tier_name": "Guardian",
+      "model": "claude-haiku-4.5-latest",
+      "rate_limit_per_min": 40,
+      "max_concurrent": 3,
+      "queue_class": "P0",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "sovereign_isolation": true,
+      "use_case": "Compliance checks, safety validation, audit logging",
+      "agents": [
+        {
+          "agent_id": "shared_runtime_ops",
+          "name": "Runtime Operations Supervisor",
+          "division": "division_7_shared_services",
+          "responsibility": "Runtime operations and monitoring"
+        },
+        {
+          "agent_id": "d8_compliance_auditor",
+          "name": "Compliance & Audit Officer",
+          "division": "division_8_saas_operations",
+          "responsibility": "Compliance checks and audit logging"
+        }
+      ]
+    }
+  },
+
+  "unassigned_agents": {
+    "note": "The following agents from agents_config.json are not yet explicitly assigned to a tier. They will use the default routing (anthropic-analyst) until assigned.",
+    "count_unassigned": "~85 agents",
+    "default_fallback_tier": "anthropic-analyst",
+    "recommendation": "Update agents_config.json with tier assignments for all 103 agents in follow-up phase"
+  },
+
+  "statistics": {
+    "total_agents_in_system": 103,
+    "explicitly_assigned": 14,
+    "using_default_fallback": "~89",
+    "sovereign_tier_agents": 5,
+    "shared_key_agents": 9
+  },
+
+  "credential_management": {
+    "ANTHROPIC_API_KEY_SOVEREIGN": {
+      "tiers": ["anthropic-strategist", "anthropic-guardian"],
+      "agents_affected": ["d1_ceo", "d1_cto", "d1_product_dev_manager", "shared_runtime_ops", "d8_compliance_auditor"],
+      "isolation_level": "CRITICAL",
+      "rotation_policy": "quarterly",
+      "requires_audit_log": true
+    },
+    "ANTHROPIC_API_KEY_SHARED": {
+      "tiers": ["anthropic-executor", "anthropic-communicator", "anthropic-analyst"],
+      "agents_affected": ["d1_fullstack_dev", "d1_devops", "d8_integration_engineer", "d8_funnel_engineer", "d1_cmo", "d1_customer_success", "d1_data_analyst", "d8_revenue_ops", "d8_crm_ops"],
+      "isolation_level": "NORMAL",
+      "rotation_policy": "monthly",
+      "requires_audit_log": false
+    }
+  },
+
+  "validation_checklist": {
+    "env_variables_present": false,
+    "claw_router_config_loaded": false,
+    "rate_limits_enforced": false,
+    "sovereign_isolation_verified": false,
+    "all_models_anthropic": false,
+    "no_openai_references": false
+  },
+
+  "migration_notes": {
+    "date": "2026-03-29",
+    "from": "OpenAI hybrid + 3-tier Anthropic",
+    "to": "Pure Anthropic 5-agent architecture (with OpenAI embedding service)",
+    "breaking_changes": [
+      "All tier names changed from tier_1/2/3 to anthropic-{name}",
+      "Provider field now tier-specific for rate limiting",
+      "Rate limits per-tier instead of per-provider",
+      "LLM completion models migrated from GPT-4o to Claude variants"
+    ],
+    "backward_compatibility": "Not maintained — this is a complete migration. Version 2.0.0 required.",
+    "dependencies_removed": [
+      "None (OpenAI SDK retained for embeddings only)"
+    ],
+    "dependencies_added": "None — @anthropic-ai/sdk already present",
+    "known_limitations": [
+      "Embeddings (agent-memory.ts) still use OpenAI text-embedding-3-small because Anthropic does not provide embedding models",
+      "Phase 2 migration needed: Replace OpenAI embeddings with alternative service (Cohere, Hugging Face, etc.)"
+    ]
+  }
+}

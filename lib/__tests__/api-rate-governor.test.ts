@@ -87,7 +87,7 @@ describe("api-rate-governor", () => {
     });
 
     it("opens circuit immediately on 401 auth expired", () => {
-      const provider = "openai-codex";
+      const provider = "anthropic-guardian";
       reportFailure(provider, 401);
 
       const status = getStatus(provider);
@@ -96,9 +96,9 @@ describe("api-rate-governor", () => {
 
     it("resets circuit on success", () => {
       // Force half-open by waiting — or just record success
-      reportSuccess("openai-codex", 0);
+      reportSuccess("anthropic-guardian", 0);
 
-      const status = getStatus("openai-codex");
+      const status = getStatus("anthropic-guardian");
       expect(status.circuitState).toBe("closed");
       expect(status.consecutiveFailures).toBe(0);
     });
@@ -108,20 +108,20 @@ describe("api-rate-governor", () => {
 
   describe("budget tracking", () => {
     it("tracks spend across requests", () => {
-      reportSuccess("openai", 100); // $1.00
-      reportSuccess("openai", 200); // $2.00
+      reportSuccess("anthropic-analyst", 100); // $1.00
+      reportSuccess("anthropic-analyst", 200); // $2.00
 
-      const status = getStatus("openai");
+      const status = getStatus("anthropic-analyst");
       expect(status.dailySpentCents).toBeGreaterThanOrEqual(300);
     });
 
     it("blocks requests when budget is exhausted", () => {
-      // OpenAI budget is 3000 cents ($30)
+      // Anthropic analyst budget is 800 cents ($8)
       // Exhaust it by reporting a large spend
-      reportSuccess("openai", 10000); // $100 — way over budget
+      reportSuccess("anthropic-analyst", 10000); // $100 — way over budget
 
       // Now the next checkRequest should be blocked for budget
-      const result = checkRequest({ provider: "openai", queueClass: "P2" });
+      const result = checkRequest({ provider: "anthropic-analyst", queueClass: "P2" });
       if (!result.allowed) {
         expect(result.reason).toContain("budget");
       }
@@ -205,12 +205,14 @@ describe("api-rate-governor", () => {
   describe("getAllStatus", () => {
     it("returns status for all configured providers", () => {
       const statuses = getAllStatus();
-      expect(statuses.length).toBeGreaterThanOrEqual(6);
+      expect(statuses.length).toBeGreaterThanOrEqual(9);
 
       const providers = statuses.map((s) => s.provider);
-      expect(providers).toContain("openai-codex");
-      expect(providers).toContain("anthropic");
-      expect(providers).toContain("openai");
+      expect(providers).toContain("anthropic-strategist");
+      expect(providers).toContain("anthropic-executor");
+      expect(providers).toContain("anthropic-communicator");
+      expect(providers).toContain("anthropic-analyst");
+      expect(providers).toContain("anthropic-guardian");
       expect(providers).toContain("ghl");
       expect(providers).toContain("supabase");
       expect(providers).toContain("telegram");

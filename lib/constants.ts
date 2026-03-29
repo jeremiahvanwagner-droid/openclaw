@@ -49,9 +49,11 @@ export const GHL_MAX_RETRIES = 2;
 // ═══════════════════════════════════════════════════════════════════
 
 export const RATE_LIMITS = {
-  "openai-codex": { requestsPerMinute: 40, requestsPerHour: 800 },
-  anthropic: { requestsPerMinute: 30, requestsPerHour: 600 },
-  openai: { requestsPerMinute: 50, requestsPerHour: 1000 },
+  "anthropic-strategist": { requestsPerMinute: 30, requestsPerHour: 600 },
+  "anthropic-executor": { requestsPerMinute: 60, requestsPerHour: 1200 },
+  "anthropic-communicator": { requestsPerMinute: 90, requestsPerHour: 1800 },
+  "anthropic-analyst": { requestsPerMinute: 120, requestsPerHour: 2400 },
+  "anthropic-guardian": { requestsPerMinute: 40, requestsPerHour: 800 },
   ghl: { requestsPerMinute: 20, requestsPerHour: 400 },
   supabase: { requestsPerMinute: 200, requestsPerHour: 5000 },
   telegram: { requestsPerMinute: 25, requestsPerHour: 1000 },
@@ -62,9 +64,11 @@ export const RATE_LIMITS = {
 // ═══════════════════════════════════════════════════════════════════
 
 export const DAILY_BUDGETS = {
-  "openai-codex": 5000, // $50/day
-  anthropic: 4000, // $40/day
-  openai: 3000, // $30/day
+  "anthropic-strategist": 3000, // $30/day
+  "anthropic-executor": 2000, // $20/day
+  "anthropic-communicator": 1500, // $15/day
+  "anthropic-analyst": 800, // $8/day
+  "anthropic-guardian": 1000, // $10/day
 } as const;
 
 /** Budget warning threshold (fraction, e.g. 0.75 = 75%) */

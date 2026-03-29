@@ -4,10 +4,12 @@
  *
  * Provides semantic memory operations using Supabase pgvector.
  * Supports private, division-scoped, and global memory sharing.
+ *
+ * TODO: Migrate embeddings from OpenAI to Anthropic or alternative embedding service
+ * (Anthropic currently does not provide embedding models)
  */
 
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
-import OpenAI from "openai";
 import { logger } from "./logger";
 import {
   memoryQueryDuration,
@@ -18,7 +20,8 @@ const log = logger.child({ module: "agent-memory" });
 
 // Initialize clients lazily
 let supabase: SupabaseClient | null = null;
-let openai: OpenAI | null = null;
+// Lazy-load OpenAI only if embeddings are needed
+let openaiModule: any = null;
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
 const EMBEDDING_DIMENSIONS = 512;
@@ -33,11 +36,27 @@ function getSupabase(): SupabaseClient {
   return supabase;
 }
 
-function getOpenAI(): OpenAI {
-  if (!openai) {
-    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+/**
+ * Lazy-load OpenAI SDK only when embeddings are needed.
+ * This allows the rest of the system to work without OpenAI if embeddings are not used.
+ *
+ * @throws Error if OPENAI_API_KEY is not configured
+ */
+async function getOpenAIClient() {
+  if (!openaiModule) {
+    // Dynamically import OpenAI only when needed
+    const OpenAI = (await import("openai")).default;
+
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error(
+        "OPENAI_API_KEY not configured. Embeddings require OpenAI API key. " +
+        "TODO: Migrate to alternative embedding service (Anthropic does not provide embedding models)"
+      );
+    }
+
+    openaiModule = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
-  return openai;
+  return openaiModule;
 }
 
 // Types
@@ -70,9 +89,13 @@ export interface QueryOptions {
 
 /**
  * Generate embedding vector for text using OpenAI text-embedding-3-small.
+ *
+ * NOTE: Anthropic does not provide embedding models. Embeddings still use OpenAI.
+ * TODO: Migrate to alternative embedding service (Cohere, Hugging Face, etc.)
  */
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await getOpenAI().embeddings.create({
+  const openai = await getOpenAIClient();
+  const response = await openai.embeddings.create({
     model: EMBEDDING_MODEL,
     dimensions: EMBEDDING_DIMENSIONS,
     input: text,

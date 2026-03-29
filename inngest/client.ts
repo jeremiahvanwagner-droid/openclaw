@@ -859,20 +859,35 @@ export function getPodLead(podId: string): string | null {
 }
 
 export const LLM_MODELS = {
-  "claude-opus-4": {
+  "claude-opus-4-latest": {
     provider: "anthropic",
-    model: "claude-opus-4-20250514",
-    tier: "strategic",
+    model: "claude-opus-4-latest",
+    tier: "strategist",
+    queue_class: "P0",
   },
-  "claude-sonnet-4.5": {
+  "claude-sonnet-4.5-latest": {
     provider: "anthropic",
-    model: "claude-sonnet-4-5-20250514",
-    tier: "content",
+    model: "claude-sonnet-4.5-latest",
+    tier: "executor",
+    queue_class: "P1",
   },
-  "claude-haiku-4-5": {
+  "claude-sonnet-4.5-communicator": {
     provider: "anthropic",
-    model: "claude-haiku-4-5",
-    tier: "routine",
+    model: "claude-sonnet-4.5-latest",
+    tier: "communicator",
+    queue_class: "P1",
+  },
+  "claude-haiku-4.5-latest": {
+    provider: "anthropic",
+    model: "claude-haiku-4.5-latest",
+    tier: "analyst",
+    queue_class: "P2",
+  },
+  "claude-haiku-4.5-guardian": {
+    provider: "anthropic",
+    model: "claude-haiku-4.5-latest",
+    tier: "guardian",
+    queue_class: "P0",
   },
 } as const;
 

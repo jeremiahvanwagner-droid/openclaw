@@ -8,8 +8,31 @@ import * as path from "path";
 const log = logger.child({ module: "claw-router" });
 
 /**
+ * Known Anthropic models for validation — Pure Anthropic migration (Mar 2026)
+ */
+const VALID_ANTHROPIC_MODELS = [
+  "claude-opus-4-latest",
+  "claude-opus-4",
+  "claude-sonnet-4.5-latest",
+  "claude-sonnet-4-5",
+  "claude-haiku-4.5-latest",
+  "claude-haiku-4-5",
+] as const;
+
+/**
+ * 5-Agent Tier Identifiers — Pure Anthropic Architecture
+ */
+const VALID_TIER_IDS = [
+  "anthropic-strategist",
+  "anthropic-executor",
+  "anthropic-communicator",
+  "anthropic-analyst",
+  "anthropic-guardian",
+] as const;
+
+/**
  * ClawRouter — Tier-isolated completion routing.
- * Enforces Sovereign key isolation and manages tier assignments.
+ * Enforces Sovereign key isolation and manages tier assignments for 5-agent pure Anthropic architecture.
  */
 export interface RouterConfig {
   tiers: Record<string, TierConfig>;
@@ -25,6 +48,8 @@ export interface TierConfig {
   temperature_default: number;
   queue_class: string;
   sovereign_isolation: boolean;
+  rate_limit_per_min?: number;
+  max_concurrent_requests?: number;
 }
 
 export interface RoutingRule {
@@ -43,7 +68,7 @@ export interface RoutingRule {
 export interface FallbackConfig {
   provider: string;
   credential_env: string;
-  model_map: Record<string, string>;
+  model_map?: Record<string, string>;
 }
 
 export interface CompletionOptions {
@@ -74,7 +99,32 @@ function getAnthropicClient(envVar: string): Anthropic {
 }
 
 /**
+ * Validate that a model identifier is a known Anthropic model
+ */
+function validateModel(model: string): void {
+  if (!VALID_ANTHROPIC_MODELS.includes(model as any)) {
+    log.warn(
+      { model, valid_models: VALID_ANTHROPIC_MODELS },
+      "Model not in known list — assuming Anthropic compatible. Ensure model exists."
+    );
+  }
+}
+
+/**
+ * Validate that a tier ID is one of the 5-agent tiers
+ */
+function validateTierId(tierId: string): void {
+  if (!VALID_TIER_IDS.includes(tierId as any)) {
+    log.warn(
+      { tierId, valid_tiers: VALID_TIER_IDS },
+      "Tier ID not in standard 5-agent list. If this is intentional, proceed."
+    );
+  }
+}
+
+/**
  * Determine the correct tier based on agent ID and tags.
+ * Uses 5-agent pure Anthropic architecture.
  */
 export function routeRequest(options: CompletionOptions): { tierId: string; config: TierConfig } {
   const config = loadConfig();
@@ -94,19 +144,34 @@ export function routeRequest(options: CompletionOptions): { tierId: string; conf
 
     if (matched) {
       const tierConfig = config.tiers[rule.route_to];
-      if (!tierConfig) throw new Error(`Invalid route: ${rule.route_to}`);
+      if (!tierConfig) {
+        const msg = `Invalid route: "${rule.route_to}" — Tier not found in config. Valid tiers: ${Object.keys(config.tiers).join(", ")}`;
+        throw new Error(msg);
+      }
+
+      // Validate model is Anthropic
+      validateModel(tierConfig.model);
+      validateTierId(rule.route_to);
 
       // CRITICAL: SOVEREIGN ISOLATION ENFORCEMENT
       if (rule.enforce_sovereign_isolation && tierConfig.credential_env !== "ANTHROPIC_API_KEY_SOVEREIGN") {
-        log.error("SECURITY_FAULT: Sovereign route assigned to non-sovereign credential.");
-        throw new Error("Sovereign isolation violation.");
+        const msg = `SECURITY_FAULT: Sovereign route "${rule.route_id}" assigned to non-sovereign credential. Expected ANTHROPIC_API_KEY_SOVEREIGN but got ${tierConfig.credential_env}`;
+        log.error(msg);
+        throw new Error(msg);
+      }
+
+      // Verify sovereign isolation is not violated in reverse
+      if (tierConfig.sovereign_isolation && !rule.enforce_sovereign_isolation) {
+        const msg = `SECURITY_WARNING: Tier "${rule.route_to}" claims sovereign_isolation but rule does not enforce it. Check routing rules.`;
+        log.warn(msg);
       }
 
       return { tierId: rule.route_to, config: tierConfig };
     }
   }
 
-  throw new Error("No routing rule matched the request.");
+  const msg = `No routing rule matched the request. Agent: ${options.agentId}, Tags: ${options.tags?.join(",")}. Available rules: ${[...config.routing_rules].map(r => r.rule_id).join(", ")}`;
+  throw new Error(msg);
 }
 
 /**

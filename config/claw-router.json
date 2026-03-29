@@ -4,58 +4,104 @@
   "generated_at": "2026-03-28T19:00:00.000Z",
   "description": "ClawRouter — Tier-isolated credential and model routing for the OpenClaw Multi-Agent Network. Sovereign key is never shared with any other agent or tier.",
 
-  "routing_law": "SOVEREIGN_KEY_ISOLATION — ANTHROPIC_API_KEY_SOVEREIGN must never be used by any agent other than sovereign. Any violation is a critical security fault.",
+  "routing_law": "5-AGENT PURE ANTHROPIC — All agents use Anthropic exclusively. Sovereign tier isolation preserved for executive agents.",
 
   "tiers": {
-    "tier_1": {
-      "name": "Sovereign Tier",
-      "description": "Strategic decisions, human-facing communication. Highest intelligence, exclusive credential.",
+    "anthropic-strategist": {
+      "name": "Strategist Tier",
+      "description": "Executive strategy, complex reasoning, multi-step planning. Highest intelligence, selective sovereign access.",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-      "provider": "anthropic",
-      "model": "claude-opus-4-5",
-      "model_aliases": ["claude-opus-4", "claude-opus-4-5", "opus"],
-      "max_tokens": 8096,
-      "temperature_default": 0.7,
-      "queue_class": "P0",
-      "agents": ["sovereign"],
-      "tags": ["tier:1", "agent:sovereign"],
-      "sovereign_isolation": true,
-      "token_pricing_usd_per_1k": {
-        "input": 0.015,
-        "output": 0.075
-      }
-    },
-    "tier_2": {
-      "name": "Operations Tier",
-      "description": "Lead monitoring, GHL ops, content and pipeline intelligence. High-capability agents.",
-      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
-      "provider": "anthropic",
-      "model": "claude-sonnet-4-5",
-      "model_aliases": ["claude-sonnet-4.5", "claude-sonnet-4-5", "sonnet"],
-      "max_tokens": 4096,
+      "provider": "anthropic-strategist",
+      "model": "claude-opus-4-latest",
+      "model_aliases": ["claude-opus-4", "claude-opus", "opus"],
+      "max_tokens": 16000,
       "temperature_default": 0.7,
       "queue_class": "P1",
-      "agents": ["herald", "strategist"],
-      "tags": ["tier:2", "agent:herald", "agent:strategist"],
+      "rate_limit_per_min": 30,
+      "max_concurrent_requests": 5,
+      "agents": ["d1_ceo", "d1_cto", "d1_product_dev_manager"],
+      "tags": ["tier:strategist", "agent:strategist"],
+      "sovereign_isolation": true,
+      "token_pricing_usd_per_1k": {
+        "input": 0.003,
+        "output": 0.015
+      }
+    },
+    "anthropic-executor": {
+      "name": "Executor Tier",
+      "description": "Code generation, workflow execution, integration handling. High-capability implementation agents.",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "provider": "anthropic-executor",
+      "model": "claude-sonnet-4.5-latest",
+      "model_aliases": ["claude-sonnet-4.5", "claude-sonnet", "sonnet"],
+      "max_tokens": 8000,
+      "temperature_default": 0.5,
+      "queue_class": "P1",
+      "rate_limit_per_min": 60,
+      "max_concurrent_requests": 10,
+      "agents": ["d1_fullstack_dev", "d1_devops", "d8_integration_engineer", "d8_funnel_engineer"],
+      "tags": ["tier:executor", "agent:executor"],
       "sovereign_isolation": false,
       "token_pricing_usd_per_1k": {
         "input": 0.003,
         "output": 0.015
       }
     },
-    "tier_3": {
-      "name": "Background Tier",
-      "description": "Data enrichment, logging, cron scans, background sweeps. Efficient high-volume agents.",
-      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
-      "provider": "anthropic",
-      "model": "claude-haiku-4-5",
-      "model_aliases": ["claude-haiku-4.5", "claude-haiku-4-5", "haiku"],
-      "max_tokens": 2048,
-      "temperature_default": 0.5,
+    "anthropic-communicator": {
+      "name": "Communicator Tier",
+      "description": "Customer support, content generation, messaging. High-volume customer-facing operations.",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "provider": "anthropic-communicator",
+      "model": "claude-sonnet-4.5-latest",
+      "model_aliases": ["claude-sonnet-4.5", "claude-sonnet", "sonnet"],
+      "max_tokens": 6000,
+      "temperature_default": 0.8,
       "queue_class": "P2",
-      "agents": ["keeper", "steward"],
-      "tags": ["tier:3", "agent:keeper", "agent:steward"],
+      "rate_limit_per_min": 90,
+      "max_concurrent_requests": 15,
+      "agents": ["d1_cmo", "d1_customer_success"],
+      "tags": ["tier:communicator", "agent:communicator"],
       "sovereign_isolation": false,
+      "token_pricing_usd_per_1k": {
+        "input": 0.003,
+        "output": 0.015
+      }
+    },
+    "anthropic-analyst": {
+      "name": "Analyst Tier",
+      "description": "Data analysis, reporting, batch processing. Efficient high-volume data operations.",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "provider": "anthropic-analyst",
+      "model": "claude-haiku-4.5-latest",
+      "model_aliases": ["claude-haiku-4.5", "claude-haiku", "haiku"],
+      "max_tokens": 4000,
+      "temperature_default": 0.3,
+      "queue_class": "P3",
+      "rate_limit_per_min": 120,
+      "max_concurrent_requests": 20,
+      "agents": ["d1_data_analyst", "d8_revenue_ops", "d8_crm_ops"],
+      "tags": ["tier:analyst", "agent:analyst"],
+      "sovereign_isolation": false,
+      "token_pricing_usd_per_1k": {
+        "input": 0.00025,
+        "output": 0.00125
+      }
+    },
+    "anthropic-guardian": {
+      "name": "Guardian Tier",
+      "description": "Compliance checks, safety validation, audit logging. Exclusive sovereign isolation for governance.",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "provider": "anthropic-guardian",
+      "model": "claude-haiku-4.5-latest",
+      "model_aliases": ["claude-haiku-4.5", "claude-haiku", "haiku"],
+      "max_tokens": 4000,
+      "temperature_default": 0.1,
+      "queue_class": "P0",
+      "rate_limit_per_min": 40,
+      "max_concurrent_requests": 3,
+      "agents": ["shared_runtime_ops", "d8_compliance_auditor"],
+      "tags": ["tier:guardian", "agent:guardian"],
+      "sovereign_isolation": true,
       "token_pricing_usd_per_1k": {
         "input": 0.00025,
         "output": 0.00125
@@ -64,107 +110,182 @@
   },
 
   "agent_topology": {
-    "sovereign": {
-      "tier": "tier_1",
+    "d1_ceo": {
+      "tier": "anthropic-strategist",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-      "model": "claude-opus-4-5",
-      "description": "Strategic decisions, human-facing output. EXCLUSIVE credential."
+      "model": "claude-opus-4-latest",
+      "description": "Executive decisions and strategic planning. EXCLUSIVE sovereign credential."
     },
-    "herald": {
-      "tier": "tier_2",
-      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
-      "model": "claude-sonnet-4-5",
-      "description": "Lead monitoring and GHL operations."
+    "d1_cto": {
+      "tier": "anthropic-strategist",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "model": "claude-opus-4-latest",
+      "description": "Technical strategy and architecture decisions."
     },
-    "strategist": {
-      "tier": "tier_2",
-      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
-      "model": "claude-sonnet-4-5",
-      "description": "Content and pipeline intelligence."
+    "d1_product_dev_manager": {
+      "tier": "anthropic-strategist",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "model": "claude-opus-4-latest",
+      "description": "Product development strategy and planning."
     },
-    "keeper": {
-      "tier": "tier_3",
-      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
-      "model": "claude-haiku-4-5",
-      "description": "Data enrichment and logging."
+    "d1_fullstack_dev": {
+      "tier": "anthropic-executor",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-sonnet-4.5-latest",
+      "description": "Code generation and implementation."
     },
-    "steward": {
-      "tier": "tier_3",
-      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
-      "model": "claude-haiku-4-5",
-      "description": "Cron scans and background sweeps."
+    "d1_devops": {
+      "tier": "anthropic-executor",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-sonnet-4.5-latest",
+      "description": "Infrastructure and deployment operations."
+    },
+    "d8_integration_engineer": {
+      "tier": "anthropic-executor",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-sonnet-4.5-latest",
+      "description": "API integrations and workflow execution."
+    },
+    "d8_funnel_engineer": {
+      "tier": "anthropic-executor",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-sonnet-4.5-latest",
+      "description": "Sales funnel and conversion optimization."
+    },
+    "d1_cmo": {
+      "tier": "anthropic-communicator",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-sonnet-4.5-latest",
+      "description": "Marketing and communications content."
+    },
+    "d1_customer_success": {
+      "tier": "anthropic-communicator",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-sonnet-4.5-latest",
+      "description": "Customer support and success operations."
+    },
+    "d1_data_analyst": {
+      "tier": "anthropic-analyst",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-haiku-4.5-latest",
+      "description": "Data analysis and reporting."
+    },
+    "d8_revenue_ops": {
+      "tier": "anthropic-analyst",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-haiku-4.5-latest",
+      "description": "Revenue operations and analytics."
+    },
+    "d8_crm_ops": {
+      "tier": "anthropic-analyst",
+      "credential_env": "ANTHROPIC_API_KEY_SHARED",
+      "model": "claude-haiku-4.5-latest",
+      "description": "CRM data processing and enrichment."
+    },
+    "shared_runtime_ops": {
+      "tier": "anthropic-guardian",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "model": "claude-haiku-4.5-latest",
+      "description": "Runtime operations and compliance monitoring."
+    },
+    "d8_compliance_auditor": {
+      "tier": "anthropic-guardian",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "model": "claude-haiku-4.5-latest",
+      "description": "Compliance checks and audit logging."
     }
   },
 
   "fallback": {
-    "trigger": "anthropic_failure",
-    "provider": "openrouter",
-    "credential_env": "OPENROUTER_API_KEY",
-    "base_url": "https://openrouter.ai/api/v1",
-    "model_map": {
-      "claude-opus-4-5": "anthropic/claude-opus-4-5",
-      "claude-sonnet-4-5": "anthropic/claude-sonnet-4-5",
-      "claude-haiku-4-5": "anthropic/claude-haiku-4-5"
-    },
+    "trigger": "anthropic_rate_limit",
+    "provider": "anthropic",
+    "credential_env": "ANTHROPIC_API_KEY_BACKUP",
+    "note": "Fallback uses backup Anthropic key if rate limit hit on primary. Sovereign tiers never downgrade.",
     "retry_after_ms": 1000,
-    "max_retries": 3,
-    "sovereign_isolation_preserved": true,
-    "note": "Sovereign tier fallback still uses a separate routing path. The OPENROUTER_API_KEY is shared across tiers during fallback only, but original tier/model assignment is preserved."
+    "max_retries": 3
   },
 
   "routing_rules": [
     {
-      "rule_id": "ROUTE-001",
+      "rule_id": "ROUTE-STRATEGIST",
       "priority": 1,
-      "description": "Sovereign agent or tier:1 tag always routes to Tier 1 with exclusive credential",
+      "description": "Executive agents (CEO, CTO, Product Lead) route to Strategist tier with sovereign credential",
       "match": {
         "any_of": [
-          { "tag": "tier:1" },
-          { "tag": "agent:sovereign" },
-          { "agent_id": "sovereign" }
+          { "tag": "tier:strategist" },
+          { "agent_id": "d1_ceo" },
+          { "agent_id": "d1_cto" },
+          { "agent_id": "d1_product_dev_manager" }
         ]
       },
-      "route_to": "tier_1",
+      "route_to": "anthropic-strategist",
       "enforce_sovereign_isolation": true
     },
     {
-      "rule_id": "ROUTE-002",
+      "rule_id": "ROUTE-EXECUTOR",
+      "priority": 10,
+      "description": "Implementation agents (Devs, DevOps, Integrations) route to Executor tier",
+      "match": {
+        "any_of": [
+          { "tag": "tier:executor" },
+          { "agent_id": "d1_fullstack_dev" },
+          { "agent_id": "d1_devops" },
+          { "agent_id": "d8_integration_engineer" },
+          { "agent_id": "d8_funnel_engineer" }
+        ]
+      },
+      "route_to": "anthropic-executor",
+      "enforce_sovereign_isolation": false
+    },
+    {
+      "rule_id": "ROUTE-COMMUNICATOR",
+      "priority": 20,
+      "description": "Customer-facing agents (CMO, Customer Success, Support) route to Communicator tier",
+      "match": {
+        "any_of": [
+          { "tag": "tier:communicator" },
+          { "agent_id": "d1_cmo" },
+          { "agent_id": "d1_customer_success" }
+        ]
+      },
+      "route_to": "anthropic-communicator",
+      "enforce_sovereign_isolation": false
+    },
+    {
+      "rule_id": "ROUTE-ANALYST",
+      "priority": 30,
+      "description": "Data agents (Analytics, Revenue Ops, CRM Ops) route to Analyst tier",
+      "match": {
+        "any_of": [
+          { "tag": "tier:analyst" },
+          { "agent_id": "d1_data_analyst" },
+          { "agent_id": "d8_revenue_ops" },
+          { "agent_id": "d8_crm_ops" }
+        ]
+      },
+      "route_to": "anthropic-analyst",
+      "enforce_sovereign_isolation": false
+    },
+    {
+      "rule_id": "ROUTE-GUARDIAN",
       "priority": 2,
-      "description": "Herald or Strategist agent, or tier:2 tag routes to Tier 2",
+      "description": "Compliance agents (Runtime Ops, Audit) route to Guardian tier with sovereign credential",
       "match": {
         "any_of": [
-          { "tag": "tier:2" },
-          { "tag": "agent:herald" },
-          { "tag": "agent:strategist" },
-          { "agent_id": "herald" },
-          { "agent_id": "strategist" }
+          { "tag": "tier:guardian" },
+          { "agent_id": "shared_runtime_ops" },
+          { "agent_id": "d8_compliance_auditor" }
         ]
       },
-      "route_to": "tier_2",
-      "enforce_sovereign_isolation": false
+      "route_to": "anthropic-guardian",
+      "enforce_sovereign_isolation": true
     },
     {
-      "rule_id": "ROUTE-003",
-      "priority": 3,
-      "description": "Keeper or Steward agent, or tier:3 tag routes to Tier 3",
-      "match": {
-        "any_of": [
-          { "tag": "tier:3" },
-          { "tag": "agent:keeper" },
-          { "tag": "agent:steward" },
-          { "agent_id": "keeper" },
-          { "agent_id": "steward" }
-        ]
-      },
-      "route_to": "tier_3",
-      "enforce_sovereign_isolation": false
-    },
-    {
-      "rule_id": "ROUTE-004",
+      "rule_id": "ROUTE-DEFAULT",
       "priority": 99,
-      "description": "Default fallback — untagged tasks route to Tier 3 (cheapest safe default)",
+      "description": "Default fallback — untagged tasks route to Analyst tier (low-cost safe default)",
       "match": { "default": true },
-      "route_to": "tier_3",
+      "route_to": "anthropic-analyst",
       "enforce_sovereign_isolation": false
     }
   ],
@@ -172,17 +293,23 @@
   "security": {
     "sovereign_key_isolation": true,
     "sovereign_credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-    "shared_credential_env": "ANTHROPIC_API_KEY_AGENTS",
+    "shared_credential_env": "ANTHROPIC_API_KEY_SHARED",
     "hardcoded_keys_forbidden": true,
     "env_only": true,
     "audit_log_all_tier1_calls": true,
-    "alert_on_isolation_violation": true
+    "alert_on_isolation_violation": true,
+    "provider_enforcement": "anthropic_only"
   },
 
   "meta": {
+    "version": "2.0.0",
+    "config_type": "5-agent pure anthropic",
     "author": "MIKE — Executive Systems Architect",
     "owner": "Truth J Blue LLC — Jeremiah Van Wagner",
-    "created_at": "2026-03-28T19:00:00.000Z",
-    "implementation_file": "lib/claw-router.ts"
+    "updated_at": "2026-03-29T00:00:00.000Z",
+    "migration_from": "3-tier openai-hybrid to 5-agent pure-anthropic",
+    "implementation_file": "lib/claw-router.ts",
+    "agents_in_system": 103,
+    "routing_agents": 14
   }
 }

@@ -3,13 +3,15 @@
  * Open Claw Multi-Agent Network
  *
  * Routes completion requests to appropriate LLM providers based on model key.
- * Supports Anthropic (Claude) and OpenAI (GPT) models.
+ * Supports Anthropic (Claude) models primarily, with OpenAI retained for embeddings only.
+ *
+ * NOTE: Embeddings still use OpenAI text-embedding-3-small because Anthropic
+ * does not provide embedding models.
  *
  * Rate-governed via api-rate-governor to prevent API limit hits and overload.
  */
 
 import Anthropic from "@anthropic-ai/sdk";
-import OpenAI from "openai";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { withGovernor, type QueueClass } from "./api-rate-governor";
 import { logger } from "./logger";
@@ -60,7 +62,7 @@ function setCache(key: string, result: CompletionResult): void {
 
 // Initialize clients lazily
 let anthropic: Anthropic | null = null;
-let openaiClient: OpenAI | null = null;
+let openaiModule: any = null;
 
 function getAnthropic(): Anthropic {
   if (!anthropic) {
@@ -69,11 +71,26 @@ function getAnthropic(): Anthropic {
   return anthropic;
 }
 
-function getOpenAI(): OpenAI {
-  if (!openaiClient) {
-    openaiClient = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+/**
+ * Lazy-load OpenAI SDK only for embeddings (not for completions).
+ * Anthropic handles all LLM completion requests.
+ *
+ * @throws Error if OPENAI_API_KEY is not configured and embeddings are needed
+ */
+async function getOpenAIClient() {
+  if (!openaiModule) {
+    const OpenAI = (await import("openai")).default;
+
+    if (!process.env.OPENAI_API_KEY) {
+      throw new Error(
+        "OPENAI_API_KEY not configured. Embeddings require OpenAI API key. " +
+        "TODO: Migrate to alternative embedding service (Anthropic does not provide embedding models)"
+      );
+    }
+
+    openaiModule = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   }
-  return openaiClient;
+  return openaiModule;
 }
 
 // Supabase client for cost logging (lazy)
@@ -378,9 +395,13 @@ export async function completeJSON<T>(
 
 /**
  * Generate embedding using OpenAI text-embedding-3-small.
+ *
+ * NOTE: Anthropic does not provide embedding models. Embeddings still use OpenAI.
+ * TODO: Migrate to alternative embedding service (Cohere, Hugging Face, etc.)
  */
 export async function embed(text: string): Promise<number[]> {
-  const response = await getOpenAI().embeddings.create({
+  const openai = await getOpenAIClient();
+  const response = await openai.embeddings.create({
     model: EMBEDDING_MODEL,
     dimensions: EMBEDDING_DIMENSIONS,
     input: text,
@@ -392,7 +413,8 @@ export async function embed(text: string): Promise<number[]> {
  * Generate embeddings for multiple texts
  */
 export async function embedBatch(texts: string[]): Promise<number[][]> {
-  const response = await getOpenAI().embeddings.create({
+  const openai = await getOpenAIClient();
+  const response = await openai.embeddings.create({
     model: EMBEDDING_MODEL,
     dimensions: EMBEDDING_DIMENSIONS,
     input: texts,
