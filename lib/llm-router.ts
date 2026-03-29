@@ -311,39 +311,6 @@ async function completeWithAnthropic(options: {
   };
 }
 
-/**
- * Complete using OpenAI GPT
- */
-async function completeWithOpenAI(options: {
-  model: string;
-  messages: ChatMessage[];
-  maxTokens: number;
-  temperature: number;
-  stopSequences?: string[];
-}): Promise<CompletionResult> {
-  const { model, messages, maxTokens, temperature, stopSequences } = options;
-
-  const response = await getOpenAI().chat.completions.create({
-    model,
-    messages,
-    max_tokens: maxTokens,
-    temperature,
-    stop: stopSequences,
-  });
-
-  const content = response.choices[0].message.content || "";
-
-  return {
-    content,
-    model,
-    provider: "openai",
-    usage: {
-      inputTokens: response.usage?.prompt_tokens || 0,
-      outputTokens: response.usage?.completion_tokens || 0,
-    },
-  };
-}
-
 // ═══════════════════════════════════════════════════════════════════
 // AGENT COMPLETION HELPERS
 // ═══════════════════════════════════════════════════════════════════

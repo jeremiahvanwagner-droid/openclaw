@@ -11,6 +11,7 @@
 
 import { inngest } from "../client";
 import { createClient } from "@supabase/supabase-js";
+import { logger } from "../../lib/logger";
 import {
   runHealingLoop,
   runIntegrationHealthCheck,
@@ -110,9 +111,9 @@ export const selfHealingScheduled = inngest.createFunction(
     });
 
     if (circuit.open_until && new Date(circuit.open_until) > new Date()) {
-      console.warn(
-        `[OpenClaw] Self-healing circuit OPEN — ${circuit.failures} failures, ` +
-        `cooldown until ${circuit.open_until}. Skipping this run.`
+      logger.warn(
+        { failures: circuit.failures, open_until: circuit.open_until },
+        "[OpenClaw] Self-healing circuit OPEN — skipping this run."
       );
       return {
         status: "circuit_open",
@@ -126,7 +127,7 @@ export const selfHealingScheduled = inngest.createFunction(
       await step.run("record-preflight-failure", async () => {
         return recordCircuitFailure();
       });
-      console.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY not set — aborting healing run");
+      logger.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY not set — aborting healing run");
       return { status: "preflight_failed", reason: "ANTHROPIC_API_KEY_missing" };
     }
 
