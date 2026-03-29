@@ -869,9 +869,9 @@ export const LLM_MODELS = {
     model: "claude-sonnet-4-5-20250514",
     tier: "content",
   },
-  "gpt-4o-mini": {
-    provider: "openai",
-    model: "gpt-4o-mini",
+  "claude-haiku-4-5": {
+    provider: "anthropic",
+    model: "claude-haiku-4-5",
     tier: "routine",
   },
 } as const;

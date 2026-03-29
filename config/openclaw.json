@@ -140,17 +140,17 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openai/gpt-5.3-codex"
+        "primary": "anthropic/claude-opus-4-5"
       },
       "models": {
-        "openai-codex/gpt-5.3-codex": {},
-        "openai/gpt-5.3-codex": {},
-        "openai/gpt-4o-mini": {}
+        "anthropic/claude-opus-4-5": {},
+        "anthropic/claude-sonnet-4-5": {},
+        "anthropic/claude-haiku-4-5": {}
       },
       "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace",
       "contextTokens": 240000,
       "memorySearch": {
-        "enabled": true,
+        "enabled": false,
         "provider": "openai",
         "model": "text-embedding-3-small"
       },
@@ -182,27 +182,27 @@
         "name": "marketing",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-marketing",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\marketing\\agent",
-        "model": "openai/gpt-5.3-codex"
+        "model": "anthropic/claude-opus-4-5"
       },
       {
         "id": "sales",
         "name": "sales",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-sales",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\sales\\agent",
-        "model": "openai/gpt-5.3-codex"
+        "model": "anthropic/claude-opus-4-5"
       },
       {
         "id": "support",
         "name": "support",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-support",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\support\\agent",
-        "model": "openai/gpt-5.3-codex"
+        "model": "anthropic/claude-opus-4-5"
       },
       {
         "id": "d1_ceo",
         "name": "CEO",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ceo",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -239,7 +239,7 @@
       {
         "id": "d1_cmo",
         "name": "Chief Marketing Officer (CMO)",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -299,7 +299,7 @@
         "id": "d1_cto",
         "name": "CTO",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cto",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -345,7 +345,7 @@
       {
         "id": "d1_customer_success",
         "name": "Customer Success Manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "analytics-dashboard",
@@ -383,7 +383,7 @@
         "id": "d1_data_analyst",
         "name": "Data Analyst",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_data_analyst",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -412,7 +412,7 @@
         "id": "d1_devops",
         "name": "DevOps / Infrastructure Engineer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_devops",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -447,7 +447,7 @@
         "id": "d1_fullstack_dev",
         "name": "Software Engineer / Full-Stack Developer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_fullstack_dev",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -489,7 +489,7 @@
         "id": "d1_product_dev_manager",
         "name": "Product Development Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_product_dev_manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -520,7 +520,7 @@
       {
         "id": "d1_sales_manager",
         "name": "Sales Manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -572,7 +572,7 @@
         "id": "d1_ux_designer",
         "name": "UX/UI Designer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ux_designer",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "asset-library-manager",
@@ -597,7 +597,7 @@
         "id": "d2_copywriter",
         "name": "Copywriter / Product Descriptions Writer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_copywriter",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -634,7 +634,7 @@
         "id": "d2_customer_service",
         "name": "Customer Service Representative",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_customer_service",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "churn-predictor",
@@ -667,7 +667,7 @@
         "id": "d2_digital_marketing",
         "name": "Digital Marketing Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_digital_marketing",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -705,7 +705,7 @@
         "id": "d2_director",
         "name": "eCommerce Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_director",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -772,7 +772,7 @@
         "id": "d2_graphic_designer",
         "name": "Graphic Designer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_graphic_designer",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "asset-library-manager",
           "brand-audiovisual-script-formatting",
@@ -801,7 +801,7 @@
         "id": "d2_inventory_specialist",
         "name": "Inventory & Fulfillment Specialist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_inventory_specialist",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "coupon-and-promo-creator",
           "ecommerce-algorithmic-cross-selling",
@@ -826,7 +826,7 @@
         "id": "d2_paid_ads",
         "name": "Paid Ads Specialist (PPC/Meta)",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_paid_ads",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -859,7 +859,7 @@
         "id": "d2_seo_strategist",
         "name": "SEO / Content Strategist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_seo_strategist",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "affiliate-campaign-manager",
           "affiliate-manager",
@@ -903,7 +903,7 @@
       {
         "id": "d2_store_manager",
         "name": "eCommerce Store Manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -950,7 +950,7 @@
         "id": "d2_web_dev",
         "name": "Web Developer / Platform Technician",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_web_dev",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "aisaas-api-rate-limit-handling",
           "aisaas-autonomous-debugging",
@@ -999,7 +999,7 @@
         "id": "d3_admin_coordinator",
         "name": "Administrative Coordinator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_admin_coordinator",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -1024,7 +1024,7 @@
       {
         "id": "d3_biz_dev",
         "name": "Business Development Manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -1071,7 +1071,7 @@
         "id": "d3_business_analyst",
         "name": "Business Analyst",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_business_analyst",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -1104,7 +1104,7 @@
         "id": "d3_ceo",
         "name": "Consulting CEO",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ceo",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "agency-automated-invoice-generation",
           "agency-autonomous-client-onboarding",
@@ -1155,7 +1155,7 @@
         "id": "d3_client_relations",
         "name": "Client Relations Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_client_relations",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "analytics-dashboard",
@@ -1183,7 +1183,7 @@
         "id": "d3_lead_strategist",
         "name": "Lead Strategy Consultant",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_lead_strategist",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "agency-automated-invoice-generation",
           "agency-autonomous-client-onboarding",
@@ -1218,7 +1218,7 @@
         "id": "d3_marketing_brand",
         "name": "Marketing & Brand Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_marketing_brand",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -1269,7 +1269,7 @@
         "id": "d3_ops_manager",
         "name": "Operations Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ops_manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agency-automated-invoice-generation",
@@ -1305,7 +1305,7 @@
         "id": "d3_sales_closer",
         "name": "Sales Consultant / Closer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_sales_closer",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -1347,7 +1347,7 @@
         "id": "d3_thought_leadership",
         "name": "Content & Thought Leadership Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_thought_leadership",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "brand-audiovisual-script-formatting",
@@ -1388,7 +1388,7 @@
         "id": "d4_client_experience",
         "name": "Client Experience Coordinator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_client_experience",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "calendar-booking-bot",
           "coaching-adaptive-action-plan-generation",
@@ -1432,7 +1432,7 @@
         "id": "d4_community_manager",
         "name": "Community Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_community_manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "comment-moderation-sop",
@@ -1471,7 +1471,7 @@
         "id": "d4_curriculum_head",
         "name": "Head of Curriculum & Program Design",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_curriculum_head",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "coaching-adaptive-action-plan-generation",
@@ -1517,7 +1517,7 @@
         "id": "d4_cvo",
         "name": "Chief Visionary Officer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_cvo",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "brand-audiovisual-script-formatting",
@@ -1577,7 +1577,7 @@
       {
         "id": "d4_enrollment",
         "name": "Client Enrollment Specialist (Sales)",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "checkout-integrator",
           "coaching-adaptive-action-plan-generation",
@@ -1636,7 +1636,7 @@
       {
         "id": "d4_funnel_strategist",
         "name": "Marketing & Funnel Strategist",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -1689,7 +1689,7 @@
         "id": "d4_lead_coach",
         "name": "Lead Coach / Mentor",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_lead_coach",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "coaching-adaptive-action-plan-generation",
           "coaching-asynchronous-progress-tracking",
@@ -1727,7 +1727,7 @@
         "id": "d4_social_creator",
         "name": "Social Media & Content Creator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_social_creator",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "asset-library-manager",
           "blog-post-publisher",
@@ -1767,7 +1767,7 @@
         "id": "d4_tech_automation",
         "name": "Tech & Automation Specialist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_tech_automation",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "automation-logic-designer",
           "checkout-integrator",
@@ -1813,7 +1813,7 @@
         "id": "d4_video_production",
         "name": "Video Production Specialist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_video_production",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "asset-library-manager",
           "blog-post-publisher",
@@ -1841,7 +1841,7 @@
         "id": "d5_acquisitions",
         "name": "Acquisitions Editor",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_acquisitions",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "agency-automated-invoice-generation",
           "agency-autonomous-client-onboarding",
@@ -1869,7 +1869,7 @@
         "id": "d5_author_relations",
         "name": "Author Relations Coordinator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_author_relations",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "calendar-booking-bot",
           "content-scheduler",
@@ -1888,7 +1888,7 @@
         "id": "d5_book_marketing",
         "name": "Book Marketing Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_book_marketing",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -1932,7 +1932,7 @@
         "id": "d5_copywriter",
         "name": "Copywriter / Content Writer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_copywriter",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "brand-audiovisual-script-formatting",
@@ -1968,7 +1968,7 @@
         "id": "d5_cover_artist",
         "name": "Graphic Designer / Cover Artist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_cover_artist",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "asset-library-manager",
           "brand-audiovisual-script-formatting",
@@ -1992,7 +1992,7 @@
         "id": "d5_digital_distribution",
         "name": "Digital Distribution Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_digital_distribution",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "broken-link-checker",
@@ -2029,7 +2029,7 @@
         "id": "d5_managing_editor",
         "name": "Managing Editor",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_managing_editor",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "approval-rubric",
           "assessment-handler",
@@ -2052,7 +2052,7 @@
         "id": "d5_pr_media",
         "name": "PR & Media Relations Specialist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_pr_media",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "brand-audiovisual-script-formatting",
@@ -2088,7 +2088,7 @@
         "id": "d5_publisher",
         "name": "Publisher",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_publisher",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "blog-post-publisher",
@@ -2127,7 +2127,7 @@
         "id": "d5_sales_affiliate",
         "name": "Sales & Affiliate Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_sales_affiliate",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "affiliate-campaign-manager",
           "affiliate-manager",
@@ -2185,7 +2185,7 @@
         "id": "d6_board_liaison",
         "name": "Board Relations & Administrative Liaison",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_board_liaison",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2206,7 +2206,7 @@
         "id": "d6_communications",
         "name": "Communications & Marketing Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_communications",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "asset-library-manager",
           "blog-post-publisher",
@@ -2251,7 +2251,7 @@
         "id": "d6_coo",
         "name": "Chief Operating Officer (COO)",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_coo",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2277,7 +2277,7 @@
         "id": "d6_dev_director",
         "name": "Development Director (Fundraising)",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_dev_director",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -2303,7 +2303,7 @@
         "id": "d6_executive_director",
         "name": "Nonprofit Executive Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_executive_director",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2341,7 +2341,7 @@
         "id": "d6_finance",
         "name": "Finance & Compliance Officer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_finance",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -2368,7 +2368,7 @@
         "id": "d6_grant_writer",
         "name": "Grant Writer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_grant_writer",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "blog-post-publisher",
           "content-analyzer",
@@ -2405,7 +2405,7 @@
         "id": "d6_outreach",
         "name": "Community Outreach Coordinator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_outreach",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "comment-moderation-sop",
@@ -2449,7 +2449,7 @@
         "id": "d6_program_director",
         "name": "Program Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_program_director",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -2491,7 +2491,7 @@
         "id": "d6_volunteer",
         "name": "Volunteer Coordinator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_volunteer",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2525,7 +2525,7 @@
         "id": "biz_01_pod_lead",
         "name": "Truth J Blue Core Brand Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_01_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2576,7 +2576,7 @@
         "id": "biz_02_pod_lead",
         "name": "Beyond the Veil Mentorship Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_02_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2630,7 +2630,7 @@
         "id": "biz_03_pod_lead",
         "name": "Divine Path Walkers Community Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_03_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2684,7 +2684,7 @@
         "id": "biz_04_pod_lead",
         "name": "Truth J Blue Publishing Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_04_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2724,7 +2724,7 @@
         "id": "biz_05_pod_lead",
         "name": "Truth J Blue Consulting Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_05_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agency-automated-invoice-generation",
@@ -2775,7 +2775,7 @@
         "id": "biz_06_pod_lead",
         "name": "Inspire Build Motivate, Inc. Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_06_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2829,7 +2829,7 @@
         "id": "biz_07_pod_lead",
         "name": "Truth J Blue Online Store Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_07_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2885,7 +2885,7 @@
         "id": "biz_08_pod_lead",
         "name": "Truth J Blue Primary SaaS Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_08_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "access-control-manager",
@@ -2928,7 +2928,7 @@
         "id": "biz_09_pod_lead",
         "name": "Incubator Shared Brands Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_09_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -2967,7 +2967,7 @@
         "id": "biz_10_pod_lead",
         "name": "Portfolio Control Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_10_pod_lead",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3017,7 +3017,7 @@
       {
         "id": "browser_primary",
         "name": "Browser Automation Primary",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "asset-library-manager",
           "automation-logic-designer",
@@ -3055,7 +3055,7 @@
         "id": "browser_secondary",
         "name": "Browser Automation Secondary",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\browser_secondary",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "automation-logic-designer",
           "browser-automation",
@@ -3074,7 +3074,7 @@
         "id": "shared_api_gateway",
         "name": "API & Integration Gateway Agent",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_api_gateway",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3116,7 +3116,7 @@
         "id": "shared_data_analytics",
         "name": "Data & Analytics Hub Agent",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_analytics",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3146,7 +3146,7 @@
         "id": "shared_data_control",
         "name": "Shared Data Control",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_control",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3171,7 +3171,7 @@
         "id": "shared_exec_orchestrator",
         "name": "Shared Executive Orchestrator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_exec_orchestrator",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3197,7 +3197,7 @@
         "id": "shared_knowledge_base",
         "name": "Internal Knowledge Base Agent",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_knowledge_base",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3231,7 +3231,7 @@
         "id": "shared_legal_compliance",
         "name": "Legal & Compliance Advisor Agent",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_legal_compliance",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3262,7 +3262,7 @@
         "id": "shared_master_orchestrator",
         "name": "Master Orchestrator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_master_orchestrator",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3292,7 +3292,7 @@
         "id": "shared_runtime_ops",
         "name": "Shared Runtime Ops",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_runtime_ops",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3326,7 +3326,7 @@
       {
         "id": "d8_automation_architect",
         "name": "Workflow & Automation Architect",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3374,7 +3374,7 @@
         "id": "d8_community_manager",
         "name": "Community & Engagement Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_community_manager",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "comment-moderation-sop",
           "community-automated-event-scheduling",
@@ -3417,7 +3417,7 @@
         "id": "d8_compliance_auditor",
         "name": "System Auditing & Compliance",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_compliance_auditor",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3451,7 +3451,7 @@
         "id": "d8_content_ops",
         "name": "Content & Asset Operations",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_content_ops",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "blog-post-publisher",
           "contact-synchronizer",
@@ -3494,7 +3494,7 @@
       {
         "id": "d8_crm_ops",
         "name": "CRM & Conversational AI Ops",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3539,7 +3539,7 @@
         "id": "d8_customer_success",
         "name": "Customer Support & Success",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_customer_success",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "analytics-dashboard",
@@ -3576,7 +3576,7 @@
       {
         "id": "d8_funnel_engineer",
         "name": "Funnel & Website Engineer",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -3624,7 +3624,7 @@
         "id": "d8_integration_engineer",
         "name": "External Orchestration & Integration",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_integration_engineer",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "aisaas-api-rate-limit-handling",
           "aisaas-autonomous-debugging",
@@ -3672,7 +3672,7 @@
         "id": "d8_marketing_automation",
         "name": "Advanced Marketing & Lead Gen",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_marketing_automation",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -3723,7 +3723,7 @@
       {
         "id": "d8_membership_director",
         "name": "Course & Membership Director",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "checkout-integrator",
@@ -3774,7 +3774,7 @@
       {
         "id": "d8_platform_architect",
         "name": "GHL Platform & Auth Architect",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -3830,7 +3830,7 @@
       {
         "id": "d8_revenue_ops",
         "name": "E-Commerce & Revenue Ops Manager",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "analytics-dashboard",
@@ -3893,7 +3893,7 @@
         "id": "d8_saas_director",
         "name": "SaaS Operations Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_saas_director",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "abandoned-cart-recovery",
           "access-control-manager",
@@ -3936,7 +3936,7 @@
         "id": "d9_analytics",
         "name": "Store Analytics & Conversion Optimizer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_analytics",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "broken-link-checker",
@@ -3979,7 +3979,7 @@
         "id": "d9_customer_experience",
         "name": "Store Customer Experience Specialist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_customer_experience",
-        "model": "openai/gpt-4o-mini",
+        "model": "anthropic/claude-haiku-4-5",
         "skills": [
           "comment-moderation-sop",
           "community-automated-event-scheduling",
@@ -4023,7 +4023,7 @@
         "id": "d9_merchandiser",
         "name": "Book & Merch Catalog Manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_merchandiser",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "asset-library-manager",
@@ -4059,7 +4059,7 @@
         "id": "d9_offer_strategist",
         "name": "Offer & Pricing Psychologist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_offer_strategist",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "analytics-dashboard",
           "campaign-analyst",
@@ -4109,7 +4109,7 @@
         "id": "d9_sales_copywriter",
         "name": "Sales Copywriter & Persuasion Specialist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_sales_copywriter",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "blog-post-publisher",
           "broken-link-checker",
@@ -4155,7 +4155,7 @@
         "id": "d9_seo_content",
         "name": "Store SEO & Content Marketer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_seo_content",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "affiliate-campaign-manager",
           "affiliate-manager",
@@ -4200,7 +4200,7 @@
         "id": "d9_social_promoter",
         "name": "Store Social Media & Promotions Coordinator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_social_promoter",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "ab-testing",
           "ad-audience-sync",
@@ -4239,7 +4239,7 @@
         "id": "d9_store_director",
         "name": "Online Store Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_store_director",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "access-control-manager",
           "agent-coordinator",
@@ -4292,7 +4292,7 @@
         "id": "d9_web_designer",
         "name": "WordPress/Divi UX Designer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_web_designer",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "asset-library-manager",
           "broken-link-checker",
@@ -4326,7 +4326,7 @@
         "id": "d9_wp_developer",
         "name": "WordPress/WooCommerce Developer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_wp_developer",
-        "model": "openai/gpt-5.3-codex",
+        "model": "anthropic/claude-opus-4-5",
         "skills": [
           "aisaas-api-rate-limit-handling",
           "aisaas-autonomous-debugging",

@@ -89,9 +89,11 @@ function getCostSupabase(): SupabaseClient | null {
 
 // Per-1K-token pricing (USD) — keep updated
 const TOKEN_PRICING: Record<string, { input: number; output: number }> = {
-  "claude-opus-4-20250514":     { input: 0.015,  output: 0.075 },
-  "claude-sonnet-4-5-20250514": { input: 0.003,  output: 0.015 },
-  "gpt-4o":                     { input: 0.0025, output: 0.01 },
+  "claude-opus-4-20250514":     { input: 0.015,   output: 0.075 },
+  "claude-sonnet-4-5-20250514": { input: 0.003,   output: 0.015 },
+  "claude-haiku-4-5":           { input: 0.00025, output: 0.00125 },
+  // Legacy OpenAI pricing retained for historical cost-log lookups only
+  "gpt-4o":                     { input: 0.0025,  output: 0.01 },
   "gpt-4o-mini":                { input: 0.00015, output: 0.0006 },
 };
 
@@ -132,7 +134,7 @@ async function logCost(
   }
 }
 
-// Model configuration
+// Model configuration — all tiers route to Anthropic
 const MODEL_MAP = {
   "claude-opus-4": {
     provider: "anthropic" as const,
@@ -146,16 +148,10 @@ const MODEL_MAP = {
     tier: "content",
     maxTokens: 4096,
   },
-  "gpt-4o-mini": {
-    provider: "openai" as const,
-    model: "gpt-4o-mini",
+  "claude-haiku-4-5": {
+    provider: "anthropic" as const,
+    model: "claude-haiku-4-5",
     tier: "routine",
-    maxTokens: 4096,
-  },
-  "gpt-4o": {
-    provider: "openai" as const,
-    model: "gpt-4o",
-    tier: "content",
     maxTokens: 4096,
   },
 } as const;
@@ -247,16 +243,8 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
               temperature,
               stopSequences,
             });
-          case "openai":
-            return completeWithOpenAI({
-              model: config.model,
-              messages,
-              maxTokens: effectiveMaxTokens,
-              temperature,
-              stopSequences,
-            });
           default:
-            return assertNever(config);
+            return assertNever(config as never);
         }
       },
     );
@@ -491,6 +479,6 @@ export function getModelForRole(roleType: string): ModelKey {
     case "specialist":
     case "coordinator":
     default:
-      return "gpt-4o-mini";
+      return "claude-haiku-4-5";
   }
 }
