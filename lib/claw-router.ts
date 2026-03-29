@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { withGovernor } from "./api-rate-governor";
+import { withGovernor, type QueueClass } from "./api-rate-governor";
 import { logger } from "./logger";
 import { llmRequestDuration, llmRequestTotal } from "./metrics";
 import * as fs from "fs";
@@ -86,8 +86,8 @@ export function routeRequest(options: CompletionOptions): { tierId: string; conf
     else if (rule.match.agent_id && options.agentId === rule.match.agent_id) matched = true;
     else if (rule.match.tag && options.tags?.includes(rule.match.tag)) matched = true;
     else if (rule.match.any_of) {
-      matched = rule.match.any_of.some(m => 
-        (m.agent_id && options.agentId === m.agent_id) || 
+      matched = rule.match.any_of.some(m =>
+        (m.agent_id && options.agentId === m.agent_id) ||
         (m.tag && options.tags?.includes(m.tag))
       );
     }
@@ -95,13 +95,13 @@ export function routeRequest(options: CompletionOptions): { tierId: string; conf
     if (matched) {
       const tierConfig = config.tiers[rule.route_to];
       if (!tierConfig) throw new Error(`Invalid route: ${rule.route_to}`);
-      
+
       // CRITICAL: SOVEREIGN ISOLATION ENFORCEMENT
       if (rule.enforce_sovereign_isolation && tierConfig.credential_env !== "ANTHROPIC_API_KEY_SOVEREIGN") {
         log.error("SECURITY_FAULT: Sovereign route assigned to non-sovereign credential.");
         throw new Error("Sovereign isolation violation.");
       }
-      
+
       return { tierId: rule.route_to, config: tierConfig };
     }
   }
@@ -115,7 +115,7 @@ export function routeRequest(options: CompletionOptions): { tierId: string; conf
 export async function complete(options: CompletionOptions): Promise<any> {
   const { tierId, config } = routeRequest(options);
   const client = getAnthropicClient(config.credential_env);
-  
+
   const timer = llmRequestDuration.startTimer({
     provider: config.provider,
     model: config.model,
@@ -124,7 +124,7 @@ export async function complete(options: CompletionOptions): Promise<any> {
 
   try {
     const response = await withGovernor(
-      { provider: config.provider, queueClass: config.queue_class, agentId: options.agentId },
+      { provider: config.provider, queueClass: config.queue_class as QueueClass, agentId: options.agentId },
       async () => {
         return client.messages.create({
           model: config.model,
@@ -135,14 +135,14 @@ export async function complete(options: CompletionOptions): Promise<any> {
       }
     );
 
-    timer({ status: "success" });
-    llmRequestTotal.inc({ tier: tierId, model: config.model, status: "success" });
-    
+    timer({ provider: config.provider, model: config.model, agent: options.agentId || "unknown" });
+    llmRequestTotal.inc({ provider: config.provider, model: config.model, status: "success" });
+
     return response;
   } catch (error) {
-    timer({ status: "error" });
-    llmRequestTotal.inc({ tier: tierId, model: config.model, status: "error" });
-    
+    timer({ provider: config.provider, model: config.model, agent: options.agentId || "unknown" });
+    llmRequestTotal.inc({ provider: config.provider, model: config.model, status: "error" });
+
     // Fallback logic could be implemented here using config.fallback
     log.error({ error }, "ClawRouter completion failed.");
     throw error;
