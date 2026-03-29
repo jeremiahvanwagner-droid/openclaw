@@ -87,8 +87,11 @@ describe("self-healing-supervisor — runHealingLoop", () => {
     vi.clearAllMocks();
     process.env.SUPABASE_URL              = "https://example.supabase.co";
     process.env.SUPABASE_SERVICE_ROLE_KEY = "test-key";
+    process.env.ANTHROPIC_API_KEY         = "sk-ant-test-key";
     // Silence Telegram alert attempt (no token set)
     delete process.env.TELEGRAM_BOT_TOKEN;
+    // Stub fetch so the gateway reachability check in preflightCheck() doesn't block
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, status: 200 }));
   });
 
   it("returns zero patches when no logs are provided", async () => {

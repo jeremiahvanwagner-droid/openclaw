@@ -10,6 +10,7 @@
  */
 
 import { inngest } from "../client";
+import { createClient } from "@supabase/supabase-js";
 import {
   runHealingLoop,
   runIntegrationHealthCheck,
@@ -20,6 +21,69 @@ import {
 } from "../../lib/self-healing-supervisor";
 
 // ─────────────────────────────────────────────────────────────────
+// CIRCUIT BREAKER — prevents runaway healing loops
+// ─────────────────────────────────────────────────────────────────
+
+const CIRCUIT_BREAKER_TABLE = "healing_circuit_breaker";
+const MAX_FAILURES = 3;
+const COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes
+
+interface CircuitState {
+  failures: number;
+  last_failure_at: string | null;
+  open_until: string | null;
+}
+
+async function getCircuitState(): Promise<CircuitState> {
+  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return { failures: 0, last_failure_at: null, open_until: null };
+
+  const sb = createClient(url, key);
+  const { data } = await sb
+    .from(CIRCUIT_BREAKER_TABLE)
+    .select("*")
+    .eq("circuit_key", "scheduled_healing")
+    .maybeSingle();
+
+  return (data as CircuitState | null) ?? { failures: 0, last_failure_at: null, open_until: null };
+}
+
+async function recordCircuitFailure(): Promise<void> {
+  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return;
+
+  const sb = createClient(url, key);
+  const state = await getCircuitState();
+  const newFailures = (state.failures ?? 0) + 1;
+  const openUntil = newFailures >= MAX_FAILURES
+    ? new Date(Date.now() + COOLDOWN_MS).toISOString()
+    : state.open_until;
+
+  await sb.from(CIRCUIT_BREAKER_TABLE).upsert({
+    circuit_key: "scheduled_healing",
+    failures: newFailures,
+    last_failure_at: new Date().toISOString(),
+    open_until: openUntil,
+  }, { onConflict: "circuit_key" });
+}
+
+async function resetCircuit(): Promise<void> {
+  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return;
+
+  const sb = createClient(url, key);
+  await sb.from(CIRCUIT_BREAKER_TABLE).upsert({
+    circuit_key: "scheduled_healing",
+    failures: 0,
+    last_failure_at: null,
+    open_until: null,
+  }, { onConflict: "circuit_key" });
+}
+
+// ─────────────────────────────────────────────────────────────────
 // SELF-HEALING LOOP — every 30 minutes
 // ─────────────────────────────────────────────────────────────────
 
@@ -27,6 +91,10 @@ import {
  * Scheduled self-healing run.
  * Collects recent error logs from Supabase, runs the full healing loop,
  * and emits events for escalations and completed repairs.
+ *
+ * Protected by a circuit breaker: if the loop fails MAX_FAILURES times
+ * within a 30-minute window, it trips open and skips runs until COOLDOWN_MS
+ * has elapsed — preventing runaway restart cascades.
  */
 export const selfHealingScheduled = inngest.createFunction(
   {
@@ -36,51 +104,87 @@ export const selfHealingScheduled = inngest.createFunction(
   },
   { cron: "*/30 * * * *" },
   async ({ step }) => {
-    // Step 1: Collect recent error logs
-    const logs = await step.run("collect-error-logs", async () => {
-      return collectRecentErrorLogs(30);
+    // ── Circuit Breaker Check ──────────────────────────────────
+    const circuit = await step.run("circuit-breaker-check", async () => {
+      return getCircuitState();
     });
 
-    if (logs.length === 0) {
-      return { status: "no_errors", logs_collected: 0 };
+    if (circuit.open_until && new Date(circuit.open_until) > new Date()) {
+      console.warn(
+        `[OpenClaw] Self-healing circuit OPEN — ${circuit.failures} failures, ` +
+        `cooldown until ${circuit.open_until}. Skipping this run.`
+      );
+      return {
+        status: "circuit_open",
+        failures: circuit.failures,
+        open_until: circuit.open_until,
+      };
     }
 
-    // Step 2: Run the healing loop
-    const result = await step.run("run-healing-loop", async () => {
-      return runHealingLoop(logs as ErrorLogEntry[], { stabilityWindowMinutes: 30 });
-    });
+    // ── Preflight: verify ANTHROPIC_API_KEY is set ─────────────
+    if (!process.env.ANTHROPIC_API_KEY) {
+      await step.run("record-preflight-failure", async () => {
+        return recordCircuitFailure();
+      });
+      console.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY not set — aborting healing run");
+      return { status: "preflight_failed", reason: "ANTHROPIC_API_KEY_missing" };
+    }
 
-    // Step 3: Emit escalation events for unresolved failures
-    if (result.escalations.length > 0) {
-      await step.sendEvent("emit-healing-escalations", {
-        name: "healing/escalation.needed",
+    try {
+      // Step 1: Collect recent error logs
+      const logs = await step.run("collect-error-logs", async () => {
+        return collectRecentErrorLogs(30);
+      });
+
+      if (logs.length === 0) {
+        await step.run("reset-circuit-on-clean", async () => resetCircuit());
+        return { status: "no_errors", logs_collected: 0 };
+      }
+
+      // Step 2: Run the healing loop
+      const result = await step.run("run-healing-loop", async () => {
+        return runHealingLoop(logs as ErrorLogEntry[], { stabilityWindowMinutes: 30 });
+      });
+
+      // Step 3: Emit escalation events for unresolved failures
+      if (result.escalations.length > 0) {
+        await step.sendEvent("emit-healing-escalations", {
+          name: "healing/escalation.needed",
+          data: {
+            run_id:      result.run_id,
+            escalations: result.escalations,
+            source:      "scheduled_healing_loop",
+          },
+        });
+      }
+
+      // Step 4: Emit completion event for downstream consumers
+      await step.sendEvent("emit-healing-complete", {
+        name: "healing/run.completed",
         data: {
-          run_id:      result.run_id,
-          escalations: result.escalations,
-          source:      "scheduled_healing_loop",
+          run_id:          result.run_id,
+          patches_applied: result.patches_applied,
+          patches_skipped: result.patches_skipped,
+          clusters_found:  result.clusters_found,
+          escalations:     result.escalations.length,
         },
       });
-    }
 
-    // Step 4: Emit completion event for downstream consumers
-    await step.sendEvent("emit-healing-complete", {
-      name: "healing/run.completed",
-      data: {
+      // Step 5: Reset circuit on success
+      await step.run("reset-circuit-on-success", async () => resetCircuit());
+
+      return {
+        status:          "completed",
         run_id:          result.run_id,
+        logs_collected:  logs.length,
         patches_applied: result.patches_applied,
-        patches_skipped: result.patches_skipped,
-        clusters_found:  result.clusters_found,
         escalations:     result.escalations.length,
-      },
-    });
-
-    return {
-      status:          "completed",
-      run_id:          result.run_id,
-      logs_collected:  logs.length,
-      patches_applied: result.patches_applied,
-      escalations:     result.escalations.length,
-    };
+      };
+    } catch (err) {
+      // Record failure and let circuit breaker accumulate
+      await step.run("record-circuit-failure", async () => recordCircuitFailure());
+      throw err;
+    }
   }
 );
 

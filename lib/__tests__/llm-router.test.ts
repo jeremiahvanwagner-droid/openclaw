@@ -77,32 +77,32 @@ describe("llm-router", () => {
       expect(config.maxTokens).toBe(4096);
     });
 
-    it("returns config for gpt-4o-mini", () => {
-      const config = getModelConfig("gpt-4o-mini");
-      expect(config.provider).toBe("openai");
+    it("returns config for claude-haiku-4-5", () => {
+      const config = getModelConfig("claude-haiku-4-5");
+      expect(config.provider).toBe("anthropic");
       expect(config.tier).toBe("routine");
     });
   });
 
   describe("getAvailableModels", () => {
-    it("returns all 4 model keys", () => {
+    it("returns all 3 model keys", () => {
       const models = getAvailableModels();
-      expect(models).toHaveLength(4);
+      expect(models).toHaveLength(3);
       expect(models).toContain("claude-opus-4");
       expect(models).toContain("claude-sonnet-4.5");
-      expect(models).toContain("gpt-4o-mini");
-      expect(models).toContain("gpt-4o");
+      expect(models).toContain("claude-haiku-4-5");
     });
   });
 
   describe("isValidModel", () => {
     it("returns true for valid model keys", () => {
       expect(isValidModel("claude-opus-4")).toBe(true);
-      expect(isValidModel("gpt-4o-mini")).toBe(true);
+      expect(isValidModel("claude-haiku-4-5")).toBe(true);
     });
 
     it("returns false for invalid model keys", () => {
       expect(isValidModel("gpt-3.5-turbo")).toBe(false);
+      expect(isValidModel("gpt-4o-mini")).toBe(false);
       expect(isValidModel("")).toBe(false);
     });
   });
@@ -128,10 +128,10 @@ describe("llm-router", () => {
       expect(getModelForRole("content")).toBe("claude-sonnet-4.5");
     });
 
-    it("returns gpt-4o-mini for specialist and default", () => {
-      expect(getModelForRole("specialist")).toBe("gpt-4o-mini");
-      expect(getModelForRole("coordinator")).toBe("gpt-4o-mini");
-      expect(getModelForRole("anything-else")).toBe("gpt-4o-mini");
+    it("returns claude-haiku-4-5 for specialist and default", () => {
+      expect(getModelForRole("specialist")).toBe("claude-haiku-4-5");
+      expect(getModelForRole("coordinator")).toBe("claude-haiku-4-5");
+      expect(getModelForRole("anything-else")).toBe("claude-haiku-4-5");
     });
   });
 
@@ -152,14 +152,14 @@ describe("llm-router", () => {
       expect(result.usage).toEqual({ inputTokens: 10, outputTokens: 20 });
     });
 
-    it("routes openai model to OpenAI API", async () => {
+    it("routes haiku model to Anthropic API", async () => {
       const result = await complete({
-        model: "gpt-4o-mini",
+        model: "claude-haiku-4-5",
         messages: [{ role: "user", content: "Hello" }],
       });
 
-      expect(result.content).toBe("mocked openai response");
-      expect(result.provider).toBe("openai");
+      expect(result.content).toBe("mocked anthropic response");
+      expect(result.provider).toBe("anthropic");
       expect(result.usage).toEqual({ inputTokens: 10, outputTokens: 20 });
     });
 
@@ -188,7 +188,7 @@ describe("llm-router", () => {
     it("includes conversation history", async () => {
       const result = await agentComplete(
         "d1_ceo",
-        "gpt-4o-mini",
+        "claude-haiku-4-5",
         "You are a test agent.",
         "Follow-up question",
         [
@@ -197,22 +197,22 @@ describe("llm-router", () => {
         ],
       );
 
-      expect(result.content).toBe("mocked openai response");
+      expect(result.content).toBe("mocked anthropic response");
     });
   });
 
   describe("completeJSON", () => {
     it("parses JSON from response content", async () => {
-      // Override the mock to return JSON
-      const openaiMod = await import("openai");
-      const mockClient = new (openaiMod.default as any)();
-      vi.spyOn(mockClient.chat.completions, "create").mockResolvedValueOnce({
-        choices: [{ message: { content: '{"name": "test", "value": 42}' } }],
-        usage: { prompt_tokens: 10, completion_tokens: 15 },
+      // Override the Anthropic mock to return valid JSON
+      const anthropicMod = await import("@anthropic-ai/sdk");
+      const mockClient = new (anthropicMod.default as any)();
+      vi.spyOn(mockClient.messages, "create").mockResolvedValueOnce({
+        content: [{ type: "text", text: '{"name": "test", "value": 42}' }],
+        usage: { input_tokens: 10, output_tokens: 15 },
       });
 
       const result = await completeJSON<{ name: string; value: number }>(
-        "gpt-4o-mini",
+        "claude-haiku-4-5",
         "Return JSON",
         "Give me data",
       );

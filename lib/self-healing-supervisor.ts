@@ -26,6 +26,48 @@ import { logger } from "./logger";
 
 const log = logger.child({ module: "self-healing-supervisor" });
 
+// ── Preflight Check ───────────────────────────────────────────────
+
+/**
+ * Verify all critical environment variables and service reachability
+ * before starting any healing cycle.
+ *
+ * Returns false if any critical check fails, preventing the healing
+ * loop from running and potentially causing a crash-loop restart cascade.
+ */
+export async function preflightCheck(): Promise<boolean> {
+  // 1. Verify ANTHROPIC_API_KEY is set
+  if (!process.env.ANTHROPIC_API_KEY) {
+    log.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY not set");
+    return false;
+  }
+
+  // 2. Verify Supabase credentials are set
+  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!supabaseUrl || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    log.error("[OpenClaw] PREFLIGHT FAILED: SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY not set");
+    return false;
+  }
+
+  // 3. Verify gateway is reachable (best-effort HTTP check)
+  const gatewayPort = process.env.OPENCLAW_GATEWAY_PORT ?? "18789";
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    const res = await fetch(`http://127.0.0.1:${gatewayPort}/health`, {
+      signal: controller.signal,
+    }).finally(() => clearTimeout(timeout));
+    if (!res.ok) {
+      log.warn({ status: res.status }, "[OpenClaw] PREFLIGHT WARN: gateway returned non-200");
+    }
+  } catch {
+    // Non-fatal: healing can still run if gateway is temporarily unavailable
+    log.warn("[OpenClaw] PREFLIGHT WARN: gateway not reachable — proceeding anyway");
+  }
+
+  return true;
+}
+
 // ── Supabase singleton ────────────────────────────────────────────
 
 function supabase() {
@@ -189,6 +231,24 @@ export async function runHealingLoop(
 ): Promise<HealingRunResult> {
   const runId     = `heal-${Date.now()}`;
   const startedAt = new Date().toISOString();
+
+  // Preflight: abort early if critical env vars are missing
+  const ready = await preflightCheck();
+  if (!ready) {
+    log.error({ run_id: runId }, "Healing loop aborted — preflight check failed");
+    return {
+      run_id:             runId,
+      started_at:         startedAt,
+      completed_at:       new Date().toISOString(),
+      incidents_ingested: 0,
+      clusters_found:     0,
+      patches_applied:    0,
+      patches_skipped:    0,
+      stability:          {},
+      report:             "Healing loop aborted: preflight check failed (see logs)",
+      escalations:        ["preflight_check_failed"],
+    };
+  }
 
   const dbg = await loadAutonomousDebugging();
 

@@ -1302,7 +1302,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d1_devops",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d1_devops",
@@ -1384,7 +1384,7 @@
       ],
       "output_format": "action",
       "escalation_path": "browser_primary",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "browser_primary",
@@ -1824,7 +1824,7 @@
       ],
       "output_format": "report",
       "escalation_path": "d1_product_dev_manager",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d1_product_dev_manager",
@@ -1889,7 +1889,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d1_cto",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d1_cto",
@@ -1960,7 +1960,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d1_product_dev_manager",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d1_product_dev_manager",
@@ -2333,7 +2333,7 @@
       ],
       "output_format": "message",
       "escalation_path": "d2_store_manager",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d2_store_manager",
@@ -2589,7 +2589,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d2_digital_marketing",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d2_digital_marketing",
@@ -2652,7 +2652,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d2_store_manager",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d2_store_manager",
@@ -2711,7 +2711,7 @@
       ],
       "output_format": "report",
       "escalation_path": "d2_digital_marketing",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d2_digital_marketing",
@@ -2949,7 +2949,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d2_store_manager",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d2_store_manager",
@@ -3032,7 +3032,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d3_ops_manager",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d3_ops_manager",
@@ -3183,7 +3183,7 @@
       ],
       "output_format": "report",
       "escalation_path": "d3_lead_strategist",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d3_lead_strategist",
@@ -3777,7 +3777,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d4_lead_coach",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d4_lead_coach",
@@ -4456,7 +4456,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d4_curriculum_head",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d4_curriculum_head",
@@ -4536,7 +4536,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d4_social_creator",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d4_social_creator",
@@ -4660,7 +4660,7 @@
       ],
       "output_format": "message",
       "escalation_path": "d5_acquisitions",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d5_acquisitions",
@@ -4863,7 +4863,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d5_managing_editor",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d5_managing_editor",
@@ -4921,7 +4921,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d5_publisher",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d5_publisher",
@@ -5289,7 +5289,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d6_executive_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d6_executive_director",
@@ -5620,7 +5620,7 @@
       ],
       "output_format": "report",
       "escalation_path": "d6_coo",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d6_coo",
@@ -5682,7 +5682,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d6_dev_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d6_dev_director",
@@ -5908,7 +5908,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d6_coo",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d6_coo",
@@ -6064,7 +6064,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6218,7 +6218,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6300,7 +6300,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P1",
       "inter_agent_dependencies": [
@@ -6391,7 +6391,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P1",
       "inter_agent_dependencies": [
@@ -6559,7 +6559,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6643,7 +6643,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6731,7 +6731,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6933,7 +6933,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P1",
       "inter_agent_dependencies": [
@@ -7141,7 +7141,7 @@
       ],
       "output_format": "report",
       "escalation_path": "d9_store_director",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "shared",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -7223,7 +7223,7 @@
       ],
       "output_format": "message",
       "escalation_path": "d9_store_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -7303,7 +7303,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d9_store_director",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "shared",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -7881,7 +7881,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d9_web_designer",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -7967,7 +7967,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d1_devops",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d1_devops",
@@ -8044,7 +8044,7 @@
       ],
       "output_format": "report",
       "escalation_path": "d1_cto",
-      "llm_model": "claude-sonnet-4.5",
+      "llm_model": "gpt-4o",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d1_cto",
@@ -8239,7 +8239,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d1_cto",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "gpt-4o-mini",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d1_cto",
