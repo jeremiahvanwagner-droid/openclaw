@@ -112,7 +112,7 @@ export function routeRequest(options: CompletionOptions): { tierId: string; conf
 /**
  * Execute a completion through the routed tier.
  */
-export async function complete(options: CompletionOptions): Promise<any> {
+export async function complete(options: CompletionOptions): Promise<Anthropic.Message> {
   const { tierId, config } = routeRequest(options);
   const client = getAnthropicClient(config.credential_env);
 
