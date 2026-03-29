@@ -542,7 +542,7 @@ export async function withGovernor<T>(
   opts: GuardedRequestOptions,
   fn: () => Promise<T>
 ): Promise<T> {
-  const { provider, queueClass = "P2" } = opts;
+  const { provider, queueClass: _queueClass = "P2" } = opts;
   const limits = PROVIDER_LIMITS[provider];
   const maxRetries = limits?.maxRetries ?? 3;
   const baseBackoff = limits?.retryAfterMs ?? 2000;

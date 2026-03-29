@@ -62,6 +62,7 @@ function setCache(key: string, result: CompletionResult): void {
 
 // Initialize clients lazily
 let anthropic: Anthropic | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 let openaiModule: any = null;
 
 function getAnthropic(): Anthropic {

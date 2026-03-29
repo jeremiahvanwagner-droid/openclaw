@@ -1,9 +1,9 @@
 {
   "providers": {
-    "openai-codex": {
-      "baseUrl": "https://chatgpt.com/backend-api",
-      "api": "openai-codex-responses",
-      "models": []
+    "anthropic": {
+      "baseUrl": "https://api.anthropic.com/v1",
+      "api": "anthropic-messages",
+      "models": ["claude-opus-4-latest", "claude-sonnet-4.5-latest", "claude-haiku-4.5-latest"]
     }
   }
 }

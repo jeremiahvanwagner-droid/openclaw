@@ -21,7 +21,7 @@ const log = logger.child({ module: "agent-memory" });
 // Initialize clients lazily
 let supabase: SupabaseClient | null = null;
 // Lazy-load OpenAI only if embeddings are needed
-let openaiModule: any = null;
+let openaiModule: typeof import("openai") | null = null;
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
 const EMBEDDING_DIMENSIONS = 512;
