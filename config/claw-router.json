@@ -1,0 +1,188 @@
+{
+  "$schema": "./schemas/claw-router.schema.json",
+  "version": "1.0.0",
+  "generated_at": "2026-03-28T19:00:00.000Z",
+  "description": "ClawRouter — Tier-isolated credential and model routing for the OpenClaw Multi-Agent Network. Sovereign key is never shared with any other agent or tier.",
+
+  "routing_law": "SOVEREIGN_KEY_ISOLATION — ANTHROPIC_API_KEY_SOVEREIGN must never be used by any agent other than sovereign. Any violation is a critical security fault.",
+
+  "tiers": {
+    "tier_1": {
+      "name": "Sovereign Tier",
+      "description": "Strategic decisions, human-facing communication. Highest intelligence, exclusive credential.",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "provider": "anthropic",
+      "model": "claude-opus-4-5",
+      "model_aliases": ["claude-opus-4", "claude-opus-4-5", "opus"],
+      "max_tokens": 8096,
+      "temperature_default": 0.7,
+      "queue_class": "P0",
+      "agents": ["sovereign"],
+      "tags": ["tier:1", "agent:sovereign"],
+      "sovereign_isolation": true,
+      "token_pricing_usd_per_1k": {
+        "input": 0.015,
+        "output": 0.075
+      }
+    },
+    "tier_2": {
+      "name": "Operations Tier",
+      "description": "Lead monitoring, GHL ops, content and pipeline intelligence. High-capability agents.",
+      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-5",
+      "model_aliases": ["claude-sonnet-4.5", "claude-sonnet-4-5", "sonnet"],
+      "max_tokens": 4096,
+      "temperature_default": 0.7,
+      "queue_class": "P1",
+      "agents": ["herald", "strategist"],
+      "tags": ["tier:2", "agent:herald", "agent:strategist"],
+      "sovereign_isolation": false,
+      "token_pricing_usd_per_1k": {
+        "input": 0.003,
+        "output": 0.015
+      }
+    },
+    "tier_3": {
+      "name": "Background Tier",
+      "description": "Data enrichment, logging, cron scans, background sweeps. Efficient high-volume agents.",
+      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
+      "provider": "anthropic",
+      "model": "claude-haiku-4-5",
+      "model_aliases": ["claude-haiku-4.5", "claude-haiku-4-5", "haiku"],
+      "max_tokens": 2048,
+      "temperature_default": 0.5,
+      "queue_class": "P2",
+      "agents": ["keeper", "steward"],
+      "tags": ["tier:3", "agent:keeper", "agent:steward"],
+      "sovereign_isolation": false,
+      "token_pricing_usd_per_1k": {
+        "input": 0.00025,
+        "output": 0.00125
+      }
+    }
+  },
+
+  "agent_topology": {
+    "sovereign": {
+      "tier": "tier_1",
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+      "model": "claude-opus-4-5",
+      "description": "Strategic decisions, human-facing output. EXCLUSIVE credential."
+    },
+    "herald": {
+      "tier": "tier_2",
+      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
+      "model": "claude-sonnet-4-5",
+      "description": "Lead monitoring and GHL operations."
+    },
+    "strategist": {
+      "tier": "tier_2",
+      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
+      "model": "claude-sonnet-4-5",
+      "description": "Content and pipeline intelligence."
+    },
+    "keeper": {
+      "tier": "tier_3",
+      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
+      "model": "claude-haiku-4-5",
+      "description": "Data enrichment and logging."
+    },
+    "steward": {
+      "tier": "tier_3",
+      "credential_env": "ANTHROPIC_API_KEY_AGENTS",
+      "model": "claude-haiku-4-5",
+      "description": "Cron scans and background sweeps."
+    }
+  },
+
+  "fallback": {
+    "trigger": "anthropic_failure",
+    "provider": "openrouter",
+    "credential_env": "OPENROUTER_API_KEY",
+    "base_url": "https://openrouter.ai/api/v1",
+    "model_map": {
+      "claude-opus-4-5": "anthropic/claude-opus-4-5",
+      "claude-sonnet-4-5": "anthropic/claude-sonnet-4-5",
+      "claude-haiku-4-5": "anthropic/claude-haiku-4-5"
+    },
+    "retry_after_ms": 1000,
+    "max_retries": 3,
+    "sovereign_isolation_preserved": true,
+    "note": "Sovereign tier fallback still uses a separate routing path. The OPENROUTER_API_KEY is shared across tiers during fallback only, but original tier/model assignment is preserved."
+  },
+
+  "routing_rules": [
+    {
+      "rule_id": "ROUTE-001",
+      "priority": 1,
+      "description": "Sovereign agent or tier:1 tag always routes to Tier 1 with exclusive credential",
+      "match": {
+        "any_of": [
+          { "tag": "tier:1" },
+          { "tag": "agent:sovereign" },
+          { "agent_id": "sovereign" }
+        ]
+      },
+      "route_to": "tier_1",
+      "enforce_sovereign_isolation": true
+    },
+    {
+      "rule_id": "ROUTE-002",
+      "priority": 2,
+      "description": "Herald or Strategist agent, or tier:2 tag routes to Tier 2",
+      "match": {
+        "any_of": [
+          { "tag": "tier:2" },
+          { "tag": "agent:herald" },
+          { "tag": "agent:strategist" },
+          { "agent_id": "herald" },
+          { "agent_id": "strategist" }
+        ]
+      },
+      "route_to": "tier_2",
+      "enforce_sovereign_isolation": false
+    },
+    {
+      "rule_id": "ROUTE-003",
+      "priority": 3,
+      "description": "Keeper or Steward agent, or tier:3 tag routes to Tier 3",
+      "match": {
+        "any_of": [
+          { "tag": "tier:3" },
+          { "tag": "agent:keeper" },
+          { "tag": "agent:steward" },
+          { "agent_id": "keeper" },
+          { "agent_id": "steward" }
+        ]
+      },
+      "route_to": "tier_3",
+      "enforce_sovereign_isolation": false
+    },
+    {
+      "rule_id": "ROUTE-004",
+      "priority": 99,
+      "description": "Default fallback — untagged tasks route to Tier 3 (cheapest safe default)",
+      "match": { "default": true },
+      "route_to": "tier_3",
+      "enforce_sovereign_isolation": false
+    }
+  ],
+
+  "security": {
+    "sovereign_key_isolation": true,
+    "sovereign_credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
+    "shared_credential_env": "ANTHROPIC_API_KEY_AGENTS",
+    "hardcoded_keys_forbidden": true,
+    "env_only": true,
+    "audit_log_all_tier1_calls": true,
+    "alert_on_isolation_violation": true
+  },
+
+  "meta": {
+    "author": "MIKE — Executive Systems Architect",
+    "owner": "Truth J Blue LLC — Jeremiah Van Wagner",
+    "created_at": "2026-03-28T19:00:00.000Z",
+    "implementation_file": "lib/claw-router.ts"
+  }
+}
