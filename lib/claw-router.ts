@@ -155,7 +155,7 @@ export function routeRequest(options: CompletionOptions): { tierId: string; conf
 
       // CRITICAL: SOVEREIGN ISOLATION ENFORCEMENT
       if (rule.enforce_sovereign_isolation && tierConfig.credential_env !== "ANTHROPIC_API_KEY_SOVEREIGN") {
-        const msg = `SECURITY_FAULT: Sovereign route "${rule.route_id}" assigned to non-sovereign credential. Expected ANTHROPIC_API_KEY_SOVEREIGN but got ${tierConfig.credential_env}`;
+        const msg = `SECURITY_FAULT: Sovereign route "${rule.rule_id}" assigned to non-sovereign credential. Expected ANTHROPIC_API_KEY_SOVEREIGN but got ${tierConfig.credential_env}`;
         log.error(msg);
         throw new Error(msg);
       }

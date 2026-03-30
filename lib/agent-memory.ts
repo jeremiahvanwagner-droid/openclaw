@@ -21,7 +21,8 @@ const log = logger.child({ module: "agent-memory" });
 // Initialize clients lazily
 let supabase: SupabaseClient | null = null;
 // Lazy-load OpenAI only if embeddings are needed
-let openaiModule: typeof import("openai") | null = null;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let openaiModule: any = null;
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
 const EMBEDDING_DIMENSIONS = 512;
@@ -42,10 +43,11 @@ function getSupabase(): SupabaseClient {
  *
  * @throws Error if OPENAI_API_KEY is not configured
  */
-async function getOpenAIClient() {
+async function getOpenAIClient(): Promise<any> {
   if (!openaiModule) {
     // Dynamically import OpenAI only when needed
-    const OpenAI = (await import("openai")).default;
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { default: OpenAI } = await import("openai");
 
     if (!process.env.OPENAI_API_KEY) {
       throw new Error(

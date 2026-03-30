@@ -420,7 +420,7 @@ export async function embedBatch(texts: string[]): Promise<number[][]> {
     dimensions: EMBEDDING_DIMENSIONS,
     input: texts,
   });
-  return response.data.map(d => d.embedding);
+  return response.data.map((d: any) => d.embedding);
 }
 
 // ═══════════════════════════════════════════════════════════════════

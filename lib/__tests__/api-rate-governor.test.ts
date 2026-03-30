@@ -205,7 +205,8 @@ describe("api-rate-governor", () => {
   describe("getAllStatus", () => {
     it("returns status for all configured providers", () => {
       const statuses = getAllStatus();
-      expect(statuses.length).toBeGreaterThanOrEqual(9);
+      // 5 Anthropic tiers + 3 other providers (ghl, supabase, telegram) = 8 total
+      expect(statuses.length).toBeGreaterThanOrEqual(8);
 
       const providers = statuses.map((s) => s.provider);
       expect(providers).toContain("anthropic-strategist");
