@@ -4,6 +4,7 @@
 
 # ── Secrets & Credentials ─────────────────────────────────────
 .env
+.env.bak.20260330-204741
 .env.local
 .env.prod
 .env.*.local
