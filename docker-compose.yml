@@ -15,6 +15,8 @@ services:
     volumes:
       - ./data:/opt/openclaw/data
       - ./logs:/opt/openclaw/logs
+      - /root/.openclaw/openclaw.json:/opt/openclaw/.openclaw/openclaw.json:ro
+      - /root/.openclaw/openclaw.json:/opt/openclaw/config/openclaw.json:ro
       - ./backups:/opt/openclaw/backups
       - ./media:/opt/openclaw/media
       - ./memory:/opt/openclaw/memory
