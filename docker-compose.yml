@@ -13,7 +13,7 @@ services:
     environment:
       - HOME=/opt/openclaw
       - OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw
-    command: ["openclaw", "gateway", "--port", "18789", "--allow-unconfigured"]
+    command: ["node", "/usr/lib/node_modules/openclaw/dist/index.js", "gateway", "--port", "18789", "--allow-unconfigured"]
     ports:
       - "18789:18789"
     volumes:
