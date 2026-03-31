@@ -176,6 +176,11 @@ Go to **Settings → Secrets and variables → Actions** in your GitHub repo:
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 6. Deploy
 
+If GitHub Actions is the authoritative deployment path, disable direct Git-triggered
+deployments for the Vercel project. This repo ships `dashboard/vercel.json` with
+`git.deploymentEnabled: false` so repo pushes do not create duplicate or misleading
+Vercel deployment statuses outside the GitHub Actions deploy workflow.
+
 After initial setup, pushes to `dashboard/**` auto-deploy via GitHub Actions.
 
 ---

@@ -162,14 +162,14 @@ async function main(): Promise<void> {
   assert.equal(strategistRejected, true);
   assert.equal(openRouterCalls, 1);
 
-  console.log("PASS: COMMUNICATOR tier falls back to OpenRouter on 429.");
-  console.log("PASS: STRATEGIST tier rethrows 429 and does not hit OpenRouter.");
+  process.stdout.write("PASS: COMMUNICATOR tier falls back to OpenRouter on 429.\n");
+  process.stdout.write("PASS: STRATEGIST tier rethrows 429 and does not hit OpenRouter.\n");
   process.exit(0);
 }
 
 main()
   .catch((error) => {
-    console.error("FAIL:", error);
+    process.stderr.write(`FAIL: ${error instanceof Error ? error.stack ?? error.message : String(error)}\n`);
     process.exit(1);
   })
   .finally(() => {
