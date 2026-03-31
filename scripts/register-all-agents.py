@@ -1,13 +1,18 @@
 #!/usr/bin/env python3
 """
-Register all 103 agents from agents_config.json into openclaw.json and openclaw.prod.json.
+Register runtime agents from config/agents_config.json into:
+  - config/openclaw.json (Windows template)
+  - config/openclaw.prod.json (Linux template)
 
-Current state: 41 agents in runtime configs, 103 in agents_config.json.
-This script adds the 62 missing agents with proper fields and scope data.
+Model mapping is derived from llm_model values and rollout mode.
 """
 
+from __future__ import annotations
+
+import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -15,37 +20,104 @@ AGENTS_CONFIG = ROOT / "config" / "agents_config.json"
 OPENCLAW_DEV = ROOT / "config" / "openclaw.json"
 OPENCLAW_PROD = ROOT / "config" / "openclaw.prod.json"
 
-# Model mapping: agents_config llm_model -> openclaw model string
-MODEL_MAP = {
-    "claude-opus-4": "openai/gpt-5.3-codex",       # strategic tier -> top model
-    "claude-sonnet-4.5": "openai/gpt-5.3-codex",   # content tier -> top model
-    "gpt-4o": "openai/gpt-5.3-codex",              # general tier
-    "gpt-4o-mini": "openai/gpt-4o-mini",           # routine tier
+ANTHROPIC_MODEL_MAP = {
+    "claude-opus-4": "anthropic/claude-opus-4-5",
+    "claude-sonnet-4.5": "anthropic/claude-sonnet-4-5",
+    "claude-haiku-4-5": "anthropic/claude-haiku-4-5",
 }
 
-# Dev workspace path template (Windows)
+LEGACY_STABLE_MODEL_MAP = {
+    "claude-opus-4": "openai/gpt-5.3-codex",
+    "claude-sonnet-4.5": "openai/gpt-5.3-codex",
+    "claude-haiku-4-5": "openai/gpt-4o-mini",
+}
+
+CANARY_AGENT_IDS = {
+    "main",
+    "marketing",
+    "sales",
+    "support",
+    "d1_ceo",
+    "d1_cto",
+    "shared_runtime_ops",
+    "d8_saas_director",
+    "d9_store_director",
+    "biz_01_pod_lead",
+}
+
+RUNTIME_FOUNDATION_LLM = {
+    "main": "claude-sonnet-4.5",
+    "marketing": "claude-sonnet-4.5",
+    "sales": "claude-sonnet-4.5",
+    "support": "claude-sonnet-4.5",
+}
+
 DEV_WORKSPACE_TMPL = "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\{agent_id}"
-# Prod workspace path template (Linux)
 PROD_WORKSPACE_TMPL = "/opt/openclaw/workspaces/{agent_id}"
 
 
-def load_json(path):
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Register runtime agents into OpenClaw templates")
+    parser.add_argument(
+        "--rollout",
+        choices=["full", "canary"],
+        default="full",
+        help="Model routing policy to apply while writing configs",
+    )
+    return parser.parse_args()
+
+
+def load_json(path: Path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
-def save_json(path, data):
+def save_json(path: Path, data):
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
         f.write("\n")
 
 
-def build_agent_entry(agent, workspace_tmpl):
-    """Build an openclaw.json agent entry from an agents_config.json record."""
+def resolve_llm_model(agent: dict) -> str:
+    agent_id = agent.get("agent_id")
+    llm_model = agent.get("llm_model")
+    if llm_model:
+        return llm_model
+    if agent_id in RUNTIME_FOUNDATION_LLM:
+        return RUNTIME_FOUNDATION_LLM[agent_id]
+    raise ValueError(f"Missing llm_model for agent '{agent_id}'")
+
+
+def resolve_runtime_model(agent_id: str, llm_model: str, rollout: str) -> str:
+    if llm_model not in ANTHROPIC_MODEL_MAP:
+        allowed = ", ".join(sorted(ANTHROPIC_MODEL_MAP.keys()))
+        raise ValueError(
+            f"Unsupported llm_model '{llm_model}' for agent '{agent_id}'. Allowed: {allowed}"
+        )
+
+    if rollout == "full":
+        return ANTHROPIC_MODEL_MAP[llm_model]
+
+    if rollout == "canary":
+        if agent_id in CANARY_AGENT_IDS:
+            return ANTHROPIC_MODEL_MAP[llm_model]
+        return LEGACY_STABLE_MODEL_MAP[llm_model]
+
+    raise ValueError(f"Unsupported rollout mode: {rollout}")
+
+
+def build_models_catalog(rollout: str) -> dict:
+    models = set(ANTHROPIC_MODEL_MAP.values())
+    if rollout == "canary":
+        models.update(LEGACY_STABLE_MODEL_MAP.values())
+    return {model: {} for model in sorted(models)}
+
+
+def build_agent_entry(agent: dict, workspace_tmpl: str, rollout: str) -> dict:
     agent_id = agent["agent_id"]
-    display_name = agent["display_name"]
-    llm_model = agent.get("llm_model", "gpt-4o")
-    model = MODEL_MAP.get(llm_model, "openai/gpt-5.3-codex")
+    display_name = agent.get("display_name", agent_id)
+    llm_model = resolve_llm_model(agent)
+    model = resolve_runtime_model(agent_id, llm_model, rollout)
 
     entry = {
         "id": agent_id,
@@ -54,7 +126,6 @@ def build_agent_entry(agent, workspace_tmpl):
         "model": model,
     }
 
-    # Add scope fields if present
     if agent.get("business_scope"):
         entry["business_scope"] = agent["business_scope"]
     if agent.get("ghl_token_group"):
@@ -65,38 +136,43 @@ def build_agent_entry(agent, workspace_tmpl):
     return entry
 
 
-def merge_agents(openclaw_path, agents_config, workspace_tmpl):
-    """Merge missing agents into an openclaw config file."""
+def merge_agents(openclaw_path: Path, agents_config: dict, workspace_tmpl: str, rollout: str):
     config = load_json(openclaw_path)
-    agent_list = config["agents"]["list"]
+    existing_list = config.get("agents", {}).get("list", [])
+    existing_by_id = {entry.get("id"): entry for entry in existing_list if entry.get("id")}
+    config_agents = {agent["agent_id"]: agent for agent in agents_config.get("agents", [])}
 
-    # Build set of existing IDs
-    existing_ids = {a["id"] for a in agent_list}
+    runtime_foundation = {
+        "main": {
+            "agent_id": "main",
+            "display_name": "main",
+            "llm_model": RUNTIME_FOUNDATION_LLM["main"],
+        },
+        "marketing": {
+            "agent_id": "marketing",
+            "display_name": "marketing",
+            "llm_model": RUNTIME_FOUNDATION_LLM["marketing"],
+        },
+        "sales": {
+            "agent_id": "sales",
+            "display_name": "sales",
+            "llm_model": RUNTIME_FOUNDATION_LLM["sales"],
+        },
+        "support": {
+            "agent_id": "support",
+            "display_name": "support",
+            "llm_model": RUNTIME_FOUNDATION_LLM["support"],
+        },
+    }
 
-    # Build lookup from agents_config
-    config_agents = {a["agent_id"]: a for a in agents_config["agents"]}
+    source_agents = {**runtime_foundation, **config_agents}
+    next_list = []
 
-    # Also update existing agents that are missing scope fields
-    updated_count = 0
-    for existing_entry in agent_list:
-        aid = existing_entry["id"]
-        if aid in config_agents:
-            src = config_agents[aid]
-            # Add scope fields if missing from existing entry but present in source
-            changed = False
-            if src.get("business_scope") and "business_scope" not in existing_entry:
-                existing_entry["business_scope"] = src["business_scope"]
-                changed = True
-            if src.get("ghl_token_group") and "ghl_token_group" not in existing_entry:
-                existing_entry["ghl_token_group"] = src["ghl_token_group"]
-                changed = True
-            if src.get("operational_boundaries") and "operational_boundaries" not in existing_entry:
-                existing_entry["operational_boundaries"] = src["operational_boundaries"]
-                changed = True
-            if changed:
-                updated_count += 1
+    for agent_id, source in source_agents.items():
+        generated = build_agent_entry(source, workspace_tmpl, rollout)
+        existing = existing_by_id.get(agent_id, {})
+        next_list.append({**existing, **generated})
 
-    # Determine division ordering for sorted insertion
     division_order = [
         "division_1_core_operations",
         "division_2_ecommerce",
@@ -110,104 +186,86 @@ def merge_agents(openclaw_path, agents_config, workspace_tmpl):
     ]
     div_rank = {d: i for i, d in enumerate(division_order)}
 
-    # Collect missing agents
-    missing = []
-    for agent_id, agent in config_agents.items():
-        if agent_id not in existing_ids:
-            entry = build_agent_entry(agent, workspace_tmpl)
-            org_unit = agent.get("org_unit", "division_9_online_store")
-            missing.append((div_rank.get(org_unit, 99), agent_id, entry))
-
-    # Sort missing by division, then by agent_id
-    missing.sort(key=lambda x: (x[0], x[1]))
-
-    # Add missing agents to the list
-    for _, _, entry in missing:
-        agent_list.append(entry)
-
-    # Re-sort the entire list by division grouping
-    # Build a lookup for division rank from agents_config
-    def agent_sort_key(entry):
+    def sort_key(entry: dict):
         aid = entry["id"]
         if aid in config_agents:
             org = config_agents[aid].get("org_unit", "zzz")
             return (div_rank.get(org, 99), aid)
-        # Original agents without config entry keep existing position
-        return (-1, aid)
+        if aid in ("main", "marketing", "sales", "support"):
+            return (-1, aid)
+        return (100, aid)
 
-    agent_list.sort(key=agent_sort_key)
+    next_list.sort(key=sort_key)
 
-    config["agents"]["list"] = agent_list
+    defaults = config.setdefault("agents", {}).setdefault("defaults", {})
+    defaults_model = defaults.setdefault("model", {})
+    defaults_model["primary"] = next(
+        (a["model"] for a in next_list if a["id"] == "main"),
+        "anthropic/claude-sonnet-4-5",
+    )
+    defaults["models"] = build_models_catalog(rollout)
+
+    config.setdefault("meta", {})
+    config["meta"]["lastTouchedAt"] = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    config["meta"]["rollout_mode"] = rollout
+    config["meta"]["rollout_generated_by"] = "scripts/register-all-agents.py"
+    config["agents"]["list"] = next_list
 
     save_json(openclaw_path, config)
-    return len(missing), updated_count
+    return len(next_list)
 
 
-def validate(openclaw_path, agents_config):
-    """Validate the merged config has all 103 agents_config agents + any legacy agents."""
+def validate(openclaw_path: Path, agents_config: dict):
     config = load_json(openclaw_path)
-    agent_list = config["agents"]["list"]
-    agent_ids = [a["id"] for a in agent_list]
-    config_ids = {a["agent_id"] for a in agents_config["agents"]}
-    legacy_ids = {aid for aid in agent_ids if aid not in config_ids}
+    agent_list = config.get("agents", {}).get("list", [])
+    agent_ids = [a.get("id") for a in agent_list if a.get("id")]
+    config_ids = {a["agent_id"] for a in agents_config.get("agents", [])}
 
-    # Check all 103 config agents are present
-    missing = config_ids - set(agent_ids)
+    required_runtime_ids = {"main", "marketing", "sales", "support", *config_ids}
+    missing = required_runtime_ids - set(agent_ids)
     if missing:
-        print(f"  WARNING: Missing agents from agents_config: {missing}")
+        print(f"  WARNING: Missing runtime agents: {sorted(missing)}")
         return False
 
-    actual = len(agent_ids)
-    expected = len(config_ids) + len(legacy_ids)
-    if actual != expected:
-        print(f"  WARNING: Expected {expected} agents (103 + {len(legacy_ids)} legacy), got {actual}")
+    if len(agent_ids) != len(set(agent_ids)):
+        print("  WARNING: Duplicate agent IDs found")
         return False
 
-    if legacy_ids:
-        print(f"  Legacy agents retained: {sorted(legacy_ids)}")
-
-    # Check duplicates
-    dupes = [aid for aid in agent_ids if agent_ids.count(aid) > 1]
-    if dupes:
-        print(f"  WARNING: Duplicate IDs: {set(dupes)}")
-        return False
-
-    # Check required fields
     for agent in agent_list:
-        if "id" not in agent:
-            print(f"  WARNING: Agent missing 'id': {agent}")
+        if not agent.get("id"):
+            print(f"  WARNING: Invalid agent entry without id: {agent}")
             return False
-        if agent["id"] != "main" and "model" not in agent:
-            print(f"  WARNING: Agent '{agent['id']}' missing 'model'")
+        if not agent.get("model"):
+            print(f"  WARNING: Agent '{agent['id']}' missing model")
             return False
 
-    print(f"  OK: {actual} agents, no duplicates, all have required fields")
+    print(f"  OK: {len(agent_ids)} agents, no duplicates, all have model")
     return True
 
 
 def main():
-    print("Loading agents_config.json...")
+    args = parse_args()
+    print("Loading config/agents_config.json...")
     agents_config = load_json(AGENTS_CONFIG)
-    total = len(agents_config["agents"])
-    print(f"  Source: {total} agents")
+    print(f"  Source agents: {len(agents_config.get('agents', []))}")
+    print(f"  Rollout mode: {args.rollout}")
 
-    # Process dev config
     print(f"\nProcessing {OPENCLAW_DEV.name}...")
-    added_dev, updated_dev = merge_agents(OPENCLAW_DEV, agents_config, DEV_WORKSPACE_TMPL)
-    print(f"  Added {added_dev} agents, updated {updated_dev} existing")
+    count_dev = merge_agents(OPENCLAW_DEV, agents_config, DEV_WORKSPACE_TMPL, args.rollout)
+    print(f"  Wrote {count_dev} runtime agents")
     ok_dev = validate(OPENCLAW_DEV, agents_config)
 
-    # Process prod config
     print(f"\nProcessing {OPENCLAW_PROD.name}...")
-    added_prod, updated_prod = merge_agents(OPENCLAW_PROD, agents_config, PROD_WORKSPACE_TMPL)
-    print(f"  Added {added_prod} agents, updated {updated_prod} existing")
+    count_prod = merge_agents(OPENCLAW_PROD, agents_config, PROD_WORKSPACE_TMPL, args.rollout)
+    print(f"  Wrote {count_prod} runtime agents")
     ok_prod = validate(OPENCLAW_PROD, agents_config)
 
     if ok_dev and ok_prod:
-        print("\n✅ All 103 agents registered in both configs.")
-    else:
-        print("\n❌ Validation failed. Check warnings above.")
-        sys.exit(1)
+        print("\nOK Runtime registration completed.")
+        return
+
+    print("\nERROR Validation failed. Check warnings above.")
+    sys.exit(1)
 
 
 if __name__ == "__main__":

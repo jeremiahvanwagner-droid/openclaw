@@ -7,6 +7,13 @@ on:
         description: "Also upgrade openclaw CLI on server"
         type: boolean
         default: false
+      rollout_mode:
+        description: "Deployment rollout mode"
+        type: choice
+        default: canary
+        options:
+          - canary
+          - full
       clean_server_checkout:
         description: "Clean /opt/openclaw when working tree is dirty"
         type: boolean
@@ -42,6 +49,8 @@ jobs:
         run: corepack pnpm typecheck
       - name: Run tests
         run: corepack pnpm test
+      - name: Runtime config parity gate
+        run: node scripts/upgrade/runtime-config-parity.mjs --primary config/openclaw.prod.json --secondary config/openclaw.json --agents config/agents_config.json --rollout full --expected-agent-count 107 --strict
 
   deploy:
     name: Deploy to Hetzner
@@ -120,10 +129,14 @@ jobs:
             sudo -u openclaw git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
             sudo -u openclaw git fetch origin main
             sudo -u openclaw git pull --ff-only origin main
+            ROLLOUT_MODE="${{ github.event.inputs.rollout_mode }}"
+            if [ -z "${ROLLOUT_MODE}" ]; then
+              ROLLOUT_MODE="canary"
+            fi
             if [ "${{ github.event.inputs.upgrade_cli }}" = "true" ]; then
-              sudo bash deploy/hetzner/deploy.sh --upgrade
+              sudo bash deploy/hetzner/deploy.sh --upgrade --rollout "${ROLLOUT_MODE}"
             else
-              sudo bash deploy/hetzner/deploy.sh
+              sudo bash deploy/hetzner/deploy.sh --rollout "${ROLLOUT_MODE}"
             fi
 
       - name: Health Check
@@ -176,9 +189,11 @@ jobs:
           STATUS: ${{ job.status }}
           COMMIT: ${{ github.sha }}
           ACTOR: ${{ github.actor }}
+          ROLLOUT: ${{ github.event.inputs.rollout_mode }}
         run: |
           ICON=$( [ "$STATUS" = "success" ] && echo "SUCCESS" || echo "FAIL" )
-          MSG="[${ICON}] OpenClaw Deploy - ${STATUS}%0ACommit: ${COMMIT}%0ABy: ${ACTOR}"
+          MODE="${ROLLOUT:-canary}"
+          MSG="[${ICON}] OpenClaw Deploy - ${STATUS}%0ARollout: ${MODE}%0ACommit: ${COMMIT}%0ABy: ${ACTOR}"
           curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
             -d chat_id="${TELEGRAM_CHAT_ID}" \
             -d text="${MSG}" \

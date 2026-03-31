@@ -25,6 +25,9 @@
     "upgrade:governance:generate": "node scripts/upgrade/generate-agent-scope-space-mapping.mjs && node scripts/upgrade/generate-tool-allowlist-policy.mjs",
     "upgrade:governance:drift": "node scripts/upgrade/check-governance-drift.mjs",
     "upgrade:runtime": "node scripts/upgrade/post-update-smoke.mjs && node scripts/upgrade/validate-worker-env.mjs --expected production",
+    "upgrade:runtime:parity": "node scripts/upgrade/runtime-config-parity.mjs --primary config/openclaw.prod.json --secondary config/openclaw.json --agents config/agents_config.json --rollout full --expected-agent-count 107 --strict",
+    "upgrade:runtime:policy": "node scripts/upgrade/validate-completion-model-policy.mjs --config config/openclaw.prod.json --agents config/agents_config.json --rollout full --expected-agent-count 107",
+    "upgrade:runtime:anthropic-probe": "node scripts/upgrade/probe-anthropic-key.mjs",
     "upgrade:revenue": "node scripts/upgrade/validate-offer-matrix.mjs && node scripts/upgrade/validate-funnel-telemetry.mjs --hours 24",
     "upgrade:pilot": "node scripts/upgrade/pilot-monitor.mjs --hours 72"
   },

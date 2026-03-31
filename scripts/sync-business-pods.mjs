@@ -14,6 +14,13 @@ import {
   buildPortfolioSummary,
   loadBusinessRegistry,
 } from "../lib/business-registry.mjs";
+import {
+  buildAgentLlmModelIndex,
+  buildRuntimeModelCatalog,
+  getAgentLlmModel,
+  resolveRuntimeModel,
+  summarizeModelDistribution,
+} from "../lib/runtime-model-policy.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,17 +28,9 @@ const ROOT_DIR = resolve(__dirname, "..");
 const WINDOWS_RUNTIME_ROOT = process.env.OPENCLAW_WINDOWS_RUNTIME_ROOT || ROOT_DIR;
 const LINUX_RUNTIME_ROOT = process.env.OPENCLAW_LINUX_RUNTIME_ROOT || "/opt/openclaw";
 
-const AGENT_CONFIG_PATHS = [
-  join(ROOT_DIR, "agents_config.json"),
-  join(ROOT_DIR, "config", "agents_config.json"),
-];
+const AGENT_CONFIG_PATHS = [join(ROOT_DIR, "config", "agents_config.json")];
 
 const OPENCLAW_CONFIGS = [
-  {
-    path: join(ROOT_DIR, "openclaw.json"),
-    platform: "windows",
-    workspaceRoot: win32.join(WINDOWS_RUNTIME_ROOT, "workspaces"),
-  },
   {
     path: join(ROOT_DIR, "config", "openclaw.json"),
     platform: "windows",
@@ -96,6 +95,15 @@ const DIVISION_METADATA = [
 
 const args = process.argv.slice(2);
 const checkOnly = args.includes("--check");
+const rolloutFlagIndex = args.indexOf("--rollout");
+const rolloutMode =
+  rolloutFlagIndex >= 0 && args[rolloutFlagIndex + 1]
+    ? args[rolloutFlagIndex + 1]
+    : "full";
+
+if (!["full", "canary"].includes(rolloutMode)) {
+  throw new Error(`Unsupported rollout mode "${rolloutMode}". Use "full" or "canary".`);
+}
 
 function loadJson(path) {
   return JSON.parse(readFileSync(path, "utf-8"));
@@ -376,7 +384,7 @@ function buildAgentConfig(registry) {
   };
 }
 
-function buildRuntimeEntry(agentId, agentName, workspaceRoot, platform) {
+function buildRuntimeEntry(agentId, agentName, workspaceRoot, platform, model) {
   const workspace =
     platform === "windows"
       ? win32.join(workspaceRoot, agentId)
@@ -386,33 +394,64 @@ function buildRuntimeEntry(agentId, agentName, workspaceRoot, platform) {
     id: agentId,
     name: agentName,
     workspace,
-    model: "openai/gpt-5.3-codex",
+    model,
   };
 }
 
-function syncOpenClawConfig(configPath, registry, agentConfig, workspaceRoot, platform) {
+function syncOpenClawConfig(configPath, registry, agentConfig, workspaceRoot, platform, rollout) {
   const config = loadJson(configPath);
   const agentMap = new Map(agentConfig.agents.map((agent) => [agent.agent_id, agent]));
-  const requiredIds = [
-    ...ESSENTIAL_RUNTIME_AGENT_IDS,
-    ...registry.businesses.map((business) => `${business.pod_id}_pod_lead`),
-  ];
-  const existing = Array.isArray(config.agents?.list) ? config.agents.list : [];
-  const mergedList = mergeByKey(
+  const llmIndex = buildAgentLlmModelIndex(agentConfig);
+  const runtimeFoundationIds = ["main", "marketing", "sales", "support"];
+  const requiredIds = mergeByKey(
     [
-      ...existing,
-      ...requiredIds.map((agentId) => {
-        const agent = agentMap.get(agentId);
-        return buildRuntimeEntry(
-          agentId,
-          agent?.display_name || agentId,
-          workspaceRoot,
-          platform,
-        );
-      }),
+      ...runtimeFoundationIds.map((id) => ({ id })),
+      ...agentConfig.agents.map((agent) => ({ id: agent.agent_id })),
+      ...ESSENTIAL_RUNTIME_AGENT_IDS.map((id) => ({ id })),
+      ...registry.businesses.map((business) => ({ id: `${business.pod_id}_pod_lead` })),
     ],
     "id",
-  );
+  ).map((entry) => entry.id);
+
+  const existing = Array.isArray(config.agents?.list) ? config.agents.list : [];
+  const existingById = new Map(existing.map((entry) => [entry.id, entry]));
+  const missingLlmMappings = [];
+  const mergedList = requiredIds.map((agentId) => {
+    const existingEntry = existingById.get(agentId) || {};
+    const agent = agentMap.get(agentId);
+    const llmModel = getAgentLlmModel(agentId, llmIndex);
+    if (!llmModel) {
+      missingLlmMappings.push(agentId);
+      return {
+        ...existingEntry,
+        ...buildRuntimeEntry(
+          agentId,
+          agent?.display_name || existingEntry?.name || agentId,
+          workspaceRoot,
+          platform,
+          existingEntry?.model || config.agents?.defaults?.model?.primary || "anthropic/claude-sonnet-4-5",
+        ),
+      };
+    }
+
+    const model = resolveRuntimeModel({ agentId, llmModel, rolloutMode: rollout });
+    return {
+      ...existingEntry,
+      ...buildRuntimeEntry(
+        agentId,
+        agent?.display_name || existingEntry?.name || agentId,
+        workspaceRoot,
+        platform,
+        model,
+      ),
+    };
+  });
+
+  if (missingLlmMappings.length > 0) {
+    throw new Error(
+      `Could not resolve llm_model mapping for runtime agents: ${missingLlmMappings.join(", ")}`,
+    );
+  }
 
   const preferredOrder = [
     "main",
@@ -448,9 +487,19 @@ function syncOpenClawConfig(configPath, registry, agentConfig, workspaceRoot, pl
     meta: {
       ...config.meta,
       lastTouchedAt: new Date().toISOString(),
+      rollout_mode: rollout,
+      rollout_generated_by: "scripts/sync-business-pods.mjs",
     },
     agents: {
       ...config.agents,
+      defaults: {
+        ...(config.agents?.defaults || {}),
+        model: {
+          ...(config.agents?.defaults?.model || {}),
+          primary: mergedList.find((entry) => entry.id === "main")?.model || "anthropic/claude-sonnet-4-5",
+        },
+        models: buildRuntimeModelCatalog(rollout),
+      },
       list: mergedList,
     },
   };
@@ -581,6 +630,7 @@ function ensurePodLeadWorkspaces(registry) {
 function main() {
   const registry = loadBusinessRegistry();
   const agentConfig = buildAgentConfig(registry);
+  const syncedRuntimeConfigs = [];
 
   if (!checkOnly) {
     for (const configPath of AGENT_CONFIG_PATHS) {
@@ -589,13 +639,18 @@ function main() {
   }
 
   for (const openclawConfig of OPENCLAW_CONFIGS) {
-    syncOpenClawConfig(
+    const syncedConfig = syncOpenClawConfig(
       openclawConfig.path,
       registry,
       agentConfig,
       openclawConfig.workspaceRoot,
       openclawConfig.platform,
+      rolloutMode,
     );
+    syncedRuntimeConfigs.push({
+      path: openclawConfig.path,
+      config: syncedConfig,
+    });
   }
 
   ensurePodLeadWorkspaces(registry);
@@ -604,11 +659,16 @@ function main() {
     JSON.stringify(
       {
         mode: checkOnly ? "check" : "write",
+        rollout_mode: rolloutMode,
         synced_agent_configs: AGENT_CONFIG_PATHS.length,
         synced_runtime_configs: OPENCLAW_CONFIGS.length,
         total_businesses: registry.businesses.length,
         total_agents: agentConfig.total_agents,
         created_or_verified_pod_workspaces: registry.businesses.length,
+        runtime_model_distribution: syncedRuntimeConfigs.reduce((accumulator, entry) => {
+          accumulator[entry.path] = summarizeModelDistribution(entry.config?.agents?.list || []);
+          return accumulator;
+        }, {}),
       },
       null,
       2,

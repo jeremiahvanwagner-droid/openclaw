@@ -77,7 +77,8 @@ if (!dashboardOnly) {
 
   warnAny(["INNGEST_SIGNING_KEY"], "Inngest function signing key");
   warnAny(["INNGEST_EVENT_KEY"], "Inngest event dispatch key");
-  warnAny(["OPENAI_API_KEY"], "OpenAI API key (required for embeddings)");
+  requireAny(["ANTHROPIC_API_KEY"], "Anthropic API key (required for completion routing)");
+  warnAny(["OPENAI_API_KEY"], "OpenAI API key (embeddings-only in current rollout)");
   warnAny(
     ["TELEGRAM_BOT_TOKEN", "OPENCLAW_TELEGRAM_BOT_TOKEN"],
     "Telegram bot token (alerts will be disabled)",
