@@ -197,12 +197,23 @@
   },
 
   "fallback": {
-    "trigger": "anthropic_rate_limit",
-    "provider": "anthropic",
-    "credential_env": "ANTHROPIC_API_KEY_BACKUP",
-    "note": "Fallback uses backup Anthropic key if rate limit hit on primary. Sovereign tiers never downgrade.",
-    "retry_after_ms": 1000,
-    "max_retries": 3
+    "enabled": true,
+    "provider": "openrouter",
+    "trigger_on_http_status": [429, 500, 503],
+    "eligible_tiers": ["EXECUTOR", "COMMUNICATOR", "ANALYST"],
+    "sovereign_tiers_excluded": ["STRATEGIST", "GUARDIAN"],
+    "max_fallback_attempts": 2,
+    "fallback_timeout_ms": 15000,
+    "model_map": {
+      "EXECUTOR": "deepseek/deepseek-r1:free",
+      "COMMUNICATOR": "meta-llama/llama-4-maverick:free",
+      "ANALYST": "deepseek/deepseek-chat-v3.1:free"
+    },
+    "tool_calling_capable_models": [
+      "deepseek/deepseek-r1:free",
+      "meta-llama/llama-4-maverick:free"
+    ],
+    "log_all_fallbacks": true
   },
 
   "routing_rules": [
@@ -298,7 +309,7 @@
     "env_only": true,
     "audit_log_all_tier1_calls": true,
     "alert_on_isolation_violation": true,
-    "provider_enforcement": "anthropic_only"
+    "provider_enforcement": "anthropic_primary"
   },
 
   "meta": {
