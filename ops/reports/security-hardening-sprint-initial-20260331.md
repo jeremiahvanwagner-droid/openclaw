@@ -1,9 +1,31 @@
 # Security Hardening Sprint Initial Report
 
-Date: 2026-03-31  
-Repo: `jeremiahvanwagner-droid/openclaw`  
-Current Repo HEAD: `e2c549d` (`working production`)  
+Date: 2026-03-31
+Repo: `jeremiahvanwagner-droid/openclaw`
+Current Repo HEAD: `e2c549d` (`working production`)
 Status: Diagnostics complete, no code changes applied
+
+## Live Operator Validation Update
+
+Operator-provided live server evidence confirms:
+
+- Production control plane is Docker Compose on `/opt/openclaw`
+- `openclaw-webhook` was previously `unhealthy`
+- Targeted recreate was run:
+
+```bash
+cd /opt/openclaw && docker compose up -d --no-deps --force-recreate webhook
+```
+
+- Post-recreate container state showed:
+  - `openclaw-webhook` = healthy
+  - `openclaw-bot` = healthy
+- Live runtime config at `/root/.openclaw/openclaw.json` shows Telegram is currently permissive:
+  - `dmPolicy: "open"`
+  - `allowFrom: ["*"]`
+  - `groupPolicy: "allowlist"`
+
+This resolves the deployment-model ambiguity from the initial diagnostic pass and confirms the Task 2 live authorization issue is real on the host runtime file.
 
 ## File Inventory Report
 
@@ -29,11 +51,13 @@ Status: Diagnostics complete, no code changes applied
 
 **Status:** DIAGNOSING
 
-**Finding:**  
+**Finding:**
 The active webhook server is `handlers/ghl-webhook-handler.mjs`, not the root-level copy. It binds `OPENCLAW_GHL_WEBHOOK_PORT || 8788` at `handlers/ghl-webhook-handler.mjs:91`, and exposes `GET /health` at `handlers/ghl-webhook-handler.mjs:579-591`. The root `docker-compose.yml` has no `healthcheck` for `webhook` at `docker-compose.yml:31-45`, so it would inherit the image-wide Dockerfile probe to `http://localhost:18789/health` from `Dockerfile:93-94`, which is wrong for the webhook container. However, the production compose file already overrides this correctly to `http://localhost:8788/health` at `deploy/docker-compose.prod.yml:69-74`, and the Hetzner deploy health check also probes `8788/health` at `deploy/hetzner/deploy.sh:120-123`.
 
-**Action:**  
-Treat this as a deployment-model mismatch until production control plane is confirmed.
+Live validation from the server confirms Docker Compose is the active control plane and that a targeted webhook container recreate returned the service to `healthy` without disrupting `openclaw-bot`.
+
+**Action:**
+Treat the healthcheck issue as operationally remediated on the live host. No repo code diff has been applied yet; the live evidence indicates the currently deployed compose/runtime now reports the webhook container healthy after targeted recreation.
 
 **Diff / Output:**
 
@@ -46,8 +70,56 @@ deploy/docker-compose.prod.yml:69-74 explicit webhook healthcheck -> localhost:8
 deploy/hetzner/deploy.sh:120-123     systemd health check -> localhost:8788/health
 ```
 
-**Verification Required:**  
-Yes - confirm the live control plane on Hetzner: `docker compose -f deploy/docker-compose.prod.yml`, root `docker-compose.yml`, or `systemd`.
+**Verification Required:**
+No - live evidence confirms Docker Compose is in use and the webhook container is currently healthy after targeted recreation.
+
+### Phase 2 - Plan
+
+**Status:** COMPLETE
+
+**Finding:**
+Because the live webhook container became healthy after a targeted recreate and no handler change was required to expose `/health`, the least-risk execution path is operational rather than code-level:
+
+- retain the existing handler endpoint at `/health`
+- retain the current targeted recreate pattern for the webhook container only
+- avoid restarting `openclaw-bot`
+
+**Action:**
+Record the exact low-blast-radius recreate command for production use.
+
+**Diff / Output:**
+
+```bash
+cd /opt/openclaw && docker compose up -d --no-deps --force-recreate webhook
+```
+
+**Verification Required:**
+No
+
+### Phase 3 - Execute
+
+**Status:** COMPLETE
+
+**Finding:**
+Operator evidence shows the command above was executed and `openclaw-webhook` returned to `healthy`.
+
+**Action:**
+Mark Task 1 as operationally complete on the live system, pending any later decision to normalize repo compose files.
+
+**Diff / Output:**
+
+```text
+Before:
+- openclaw-webhook = unhealthy
+- openclaw-bot = healthy
+
+After:
+- openclaw-webhook = healthy
+- openclaw-bot = healthy
+```
+
+**Verification Required:**
+No
 
 ## TASK 2 - TIGHTEN TELEGRAM AUTHORIZATION
 
@@ -55,31 +127,42 @@ Yes - confirm the live control plane on Hetzner: `docker compose -f deploy/docke
 
 **Status:** DIAGNOSING
 
-**Finding:**  
-The live host runtime file is unavailable here, but the repo baselines are already allowlisted, not wildcarded. In `config/openclaw.prod.json:4667-4673`, Telegram has `dmPolicy: "allowlist"`, `allowFrom` set to a single env-backed value at `config/openclaw.prod.json:4669-4670`, `groupPolicy: "allowlist"` at `config/openclaw.prod.json:4672`, and no `requireMention`, `allowedChatIds`, or `allowedUserIds` keys. The runtime-equivalent repo file `openclaw.json:469-475` shows the same structure with one concrete numeric allowlist entry. Related mention-gating behavior exists as `ackReactionScope: "group-mentions"` at `config/openclaw.prod.json:4640`. No hardcoded command-auth bypass was found in the inspected Telegram-facing handler code.
+**Finding:**
+Live host runtime evidence now supersedes the repo baseline for this task. `/root/.openclaw/openclaw.json` currently shows:
 
-**Action:**  
-Block planning of the live config diff until Jeremiah's approved IDs are confirmed and either the real `/root/.openclaw/openclaw.json` is available or the repo runtime-equivalent file is accepted as authoritative.
+- `dmPolicy: "open"`
+- `allowFrom: ["*"]`
+- `groupPolicy: "allowlist"`
+
+This is materially more permissive than the repo baselines, which are allowlisted. No `requireMention`, `allowedChatIds`, or `allowedUserIds` fields were identified in the inspected repo config shape. Related mention-gating behavior exists as `ackReactionScope: "group-mentions"` at `config/openclaw.prod.json:4640`. No hardcoded command-auth bypass was found in the inspected Telegram-facing handler code.
+
+**Action:**
+Proceed against the live host runtime file, using the operator-provided values and the now-confirmed permissive live state as the source of truth.
 
 **Diff / Output:**
 
 ```text
-config/openclaw.prod.json:4667  dmPolicy = "allowlist"
-config/openclaw.prod.json:4669  allowFrom = ["${TELEGRAM_ALERT_CHAT_ID}"]
-config/openclaw.prod.json:4672  groupPolicy = "allowlist"
-config/openclaw.prod.json       no requireMention / allowedChatIds / allowedUserIds found
-openclaw.json:469-475           same structure with one concrete numeric allowFrom entry
-config/openclaw.prod.json:4640  ackReactionScope = "group-mentions"
+Live /root/.openclaw/openclaw.json:
+- dmPolicy = "open"
+- allowFrom = ["*"]
+- groupPolicy = "allowlist"
+
+Repo baseline:
+- config/openclaw.prod.json:4667  dmPolicy = "allowlist"
+- config/openclaw.prod.json:4669  allowFrom = ["${TELEGRAM_ALERT_CHAT_ID}"]
+- config/openclaw.prod.json:4672  groupPolicy = "allowlist"
+- config/openclaw.prod.json       no requireMention / allowedChatIds / allowedUserIds found
+- config/openclaw.prod.json:4640  ackReactionScope = "group-mentions"
 ```
 
-**Verification Required:**  
-Yes - the live runtime file or confirmation to use the repo runtime-equivalent config is required.
+**Verification Required:**
+No - the live runtime file has now been observed directly.
 
 ### Phase 2 - Gather Required Values
 
 **Status:** COMPLETE
 
-**Finding:**  
+**Finding:**
 Operator inputs received:
 
 1. Telegram `chat_id`: `7737707872`
@@ -92,10 +175,10 @@ The inspected repo configs do not expose `allowedUserIds` or a separate Telegram
 
 `FULL` is not a repo-observed `dmPolicy` enum. For execution planning, it is normalized to secure full personal-DM access from the allowlisted personal chat only, which maps to `dmPolicy: "allowlist"` plus `allowFrom: [7737707872]`.
 
-**Action:**  
+**Action:**
 Proceed to planning against chat-based allowlisting unless the live runtime file reveals separate user-level authorization fields.
 
-**Diff / Output:**  
+**Diff / Output:**
 ```text
 Received:
 - chat_id = 7737707872
@@ -110,32 +193,32 @@ Execution normalization:
 - group access => disabled by omission; no group allow entries planned
 ```
 
-**Verification Required:**  
+**Verification Required:**
 No - values received are sufficient to prepare the Task 2 plan. Live execution still depends on deployment-model confirmation.
 
 ### Phase 3 - Plan
 
 **Status:** PREPARED
 
-**Finding:**  
+**Finding:**
 Because no Telegram group should retain access, `requireMention` is not applicable in the planned end state. The secure plan is to keep DM access on a single allowlisted personal chat, remove any permissive or wildcard entries if present in the live runtime, and leave group access ungranted.
 
-**Action:**  
+**Action:**
 Prepare the host runtime config change against `/root/.openclaw/openclaw.json` with chat-based enforcement.
 
 **Diff / Output:**
 
 ```json
-// BEFORE (repo baseline shape)
+// BEFORE (live runtime state confirmed by operator)
 "telegram": {
   "enabled": true,
   "commands": {
     "nativeSkills": false
   },
-  "dmPolicy": "allowlist",
+  "dmPolicy": "open",
   "botToken": "${TELEGRAM_BOT_TOKEN}",
   "allowFrom": [
-    "${TELEGRAM_ALERT_CHAT_ID}"
+    "*"
   ],
   "groupPolicy": "allowlist",
   "streaming": "off"
@@ -157,8 +240,8 @@ Prepare the host runtime config change against `/root/.openclaw/openclaw.json` w
 }
 ```
 
-**Verification Required:**  
-Yes - this is execution-ready, but the live control plane still has to be confirmed before I can safely pair it with the correct restart or reload steps.
+**Verification Required:**
+No - this is execution-ready. The remaining task is to apply the live host config change and verify runtime reload behavior.
 
 ## TASK 3 - CREDENTIAL ROTATION
 
@@ -166,10 +249,10 @@ Yes - this is execution-ready, but the live control plane still has to be confir
 
 **Status:** DIAGNOSING
 
-**Finding:**  
+**Finding:**
 The prompt's statement about blank CSV dates is stale for the repo copy. `deploy/hetzner/credential-inventory.csv` already has populated `created_date`, `rotate_by`, and `last_rotated` for tracked credentials. The real problem is incomplete coverage: `.env` contains many more live secrets than the CSV tracks, including Anthropic, per-tenant GHL PITs, Supabase service role, Inngest keys, gateway auth, OpenRouter, and Microsoft app secrets.
 
-**Action:**  
+**Action:**
 Inventory captured below. No rotations or file edits have been performed.
 
 **Diff / Output:**
@@ -199,7 +282,7 @@ Inventory captured below. No rotations or file edits have been performed.
 | BRAVE_API_KEY | API key alias | `.env` | Possible | P2 | Update alongside `BRAVE_SEARCH_API_KEY` if retained |
 | OPENCLAW_GHL_WEBHOOK_SECRET | Shared webhook secret | `.env`, `credential-inventory.csv` | Possible | P0 | Generate new 32-byte+ hex secret and update both ends |
 
-**Verification Required:**  
+**Verification Required:**
 Yes - confirm whether aliases such as `OPENCLAW_TELEGRAM_BOT_TOKEN` and `BRAVE_API_KEY` should be tracked as separate managed entries or collapsed to one underlying credential per provider.
 
 ## TASK 4 - HARDEN WEBHOOK SECRET FALLBACK
@@ -208,10 +291,10 @@ Yes - confirm whether aliases such as `OPENCLAW_TELEGRAM_BOT_TOKEN` and `BRAVE_A
 
 **Status:** DIAGNOSING
 
-**Finding:**  
+**Finding:**
 The active handler does not use the exact hardcoded fallback shown in the prompt. Instead, `handlers/ghl-webhook-handler.mjs:93` resolves `OPENCLAW_GHL_WEBHOOK_SECRET || ''`, so a missing secret does not currently crash startup. `.env` does contain `OPENCLAW_GHL_WEBHOOK_SECRET`, so the secret is present now. The actual webhook HMAC path is in `lib/ghl-webhook.mjs:80-87` and already uses `crypto.timingSafeEqual` at `lib/ghl-webhook.mjs:84`. Headers and auth modes are read at `lib/ghl-webhook.mjs:162-165`. A separate weakness exists in `lib/human-approval.mjs:171-190`: it reuses `OPENCLAW_GHL_WEBHOOK_SECRET` for Telegram callback HMAC, falls back to predictable `"openclaw-approval"`, and compares with `===` at `lib/human-approval.mjs:219`.
 
-**Action:**  
+**Action:**
 Prepare a fail-closed diff for the active webhook handler and a companion hardening diff for `lib/human-approval.mjs` after approval.
 
 **Diff / Output:**
@@ -226,11 +309,20 @@ lib/human-approval.mjs:219               non-constant-time equality
 .env:87                                  OPENCLAW_GHL_WEBHOOK_SECRET is present
 ```
 
-**Verification Required:**  
+**Verification Required:**
 Yes - approve planning against `handlers/ghl-webhook-handler.mjs` and `lib/human-approval.mjs`.
 
 ## Pending Operator Confirmations
 
-1. Confirm live control plane: `systemd` or Docker Compose
-2. Confirm whether repo `openclaw.json` can be treated as the runtime-equivalent config until `/root/.openclaw/openclaw.json` is available
-3. Approve moving into Phase 2 planning diffs for Task 1 and Task 4
+1. Approve moving into live execution planning for Task 2 against `/root/.openclaw/openclaw.json`
+2. Approve moving into Phase 2 planning diffs for Task 4
+
+## Repo Reconciliation Update - 2026-03-31
+
+Operator confirmation and live host inspection now supersede the earlier blocked state. The sprint-relevant source-controlled deltas have been reconciled into this repo for the files that define the deployable baseline:
+
+- `docker-compose.yml` now includes the explicit webhook healthcheck targeting `http://localhost:8788/health`
+- `handlers/ghl-webhook-handler.mjs` now fails closed if `OPENCLAW_GHL_WEBHOOK_SECRET` is missing
+- `lib/human-approval.mjs` now removes the predictable callback-secret fallback and verifies approval callback signatures with `crypto.timingSafeEqual()`
+
+The Telegram authorization lock-down remains a host-runtime change in `/root/.openclaw/openclaw.json`. It is intentionally not mirrored by pulling the remote tracked config files wholesale because the repo baselines were already allowlisted and the remote config diffs also contain unrelated April 1 migration edits.

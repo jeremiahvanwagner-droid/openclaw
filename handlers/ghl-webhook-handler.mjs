@@ -90,7 +90,11 @@ async function loadPhase3Modules() {
 
 const PORT = process.env.OPENCLAW_GHL_WEBHOOK_PORT || 8788;
 const HOST = process.env.OPENCLAW_GHL_WEBHOOK_HOST || '0.0.0.0';
-const WEBHOOK_SECRET = process.env.OPENCLAW_GHL_WEBHOOK_SECRET || '';
+const WEBHOOK_SECRET = process.env.OPENCLAW_GHL_WEBHOOK_SECRET;
+if (!WEBHOOK_SECRET) {
+  console.error('FATAL: OPENCLAW_GHL_WEBHOOK_SECRET is not set. Refusing to start.');
+  process.exit(1);
+}
 const TELEGRAM_CHAT_ID = process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID || '';
 const TEAMS_CHANNEL_ID = process.env.OPENCLAW_ALERT_TEAMS_CHANNEL_ID || '';
 const M365_EMAIL_OWNER = process.env.M365_EMAIL_OWNER || '';
