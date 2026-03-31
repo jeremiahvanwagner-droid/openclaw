@@ -18,8 +18,8 @@ EnvironmentFile=/etc/openclaw/.env
 Environment=NODE_ENV=production
 Environment=PORT=3001
 
-# Use pnpm run so it resolves the next binary through the pnpm virtual store
-ExecStart=/usr/bin/node /opt/openclaw/scripts/pnpm.mjs --filter openclaw-dashboard run start
+# Start from the dashboard package directory so Next resolves its local bin/deps.
+ExecStart=/usr/bin/node /opt/openclaw/scripts/pnpm.mjs --dir dashboard run start
 
 # Auto-restart on failure
 Restart=always

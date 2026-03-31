@@ -135,14 +135,14 @@ cp "$OPENCLAW_HOME/deploy/hetzner/Caddyfile" /etc/caddy/Caddyfile
 echo "  Building Next.js dashboard..."
 sudo -u "$OPENCLAW_USER" bash -lc "
     export CI=true
-    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs install --filter openclaw-dashboard --no-frozen-lockfile
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --dir dashboard install --no-frozen-lockfile
 " || echo "  Warning: dashboard dep install failed — build may fail"
 sudo -u "$OPENCLAW_USER" bash -lc "
     export CI=true
     set -a
     [ -f /etc/openclaw/.env ] && source /etc/openclaw/.env
     set +a
-    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --filter openclaw-dashboard run build
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --dir dashboard run build
 " || echo "  Warning: dashboard build failed — service will be disabled until fixed"
 chown -R "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME/dashboard"
 echo "  Dashboard build step complete."

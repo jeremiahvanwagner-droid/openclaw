@@ -12,8 +12,10 @@ if (-not (Test-Path $SshKeyPath)) {
 $ssh = Get-Command ssh -ErrorAction Stop
 $target = "root@$ServerIp"
 
-$listCommand = 'set -a; . /etc/openclaw/.env; set +a; openclaw devices list --url ws://127.0.0.1:18789 --token "$OPENCLAW_GATEWAY_AUTH_TOKEN" --json'
-$approveCommand = 'set -a; . /etc/openclaw/.env; set +a; openclaw devices approve --latest --url ws://127.0.0.1:18789 --token "$OPENCLAW_GATEWAY_AUTH_TOKEN" --json'
+$remotePrefix = 'set -a; . /etc/openclaw/.env; set +a; sudo -u openclaw env HOME=/opt/openclaw OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw OPENCLAW_GATEWAY_AUTH_TOKEN="$OPENCLAW_GATEWAY_AUTH_TOKEN"'
+
+$listCommand = "$remotePrefix openclaw devices list --url ws://127.0.0.1:18789 --token `"`$OPENCLAW_GATEWAY_AUTH_TOKEN`" --json"
+$approveCommand = "$remotePrefix openclaw devices approve --latest --url ws://127.0.0.1:18789 --token `"`$OPENCLAW_GATEWAY_AUTH_TOKEN`" --json"
 
 Write-Output "Listing pending and paired devices on $target ..."
 & $ssh.Source -i $SshKeyPath $target $listCommand

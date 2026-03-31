@@ -284,14 +284,14 @@ echo "[6/8] Building Next.js dashboard..."
 DASH_DIR="${OPENCLAW_HOME}/dashboard"
 sudo -u openclaw bash -lc "
     export CI=true
-    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs install --filter openclaw-dashboard --no-frozen-lockfile
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --dir dashboard install --no-frozen-lockfile
 "
 sudo -u openclaw bash -lc "
     export CI=true
     set -a
     [ -f /etc/openclaw/.env ] && source /etc/openclaw/.env
     set +a
-    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --filter openclaw-dashboard run build
+    cd \"$OPENCLAW_HOME\" && node scripts/pnpm.mjs --dir dashboard run build
 "
 chown -R openclaw:openclaw "$DASH_DIR"
 echo "  Dashboard build complete."

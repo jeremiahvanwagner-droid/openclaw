@@ -221,7 +221,7 @@ If pairing or browser access still fails, inspect the live services on the Hetzn
 ```powershell
 ssh -i $env:USERPROFILE\.ssh\openclaw_hetzner root@87.99.138.98 "journalctl -u openclaw -n 100 --no-pager"
 ssh -i $env:USERPROFILE\.ssh\openclaw_hetzner root@87.99.138.98 "journalctl -u caddy -n 100 --no-pager"
-ssh -i $env:USERPROFILE\.ssh\openclaw_hetzner root@87.99.138.98 "openclaw gateway status"
+ssh -i $env:USERPROFILE\.ssh\openclaw_hetzner root@87.99.138.98 "set -a; . /etc/openclaw/.env; set +a; sudo -u openclaw env HOME=/opt/openclaw OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw OPENCLAW_GATEWAY_AUTH_TOKEN=`"`$OPENCLAW_GATEWAY_AUTH_TOKEN`" openclaw gateway status"
 ```
 
 Interpret the common auth states as follows:
