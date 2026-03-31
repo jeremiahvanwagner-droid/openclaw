@@ -10,6 +10,10 @@ services:
       dockerfile: Dockerfile
     container_name: openclaw-bot
     env_file: .env
+    environment:
+      - HOME=/opt/openclaw
+      - OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw
+    command: ["openclaw", "gateway", "--port", "18789", "--allow-unconfigured"]
     ports:
       - "18789:18789"
     volumes:
