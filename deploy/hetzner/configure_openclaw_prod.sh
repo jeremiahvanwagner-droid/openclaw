@@ -36,9 +36,9 @@ openclaw onboard \
 openclaw config set 'gateway.mode' '"local"'
 openclaw config set 'gateway.bind' '"loopback"'
 openclaw config set 'gateway.tailscale.mode' '"route"'
-openclaw config set 'agents.defaults.model.primary' '"openai/gpt-5"'
-openclaw config set 'agents.defaults.maxConcurrent' '1'
-openclaw config set 'agents.defaults.subagents.maxConcurrent' '1'
+openclaw config set 'agents.defaults.model.primary' '"openai/gpt-5.3-codex"'
+openclaw config set 'agents.defaults.maxConcurrent' '23'
+openclaw config set 'agents.defaults.subagents.maxConcurrent' '5'
 
 # Configure sandbox browser
 openclaw config set 'agents.defaults.sandbox.browser.enabled' 'true'

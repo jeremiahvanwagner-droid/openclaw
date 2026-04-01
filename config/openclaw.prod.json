@@ -6,10 +6,10 @@
     "rollout_generated_by": "scripts/upgrade/build-runtime-rollout-config.mjs"
   },
   "wizard": {
-    "lastRunAt": "2026-03-15T18:00:00.000Z",
-    "lastRunVersion": "2026.3.13",
+    "lastRunAt": "2026-03-31T00:00:00.000Z",
+    "lastRunVersion": "2026.3.31",
     "lastRunCommand": "configure",
-    "lastRunMode": "local"
+    "lastRunMode": "remote"
   },
   "browser": {
     "headless": true,
@@ -4683,10 +4683,14 @@
   },
   "gateway": {
     "port": 18789,
-    "mode": "local",
+    "mode": "remote",
     "bind": "loopback",
     "auth": {
       "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
+    },
+    "remote": {
+      "url": "https://api.truthjblue.dev",
       "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
     },
     "tailscale": {
