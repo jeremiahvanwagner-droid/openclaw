@@ -12,10 +12,10 @@ if (-not (Test-Path $SshKeyPath)) {
 $ssh = Get-Command ssh -ErrorAction Stop
 $target = "root@$ServerIp"
 
-$remotePrefix = 'set -a; . /etc/openclaw/.env; set +a; sudo -u openclaw env HOME=/opt/openclaw OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw OPENCLAW_GATEWAY_AUTH_TOKEN="$OPENCLAW_GATEWAY_AUTH_TOKEN"'
+$remotePrefix = 'ENV_FILE=/opt/openclaw/.env; if [ ! -f "$ENV_FILE" ]; then ENV_FILE=/etc/openclaw/.env; fi; set -a; . "$ENV_FILE"; set +a; if [ -z "${OPENCLAW_GATEWAY_AUTH_TOKEN:-}" ] && [ -n "${OPEN_CLAW_GATEWAY_AUTH_TOKEN:-}" ]; then export OPENCLAW_GATEWAY_AUTH_TOKEN="$OPEN_CLAW_GATEWAY_AUTH_TOKEN"; fi; export OPENCLAW_GATEWAY_TOKEN="${OPENCLAW_GATEWAY_TOKEN:-$OPENCLAW_GATEWAY_AUTH_TOKEN}"; cd /opt/openclaw'
 
-$listCommand = "$remotePrefix openclaw devices list --url ws://127.0.0.1:18789 --token `"`$OPENCLAW_GATEWAY_AUTH_TOKEN`" --json"
-$approveCommand = "$remotePrefix openclaw devices approve --latest --url ws://127.0.0.1:18789 --token `"`$OPENCLAW_GATEWAY_AUTH_TOKEN`" --json"
+$listCommand = "$remotePrefix && docker compose exec -T -e OPENCLAW_GATEWAY_TOKEN=`"`$OPENCLAW_GATEWAY_TOKEN`" bot openclaw devices list --json"
+$approveCommand = "$remotePrefix && docker compose exec -T -e OPENCLAW_GATEWAY_TOKEN=`"`$OPENCLAW_GATEWAY_TOKEN`" bot openclaw devices approve --latest --json"
 
 Write-Output "Listing pending and paired devices on $target ..."
 & $ssh.Source -i $SshKeyPath $target $listCommand
