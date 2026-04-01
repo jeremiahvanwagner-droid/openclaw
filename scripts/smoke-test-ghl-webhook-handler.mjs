@@ -36,7 +36,7 @@ function buildPayload(eventType, businessId) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const endpoint = opts.url || `${process.env.OPENCLAW_PUBLIC_WEBHOOK_BASE_URL || 'http://127.0.0.1:8788'}/webhook/ghl`;
+  const endpoint = opts.url || `${process.env.OPENCLAW_PUBLIC_WEBHOOK_BASE_URL || process.env.OPENCLAW_GHL_WEBHOOK_BASE_URL || 'http://127.0.0.1:8788'}/webhook/ghl`;
   const eventType = opts.event || 'contact.created';
   const authMode = opts['auth-mode'] || 'bearer';
   const businessId = opts['business-id'] || 'smoke_test_business';

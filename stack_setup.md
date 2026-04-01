@@ -353,10 +353,11 @@ export const { GET, POST, PUT } = serve({
 ### 4.4 Local Development
 
 ```bash
-# Start Inngest Dev Server (separate terminal)
+# Start Inngest Dev Server (separate terminal, local dev only)
 npx inngest-cli@latest dev
 
-# Visit http://localhost:8288 to see dashboard
+# Visit http://localhost:8288 to see dashboard (local dev only)
+# Production: use Inngest Cloud at https://app.inngest.com
 ```
 
 ### 4.5 Production Deployment
@@ -972,9 +973,10 @@ pnpm dev
 # 7. Start Inngest dev server (separate terminal)
 npx inngest-cli dev
 
-# 8. Test an agent
-curl -X POST http://localhost:3000/api/agents/d1_ceo/invoke \
+# 8. Test an agent (via production gateway)
+curl -X POST https://api.truthjblue.dev/api/agents/d1_ceo/invoke \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $OPENCLAW_GATEWAY_AUTH_TOKEN" \
   -d '{"message": "Hello, CEO agent!"}'
 ```
 

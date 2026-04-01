@@ -101,8 +101,13 @@ export async function POST(req: NextRequest) {
   switch (action) {
     case "invoke": {
       // Trigger manual agent run via Inngest
-      const inngestUrl =
-        process.env.INNGEST_EVENT_API_URL ?? "http://localhost:8288/e";
+      const inngestUrl = process.env.INNGEST_EVENT_API_URL;
+      if (!inngestUrl) {
+        return NextResponse.json(
+          { error: "INNGEST_EVENT_API_URL is not configured" },
+          { status: 503 },
+        );
+      }
       const inngestKey = process.env.INNGEST_EVENT_KEY ?? "";
 
       const res = await fetch(`${inngestUrl}/${inngestKey}`, {

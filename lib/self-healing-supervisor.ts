@@ -50,11 +50,12 @@ export async function preflightCheck(): Promise<boolean> {
   }
 
   // 3. Verify gateway is reachable (best-effort HTTP check)
-  const gatewayPort = process.env.OPENCLAW_GATEWAY_PORT ?? "18789";
+  const gatewayUrl = process.env.OPENCLAW_GATEWAY_URL
+    ?? `http://127.0.0.1:${process.env.OPENCLAW_GATEWAY_PORT ?? "18789"}/health`;
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 3000);
-    const res = await fetch(`http://127.0.0.1:${gatewayPort}/health`, {
+    const res = await fetch(gatewayUrl, {
       signal: controller.signal,
     }).finally(() => clearTimeout(timeout));
     if (!res.ok) {

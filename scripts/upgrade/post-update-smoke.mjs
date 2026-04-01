@@ -7,7 +7,9 @@ const execFileAsync = promisify(execFile);
 
 function parseArgs(argv) {
   const args = {
-    gatewayUrl: process.env.OPENCLAW_GATEWAY_URL || 'http://127.0.0.1:18789/health',
+    gatewayUrl: process.env.OPENCLAW_GATEWAY_URL || process.env.OPENCLAW_REMOTE_URL
+      ? `${process.env.OPENCLAW_REMOTE_URL}/health`
+      : 'http://127.0.0.1:18789/health',
     webhookAuthMode: 'bearer',
   };
 

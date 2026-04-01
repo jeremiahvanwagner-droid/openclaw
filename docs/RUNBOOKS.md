@@ -60,7 +60,7 @@
 |-----------|--------------|---------|
 | Supabase DB | `your-project.supabase.co` | Agent state, memory, events |
 | Inngest Cloud | `app.inngest.com` | Event orchestration |
-| Dashboard | `localhost:3001` (dev) | Monitoring UI |
+| Dashboard | `https://api.truthjblue.dev/dashboard` (prod) | Monitoring UI |
 | Telegram Bot | `@OpenClawAlertBot` | Critical alerts |
 
 ### Environment Variables
@@ -89,7 +89,7 @@ OPENAI_API_KEY=<secret>
 ### Morning Checklist (8:00 AM)
 
 1. **Check Dashboard Health**
-   - Open dashboard: `http://localhost:3001`
+   - Open dashboard: `openclaw dashboard` (or `https://api.truthjblue.dev/dashboard`)
    - Verify all 103 agents show "active" status
    - Check for overnight errors in Events tab
 

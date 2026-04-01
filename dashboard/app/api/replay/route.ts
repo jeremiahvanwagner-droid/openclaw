@@ -38,8 +38,13 @@ export async function POST(req: NextRequest) {
   const newCorrelationId = `replay:${original.correlation_id ?? original.id}`;
 
   // Re-publish to Inngest
-  const inngestUrl =
-    process.env.INNGEST_EVENT_API_URL ?? "http://localhost:8288/e";
+  const inngestUrl = process.env.INNGEST_EVENT_API_URL;
+  if (!inngestUrl) {
+    return NextResponse.json(
+      { error: "INNGEST_EVENT_API_URL is not configured" },
+      { status: 503 },
+    );
+  }
   const inngestKey = process.env.INNGEST_EVENT_KEY ?? "";
 
   const inngestRes = await fetch(`${inngestUrl}/${inngestKey}`, {

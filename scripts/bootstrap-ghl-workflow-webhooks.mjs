@@ -69,7 +69,7 @@ async function writePlan(planPath, plan) {
 
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
-  const baseUrl = opts['base-url'] || process.env.OPENCLAW_PUBLIC_WEBHOOK_BASE_URL || 'http://127.0.0.1:8788';
+  const baseUrl = opts['base-url'] || process.env.OPENCLAW_PUBLIC_WEBHOOK_BASE_URL || process.env.OPENCLAW_GHL_WEBHOOK_BASE_URL || 'http://127.0.0.1:8788';
   const handlerPath = opts['handler-path'] || '/webhook/ghl';
   const authMode = opts['auth-mode'] || 'bearer';
   const writePlanFile = opts['write-plan'] !== false;
