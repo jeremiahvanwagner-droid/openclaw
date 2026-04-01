@@ -365,8 +365,8 @@ async function scheduleCallVapi(phoneNumber, templateId, contactId = null) {
     // Build Vapi assistant config
     const assistantConfig = {
       model: {
-        provider: 'openai',
-        model: 'gpt-4',
+        provider: 'anthropic',
+        model: 'claude-sonnet-4-5-20250514',
         messages: [
           {
             role: 'system',

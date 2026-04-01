@@ -202,13 +202,18 @@ const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
     retryAfterMs: 1000,
     maxRetries: 2,
   },
+  // OpenAI — BACKUP ONLY. Embeddings only, no completions.
+  // Hard cap: $3/day to prevent runaway costs.
+  "openai": {
+    requestsPerMinute: 10,
+    requestsPerHour: 200,
+    dailyBudgetCents: 300,        // $3/day hard cap — embeddings only
+    dailyBudgetWarningPct: 0.5,   // warn at 50% ($1.50)
+    maxConcurrent: 2,
+    retryAfterMs: 5000,
+    maxRetries: 1,
+  },
 };
-
-// Legacy provider entries (removed from production)
-// const LEGACY_PROVIDERS = {
-//   "openai": { ... },            // REMOVED per 2026-03-29 migration
-//   "openai-codex": { ... },      // REMOVED per 2026-03-29 migration
-// };
 
 // ═══════════════════════════════════════════════════════════════════
 // CIRCUIT BREAKER

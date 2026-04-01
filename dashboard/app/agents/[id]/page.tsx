@@ -29,8 +29,7 @@ interface Agent {
 const MODELS = [
   "claude-opus-4-20250514",
   "claude-sonnet-4-20250514",
-  "gpt-4o",
-  "gpt-4o-mini",
+  "claude-haiku-4-5-20250514",
 ];
 
 const STATUSES = ["active", "idle", "paused", "quarantined", "error"];

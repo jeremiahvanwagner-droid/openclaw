@@ -4693,7 +4693,7 @@
   "skills": {
     "entries": {
       "notion": {},
-      "openai-image-gen": {},
+      "openai-image-gen": { "enabled": false },
       "sag": {},
       "ghl": {
         "enabled": true,
