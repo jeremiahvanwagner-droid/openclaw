@@ -47,14 +47,6 @@
         ],
         "timeoutMs": 3000
       },
-      "user_env_exec": {
-        "source": "exec",
-        "command": "/usr/bin/printenv",
-        "args": [
-          "OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN"
-        ],
-        "timeoutMs": 3000
-      },
       "supabase_url_env": {
         "source": "exec",
         "command": "/usr/bin/printenv",
@@ -119,24 +111,6 @@
         ],
         "timeoutMs": 3000
       }
-    }
-  },
-  "auth": {
-    "profiles": {
-      "openai-codex:default": {
-        "provider": "openai-codex",
-        "mode": "oauth"
-      },
-      "openai-codex:manual": {
-        "provider": "openai-codex",
-        "mode": "token"
-      }
-    },
-    "order": {
-      "openai-codex": [
-        "openai-codex:default",
-        "openai-codex:manual"
-      ]
     }
   },
   "agents": {

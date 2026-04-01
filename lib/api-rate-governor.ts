@@ -119,6 +119,17 @@ export interface ProviderLimits {
  * - Guardian: 40/min (P0, Haiku, Sovereign)
  */
 const PROVIDER_LIMITS: Record<string, ProviderLimits> = {
+  // Catch-all for any Anthropic call that doesn't specify a tier.
+  // Matches the strategist (most conservative) tier as a safe default.
+  "anthropic": {
+    requestsPerMinute: 30,
+    requestsPerHour: 1800,
+    dailyBudgetCents: 3000,
+    dailyBudgetWarningPct: 0.8,
+    maxConcurrent: 5,
+    retryAfterMs: 2000,
+    maxRetries: 3,
+  },
   "anthropic-strategist": {
     requestsPerMinute: 30,
     requestsPerHour: 1800,

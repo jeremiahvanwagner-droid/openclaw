@@ -8453,7 +8453,7 @@
         "shared_data_control"
       ],
       "workspace_path": ".openclaw/workspaces/shared_runtime_ops",
-      "cron_schedule": "*/5 * * * *",
+      "cron_schedule": "*/15 * * * *",
       "telegram_delivery": true,
       "teams_delivery": false,
       "reports_to": "shared_exec_orchestrator",
