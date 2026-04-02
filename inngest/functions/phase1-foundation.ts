@@ -118,6 +118,7 @@ export const scopeDriftDetected = inngest.createFunction(
     id: "scope-drift-detected",
     name: "Scope Drift — Auto-Correct Handler",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "scope/drift.detected" },
   async ({ event, step }) => {
@@ -158,6 +159,7 @@ export const scopeViolationAttempted = inngest.createFunction(
     id: "scope-violation-attempted",
     name: "Scope Violation — Logger",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "scope/violation.attempted" },
   async ({ event, step }) => {
@@ -267,6 +269,7 @@ export const integrationFailureDetected = inngest.createFunction(
     id: "integration-failure-detected",
     name: "Integration Failure — Auto-Heal Handler",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "integration/failure.detected" },
   async ({ event, step }) => {
@@ -315,6 +318,7 @@ export const integrationHealed = inngest.createFunction(
     id: "integration-healed",
     name: "Integration Healed — Logger",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "integration/healed" },
   async ({ event, step }) => {
@@ -338,6 +342,7 @@ export const integrationEscalation = inngest.createFunction(
     id: "integration-escalation",
     name: "Integration Escalation — Human Required",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "integration/escalation.needed" },
   async ({ event, step }) => {
@@ -446,6 +451,7 @@ export const qaFunnelPublished = inngest.createFunction(
     id: "qa-funnel-published",
     name: "QA — Funnel Published Audit",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "qa/funnel.published" },
   async ({ event, step }) => {
@@ -496,6 +502,7 @@ export const qaComplianceAlert = inngest.createFunction(
     id: "qa-compliance-alert",
     name: "QA — Compliance Alert Handler",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "qa/compliance.alert" },
   async ({ event, step }) => {
@@ -520,6 +527,7 @@ export const qaTrackingBroken = inngest.createFunction(
     id: "qa-tracking-broken",
     name: "QA — Tracking Broken Alert",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "qa/tracking.broken" },
   async ({ event, step }) => {

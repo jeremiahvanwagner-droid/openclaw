@@ -10,7 +10,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -34,13 +34,6 @@ export function resetCache() {
 
 // ── Supabase client ────────────────────────────────────────────
 
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
-  return createClient(url, key);
-}
-
 // ── Core Functions ─────────────────────────────────────────────
 
 /**
@@ -49,7 +42,7 @@ function supabase() {
  * integration_health_log, journey_scores, scope_violations_log.
  */
 export async function generatePortfolioBriefing() {
-  const sb = supabase();
+  const sb = supabase;
   const registry = businessRegistry();
   const today = new Date().toISOString().slice(0, 10);
   const oneDayAgo = new Date(Date.now() - 86400000).toISOString();
@@ -166,7 +159,7 @@ export async function generatePortfolioBriefing() {
  * Identify the biggest bottlenecks across all businesses.
  */
 export async function identifyBottlenecks() {
-  const sb = supabase();
+  const sb = supabase;
   const today = new Date().toISOString().slice(0, 10);
   const bottlenecks = [];
 
@@ -218,7 +211,7 @@ export async function identifyBottlenecks() {
  * Surface risks aggregated from all skills.
  */
 export async function surfaceRisks() {
-  const sb = supabase();
+  const sb = supabase;
   const oneDayAgo = new Date(Date.now() - 86400000).toISOString();
   const risks = [];
 
@@ -274,7 +267,7 @@ export async function surfaceRisks() {
  * Recommend top 3 actions for a business based on all available data.
  */
 export async function recommendNextActions(businessId) {
-  const sb = supabase();
+  const sb = supabase;
   const today = new Date().toISOString().slice(0, 10);
   const actions = [];
 

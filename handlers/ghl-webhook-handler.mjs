@@ -25,6 +25,7 @@ import {
   answerTelegramCallback,
 } from '../lib/human-approval.mjs';
 import { initAutoRefresh } from '../skills/ghl-oauth-manager.mjs';
+import { validateGhlWebhookPayload } from '../lib/schemas/ghl-webhook.schema.mjs';
 
 const log = childLogger({ module: 'webhook-handler' });
 
@@ -660,6 +661,17 @@ const server = http.createServer(async (req, res) => {
     const traceId = crypto.randomUUID();
     const normalized = normalizeGhlWebhookPayload(payload);
     const eventType = normalized.eventType || 'unknown';
+
+    // Validate payload shape against registered Zod schema (non-fatal — log and continue)
+    const validation = validateGhlWebhookPayload(eventType, normalized.payload);
+    if (!validation.success) {
+      log.warn({
+        trace_id: traceId,
+        eventType,
+        issues: validation.error?.issues?.map(i => `${i.path.join('.')}: ${i.message}`),
+      }, 'Webhook payload failed schema validation — processing with raw payload');
+    }
+
     const enrichedPayload = {
       ...normalized.payload,
       trace_id: traceId,

@@ -9,7 +9,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -32,13 +32,6 @@ export function resetCache() {
 }
 
 // ── Supabase client ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
-  return createClient(url, key);
-}
 
 // ── LLM router loader ─────────────────────────────────────────
 
@@ -118,7 +111,7 @@ export async function atomizeIdea(coreIdea, businessId) {
   };
 
   // Store in Supabase
-  const db = supabase();
+  const db = supabase;
   const { data, error } = await db.from('campaign_ideas').insert({
     business_id: businessId,
     core_idea: coreIdea,
@@ -136,7 +129,7 @@ export async function atomizeIdea(coreIdea, businessId) {
  */
 export async function generateAssetBundle(atomizedIdea, channels = null) {
   const targetChannels = channels || Object.keys(CHANNELS);
-  const db = supabase();
+  const db = supabase;
   const campaignId = atomizedIdea.campaign_id;
   const assets = [];
 
@@ -274,7 +267,7 @@ export async function scheduleDistribution(assetBundle, calendar = {}) {
   });
 
   // Update campaign status
-  const db = supabase();
+  const db = supabase;
   await db.from('campaign_ideas')
     .update({ status: 'scheduled' })
     .eq('id', assetBundle.campaign_id);
@@ -299,7 +292,7 @@ export async function scheduleDistribution(assetBundle, calendar = {}) {
  * Collect performance metrics for a campaign.
  */
 export async function trackCampaignPerformance(campaignId) {
-  const db = supabase();
+  const db = supabase;
 
   // Get all assets for this campaign
   const { data: assets } = await db.from('campaign_assets')

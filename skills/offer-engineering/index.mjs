@@ -9,7 +9,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -39,13 +39,6 @@ export function resetCache() {
 }
 
 // ── Supabase client ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
-  return createClient(url, key);
-}
 
 // ── Pricing Psychology Principles ──────────────────────────────
 
@@ -79,7 +72,7 @@ export async function analyzeCurrentOffers(businessId) {
     return { business_id: businessId, offers: [], message: 'No offers found in matrix' };
   }
 
-  const db = supabase();
+  const db = supabase;
 
   // Get recent analytics if available
   const { data: existingAnalytics } = await db.from('offer_analytics')
@@ -194,7 +187,7 @@ export async function designOfferStack(businessId, config = {}) {
   }
 
   // Store in Supabase
-  const db = supabase();
+  const db = supabase;
   const { data } = await db.from('offer_stacks').insert({
     business_id: businessId,
     stack_json: stack,
@@ -380,7 +373,7 @@ export async function simulateRevenue(offerStack, trafficEstimate) {
 
   // Store simulation
   if (offerStack.stack_id) {
-    const db = supabase();
+    const db = supabase;
     await db.from('offer_stacks')
       .update({ simulation_json: simulation })
       .eq('id', offerStack.stack_id);
@@ -393,7 +386,7 @@ export async function simulateRevenue(offerStack, trafficEstimate) {
  * Track offer performance metrics over a period.
  */
 export async function trackOfferPerformance(offerId, period = 'daily') {
-  const db = supabase();
+  const db = supabase;
 
   // Get historical analytics
   const { data: history } = await db.from('offer_analytics')
@@ -474,7 +467,7 @@ export async function recommendOptimizations(businessId) {
 
   // Store recommendations
   if (recommendations.length) {
-    const db = supabase();
+    const db = supabase;
     await db.from('offer_optimizations').insert(
       recommendations.map(r => ({
         business_id: businessId,

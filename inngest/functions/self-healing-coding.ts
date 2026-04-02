@@ -10,7 +10,7 @@
  */
 
 import { inngest } from "../client";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../lib/agent-memory.js";
 import { logger } from "../../lib/logger";
 import {
   runHealingLoop,
@@ -36,11 +36,11 @@ interface CircuitState {
 }
 
 async function getCircuitState(): Promise<CircuitState> {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return { failures: 0, last_failure_at: null, open_until: null };
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { failures: 0, last_failure_at: null, open_until: null };
+  }
 
-  const sb = createClient(url, key);
+  const sb = supabase;
   const { data } = await sb
     .from(CIRCUIT_BREAKER_TABLE)
     .select("*")
@@ -51,11 +51,9 @@ async function getCircuitState(): Promise<CircuitState> {
 }
 
 async function recordCircuitFailure(): Promise<void> {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return;
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return;
 
-  const sb = createClient(url, key);
+  const sb = supabase;
   const state = await getCircuitState();
   const newFailures = (state.failures ?? 0) + 1;
   const openUntil = newFailures >= MAX_FAILURES
@@ -71,11 +69,9 @@ async function recordCircuitFailure(): Promise<void> {
 }
 
 async function resetCircuit(): Promise<void> {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return;
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return;
 
-  const sb = createClient(url, key);
+  const sb = supabase;
   await sb.from(CIRCUIT_BREAKER_TABLE).upsert({
     circuit_key: "scheduled_healing",
     failures: 0,
@@ -205,6 +201,7 @@ export const selfHealingOnDemand = inngest.createFunction(
     id: "self-healing-on-demand",
     name: "Self-Healing — On-Demand Run",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "healing/run.requested" },
   async ({ event, step }) => {
@@ -238,6 +235,7 @@ export const supervisorIntegrationCheck = inngest.createFunction(
     id: "supervisor-integration-check",
     name: "Supervisor — Integration Health Check",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "healing/integration.health_check" },
   async ({ step }) => {
@@ -280,6 +278,7 @@ export const healingEscalationHandler = inngest.createFunction(
     id: "healing-escalation-handler",
     name: "Self-Healing — Escalation Handler",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "healing/escalation.needed" },
   async ({ event, step }) => {
@@ -319,6 +318,7 @@ export const ciAutoFix = inngest.createFunction(
     retries: 1,
     // Debounce: at most one CI fix per repo per 10 minutes
     debounce: { period: "10m", key: "event.data.owner + '/' + event.data.repo" },
+    idempotency: "event.id",
   },
   { event: "ci/run.failed" },
   async ({ event, step }) => {

@@ -9,7 +9,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -47,13 +47,6 @@ export function resetCache() {
 
 // ── Supabase client ────────────────────────────────────────────
 
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
-  return createClient(url, key);
-}
-
 // ── Stall Thresholds (ms) ──────────────────────────────────────
 
 const STALL_THRESHOLDS = {
@@ -79,7 +72,7 @@ const SCORING_WEIGHTS = {
  * Record a touchpoint event for a contact.
  */
 export async function recordTouchpoint(contactId, event) {
-  const sb = supabase();
+  const sb = supabase;
 
   const touchpoint = {
     contact_id: contactId,
@@ -111,7 +104,7 @@ export async function recordTouchpoint(contactId, event) {
  * Build a complete journey map for a contact.
  */
 export async function buildJourneyMap(contactId) {
-  const sb = supabase();
+  const sb = supabase;
 
   const { data, error } = await sb
     .from('journey_touchpoints')
@@ -128,7 +121,7 @@ export async function buildJourneyMap(contactId) {
  * Uses multi-factor scoring reusing predictive-scoring.mjs patterns.
  */
 export async function scoreIntent(contactId) {
-  const sb = supabase();
+  const sb = supabase;
   const journey = await buildJourneyMap(contactId);
   if (!journey.length) return { intent_score: 0, factors: {} };
 
@@ -185,7 +178,7 @@ export async function scoreIntent(contactId) {
  * Detect if a contact's journey has stalled at a funnel stage.
  */
 export async function detectJourneyStall(contactId) {
-  const sb = supabase();
+  const sb = supabase;
   const journey = await buildJourneyMap(contactId);
   if (!journey.length) return null;
 
@@ -214,7 +207,7 @@ export async function detectJourneyStall(contactId) {
  * Recommend the best next offer for a contact based on journey + intent.
  */
 export async function recommendNextOffer(contactId) {
-  const sb = supabase();
+  const sb = supabase;
   const journey = await buildJourneyMap(contactId);
   const { intent_score } = await scoreIntent(contactId);
   const offers = offerMatrix();
@@ -266,7 +259,7 @@ export async function recommendNextOffer(contactId) {
  * Trigger the next action (GHL workflow enrollment) for a contact.
  */
 export async function triggerNextAction(contactId, recommendation) {
-  const sb = supabase();
+  const sb = supabase;
 
   // Mark recommendation as acted upon
   if (recommendation.id) {
@@ -289,7 +282,7 @@ export async function triggerNextAction(contactId, recommendation) {
  * Segment all contacts by their current journey stage for a business.
  */
 export async function segmentByJourneyStage(businessId) {
-  const sb = supabase();
+  const sb = supabase;
 
   // Get latest touchpoint per contact for this business
   const { data: touchpoints, error } = await sb

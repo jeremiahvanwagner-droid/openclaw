@@ -10,6 +10,7 @@
  */
 
 import { inngest } from "../client";
+import { supabase as _supabaseSingleton } from "../../lib/agent-memory.js";
 
 // Typed loaders for dynamic .mjs skill imports
 // @ts-expect-error — .mjs skills are untyped by design
@@ -38,6 +39,7 @@ export const ghlBuildCreateRequested = inngest.createFunction(
     id: "ghl-build-create-requested",
     name: "GHL Builder — Create Requested",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "ghl-build/create.requested" },
   async ({ event, step }) => {
@@ -99,6 +101,7 @@ export const ghlSnapshotCreated = inngest.createFunction(
     id: "ghl-snapshot-created",
     name: "GHL Builder — Snapshot Created",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "ghl-build/snapshot.created" },
   async ({ event, step }) => {
@@ -123,6 +126,7 @@ export const ghlRollbackRequested = inngest.createFunction(
     id: "ghl-rollback-requested",
     name: "GHL Builder — Rollback Requested",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "ghl-build/rollback.requested" },
   async ({ event, step }) => {
@@ -164,6 +168,7 @@ export const experimentCreated = inngest.createFunction(
     id: "experiment-created",
     name: "Experiment Engine — Created",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "experiment/created" },
   async ({ event, step }) => {
@@ -246,6 +251,7 @@ export const experimentSignificant = inngest.createFunction(
     id: "experiment-significant",
     name: "Experiment Engine — Significant Result",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "experiment/significant" },
   async ({ event, step }) => {
@@ -273,6 +279,7 @@ export const experimentPromoted = inngest.createFunction(
     id: "experiment-promoted",
     name: "Experiment Engine — Promote Winner",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "experiment/promoted" },
   async ({ event, step }) => {
@@ -307,6 +314,7 @@ export const campaignIdeaSubmitted = inngest.createFunction(
     id: "campaign-idea-submitted",
     name: "Campaign Factory — Idea Submitted",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "campaign/idea.submitted" },
   async ({ event, step }) => {
@@ -350,6 +358,7 @@ export const campaignBundleReady = inngest.createFunction(
     id: "campaign-bundle-ready",
     name: "Campaign Factory — Bundle Ready",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "campaign/bundle.ready" },
   async ({ event, step }) => {
@@ -374,6 +383,7 @@ export const campaignApproved = inngest.createFunction(
     id: "campaign-approved",
     name: "Campaign Factory — Approved & Schedule",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "campaign/approved" },
   async ({ event, step }) => {
@@ -413,11 +423,7 @@ export const campaignPerformanceCollect = inngest.createFunction(
     const mod = await step.run("load-campaign-factory", () => loadCampaignFactory());
 
     // Get active campaigns from Supabase
-    const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-    );
+    const sb = _supabaseSingleton;
 
     const { data: activeCampaigns } = await sb
       .from("campaign_ideas")
@@ -507,6 +513,7 @@ export const offerOptimizationSuggested = inngest.createFunction(
     id: "offer-optimization-suggested",
     name: "Offer Engineering — Optimization Alert",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "offer/optimization.suggested" },
   async ({ event, step }) => {
@@ -537,11 +544,7 @@ export const offerPerformanceCollected = inngest.createFunction(
     const mod = await step.run("load-offer-engineering", () => loadOfferEngineering());
 
     // Get all offers with analytics
-    const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-    );
+    const sb = _supabaseSingleton;
 
     const { data: offers } = await sb
       .from("offer_analytics")

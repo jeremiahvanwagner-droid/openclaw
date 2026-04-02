@@ -7,16 +7,9 @@
  * validate in isolated environments, apply with rollback safeguards.
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 // ── Supabase client ────────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
-  return createClient(url, key);
-}
 
 // ── Root-cause signature patterns ─────────────────────────────────
 
@@ -47,7 +40,7 @@ const PATCH_TABLE    = 'debug_patches';
  * @returns {{ incidents: Array<{id: string, signature: string, severity: string, message: string, source: string, timestamp: string}> }}
  */
 export async function ingestErrorLogs(logs) {
-  const db = supabase();
+  const db = supabase;
   const incidents = [];
 
   for (const log of logs) {
@@ -247,7 +240,7 @@ export function validatePatch(proposal) {
  * @returns {{ applied: boolean, patch_id: string, rollback_token: string }}
  */
 export async function applyPatch(proposal, clusterSignature) {
-  const db = supabase();
+  const db = supabase;
   const rollbackToken = `rollback-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
   const { data, error } = await db
@@ -278,7 +271,7 @@ export async function applyPatch(proposal, clusterSignature) {
  * @returns {{ rolled_back: boolean, patch_id: string }}
  */
 export async function rollbackPatch(rollbackToken) {
-  const db = supabase();
+  const db = supabase;
 
   const { data, error } = await db
     .from(PATCH_TABLE)
@@ -302,7 +295,7 @@ export async function rollbackPatch(rollbackToken) {
  * @returns {{ stable: boolean, recurrence_count: number, verdict: 'stable'|'regressed'|'insufficient_data' }}
  */
 export async function monitorPostFixStability(clusterSignature, options = {}) {
-  const db = supabase();
+  const db = supabase;
   const windowMinutes = options.windowMinutes ?? 30;
   const since = new Date(Date.now() - windowMinutes * 60 * 1000).toISOString();
 

@@ -14,7 +14,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { supabase as _supabaseSingleton } from "./agent-memory.js";
 import { withGovernor, type QueueClass } from "./api-rate-governor";
 import { logger } from "./logger";
 import {
@@ -139,15 +139,10 @@ async function getOpenAIClient() {
   return openaiModule;
 }
 
-// Supabase client for cost logging (lazy)
-let costSupabase: SupabaseClient | null = null;
-function getCostSupabase(): SupabaseClient | null {
-  if (costSupabase) return costSupabase;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) return null;
-  costSupabase = createClient(url, key);
-  return costSupabase;
+// Supabase client for cost logging (singleton)
+function getCostSupabase() {
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
+  return _supabaseSingleton;
 }
 
 // Per-1K-token pricing (USD) — keep updated

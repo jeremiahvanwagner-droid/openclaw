@@ -9,7 +9,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -54,13 +54,6 @@ export function resetCache() {
 }
 
 // ── Supabase client ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
-  return createClient(url, key);
-}
 
 // ── Scope resolution helpers ───────────────────────────────────
 
@@ -129,7 +122,7 @@ export async function auditScopeCompliance() {
   };
 
   // Persist results
-  const db = supabase();
+  const db = supabase;
   await db.from('scope_audit_results').insert({
     audit_type: 'compliance',
     findings_json: findings,
@@ -165,7 +158,7 @@ function getSkillRequiredScopes(skillId) {
  * @returns {{ drifts: Array<{agent_id: string, field: string, baseline: any, current: any, severity: string}>, has_drift: boolean }}
  */
 export async function detectScopeDrift() {
-  const db = supabase();
+  const db = supabase;
 
   // Get the latest baseline
   const { data: baseline } = await db
@@ -283,7 +276,7 @@ export async function generateScopeBaseline(createdBy = 'system') {
     generated_at: new Date().toISOString(),
   };
 
-  const db = supabase();
+  const db = supabase;
   const { data, error } = await db
     .from('scope_baselines')
     .insert({
@@ -344,7 +337,7 @@ export async function crossBusinessIsolationCheck() {
   }
 
   // Persist
-  const db = supabase();
+  const db = supabase;
   await db.from('scope_audit_results').insert({
     audit_type: 'isolation',
     findings_json: violations,
@@ -395,7 +388,7 @@ export async function policyGuardrailEnforcement() {
   }
 
   // Persist
-  const db = supabase();
+  const db = supabase;
   await db.from('scope_audit_results').insert({
     audit_type: 'policy',
     findings_json: violations,
@@ -412,7 +405,7 @@ export async function policyGuardrailEnforcement() {
  * @param {{ agent_id: string, resource: string, operation: string, business_id?: string, blocked: boolean }} violation
  */
 export async function logScopeViolation(violation) {
-  const db = supabase();
+  const db = supabase;
   await db.from('scope_violations_log').insert({
     agent_id: violation.agent_id,
     resource: violation.resource,

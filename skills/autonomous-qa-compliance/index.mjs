@@ -10,19 +10,12 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
 
 // ── Supabase client ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
-  return createClient(url, key);
-}
 
 // ── Config helpers ─────────────────────────────────────────────
 
@@ -96,7 +89,7 @@ export async function runFunnelAudit(locationId) {
   const score = total > 0 ? Math.round((passed / total) * 100) : 0;
 
   // Persist audit
-  const db = supabase();
+  const db = supabase;
   await db.from('qa_audit_results').insert({
     location_id: locationId,
     business_id: locationId, // Resolved by caller
@@ -135,7 +128,7 @@ export async function runTrackingIntegrityCheck(locationId) {
 
   const score = 0; // Pending live validation
 
-  const db = supabase();
+  const db = supabase;
   await db.from('qa_audit_results').insert({
     location_id: locationId,
     business_id: locationId,
@@ -194,7 +187,7 @@ export async function runBrandComplianceCheck(locationId, brandGuidelines = {}) 
 
   const score = total > 0 ? Math.round((passed / total) * 100) : 0;
 
-  const db = supabase();
+  const db = supabase;
   await db.from('qa_audit_results').insert({
     location_id: locationId,
     business_id: locationId,
@@ -236,7 +229,7 @@ export async function runPolicyGuardrailCheck(agentId, action) {
   }
 
   if (!allowedActions.has(action)) {
-    const db = supabase();
+    const db = supabase;
     await db.from('qa_audit_results').insert({
       location_id: 'system',
       business_id: 'system',
@@ -300,7 +293,7 @@ export async function runMobileUXAudit(funnelUrls) {
  * @returns {{ overall_score: number, categories: Record<string, {score: number, status: string}> }}
  */
 export async function generateComplianceScorecard(locationId) {
-  const db = supabase();
+  const db = supabase;
 
   // Get the latest audit for each type
   const auditTypes = ['funnel', 'tracking', 'brand', 'policy', 'mobile_ux'];

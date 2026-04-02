@@ -9,7 +9,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -41,13 +41,6 @@ export function resetCache() {
 
 // ── Supabase client ────────────────────────────────────────────
 
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
-  return createClient(url, key);
-}
-
 // ── Z-Score Anomaly Detection ──────────────────────────────────
 
 const BASELINE_DAYS = 14;
@@ -73,7 +66,7 @@ function classifySeverity(zScore) {
  * Stores result in daily_kpis table.
  */
 export async function collectDailyKPIs(businessId) {
-  const sb = supabase();
+  const sb = supabase;
   const registry = businessRegistry();
   const business = registry.businesses?.find(b => b.business_id === businessId);
   const today = new Date().toISOString().slice(0, 10);
@@ -111,7 +104,7 @@ export async function collectDailyKPIs(businessId) {
  * Uses Z-score with 14-day rolling average.
  */
 export async function detectKPIAnomalies(businessId, period = BASELINE_DAYS) {
-  const sb = supabase();
+  const sb = supabase;
 
   // Fetch recent KPIs for baseline calculation
   const { data: kpis, error } = await sb
@@ -181,7 +174,7 @@ export function matchPlaybook(anomaly) {
  * Auto-executes safe actions; flags HITL-required actions for human approval.
  */
 export async function executePlaybook(playbook, context) {
-  const sb = supabase();
+  const sb = supabase;
   const executedActions = [];
   let outcome = 'success';
 
@@ -245,7 +238,7 @@ function evaluateCondition(condition, context) {
  * Generate a daily briefing for one business.
  */
 export async function generateDailyBriefing(businessId) {
-  const sb = supabase();
+  const sb = supabase;
   const today = new Date().toISOString().slice(0, 10);
   const registry = businessRegistry();
   const business = registry.businesses?.find(b => b.business_id === businessId);
@@ -291,7 +284,7 @@ export async function generateDailyBriefing(businessId) {
  * Aggregate portfolio pulse across all 10 businesses.
  */
 export async function portfolioPulse() {
-  const sb = supabase();
+  const sb = supabase;
   const today = new Date().toISOString().slice(0, 10);
 
   // Get all businesses' KPIs for today

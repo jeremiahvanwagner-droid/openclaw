@@ -14,15 +14,11 @@
  */
 
 import { inngest } from "../client";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../lib/agent-memory.js";
 import * as fs from "fs";
 import * as path from "path";
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Supabase singleton is imported from agent-memory.js
 
 const WORKSPACE_ROOT = path.resolve(process.env.OPENCLAW_HOME ?? process.cwd());
 const TRAINING_DIR = path.join(WORKSPACE_ROOT, "training");
@@ -63,6 +59,7 @@ export const trainingWeeklyReview = inngest.createFunction(
     id: "training-weekly-review",
     name: "Training: Weekly Review & Planning",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "training.weekly_review" },
   async ({ event, step }) => {
@@ -202,6 +199,7 @@ export const trainingSkillDevelopment = inngest.createFunction(
     id: "training-skill-development",
     name: "Training: Skill Development",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "training.skill_development" },
   async ({ event, step }) => {
@@ -309,6 +307,7 @@ export const trainingCrossDivision = inngest.createFunction(
     id: "training-cross-division",
     name: "Training: Cross-Division Collaboration",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "training.cross_division" },
   async ({ event, step }) => {
@@ -446,6 +445,7 @@ export const trainingSoulRefinement = inngest.createFunction(
     id: "training-soul-refinement",
     name: "Training: SOUL.md Refinement",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "training.soul_refinement" },
   async ({ event, step }) => {
@@ -553,6 +553,7 @@ export const trainingPerformanceReview = inngest.createFunction(
     id: "training-performance-review",
     name: "Training: Performance Review",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "training.performance_review" },
   async ({ event, step }) => {
@@ -683,6 +684,7 @@ export const trainingMemoryConsolidation = inngest.createFunction(
     id: "training-memory-consolidation",
     name: "Training: Memory Consolidation",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "training.memory_consolidation" },
   async ({ event, step }) => {
@@ -819,6 +821,7 @@ export const trainingHealthCheck = inngest.createFunction(
     id: "training-health-check",
     name: "Training: System Health Check",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "training.health_check" },
   async ({ event, step }) => {

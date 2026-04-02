@@ -21,7 +21,7 @@
  * and the `skills/self-healing-integrations` health-check cron.
  */
 
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "./agent-memory.js";
 import { logger } from "./logger";
 
 const log = logger.child({ module: "self-healing-supervisor" });
@@ -67,15 +67,6 @@ export async function preflightCheck(): Promise<boolean> {
   }
 
   return true;
-}
-
-// ── Supabase singleton ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error("Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY");
-  return createClient(url, key);
 }
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -176,7 +167,7 @@ async function loadSelfHealingIntegrations(): Promise<any> {
  * Persist an escalation record and (optionally) send a Telegram alert.
  */
 async function escalate(reason: string, context: Record<string, unknown>): Promise<void> {
-  const db = supabase();
+  const db = supabase;
   try {
     await db.from("healing_escalations").insert({
       reason,
@@ -340,7 +331,7 @@ export async function runHealingLoop(
   };
 
   // Persist run summary to Supabase
-  const db = supabase();
+  const db = supabase;
   try {
     await db.from("healing_run_log").insert({
       run_id:             result.run_id,
@@ -454,7 +445,7 @@ export async function runCiHealingCycle(
  * @param windowMinutes   Look-back window in minutes (default: 30)
  */
 export async function collectRecentErrorLogs(windowMinutes = 30): Promise<ErrorLogEntry[]> {
-  const db = supabase();
+  const db = supabase;
   const since = new Date(Date.now() - windowMinutes * 60_000).toISOString();
 
   const { data } = await db

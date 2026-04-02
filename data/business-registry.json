@@ -189,7 +189,7 @@
         "dashboard_widgets": true,
         "exception_rules": true
       },
-      "rollout_wave": 2
+      "rollout_wave": 1
     },
     {
       "business_id": "biz_03_divine_path_walkers",
@@ -279,7 +279,7 @@
         "dashboard_widgets": true,
         "exception_rules": true
       },
-      "rollout_wave": 3
+      "rollout_wave": 1
     },
     {
       "business_id": "biz_04_publishing_media",

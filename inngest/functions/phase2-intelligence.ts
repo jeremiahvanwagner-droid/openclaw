@@ -9,6 +9,7 @@
  */
 
 import { inngest } from "../client";
+import { supabase as _supabaseSingleton } from "../../lib/agent-memory.js";
 
 // Typed loaders for dynamic .mjs skill imports
 // @ts-expect-error — .mjs skills are untyped by design
@@ -105,6 +106,7 @@ export const revenueAnomalyDetected = inngest.createFunction(
     id: "revenue-anomaly-detected",
     name: "Revenue Ops — Anomaly Response",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "revenue/anomaly.detected" },
   async ({ event, step }) => {
@@ -149,6 +151,7 @@ export const revenueBriefingReady = inngest.createFunction(
     id: "revenue-briefing-ready",
     name: "Revenue Ops — Briefing Delivery",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "revenue/briefing.ready" },
   async ({ step }) => {
@@ -188,6 +191,7 @@ export const journeyTouchpointRecorded = inngest.createFunction(
     id: "journey-touchpoint-recorded",
     name: "Journey — Record Touchpoint",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "journey/touchpoint.recorded" },
   async ({ event, step }) => {
@@ -233,11 +237,7 @@ export const journeyStallDetection = inngest.createFunction(
     const mod = await step.run("load-journey", () => loadJourneyIntel());
 
     // Get all active contacts with recent touchpoints
-    const { createClient } = await import("@supabase/supabase-js");
-    const sb = createClient(
-      process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-      process.env.SUPABASE_SERVICE_ROLE_KEY || ""
-    );
+    const sb = _supabaseSingleton;
 
     const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
     const { data: recentContacts } = await sb
@@ -280,6 +280,7 @@ export const journeyHighIntent = inngest.createFunction(
     id: "journey-high-intent",
     name: "Journey — High Intent Response",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "journey/intent.high" },
   async ({ event, step }) => {
@@ -313,6 +314,7 @@ export const journeyNextOfferTriggered = inngest.createFunction(
     id: "journey-next-offer-triggered",
     name: "Journey — Next Offer Trigger",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "journey/next-offer.triggered" },
   async ({ event, step }) => {
@@ -396,6 +398,7 @@ export const commandCenterCriticalAlert = inngest.createFunction(
     id: "command-center-critical-alert",
     name: "Command Center — Critical Alert",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "command-center/alert.critical" },
   async ({ event, step }) => {

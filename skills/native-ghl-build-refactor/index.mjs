@@ -9,7 +9,7 @@
 import { readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -39,13 +39,6 @@ export function resetCache() {
 }
 
 // ── Supabase client ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
-  return createClient(url, key);
-}
 
 // ── GHL client loader ──────────────────────────────────────────
 
@@ -126,7 +119,7 @@ export async function createFunnel(businessId, template, customization = {}) {
   };
 
   // Log the build action
-  const db = supabase();
+  const db = supabase;
   const { data: logEntry } = await db.from('ghl_build_log').insert({
     location_id: locationId,
     action: 'create',
@@ -179,7 +172,7 @@ export async function createWorkflow(businessId, blueprint) {
     active: false, // Always start inactive for safety
   };
 
-  const db = supabase();
+  const db = supabase;
   await db.from('ghl_build_log').insert({
     location_id: locationId,
     action: 'create',
@@ -220,7 +213,7 @@ export async function createPaymentLink(businessId, offerConfig) {
     redirect_url: offerConfig.redirect_url || null,
   };
 
-  const db = supabase();
+  const db = supabase;
   await db.from('ghl_build_log').insert({
     location_id: locationId,
     action: 'create',
@@ -242,7 +235,7 @@ export async function createPaymentLink(businessId, offerConfig) {
  * Stores full entity config in Supabase for rollback.
  */
 export async function snapshotCurrentState(locationId, entityType, entityId) {
-  const db = supabase();
+  const db = supabase;
 
   // Capture current state (in production, this would pull from GHL API)
   const snapshotData = {
@@ -279,7 +272,7 @@ export async function refactorEntity(locationId, entityId, changes) {
   }
 
   // Step 3: Apply changes (logged)
-  const db = supabase();
+  const db = supabase;
   const { data: logEntry } = await db.from('ghl_build_log').insert({
     location_id: locationId,
     action: 'refactor',
@@ -305,7 +298,7 @@ export async function refactorEntity(locationId, entityId, changes) {
  * Requires HITL approval (irreversible action).
  */
 export async function rollback(snapshotId) {
-  const db = supabase();
+  const db = supabase;
 
   // Fetch snapshot
   const { data: snapshot, error } = await db.from('ghl_snapshots')
@@ -339,7 +332,7 @@ export async function rollback(snapshotId) {
  * Show what changed between two snapshots.
  */
 export async function diffSnapshot(snapshotIdA, snapshotIdB) {
-  const db = supabase();
+  const db = supabase;
 
   const [{ data: a }, { data: b }] = await Promise.all([
     db.from('ghl_snapshots').select('*').eq('id', snapshotIdA).single(),

@@ -12,15 +12,12 @@
  */
 
 import { DIVISION_HEADS, inngest, POD_LEADS } from "../client";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../lib/agent-memory.js";
 import { logger } from "../../lib/logger";
 
 const log = logger.child({ module: "weekly-meeting" });
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
+// Supabase singleton is imported from agent-memory.js
 
 // ═══════════════════════════════════════════════════════════════════
 // TYPES
@@ -418,6 +415,7 @@ export const onDemandMeeting = inngest.createFunction(
     id: "on-demand-meeting",
     name: "On-Demand Executive Meeting",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "meeting/executive.request" },
   async ({ event, step }) => {

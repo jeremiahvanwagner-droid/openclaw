@@ -10,7 +10,7 @@
 import { readFileSync, readdirSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..', '..');
@@ -41,13 +41,6 @@ const PROVIDERS = {
 };
 
 // ── Supabase client ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
-  return createClient(url, key);
-}
 
 // ── DLQ Inspection ─────────────────────────────────────────────
 
@@ -91,7 +84,7 @@ function inspectDlq() {
  */
 export async function probeAllWebhooks() {
   const results = [];
-  const db = supabase();
+  const db = supabase;
 
   for (const [id, provider] of Object.entries(PROVIDERS)) {
     let healthUrl = provider.healthUrl;
@@ -174,7 +167,7 @@ export async function probeAllWebhooks() {
  * @returns {{ broken: Array<{provider: string, reason: string, failure_type: string}>, healthy: string[] }}
  */
 export async function detectBrokenIntegrations() {
-  const db = supabase();
+  const db = supabase;
   const broken = [];
   const healthy = [];
 
@@ -258,7 +251,7 @@ export function classifyFailure(endpoint, errorHistory) {
  * @returns {{ retried: number, succeeded: number, failed: number }}
  */
 export async function autoRetryTransient(failedEvents) {
-  const db = supabase();
+  const db = supabase;
   let succeeded = 0;
   let failed = 0;
 
@@ -312,7 +305,7 @@ export async function remapEndpoint(oldUrl, newUrl, integrationId) {
     };
   }
 
-  const db = supabase();
+  const db = supabase;
   await db.from('integration_heal_events').insert({
     provider: integrationId,
     failure_type: 'dead',
@@ -331,7 +324,7 @@ export async function remapEndpoint(oldUrl, newUrl, integrationId) {
  * @returns {{ reset: boolean, previous_state: string }}
  */
 export async function selfHealCircuitBreaker(provider) {
-  const db = supabase();
+  const db = supabase;
 
   // Check latest health status
   const { data: latest } = await db
@@ -363,7 +356,7 @@ export async function selfHealCircuitBreaker(provider) {
  * @returns {{ providers: Record<string, {status: string, uptime_pct: number, avg_latency_ms: number, dlq_depth: number}>, overall: string }}
  */
 export async function generateHealthReport() {
-  const db = supabase();
+  const db = supabase;
   const providers = {};
   const dlq = inspectDlq();
 

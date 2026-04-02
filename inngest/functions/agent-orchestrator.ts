@@ -10,18 +10,14 @@
  */
 
 import { agentTaskName, getDivisionHead, getPodLead, inngest, podTaskName } from "../client";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "../../lib/agent-memory.js";
 import { randomUUID } from "crypto";
 import { reportFailure as governorReportFailure } from "../../lib/api-rate-governor";
 import { logger } from "../../lib/logger";
 
 const log = logger.child({ module: "agent-orchestrator" });
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Supabase singleton is imported from agent-memory.js
 
 // ═══════════════════════════════════════════════════════════════════
 // AGENT INVOKE ROUTER
@@ -32,6 +28,7 @@ export const agentInvoke = inngest.createFunction(
     id: "agent-invoke",
     name: "Agent Invoke Router",
     retries: 3,
+    idempotency: "event.data.correlation_id",
   },
   { event: "agent/invoke" },
   async ({ event, step }) => {
@@ -245,6 +242,7 @@ export const agentEscalate = inngest.createFunction(
     id: "agent-escalate",
     name: "Agent Escalation Handler",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "agent/escalate" },
   async ({ event, step }) => {
@@ -525,6 +523,7 @@ export const telegramAlert = inngest.createFunction(
     id: "telegram-alert",
     name: "Telegram Alert Handler",
     retries: 2,
+    idempotency: "event.id",
   },
   { event: "alert/telegram" },
   async ({ event, step }) => {
@@ -589,6 +588,7 @@ export const podQuarantine = inngest.createFunction(
     id: "pod-quarantine",
     name: "Pod Quarantine Handler",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "pod/*/quarantine" },
   async ({ event, step }) => {
@@ -665,6 +665,7 @@ export const podRestore = inngest.createFunction(
     id: "pod-restore",
     name: "Pod Restore Handler",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "pod/*/restore" as any },
   async ({ event, step }) => {
@@ -724,6 +725,7 @@ export const credentialHealthCheck = inngest.createFunction(
     id: "credential-health-check",
     name: "Credential Health Check",
     retries: 1,
+    idempotency: "event.id",
   },
   { event: "credential/health.check" },
   async ({ event, step }) => {
@@ -831,6 +833,7 @@ export const bookLaunchReady = inngest.createFunction(
   {
     id: "book-launch-ready",
     name: "Book Launch Cross-Promotion",
+    idempotency: "event.id",
   },
   { event: "book.launch.ready" },
   async ({ event, step }) => {

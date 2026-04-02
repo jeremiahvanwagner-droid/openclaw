@@ -19,7 +19,7 @@ import {
 const log = logger.child({ module: "agent-memory" });
 
 // Initialize clients lazily
-let supabase: SupabaseClient | null = null;
+let _supabase: SupabaseClient | null = null;
 // Lazy-load OpenAI only if embeddings are needed
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let openaiModule: any = null;
@@ -28,14 +28,34 @@ const EMBEDDING_MODEL = "text-embedding-3-small";
 const EMBEDDING_DIMENSIONS = 512;
 
 function getSupabase(): SupabaseClient {
-  if (!supabase) {
-    supabase = createClient(
+  if (!_supabase) {
+    _supabase = createClient(
       process.env.SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
   }
-  return supabase;
+  return _supabase;
 }
+
+/**
+ * Shared Supabase singleton — import this instead of calling createClient() inline.
+ * Uses the same lazy-initialized instance as the rest of agent-memory.
+ * All property access is delegated to the real client via Proxy, ensuring
+ * the singleton is stable across module imports (strict equality is guaranteed
+ * by Node.js ESM module caching).
+ */
+export const supabase: SupabaseClient = new Proxy<SupabaseClient>(
+  {} as SupabaseClient,
+  {
+    get(_target: SupabaseClient, prop: string | symbol): unknown {
+      const client = getSupabase();
+      const value = (client as unknown as Record<string | symbol, unknown>)[prop];
+      return typeof value === "function"
+        ? (value as (...args: unknown[]) => unknown).bind(client)
+        : value;
+    },
+  }
+);
 
 /**
  * Lazy-load OpenAI SDK only when embeddings are needed.

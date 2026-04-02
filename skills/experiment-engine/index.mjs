@@ -7,16 +7,9 @@
  */
 
 import { createHash } from 'crypto';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../../lib/agent-memory.js';
 
 // ── Supabase client ────────────────────────────────────────────
-
-function supabase() {
-  const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required');
-  return createClient(url, key);
-}
 
 // ── Statistical Functions ──────────────────────────────────────
 
@@ -88,7 +81,7 @@ export async function createExperiment(config) {
     variants.map(v => [v, Math.floor(100 / variants.length)])
   );
 
-  const db = supabase();
+  const db = supabase;
   const { data, error } = await db.from('experiments').insert({
     business_id: config.business_id,
     type: config.type,
@@ -114,7 +107,7 @@ export async function createExperiment(config) {
  * Same subject always gets the same variant for a given experiment.
  */
 export async function assignVariant(experimentId, subjectId) {
-  const db = supabase();
+  const db = supabase;
 
   // Check for existing assignment
   const { data: existing } = await db.from('experiment_assignments')
@@ -169,7 +162,7 @@ export async function assignVariant(experimentId, subjectId) {
  * Record a conversion event for a subject.
  */
 export async function recordConversion(experimentId, subjectId, metric, value = 1) {
-  const db = supabase();
+  const db = supabase;
 
   // Look up assigned variant
   const { data: assignment } = await db.from('experiment_assignments')
@@ -197,7 +190,7 @@ export async function recordConversion(experimentId, subjectId, metric, value = 
  * Evaluate statistical significance of an experiment.
  */
 export async function evaluateSignificance(experimentId) {
-  const db = supabase();
+  const db = supabase;
 
   // Load experiment config
   const { data: experiment } = await db.from('experiments')
@@ -283,7 +276,7 @@ export async function evaluateSignificance(experimentId) {
  * Auto-promote the winning variant to production.
  */
 export async function autoPromoteWinner(experimentId) {
-  const db = supabase();
+  const db = supabase;
 
   const { data: result } = await db.from('experiment_results')
     .select('*')
@@ -323,7 +316,7 @@ export async function autoPromoteWinner(experimentId) {
  * Archive a completed experiment with learnings.
  */
 export async function archiveExperiment(experimentId) {
-  const db = supabase();
+  const db = supabase;
 
   await db.from('experiments')
     .update({ status: 'completed' })
@@ -345,7 +338,7 @@ export async function archiveExperiment(experimentId) {
  * List active experiments for a business.
  */
 export async function listActiveExperiments(businessId) {
-  const db = supabase();
+  const db = supabase;
 
   const { data, error } = await db.from('experiments')
     .select('*')

@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.truthjblue.co/anthropic-tier-assignment.json",
   "version": "1.0.0",
-  "description": "5-Agent Pure Anthropic Architecture — Tier Assignments (OpenClaw 2026-03-29 Migration)",
-  "generated_at": "2026-03-29T00:00:00.000Z",
+  "description": "5-Agent Pure Anthropic Architecture — Tier Assignments (OpenClaw 2026-03-29 Migration, fully assigned 2026-04-02)",
+  "generated_at": "2026-04-02T00:00:00.000Z",
   "migration_status": "active",
 
   "tier_assignments": {
@@ -33,6 +33,30 @@
           "name": "Product Development Manager",
           "division": "division_1_core_operations",
           "responsibility": "Product development planning"
+        },
+        {
+          "agent_id": "d3_ceo",
+          "name": "Consulting Practice CEO",
+          "division": "division_3_consulting",
+          "responsibility": "Consulting division strategy and client acquisition"
+        },
+        {
+          "agent_id": "d6_executive_director",
+          "name": "Nonprofit Executive Director",
+          "division": "division_6_nonprofit",
+          "responsibility": "Nonprofit strategy, board relations, and program governance"
+        },
+        {
+          "agent_id": "shared_master_orchestrator",
+          "name": "Master Orchestrator",
+          "division": "division_7_shared_services",
+          "responsibility": "Cross-division orchestration and strategic coordination"
+        },
+        {
+          "agent_id": "shared_exec_orchestrator",
+          "name": "Executive Orchestrator",
+          "division": "division_7_shared_services",
+          "responsibility": "Executive workflow orchestration and escalation routing"
         }
       ]
     },
@@ -60,16 +84,58 @@
           "responsibility": "Infrastructure and deployment"
         },
         {
-          "agent_id": "d8_integration_engineer",
-          "name": "Integration Engineer",
+          "agent_id": "d1_ux_designer",
+          "name": "UX Designer",
+          "division": "division_1_core_operations",
+          "responsibility": "User experience design and front-end implementation"
+        },
+        {
+          "agent_id": "d2_web_dev",
+          "name": "Web Developer",
+          "division": "division_2_ecommerce",
+          "responsibility": "eCommerce web development and storefront implementation"
+        },
+        {
+          "agent_id": "d4_tech_automation",
+          "name": "Tech & Automation Specialist",
+          "division": "division_4_coaching",
+          "responsibility": "Coaching platform automation and technical integrations"
+        },
+        {
+          "agent_id": "d8_automation_architect",
+          "name": "Automation Architect",
           "division": "division_8_saas_operations",
-          "responsibility": "API integrations and workflow execution"
+          "responsibility": "GHL workflow and automation architecture"
         },
         {
           "agent_id": "d8_funnel_engineer",
           "name": "Funnel Engineer",
           "division": "division_8_saas_operations",
           "responsibility": "Sales funnel and conversion optimization"
+        },
+        {
+          "agent_id": "d8_integration_engineer",
+          "name": "Integration Engineer",
+          "division": "division_8_saas_operations",
+          "responsibility": "API integrations and workflow execution"
+        },
+        {
+          "agent_id": "d8_platform_architect",
+          "name": "Platform Architect",
+          "division": "division_8_saas_operations",
+          "responsibility": "SaaS platform design and technical architecture"
+        },
+        {
+          "agent_id": "d8_saas_director",
+          "name": "SaaS Director",
+          "division": "division_8_saas_operations",
+          "responsibility": "SaaS operations leadership and technical governance"
+        },
+        {
+          "agent_id": "d9_wp_developer",
+          "name": "WordPress Developer",
+          "division": "division_9_online_store",
+          "responsibility": "WordPress/WooCommerce storefront development"
         }
       ]
     },
@@ -84,18 +150,78 @@
       "sovereign_isolation": false,
       "use_case": "Customer support, content generation, messaging",
       "agents": [
-        {
-          "agent_id": "d1_cmo",
-          "name": "Chief Marketing Officer",
-          "division": "division_1_core_operations",
-          "responsibility": "Marketing and communications content"
-        },
-        {
-          "agent_id": "d1_customer_success",
-          "name": "Customer Success Manager",
-          "division": "division_1_core_operations",
-          "responsibility": "Customer support and success"
-        }
+        { "agent_id": "biz_01_pod_lead", "name": "Business 01 Pod Lead", "division": "division_7_shared_services", "responsibility": "TJB Core pod coordination" },
+        { "agent_id": "biz_02_pod_lead", "name": "Business 02 Pod Lead", "division": "division_7_shared_services", "responsibility": "BTV pod coordination" },
+        { "agent_id": "biz_03_pod_lead", "name": "Business 03 Pod Lead", "division": "division_7_shared_services", "responsibility": "DPW pod coordination" },
+        { "agent_id": "biz_04_pod_lead", "name": "Business 04 Pod Lead", "division": "division_7_shared_services", "responsibility": "Publishing pod coordination" },
+        { "agent_id": "biz_05_pod_lead", "name": "Business 05 Pod Lead", "division": "division_7_shared_services", "responsibility": "Consulting pod coordination" },
+        { "agent_id": "biz_06_pod_lead", "name": "Business 06 Pod Lead", "division": "division_7_shared_services", "responsibility": "Nonprofit pod coordination" },
+        { "agent_id": "biz_07_pod_lead", "name": "Business 07 Pod Lead", "division": "division_7_shared_services", "responsibility": "D7 pod coordination" },
+        { "agent_id": "biz_08_pod_lead", "name": "Business 08 Pod Lead", "division": "division_7_shared_services", "responsibility": "SaaS pod coordination" },
+        { "agent_id": "biz_09_pod_lead", "name": "Business 09 Pod Lead", "division": "division_7_shared_services", "responsibility": "Online store pod coordination" },
+        { "agent_id": "biz_10_pod_lead", "name": "Business 10 Pod Lead", "division": "division_7_shared_services", "responsibility": "D10 pod coordination" },
+        { "agent_id": "browser_primary", "name": "Primary Browser Agent", "division": "division_7_shared_services", "responsibility": "Primary web browsing and scraping tasks" },
+        { "agent_id": "browser_secondary", "name": "Secondary Browser Agent", "division": "division_7_shared_services", "responsibility": "Secondary/fallback web browsing tasks" },
+        { "agent_id": "d1_cmo", "name": "Chief Marketing Officer", "division": "division_1_core_operations", "responsibility": "Marketing and communications content" },
+        { "agent_id": "d1_customer_success", "name": "Customer Success Manager", "division": "division_1_core_operations", "responsibility": "Customer support and success" },
+        { "agent_id": "d1_sales_manager", "name": "Sales Manager", "division": "division_1_core_operations", "responsibility": "Sales team management and pipeline oversight" },
+        { "agent_id": "d2_copywriter", "name": "Copywriter", "division": "division_2_ecommerce", "responsibility": "Sales copy and product descriptions" },
+        { "agent_id": "d2_customer_service", "name": "Customer Service Agent", "division": "division_2_ecommerce", "responsibility": "eCommerce customer support" },
+        { "agent_id": "d2_digital_marketing", "name": "Digital Marketing Specialist", "division": "division_2_ecommerce", "responsibility": "Digital marketing campaigns and strategy" },
+        { "agent_id": "d2_director", "name": "eCommerce Director", "division": "division_2_ecommerce", "responsibility": "eCommerce operations leadership" },
+        { "agent_id": "d2_graphic_designer", "name": "Graphic Designer", "division": "division_2_ecommerce", "responsibility": "Visual assets and brand graphics" },
+        { "agent_id": "d2_paid_ads", "name": "Paid Ads Specialist", "division": "division_2_ecommerce", "responsibility": "Paid advertising campaigns (FB, Google, TikTok)" },
+        { "agent_id": "d2_seo_strategist", "name": "SEO Strategist", "division": "division_2_ecommerce", "responsibility": "Search engine optimization and organic traffic" },
+        { "agent_id": "d2_store_manager", "name": "Store Manager", "division": "division_2_ecommerce", "responsibility": "eCommerce store operations and merchandising" },
+        { "agent_id": "d3_admin_coordinator", "name": "Admin Coordinator", "division": "division_3_consulting", "responsibility": "Administrative coordination and scheduling" },
+        { "agent_id": "d3_biz_dev", "name": "Business Development Manager", "division": "division_3_consulting", "responsibility": "Business development and partnering" },
+        { "agent_id": "d3_client_relations", "name": "Client Relations Manager", "division": "division_3_consulting", "responsibility": "Client relationship management and retention" },
+        { "agent_id": "d3_lead_strategist", "name": "Lead Strategist", "division": "division_3_consulting", "responsibility": "Lead strategy and market positioning" },
+        { "agent_id": "d3_marketing_brand", "name": "Marketing & Brand Director", "division": "division_3_consulting", "responsibility": "Consulting brand marketing" },
+        { "agent_id": "d3_ops_manager", "name": "Operations Manager", "division": "division_3_consulting", "responsibility": "Consulting operations management" },
+        { "agent_id": "d3_sales_closer", "name": "Sales Closer", "division": "division_3_consulting", "responsibility": "High-ticket sales closing" },
+        { "agent_id": "d3_thought_leadership", "name": "Thought Leadership Director", "division": "division_3_consulting", "responsibility": "Content and thought leadership strategy" },
+        { "agent_id": "d4_client_experience", "name": "Client Experience Manager", "division": "division_4_coaching", "responsibility": "Coaching client experience and satisfaction" },
+        { "agent_id": "d4_community_manager", "name": "Community Manager", "division": "division_4_coaching", "responsibility": "Community engagement and moderation" },
+        { "agent_id": "d4_curriculum_head", "name": "Curriculum Director", "division": "division_4_coaching", "responsibility": "Course and curriculum design" },
+        { "agent_id": "d4_cvo", "name": "Chief Value Officer", "division": "division_4_coaching", "responsibility": "Member value delivery and transformation outcomes" },
+        { "agent_id": "d4_enrollment", "name": "Enrollment Specialist", "division": "division_4_coaching", "responsibility": "Program enrollment and onboarding" },
+        { "agent_id": "d4_funnel_strategist", "name": "Funnel Strategist", "division": "division_4_coaching", "responsibility": "Coach funnel design and conversion strategy" },
+        { "agent_id": "d4_lead_coach", "name": "Lead Coach", "division": "division_4_coaching", "responsibility": "Coaching delivery and member support" },
+        { "agent_id": "d4_social_creator", "name": "Social Media Creator", "division": "division_4_coaching", "responsibility": "Social content creation and community growth" },
+        { "agent_id": "d4_video_production", "name": "Video Production Specialist", "division": "division_4_coaching", "responsibility": "Video content production and delivery" },
+        { "agent_id": "d5_acquisitions", "name": "Acquisitions Editor", "division": "division_5_publishing", "responsibility": "Manuscript acquisition and author sourcing" },
+        { "agent_id": "d5_author_relations", "name": "Author Relations Manager", "division": "division_5_publishing", "responsibility": "Author relationship management" },
+        { "agent_id": "d5_book_marketing", "name": "Book Marketing Specialist", "division": "division_5_publishing", "responsibility": "Book launch marketing and promotion" },
+        { "agent_id": "d5_copywriter", "name": "Publishing Copywriter", "division": "division_5_publishing", "responsibility": "Book copy, descriptions, and promotional content" },
+        { "agent_id": "d5_cover_artist", "name": "Cover Artist", "division": "division_5_publishing", "responsibility": "Book cover design and visual assets" },
+        { "agent_id": "d5_digital_distribution", "name": "Digital Distribution Manager", "division": "division_5_publishing", "responsibility": "Digital publishing and distribution" },
+        { "agent_id": "d5_managing_editor", "name": "Managing Editor", "division": "division_5_publishing", "responsibility": "Editorial management and publication standards" },
+        { "agent_id": "d5_pr_media", "name": "PR & Media Relations", "division": "division_5_publishing", "responsibility": "Press and media outreach" },
+        { "agent_id": "d5_publisher", "name": "Publisher", "division": "division_5_publishing", "responsibility": "Publishing operations and catalog management" },
+        { "agent_id": "d5_sales_affiliate", "name": "Sales & Affiliate Manager", "division": "division_5_publishing", "responsibility": "Book sales and affiliate program management" },
+        { "agent_id": "d6_board_liaison", "name": "Board Liaison", "division": "division_6_nonprofit", "responsibility": "Board communications and governance support" },
+        { "agent_id": "d6_communications", "name": "Communications Manager", "division": "division_6_nonprofit", "responsibility": "Nonprofit communications and PR" },
+        { "agent_id": "d6_coo", "name": "Nonprofit COO", "division": "division_6_nonprofit", "responsibility": "Nonprofit operations and program delivery" },
+        { "agent_id": "d6_dev_director", "name": "Development Director", "division": "division_6_nonprofit", "responsibility": "Fundraising and donor development" },
+        { "agent_id": "d6_finance", "name": "Finance Manager", "division": "division_6_nonprofit", "responsibility": "Nonprofit financial management" },
+        { "agent_id": "d6_grant_writer", "name": "Grant Writer", "division": "division_6_nonprofit", "responsibility": "Grant proposals and reporting" },
+        { "agent_id": "d6_outreach", "name": "Community Outreach Manager", "division": "division_6_nonprofit", "responsibility": "Community engagement and outreach programs" },
+        { "agent_id": "d6_program_director", "name": "Program Director", "division": "division_6_nonprofit", "responsibility": "Program design, delivery, and evaluation" },
+        { "agent_id": "d6_volunteer", "name": "Volunteer Coordinator", "division": "division_6_nonprofit", "responsibility": "Volunteer recruitment and management" },
+        { "agent_id": "d8_community_manager", "name": "GHL Community Manager", "division": "division_8_saas_operations", "responsibility": "GHL community management and engagement" },
+        { "agent_id": "d8_content_ops", "name": "Content Operations Manager", "division": "division_8_saas_operations", "responsibility": "Content operations and publishing workflows" },
+        { "agent_id": "d8_customer_success", "name": "Customer Success Agent", "division": "division_8_saas_operations", "responsibility": "SaaS customer support and success" },
+        { "agent_id": "d8_marketing_automation", "name": "Marketing Automation Specialist", "division": "division_8_saas_operations", "responsibility": "GHL marketing automation and campaign management" },
+        { "agent_id": "d8_membership_director", "name": "Membership Director", "division": "division_8_saas_operations", "responsibility": "Membership program management and retention" },
+        { "agent_id": "d9_customer_experience", "name": "Customer Experience Manager", "division": "division_9_online_store", "responsibility": "Online store customer experience optimization" },
+        { "agent_id": "d9_merchandiser", "name": "Merchandiser", "division": "division_9_online_store", "responsibility": "Product merchandising and catalog management" },
+        { "agent_id": "d9_offer_strategist", "name": "Offer Strategist", "division": "division_9_online_store", "responsibility": "Offer architecture and pricing strategy" },
+        { "agent_id": "d9_sales_copywriter", "name": "Sales Copywriter", "division": "division_9_online_store", "responsibility": "Sales copy for store pages and product listings" },
+        { "agent_id": "d9_seo_content", "name": "SEO Content Specialist", "division": "division_9_online_store", "responsibility": "SEO and content strategy for online store" },
+        { "agent_id": "d9_social_promoter", "name": "Social Media Promoter", "division": "division_9_online_store", "responsibility": "Social promotion and community engagement for store" },
+        { "agent_id": "d9_store_director", "name": "Online Store Director", "division": "division_9_online_store", "responsibility": "Online store operations leadership" },
+        { "agent_id": "shared_knowledge_base", "name": "Knowledge Base Agent", "division": "division_7_shared_services", "responsibility": "Cross-division knowledge base management and retrieval" }
       ]
     },
 
@@ -116,16 +242,52 @@
           "responsibility": "Data analysis and reporting"
         },
         {
-          "agent_id": "d8_revenue_ops",
-          "name": "Revenue Operations Manager",
-          "division": "division_8_saas_operations",
-          "responsibility": "Revenue operations and analytics"
+          "agent_id": "d2_inventory_specialist",
+          "name": "Inventory Specialist",
+          "division": "division_2_ecommerce",
+          "responsibility": "eCommerce inventory tracking and data management"
+        },
+        {
+          "agent_id": "d3_business_analyst",
+          "name": "Business Analyst",
+          "division": "division_3_consulting",
+          "responsibility": "Business analysis, data modeling, and reporting"
         },
         {
           "agent_id": "d8_crm_ops",
           "name": "CRM Operations Manager",
           "division": "division_8_saas_operations",
           "responsibility": "CRM data processing and enrichment"
+        },
+        {
+          "agent_id": "d8_revenue_ops",
+          "name": "Revenue Operations Manager",
+          "division": "division_8_saas_operations",
+          "responsibility": "Revenue operations and analytics"
+        },
+        {
+          "agent_id": "d9_analytics",
+          "name": "Store Analytics Specialist",
+          "division": "division_9_online_store",
+          "responsibility": "Online store analytics and performance reporting"
+        },
+        {
+          "agent_id": "d9_web_designer",
+          "name": "Web Designer",
+          "division": "division_9_online_store",
+          "responsibility": "Store design, UX analysis, and conversion optimization"
+        },
+        {
+          "agent_id": "shared_data_analytics",
+          "name": "Shared Data Analytics",
+          "division": "division_7_shared_services",
+          "responsibility": "Cross-division data analytics and dashboards"
+        },
+        {
+          "agent_id": "shared_data_control",
+          "name": "Shared Data Control",
+          "division": "division_7_shared_services",
+          "responsibility": "Data governance, quality control, and pipeline management"
         }
       ]
     },
@@ -141,34 +303,46 @@
       "use_case": "Compliance checks, safety validation, audit logging",
       "agents": [
         {
-          "agent_id": "shared_runtime_ops",
-          "name": "Runtime Operations Supervisor",
-          "division": "division_7_shared_services",
-          "responsibility": "Runtime operations and monitoring"
-        },
-        {
           "agent_id": "d8_compliance_auditor",
           "name": "Compliance & Audit Officer",
           "division": "division_8_saas_operations",
           "responsibility": "Compliance checks and audit logging"
+        },
+        {
+          "agent_id": "shared_api_gateway",
+          "name": "API Gateway Agent",
+          "division": "division_7_shared_services",
+          "responsibility": "API security enforcement and request routing"
+        },
+        {
+          "agent_id": "shared_legal_compliance",
+          "name": "Legal & Compliance Agent",
+          "division": "division_7_shared_services",
+          "responsibility": "Legal compliance monitoring and policy enforcement"
+        },
+        {
+          "agent_id": "shared_runtime_ops",
+          "name": "Runtime Operations Supervisor",
+          "division": "division_7_shared_services",
+          "responsibility": "Runtime operations and monitoring"
         }
       ]
     }
   },
 
-  "unassigned_agents": {
-    "note": "The following agents from agents_config.json are not yet explicitly assigned to a tier. They will use the default routing (anthropic-analyst) until assigned.",
-    "count_unassigned": "~85 agents",
-    "default_fallback_tier": "anthropic-analyst",
-    "recommendation": "Update agents_config.json with tier assignments for all 103 agents in follow-up phase"
-  },
-
   "statistics": {
     "total_agents_in_system": 103,
-    "explicitly_assigned": 14,
-    "using_default_fallback": "~89",
-    "sovereign_tier_agents": 5,
-    "shared_key_agents": 9
+    "explicitly_assigned": 103,
+    "using_default_fallback": 0,
+    "sovereign_tier_agents": 11,
+    "shared_key_agents": 92,
+    "tier_breakdown": {
+      "anthropic-strategist": 7,
+      "anthropic-executor": 11,
+      "anthropic-communicator": 72,
+      "anthropic-analyst": 9,
+      "anthropic-guardian": 4
+    }
   },
 
   "credential_management": {
@@ -192,9 +366,11 @@
     "env_variables_present": false,
     "claw_router_config_loaded": false,
     "rate_limits_enforced": false,
-    "sovereign_isolation_verified": false,
-    "all_models_anthropic": false,
-    "no_openai_references": false
+    "sovereign_isolation_verified": true,
+    "all_models_anthropic": true,
+    "no_openai_references": false,
+    "all_103_agents_assigned": true,
+    "fallback_agent_count": 0
   },
 
   "migration_notes": {
