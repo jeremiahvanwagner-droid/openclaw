@@ -1,0 +1,69 @@
+{
+  "_meta": {
+    "description": "Truth J Blue offer matrix — source of truth for product tiers, pricing, and funnel routing",
+    "updated": "2026-04-02",
+    "maintained_by": "d8_revenue_ops"
+  },
+  "offers": [
+    {
+      "offer_id": "tjb-assessment-free",
+      "name": "Divine Alignment Assessment",
+      "funnel_stage": "assessment",
+      "price_usd": 0,
+      "payment_link": null,
+      "tag": "assessment-completed",
+      "pipeline_stage": "Assessment Lead",
+      "owner_agent": "d4_funnel_strategist",
+      "value_ladder_step": 1,
+      "description": "Free entry-point assessment to segment leads by readiness and offer fit"
+    },
+    {
+      "offer_id": "tjb-ebook-divine-alignment",
+      "name": "Divine Alignment eBook",
+      "funnel_stage": "ebook",
+      "price_usd": 27,
+      "payment_link": "https://truthjblue.com/order/ebook",
+      "tag": "ebook-buyer",
+      "pipeline_stage": "eBook Buyer",
+      "owner_agent": "d2_store_manager",
+      "value_ladder_step": 2,
+      "description": "Core entry-product eBook for new buyers"
+    },
+    {
+      "offer_id": "tjb-ebook-bundle",
+      "name": "Divine Alignment eBook Bundle",
+      "funnel_stage": "ebook",
+      "price_usd": 47,
+      "payment_link": "https://truthjblue.com/order/ebook-bundle",
+      "tag": "ebook-buyer",
+      "pipeline_stage": "eBook Buyer",
+      "owner_agent": "d2_store_manager",
+      "value_ladder_step": 2,
+      "description": "eBook + bonus resources bundle for higher-commitment buyers"
+    },
+    {
+      "offer_id": "tjb-course-agentic-ai",
+      "name": "Agentic AI Mastery Course",
+      "funnel_stage": "membership_or_course",
+      "price_usd": 497,
+      "payment_link": "https://truthjblue.com/order/course",
+      "tag": "course-buyer",
+      "pipeline_stage": "Course Buyer",
+      "owner_agent": "d8_funnel_engineer",
+      "value_ladder_step": 3,
+      "description": "Mid-ticket course for leads who scored high on the assessment"
+    },
+    {
+      "offer_id": "tjb-intensive-implementation",
+      "name": "Implementation Intensive",
+      "funnel_stage": "membership_or_course",
+      "price_usd": 1997,
+      "payment_link": "https://truthjblue.com/order/intensive",
+      "tag": "high-ticket-prospect",
+      "pipeline_stage": "Backend Prospect",
+      "owner_agent": "d4_enrollment",
+      "value_ladder_step": 4,
+      "description": "High-ticket done-with-you implementation program"
+    }
+  ]
+}

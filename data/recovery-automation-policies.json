@@ -1,0 +1,42 @@
+{
+  "_meta": {
+    "description": "Recovery automation policies — source of truth for abandoned cart, dunning, no-show, and win-back sequences",
+    "updated": "2026-04-02",
+    "maintained_by": "d8_revenue_ops"
+  },
+  "abandoned_cart": {
+    "track_on_checkout_page_visit": true,
+    "recovery_sequence_hours": [1, 24, 72],
+    "max_attempts": 3,
+    "complete_on_payment": true,
+    "owner_agent": "d8_revenue_ops"
+  },
+  "payment_failure_dunning": {
+    "retry_intervals_days": [1, 3, 7],
+    "max_retries": 3,
+    "escalate_to_director_on_amount_usd": 500,
+    "escalate_to_director_on_retry_count": 3,
+    "dunning_agent": "d8_revenue_ops",
+    "cancel_on_payment_received": true
+  },
+  "no_show_recovery": {
+    "trigger_event": "appointment.no_show",
+    "re_book_delay_hours": 2,
+    "sequence_length_days": 7,
+    "max_rebook_attempts": 2,
+    "owner_agent": "d4_enrollment"
+  },
+  "churn_winback": {
+    "trigger_event": "subscription.cancelled",
+    "initial_delay_hours": 24,
+    "sequence_length_days": 14,
+    "director_alert": true,
+    "owner_agent": "d8_customer_success"
+  },
+  "cold_lead_recovery": {
+    "inactivity_days_threshold": 30,
+    "re_engagement_sequence_days": 14,
+    "max_attempts": 2,
+    "owner_agent": "d8_marketing_automation"
+  }
+}

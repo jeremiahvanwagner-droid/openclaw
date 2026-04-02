@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "description": "GHL funnel page paths — source of truth for checkout routing, cart tracking, and pipeline routing",
+    "updated": "2026-04-02",
+    "maintained_by": "d8_funnel_engineer"
+  },
+  "checkout_path_prefixes": ["/order", "/checkout"],
+  "base_url": "https://truthjblue.com",
+  "funnels": [
+    {
+      "funnel_id": "ebook-primary",
+      "name": "eBook Primary Funnel",
+      "product_id": "tjb-ebook-divine-alignment",
+      "paths": ["/order/ebook", "/checkout/ebook"],
+      "cart_product_label": "eBook",
+      "pipeline_stage": "eBook Buyer",
+      "owner_agent": "d2_store_manager"
+    },
+    {
+      "funnel_id": "ebook-bundle",
+      "name": "eBook Bundle Funnel",
+      "product_id": "tjb-ebook-bundle",
+      "paths": ["/order/ebook-bundle", "/checkout/ebook-bundle"],
+      "cart_product_label": "eBook",
+      "pipeline_stage": "eBook Buyer",
+      "owner_agent": "d2_store_manager"
+    },
+    {
+      "funnel_id": "course-agentic-ai",
+      "name": "Agentic AI Mastery Course Funnel",
+      "product_id": "tjb-course-agentic-ai",
+      "paths": ["/order/course", "/checkout/course"],
+      "cart_product_label": "Agentic AI Mastery Course",
+      "pipeline_stage": "Course Buyer",
+      "owner_agent": "d8_funnel_engineer"
+    },
+    {
+      "funnel_id": "implementation-intensive",
+      "name": "Implementation Intensive Funnel",
+      "product_id": "tjb-intensive-implementation",
+      "paths": ["/order/intensive", "/checkout/intensive"],
+      "cart_product_label": "Implementation Intensive",
+      "pipeline_stage": "Backend Prospect",
+      "owner_agent": "d4_enrollment"
+    }
+  ],
+  "path_product_routing": {
+    "default": "eBook",
+    "contains_course": "Agentic AI Mastery Course",
+    "contains_intensive": "Implementation Intensive"
+  }
+}

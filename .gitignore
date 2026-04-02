@@ -20,6 +20,9 @@ data/
 data/**
 !data/business-registry.json
 !data/saas-instances.json
+!data/tjb-offer-matrix.json
+!data/ghl-funnel-paths.json
+!data/recovery-automation-policies.json
 logs/
 backups/
 browser/
