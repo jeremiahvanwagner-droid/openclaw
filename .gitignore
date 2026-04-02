@@ -74,6 +74,8 @@ dist/
 *.tsbuildinfo
 # Dashboard uses pnpm (pnpm-lock.yaml at root); ignore npm lockfile
 dashboard/package-lock.json
+# Root project is pnpm — ignore npm lockfile if accidentally generated
+package-lock.json
 
 # ── OS Files ──────────────────────────────────────────────────
 Thumbs.db
