@@ -50,7 +50,8 @@ vi.mock("../api-rate-governor", () => ({
 }));
 
 // Set env vars before import
-process.env.ANTHROPIC_API_KEY = "test-anthropic-key";
+process.env.ANTHROPIC_API_KEY_SOVEREIGN = "test-anthropic-key-sovereign";
+process.env.ANTHROPIC_API_KEY_SHARED    = "test-anthropic-key-shared";
 process.env.OPENAI_API_KEY = "test-openai-key";
 
 import {

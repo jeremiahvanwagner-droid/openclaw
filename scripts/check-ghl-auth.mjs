@@ -190,8 +190,8 @@ async function main() {
   const userPrimaryAuth = await checkUserPrimaryAuth(userPrimaryToken, userPrimaryLocationId);
   const warnings = [];
 
-  if (!dotEnvValues.GHL_LOCATION_ID) {
-    warnings.push('.env is missing GHL_LOCATION_ID; scripts that rely on the primary alias may drift.');
+  if (!dotEnvValues.GHL_LOCATION_ID && !dotEnvValues.GHL_LOCATION_ID_TJB) {
+    warnings.push('.env is missing GHL_LOCATION_ID (and no GHL_LOCATION_ID_TJB fallback); scripts that rely on the primary alias may drift.');
   }
 
   if (/^\$\{[A-Z0-9_]+\}$/.test(dotEnvValues.GHL_TOKEN || '')) {

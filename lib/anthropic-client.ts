@@ -8,13 +8,17 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  throw new Error("[OpenClaw] ANTHROPIC_API_KEY is required but not set");
-}
-
-export const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+export const anthropicSovereign = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY_SOVEREIGN,
 });
+
+export const anthropicShared = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY_SHARED,
+});
+
+export function getAnthropicForTier(sovereign: boolean): Anthropic {
+  return sovereign ? anthropicSovereign : anthropicShared;
+}
 
 /**
  * Model tier mapping — canonical Anthropic model strings for OpenClaw.

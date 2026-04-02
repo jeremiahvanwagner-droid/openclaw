@@ -70,22 +70,44 @@ if (!dashboardOnly) {
     "GoHighLevel primary integration token",
   );
   requireAny(
+    ["GHL_LOCATION_ID", "GHL_LOCATION_ID_TJB"],
+    "GHL primary location ID (GHL_LOCATION_ID or GHL_LOCATION_ID_TJB)",
+  );
+  requireAny(
     ["OPENCLAW_GATEWAY_AUTH_TOKEN", "OPEN_CLAW_GATEWAY_AUTH_TOKEN"],
     "Webhook -> gateway auth token",
   );
   requireAny(["OPENCLAW_GHL_WEBHOOK_SECRET"], "GHL webhook HMAC secret");
 
+  // Warn if GHL_TOKEN looks like a literal unexpanded variable reference
+  const rawGhlToken = process.env.GHL_TOKEN || "";
+  if (/^\$\{[A-Z0-9_]+\}$/.test(rawGhlToken)) {
+    warnings.push(
+      "  ! GHL_TOKEN is a literal ${...} placeholder and will not authenticate. Set it to the real PIT value.",
+    );
+  }
+
   warnAny(["INNGEST_SIGNING_KEY"], "Inngest function signing key");
   warnAny(["INNGEST_EVENT_KEY"], "Inngest event dispatch key");
-  requireAny(["ANTHROPIC_API_KEY"], "Anthropic API key (required for completion routing)");
+
+  // Split-key Anthropic credential contract
+  requireAny(["ANTHROPIC_API_KEY_SOVEREIGN"], "Anthropic sovereign-tier API key (required for Opus / governance agents)");
+  requireAny(["ANTHROPIC_API_KEY_SHARED"], "Anthropic shared-tier API key (required for Sonnet / Haiku agents)");
+  if (process.env.ANTHROPIC_API_KEY) {
+    warnings.push(
+      "  ! ANTHROPIC_API_KEY (legacy single key) is set but ignored. Use ANTHROPIC_API_KEY_SOVEREIGN and ANTHROPIC_API_KEY_SHARED.",
+    );
+  }
+
   warnAny(["OPENAI_API_KEY"], "OpenAI API key (embeddings-only in current rollout)");
-  warnAny(
+
+  requireAny(
     ["TELEGRAM_BOT_TOKEN", "OPENCLAW_TELEGRAM_BOT_TOKEN"],
-    "Telegram bot token (alerts will be disabled)",
+    "Telegram bot token (required for alert routing and auto-refresh notifications)",
   );
-  warnAny(
-    ["TELEGRAM_ALERT_CHAT_ID", "OPENCLAW_ALERT_TELEGRAM_CHAT_ID"],
-    "Telegram alert chat ID",
+  requireAny(
+    ["TELEGRAM_CHAT_ID", "TELEGRAM_ALERT_CHAT_ID", "OPENCLAW_ALERT_TELEGRAM_CHAT_ID"],
+    "Telegram alert chat ID (required for alert routing)",
   );
 }
 

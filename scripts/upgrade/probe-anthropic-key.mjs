@@ -27,19 +27,22 @@ function maskKey(apiKey) {
   return `${apiKey.slice(0, 7)}...${apiKey.slice(-4)}`;
 }
 
-async function main() {
-  const args = parseArgs(process.argv.slice(2));
-  const apiKey = process.env.ANTHROPIC_API_KEY || "";
+async function probeKey(keyName, apiKey, endpoint, timeoutMs) {
   if (!apiKey) {
-    throw new Error("ANTHROPIC_API_KEY is not set");
+    return {
+      key_name: keyName,
+      action: "probe-anthropic-key",
+      ok: false,
+      error: `${keyName} is not set`,
+    };
   }
 
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), args.timeoutMs);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   let response;
   try {
-    response = await fetch(args.endpoint, {
+    response = await fetch(endpoint, {
       method: "GET",
       headers: {
         "x-api-key": apiKey,
@@ -57,24 +60,37 @@ async function main() {
     || response.headers.get("x-request-id")
     || null;
 
-  const report = {
+  return {
+    key_name: keyName,
     action: "probe-anthropic-key",
-    endpoint: args.endpoint,
-    timeout_ms: args.timeoutMs,
+    endpoint,
+    timeout_ms: timeoutMs,
     request_id: requestId,
     status: response.status,
     key: maskKey(apiKey),
     ok: response.ok,
+    ...(response.ok ? {} : { error: "anthropic_key_probe_failed", response_excerpt: body.slice(0, 300) }),
   };
+}
 
-  if (!response.ok) {
-    report.error = "anthropic_key_probe_failed";
-    report.response_excerpt = body.slice(0, 300);
-    console.error(JSON.stringify(report, null, 2));
+async function main() {
+  const args = parseArgs(process.argv.slice(2));
+  const sovereignKey = process.env.ANTHROPIC_API_KEY_SOVEREIGN || "";
+  const sharedKey    = process.env.ANTHROPIC_API_KEY_SHARED    || "";
+
+  const [sovereignReport, sharedReport] = await Promise.all([
+    probeKey("ANTHROPIC_API_KEY_SOVEREIGN", sovereignKey, args.endpoint, args.timeoutMs),
+    probeKey("ANTHROPIC_API_KEY_SHARED",    sharedKey,    args.endpoint, args.timeoutMs),
+  ]);
+
+  const allOk = sovereignReport.ok && sharedReport.ok;
+
+  if (!allOk) {
+    console.error(JSON.stringify({ results: [sovereignReport, sharedReport], all_ok: allOk }, null, 2));
     process.exit(1);
   }
 
-  console.log(JSON.stringify(report, null, 2));
+  console.log(JSON.stringify({ results: [sovereignReport, sharedReport], all_ok: allOk }, null, 2));
 }
 
 main().catch((error) => {

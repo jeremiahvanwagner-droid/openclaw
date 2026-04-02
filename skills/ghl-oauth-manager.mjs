@@ -15,6 +15,7 @@
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
 
 const OPENCLAW_ROOT = join(process.env.USERPROFILE || process.env.HOME || '', '.openclaw');
 const TOKENS_PATH = join(OPENCLAW_ROOT, 'credentials', 'ghl-oauth-tokens.json');
@@ -290,6 +291,87 @@ function status() {
   }, null, 2));
 }
 
+// --- Auto-Refresh (exported API) ---
+
+/**
+ * Returns milliseconds until expiry for instanceId. Returns -1 if no token exists.
+ */
+export function getTokenExpiryMs(instanceId) {
+  const tokens = loadTokens();
+  const entry = tokens.instances?.[instanceId];
+  if (!entry?.expires_at) return -1;
+  return entry.expires_at - Date.now();
+}
+
+async function sendTelegramAlert(message) {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId =
+    process.env.TELEGRAM_CHAT_ID ||
+    process.env.TELEGRAM_ALERT_CHAT_ID ||
+    process.env.OPENCLAW_ALERT_TELEGRAM_CHAT_ID;
+  if (!botToken || !chatId) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'HTML' }),
+    });
+  } catch {
+    // Alert delivery is best-effort
+  }
+}
+
+const MAX_REFRESH_RETRIES = 3;
+const RETRY_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+async function attemptRefreshWithRetry(instanceId, attempt) {
+  try {
+    await refresh(instanceId);
+    // Re-schedule for the next token cycle
+    scheduleAutoRefresh(instanceId);
+  } catch (err) {
+    if (attempt < MAX_REFRESH_RETRIES - 1) {
+      setTimeout(() => void attemptRefreshWithRetry(instanceId, attempt + 1), RETRY_INTERVAL_MS);
+    } else {
+      const msg = `[OpenClaw] GHL OAuth auto-refresh FAILED for instance <b>${instanceId}</b> after ${MAX_REFRESH_RETRIES} attempts.\nError: ${err.message}\nManual intervention required.`;
+      void sendTelegramAlert(msg);
+    }
+  }
+}
+
+/**
+ * Schedules an auto-refresh for instanceId at 80% of token lifetime.
+ * Retries up to 3 times at 5-minute intervals on failure; sends Telegram alert after exhaustion.
+ */
+export function scheduleAutoRefresh(instanceId) {
+  const expiryMs = getTokenExpiryMs(instanceId);
+  if (expiryMs <= 0) {
+    void attemptRefreshWithRetry(instanceId, 0);
+    return;
+  }
+  const delayMs = Math.floor(expiryMs * 0.8);
+  setTimeout(() => void attemptRefreshWithRetry(instanceId, 0), delayMs);
+}
+
+/**
+ * Initializes auto-refresh for all registered SaaS instances.
+ * Safe to call at gateway startup — no-ops for instances without tokens.
+ */
+export function initAutoRefresh() {
+  let instanceIds;
+  try {
+    const registry = loadRegistry();
+    instanceIds = Object.keys(registry.instances || {});
+  } catch {
+    return;
+  }
+  for (const instanceId of instanceIds) {
+    if (getTokenExpiryMs(instanceId) !== -1) {
+      scheduleAutoRefresh(instanceId);
+    }
+  }
+}
+
 // --- Main ---
 
 async function main() {
@@ -336,4 +418,6 @@ async function main() {
   }
 }
 
-main();
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  main();
+}

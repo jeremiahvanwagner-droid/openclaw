@@ -8488,5 +8488,33 @@
         "self-healing-integrations"
       ]
     }
-  ]
+  ],
+  "security_policy": {
+    "version": "1.0.0",
+    "effectiveDate": "2026-04-02",
+    "enforcement_modes": {
+      "capabilities": "warn",
+      "skill_registry": "warn"
+    },
+    "defaults": {
+      "requires_hitl_for": ["ghl_write", "email_send", "payment_action"]
+    },
+    "alias_agents": {
+      "main":      "d1_ceo",
+      "marketing": "d1_cmo",
+      "sales":     "d1_sales_manager",
+      "support":   "d1_customer_success"
+    },
+    "hard_limits": {
+      "max_concurrent_ghl_writes": 5,
+      "max_daily_email_sends": 1000,
+      "max_daily_payment_actions": 100
+    },
+    "human_approval_required": ["payment_action", "contract_sign", "bulk_email_send"],
+    "sovereignIsolationPolicy": {
+      "enabled": true,
+      "sovereign_agents": ["d1_ceo", "d1_cto", "d1_product_dev_manager", "shared_runtime_ops", "d8_compliance_auditor"],
+      "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN"
+    }
+  }
 }

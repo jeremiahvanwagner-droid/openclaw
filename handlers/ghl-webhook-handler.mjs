@@ -24,6 +24,7 @@ import {
   resolveHumanApproval,
   answerTelegramCallback,
 } from '../lib/human-approval.mjs';
+import { initAutoRefresh } from '../skills/ghl-oauth-manager.mjs';
 
 const log = childLogger({ module: 'webhook-handler' });
 
@@ -718,6 +719,13 @@ server.listen(PORT, HOST, async () => {
     await loadPhase3Modules();
   } catch (error) {
     log.error({ err: error.message }, 'Phase 3 module loading failed (non-fatal)');
+  }
+
+  try {
+    initAutoRefresh();
+    log.info('GHL OAuth auto-refresh initialized');
+  } catch (error) {
+    log.error({ err: error.message }, 'GHL OAuth auto-refresh initialization failed (non-fatal)');
   }
 });
 

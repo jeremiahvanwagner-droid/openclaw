@@ -12,6 +12,8 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { withGovernor, type QueueClass } from "./api-rate-governor";
 import { logger } from "./logger";
@@ -61,15 +63,58 @@ function setCache(key: string, result: CompletionResult): void {
 }
 
 // Initialize clients lazily
-let anthropic: Anthropic | null = null;
+let anthropicSovereign: Anthropic | null = null;
+let anthropicShared: Anthropic | null = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let openaiModule: any = null;
 
-function getAnthropic(): Anthropic {
-  if (!anthropic) {
-    anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+function getAnthropicClient(sovereign: boolean): Anthropic {
+  if (sovereign) {
+    if (!anthropicSovereign) {
+      const key = process.env.ANTHROPIC_API_KEY_SOVEREIGN;
+      if (!key) throw new Error("ANTHROPIC_API_KEY_SOVEREIGN and ANTHROPIC_API_KEY_SHARED are required. Legacy ANTHROPIC_API_KEY is not supported.");
+      anthropicSovereign = new Anthropic({ apiKey: key });
+    }
+    return anthropicSovereign;
+  } else {
+    if (!anthropicShared) {
+      const key = process.env.ANTHROPIC_API_KEY_SHARED;
+      if (!key) throw new Error("ANTHROPIC_API_KEY_SOVEREIGN and ANTHROPIC_API_KEY_SHARED are required. Legacy ANTHROPIC_API_KEY is not supported.");
+      anthropicShared = new Anthropic({ apiKey: key });
+    }
+    return anthropicShared;
   }
-  return anthropic;
+}
+
+// Cached sovereign agent set (loaded once from anthropic-tier-assignment.json)
+let _sovereignAgentSet: Set<string> | null = null;
+
+function getSovereignAgentSet(): Set<string> {
+  if (_sovereignAgentSet) return _sovereignAgentSet;
+  try {
+    const configPath = join(process.cwd(), "config", "anthropic-tier-assignment.json");
+    const raw = JSON.parse(readFileSync(configPath, "utf-8")) as Record<string, unknown>;
+    const tiers = (raw.tier_assignments ?? {}) as Record<string, unknown>;
+    const agentIds: string[] = [];
+    for (const tier of Object.values(tiers)) {
+      const t = tier as Record<string, unknown>;
+      if (t.sovereign_isolation === true && Array.isArray(t.agents)) {
+        for (const a of t.agents as Array<Record<string, unknown>>) {
+          if (typeof a.agent_id === "string") agentIds.push(a.agent_id);
+        }
+      }
+    }
+    _sovereignAgentSet = new Set(agentIds);
+  } catch {
+    _sovereignAgentSet = new Set();
+  }
+  return _sovereignAgentSet;
+}
+
+function isSovereignRequest(tier: string, agentId?: string): boolean {
+  if (tier === "strategic") return true;
+  if (agentId && getSovereignAgentSet().has(agentId)) return true;
+  return false;
 }
 
 /**
@@ -260,6 +305,7 @@ export async function complete(options: CompletionOptions): Promise<CompletionRe
               maxTokens: effectiveMaxTokens,
               temperature,
               stopSequences,
+              sovereign: isSovereignRequest(config.tier, agentId),
             });
           default:
             return assertNever(config as never);
@@ -295,6 +341,7 @@ async function completeWithAnthropic(options: {
   maxTokens: number;
   temperature: number;
   stopSequences?: string[];
+  sovereign: boolean;
 }): Promise<CompletionResult> {
   const { model, messages, maxTokens, temperature, stopSequences } = options;
 
@@ -302,7 +349,7 @@ async function completeWithAnthropic(options: {
   const systemMessage = messages.find(m => m.role === "system")?.content;
   const nonSystemMessages = messages.filter(m => m.role !== "system");
 
-  const response = await getAnthropic().messages.create({
+  const response = await getAnthropicClient(options.sovereign).messages.create({
     model,
     max_tokens: maxTokens,
     temperature,

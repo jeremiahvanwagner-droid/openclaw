@@ -36,9 +36,9 @@ const log = logger.child({ module: "self-healing-supervisor" });
  * loop from running and potentially causing a crash-loop restart cascade.
  */
 export async function preflightCheck(): Promise<boolean> {
-  // 1. Verify ANTHROPIC_API_KEY is set
-  if (!process.env.ANTHROPIC_API_KEY) {
-    log.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY not set");
+  // 1. Verify ANTHROPIC_API_KEY_SOVEREIGN is set
+  if (!process.env.ANTHROPIC_API_KEY_SOVEREIGN) {
+    log.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY_SOVEREIGN not set");
     return false;
   }
 

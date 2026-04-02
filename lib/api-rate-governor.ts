@@ -695,6 +695,32 @@ function extractStatusCode(error: unknown): number | undefined {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// GHL TOKEN STALENESS FLAG
+// ═══════════════════════════════════════════════════════════════════
+
+const ghlTokenStale = new Map<string, boolean>();
+
+/**
+ * Mark a GHL tenant token as stale (or clear the stale flag).
+ * Used by ghl-oauth-manager auto-refresh to signal that GHL API calls
+ * should be held until the token is refreshed.
+ */
+export function setGhlTokenStale(tenant: string, stale: boolean): void {
+  if (stale) {
+    ghlTokenStale.set(tenant, true);
+  } else {
+    ghlTokenStale.delete(tenant);
+  }
+}
+
+/**
+ * Returns true if the GHL token for the given tenant is currently stale.
+ */
+export function isGhlTokenStale(tenant: string): boolean {
+  return ghlTokenStale.get(tenant) === true;
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // INITIALIZATION — rehydrate persisted state on module load
 // ═══════════════════════════════════════════════════════════════════
 

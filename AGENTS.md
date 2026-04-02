@@ -20,25 +20,25 @@ Generated from [config/agents_config.json](./config/agents_config.json). Do not 
 
 | Agent | Org Unit | Tools | Channels | Action Families |
 | --- | --- | --- | --- | --- |
-| biz_01_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_02_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_03_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_04_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_05_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_06_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_07_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_08_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_09_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| biz_10_pod_lead | division_7_shared_services | 8 | 1 | 1 |
-| browser_primary | division_7_shared_services | 8 | 2 | 1 |
-| browser_secondary | division_7_shared_services | 6 | 0 | 0 |
-| d1_ceo | division_1_core_operations | 9 | 2 | 2 |
-| d1_cmo | division_1_core_operations | 8 | 2 | 1 |
-| d1_cto | division_1_core_operations | 8 | 2 | 0 |
-| d1_customer_success | division_1_core_operations | 7 | 2 | 1 |
-| d1_data_analyst | division_1_core_operations | 7 | 0 | 1 |
-| d1_devops | division_1_core_operations | 8 | 2 | 0 |
-| d1_fullstack_dev | division_1_core_operations | 8 | 0 | 0 |
-| d1_product_dev_manager | division_1_core_operations | 7 | 0 | 0 |
+| biz_01_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_02_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_03_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_04_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_05_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_06_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_07_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_08_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_09_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| biz_10_pod_lead | division_7_shared_services | 7 | 1 | 1 |
+| browser_primary | division_7_shared_services | 7 | 2 | 1 |
+| browser_secondary | division_7_shared_services | 5 | 0 | 0 |
+| d1_ceo | division_1_core_operations | 8 | 2 | 2 |
+| d1_cmo | division_1_core_operations | 7 | 2 | 1 |
+| d1_cto | division_1_core_operations | 7 | 2 | 0 |
+| d1_customer_success | division_1_core_operations | 6 | 2 | 1 |
+| d1_data_analyst | division_1_core_operations | 6 | 0 | 1 |
+| d1_devops | division_1_core_operations | 7 | 2 | 0 |
+| d1_fullstack_dev | division_1_core_operations | 7 | 0 | 0 |
+| d1_product_dev_manager | division_1_core_operations | 6 | 0 | 0 |
 
 Total configured agents: 103

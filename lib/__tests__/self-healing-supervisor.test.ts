@@ -87,7 +87,8 @@ describe("self-healing-supervisor — runHealingLoop", () => {
     vi.clearAllMocks();
     process.env.SUPABASE_URL              = "https://example.supabase.co";
     process.env.SUPABASE_SERVICE_ROLE_KEY = "test-key";
-    process.env.ANTHROPIC_API_KEY         = "sk-ant-test-key";
+    process.env.ANTHROPIC_API_KEY_SOVEREIGN = "sk-ant-test-key-sovereign";
+    process.env.ANTHROPIC_API_KEY_SHARED    = "sk-ant-test-key-shared";
     // Silence Telegram alert attempt (no token set)
     delete process.env.TELEGRAM_BOT_TOKEN;
     // Stub fetch so the gateway reachability check in preflightCheck() doesn't block
