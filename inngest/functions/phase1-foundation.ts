@@ -197,10 +197,10 @@ export const scopeViolationAttempted = inngest.createFunction(
 export const integrationHealthCheck = inngest.createFunction(
   {
     id: "integration-health-check",
-    name: "Integration Health — 5min Probe",
+    name: "Integration Health — Hourly Probe",
     retries: 1,
   },
-  { cron: "*/5 * * * *" },
+  { cron: "0 * * * *" },
   async ({ step }) => {
     const { probeAllWebhooks, detectBrokenIntegrations, selfHealCircuitBreaker } =
       await step.run("load-self-healing", async () => {

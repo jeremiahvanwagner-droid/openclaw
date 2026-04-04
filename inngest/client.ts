@@ -817,6 +817,12 @@ type OpenClawEvent =
       };
     }
   | {
+      name: "healing/run.scheduled.trigger";
+      data: {
+        triggered_by?: string;
+      };
+    }
+  | {
       name: "ci/run.failed";
       data: {
         owner: string;

@@ -23,6 +23,7 @@
 
 import { supabase } from "./agent-memory.js";
 import { logger } from "./logger";
+import { guardedLLMCall } from "./cost-guard";
 
 const log = logger.child({ module: "self-healing-supervisor" });
 
@@ -36,9 +37,12 @@ const log = logger.child({ module: "self-healing-supervisor" });
  * loop from running and potentially causing a crash-loop restart cascade.
  */
 export async function preflightCheck(): Promise<boolean> {
-  // 1. Verify ANTHROPIC_API_KEY_SOVEREIGN is set
-  if (!process.env.ANTHROPIC_API_KEY_SOVEREIGN) {
-    log.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY_SOVEREIGN not set");
+  // 1. Verify at least one Anthropic API key is set (shared → sovereign → fallback)
+  const anthropicKey = process.env.ANTHROPIC_API_KEY_SHARED
+    ?? process.env.ANTHROPIC_API_KEY_SOVEREIGN
+    ?? process.env.ANTHROPIC_API_KEY;
+  if (!anthropicKey) {
+    log.error("[OpenClaw] PREFLIGHT FAILED: No Anthropic API key set (checked SHARED, SOVEREIGN, fallback)");
     return false;
   }
 
@@ -256,7 +260,11 @@ export async function runHealingLoop(
   const escalations: string[] = [];
 
   for (const cluster of clusterList) {
-    const { proposals }: { proposals: PatchProposal[] } = await dbg.generatePatchProposals(cluster, { model: opts.model });
+    const { proposals }: { proposals: PatchProposal[] } = await guardedLLMCall(
+      `generatePatchProposals(${cluster.signature})`,
+      () => dbg.generatePatchProposals(cluster, { model: opts.model }),
+      { proposals: [] },
+    );
 
     for (const proposal of proposals) {
       const validation: { valid: boolean; safe_to_apply: boolean; reason: string } =

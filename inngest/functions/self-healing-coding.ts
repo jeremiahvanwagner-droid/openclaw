@@ -17,6 +17,7 @@ import {
   runIntegrationHealthCheck,
   runCiHealingCycle,
   collectRecentErrorLogs,
+  preflightCheck,
   type ErrorLogEntry,
   type CiFixResult,
 } from "../../lib/self-healing-supervisor";
@@ -96,10 +97,12 @@ async function resetCircuit(): Promise<void> {
 export const selfHealingScheduled = inngest.createFunction(
   {
     id: "self-healing-scheduled",
-    name: "Self-Healing — Scheduled 30-min Loop",
+    name: "Self-Healing — Event-Triggered Run",
     retries: 1,
+    idempotency: "event.id",
   },
-  { cron: "*/30 * * * *" },
+  // WS-B: Converted from cron "*/30 * * * *" to event-triggered to stop cost bleed
+  { event: "healing/run.scheduled.trigger" },
   async ({ step }) => {
     // ── Circuit Breaker Check ──────────────────────────────────
     const circuit = await step.run("circuit-breaker-check", async () => {
@@ -118,12 +121,15 @@ export const selfHealingScheduled = inngest.createFunction(
       };
     }
 
-    // ── Preflight: verify ANTHROPIC_API_KEY is set ─────────────
-    if (!process.env.ANTHROPIC_API_KEY) {
+    // ── Preflight: delegate to supervisor preflightCheck ─────────
+    const ready = await step.run("preflight-check", async () => {
+      return preflightCheck();
+    });
+    if (!ready) {
       await step.run("record-preflight-failure", async () => {
         return recordCircuitFailure();
       });
-      logger.error("[OpenClaw] PREFLIGHT FAILED: ANTHROPIC_API_KEY not set — aborting healing run");
+      logger.error("[OpenClaw] PREFLIGHT FAILED: No Anthropic API key set — aborting healing run");
       return { status: "preflight_failed", reason: "ANTHROPIC_API_KEY_missing" };
     }
 

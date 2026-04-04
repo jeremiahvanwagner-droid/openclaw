@@ -38,10 +38,10 @@ divisions, all skills, all integrations, all infrastructure.
 
 | Field | Value |
 |---|---|
-| **Last audit commit** | WP-2 session (April 2, 2026) — post-WP-2 state |
-| **Prior baseline commit** | WP-1 session (April 2, 2026) |
+| **Last audit commit** | Phase 1 cost-foundation session (April 2, 2026) — post-cost-guard state |
+| **Prior baseline commit** | WP-2 session (April 2, 2026) |
 | **Last human-verified date** | April 2, 2026 |
-| **Audit source** | Copilot WP-2 execution + exit gate validators |
+| **Audit source** | Copilot Phase 1 execution + typecheck + 239 tests |
 | **Tests passing** | 239 Vitest tests ✅ (was 197 before WP-2 added test coverage) |
 | **TypeScript compile** | Clean — tsc --noEmit exit 0 ✅ |
 | **Dashboard build** | Green ✅ |
@@ -94,10 +94,11 @@ divisions, all skills, all integrations, all infrastructure.
 - **Legacy OpenAI NOT fully removed:**
   — `openai-codex` provider blocks still in `openclaw.json`
   — `memorySearch` still uses `text-embedding-3-small` (OpenAI)
-  — ✅ Legacy `ANTHROPIC_API_KEY` call paths RESOLVED in WP-1:
+  — ✅ Legacy `ANTHROPIC_API_KEY` call paths RESOLVED in WP-1 + Phase 1:
     - `lib/anthropic-client.ts` — split to `anthropicSovereign` + `anthropicShared`
     - `lib/llm-router.ts` — `isSovereignRequest()` routing via `anthropic-tier-assignment.json`
-    - `lib/self-healing-supervisor.ts` — preflight checks `ANTHROPIC_API_KEY_SOVEREIGN`
+    - `lib/self-healing-supervisor.ts` — preflight checks `SHARED → SOVEREIGN → fallback` chain (fixed in Phase 1)
+    - `inngest/functions/self-healing-coding.ts` — delegates to `preflightCheck()` (fixed in Phase 1)
     - `scripts/validate-env.mjs` — requires both split keys
     - `scripts/upgrade/probe-anthropic-key.mjs` — probes both keys independently
 
@@ -131,8 +132,10 @@ divisions, all skills, all integrations, all infrastructure.
 - **Docker stack:** Split (not single-stack)
   — `docker-compose.yml` + `docker-compose.prod.yml`: bot/gateway on 18789, webhook on 8788
   — `docker-compose.monitoring.yml`: Prometheus, Grafana, Loki, Promtail (separate stack)
-- **Inngest:** 65 function definitions, 50 unique event-triggered names, 13 cron schedules
+- **Inngest:** 65 function definitions, 51 unique event-triggered names, 12 cron schedules
   (NOT the claimed 77 event types)
+  — `selfHealingScheduled` converted from cron to event-triggered (`healing/run.scheduled.trigger`)
+  — `integrationHealthCheck` reduced from `*/5` to `0 * * * *` (hourly)
 - **CI/CD:** 2 workflows (NOT 3)
   — `ci.yml` ✅ (lint, typecheck, test, dashboard build)
   — `deploy-bot.yml` ✅ (tests, parity, health checks, Telegram)
@@ -184,6 +187,15 @@ divisions, all skills, all integrations, all infrastructure.
 - ✅ **Data source-of-truth files created** — `data/tjb-offer-matrix.json` (5 offers, 3 funnel stages), `data/ghl-funnel-paths.json`, `data/recovery-automation-policies.json`; `validate-offer-matrix.mjs` exits 0
 - ✅ **Rollout registry aligned** — biz_02 (BTV) and biz_03 (DPW) both at `rollout_wave: 1`
 - ✅ **5-tier Anthropic assignment complete** — all 103 agents explicitly assigned; 0 on fallback; `sovereign_isolation_verified: true`
+- ✅ **Phase 1 cost-foundation complete** — Anthropic cost bleed stopped:
+  - `selfHealingScheduled` converted from `*/30 * * * *` cron (48×/day) to event-triggered
+  - `integrationHealthCheck` reduced from `*/5 * * * *` (288×/day) to `0 * * * *` (24×/day)
+  - 7 training functions gated behind `TRAINING_PROTOCOL_ENABLED` env var
+  - 4 Phase 2 cron functions gated behind `PHASE2_INTELLIGENCE_ENABLED` env var
+  - `preflightCheck()` fixed to use `SHARED → SOVEREIGN → fallback` credential chain
+  - `lib/cost-guard.ts` created — `guardedLLMCall()` dry-run wrapper with `DRY_RUN` env gate
+  - `generatePatchProposals` in healing loop wrapped with `guardedLLMCall`
+  - `.env.example` updated with `DRY_RUN=false`
 
 ---
 
@@ -272,6 +284,7 @@ divisions, all skills, all integrations, all infrastructure.
 | April 1, 2026 | ❌ NOT READY for full production | Codex audit (commit dc22a1e) |
 | April 2, 2026 | ✅ WP-1 P0 BLOCKERS CLEARED — Deploy with controls approved | Copilot WP-1 execution + exit gate |
 | April 2, 2026 | ✅ WP-2 P1 BLOCKERS CLEARED — All 7 issues resolved, 239 tests pass | Copilot WP-2 execution + exit gate |
+| April 2, 2026 | ✅ Phase 1 cost-foundation — cron throttle + env gates + cost-guard, 239 tests pass | Copilot Phase 1 execution |
 | April 2026 | Foundation + Soft Launch only | MIKE operational directive |
 
 ---

@@ -39,6 +39,9 @@ export const revenueDailyCollection = inngest.createFunction(
   },
   { cron: "0 6 * * *" },
   async ({ step }) => {
+    if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
+      return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
+    }
     const mod = await step.run("load-revenue-ops", () => loadRevenueOps());
 
     // Fan out KPI collection across all 10 businesses
@@ -234,6 +237,9 @@ export const journeyStallDetection = inngest.createFunction(
   },
   { cron: "0 4 * * *" },
   async ({ step }) => {
+    if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
+      return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
+    }
     const mod = await step.run("load-journey", () => loadJourneyIntel());
 
     // Get all active contacts with recent touchpoints
@@ -343,6 +349,9 @@ export const commandCenterDailyBriefing = inngest.createFunction(
   },
   { cron: "0 7 * * *" },
   async ({ step }) => {
+    if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
+      return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
+    }
     const mod = await step.run("load-command-center", () => loadCommandCenter());
 
     const briefing = await step.run("generate-briefing", () => mod.generatePortfolioBriefing()) as {
@@ -369,6 +378,9 @@ export const commandCenterWeeklyDigest = inngest.createFunction(
   },
   { cron: "0 8 * * 1" },
   async ({ step }) => {
+    if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
+      return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
+    }
     const mod = await step.run("load-command-center", () => loadCommandCenter());
 
     const briefing = await step.run("generate-weekly-briefing", () => mod.generatePortfolioBriefing()) as {

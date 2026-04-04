@@ -63,6 +63,9 @@ export const trainingWeeklyReview = inngest.createFunction(
   },
   { event: "training.weekly_review" },
   async ({ event, step }) => {
+    if (!process.env.TRAINING_PROTOCOL_ENABLED) {
+      return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
+    }
     const weekNumber = getWeekNumber(new Date());
 
     // Step 1: Gather performance metrics for all agents
@@ -203,6 +206,9 @@ export const trainingSkillDevelopment = inngest.createFunction(
   },
   { event: "training.skill_development" },
   async ({ event, step }) => {
+    if (!process.env.TRAINING_PROTOCOL_ENABLED) {
+      return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
+    }
     const prioritySkills = [
       { name: "highlevel-advanced", priority: "critical", agents: ["marketing", "sales", "d4_enrollment"] },
       { name: "stripe-advanced", priority: "critical", agents: ["d2_director", "d6_finance"] },
@@ -311,6 +317,9 @@ export const trainingCrossDivision = inngest.createFunction(
   },
   { event: "training.cross_division" },
   async ({ event, step }) => {
+    if (!process.env.TRAINING_PROTOCOL_ENABLED) {
+      return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
+    }
     const scenarios = [
       {
         name: "New Lead → Discovery Call",
@@ -449,6 +458,9 @@ export const trainingSoulRefinement = inngest.createFunction(
   },
   { event: "training.soul_refinement" },
   async ({ event, step }) => {
+    if (!process.env.TRAINING_PROTOCOL_ENABLED) {
+      return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
+    }
     const workspacesDir = path.join(WORKSPACE_ROOT, "workspaces");
 
     // Step 1: Load agents needing refinement from Monday's review
@@ -557,6 +569,9 @@ export const trainingPerformanceReview = inngest.createFunction(
   },
   { event: "training.performance_review" },
   async ({ event, step }) => {
+    if (!process.env.TRAINING_PROTOCOL_ENABLED) {
+      return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
+    }
     // Step 1: Generate performance dashboard
     const dashboard = await step.run("generate-dashboard", async () => {
       const { data, error } = await supabase
@@ -688,6 +703,9 @@ export const trainingMemoryConsolidation = inngest.createFunction(
   },
   { event: "training.memory_consolidation" },
   async ({ event, step }) => {
+    if (!process.env.TRAINING_PROTOCOL_ENABLED) {
+      return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
+    }
     // Step 1: Gather learnings from all agents
     const learnings = await step.run("gather-learnings", async () => {
       const memoryDir = path.join(WORKSPACE_ROOT, "memory");
@@ -825,6 +843,9 @@ export const trainingHealthCheck = inngest.createFunction(
   },
   { event: "training.health_check" },
   async ({ event, step }) => {
+    if (!process.env.TRAINING_PROTOCOL_ENABLED) {
+      return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
+    }
     const healthResults: HealthCheckResult = {
       timestamp: new Date().toISOString(),
       workspaces: { status: "unknown", details: [] },
