@@ -1,5 +1,7 @@
 # Open Claw Build — Strategic Architecture Report
 
+> Historical strategic report. It does not describe the current repo-verified architecture. Current truth is 103 configured agents across 9 divisions; see `AGENTS.md` and `REGGIE-STATE.md`.
+
 **Prepared for:** Jeremiah Van Wagner, Founder & CEO — Truth J Blue LLC  
 **Date:** March 14, 2026  
 **Classification:** Leadership — Internal Strategy  

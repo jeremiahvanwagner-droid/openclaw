@@ -52,10 +52,26 @@ if [[ -f "${USER_CREDENTIALS_ENV}" ]]; then
   source "${USER_CREDENTIALS_ENV}"
 fi
 
+WEBHOOK_SECRET_VALUE="${OPENCLAW_GHL_WEBHOOK_SECRET:-}"
+if [[ -z "${WEBHOOK_SECRET_VALUE}" ]]; then
+  echo "OPENCLAW_GHL_WEBHOOK_SECRET must be set before installing the webhook service."
+  exit 1
+fi
+
+if [[ "${WEBHOOK_SECRET_VALUE}" == "replace-with-32byte-random-secret" || "${WEBHOOK_SECRET_VALUE}" == "your-32-byte-random-webhook-secret" ]]; then
+  echo "OPENCLAW_GHL_WEBHOOK_SECRET must not use a placeholder value."
+  exit 1
+fi
+
+if [[ "${#WEBHOOK_SECRET_VALUE}" -lt 32 ]]; then
+  echo "OPENCLAW_GHL_WEBHOOK_SECRET must be at least 32 characters."
+  exit 1
+fi
+
 upsert_env "OPENCLAW_OPS_DB_PATH" "${OPENCLAW_OPS_DB_PATH:-${APP_HOME}/.config/openclaw-prod/ops.db}"
 upsert_env "OPENCLAW_GHL_WEBHOOK_HOST" "${OPENCLAW_GHL_WEBHOOK_HOST:-127.0.0.1}"
 upsert_env "OPENCLAW_GHL_WEBHOOK_PORT" "${OPENCLAW_GHL_WEBHOOK_PORT:-8788}"
-upsert_env "OPENCLAW_GHL_WEBHOOK_SECRET" "${OPENCLAW_GHL_WEBHOOK_SECRET:-replace-with-32byte-random-secret}"
+upsert_env "OPENCLAW_GHL_WEBHOOK_SECRET" "${WEBHOOK_SECRET_VALUE}"
 upsert_env "OPENCLAW_GATEWAY_AUTH_TOKEN" "${OPENCLAW_GATEWAY_AUTH_TOKEN:-}"
 upsert_env "OPENCLAW_PUBLIC_WEBHOOK_BASE_URL" "${OPENCLAW_PUBLIC_WEBHOOK_BASE_URL:-}"
 upsert_env "OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY" "${OPENCLAW_GHL_WEBHOOK_PUBLIC_KEY:-}"

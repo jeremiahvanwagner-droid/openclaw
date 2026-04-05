@@ -1,363 +1,164 @@
 # REGGIE-STATE.md
 # Runtime Engine Governing Global Integrations & Execution
-# Truth J Blue LLC — OpenClaw Platform
+# Truth J Blue LLC - OpenClaw Platform
 
-> ⚠️ MANDATORY FIRST READ FOR EVERY AI SESSION, EVERY CODEX PROMPT,
+> MANDATORY FIRST READ FOR EVERY AI SESSION, EVERY CODEX PROMPT,
 > AND EVERY DEVELOPER TOUCHING THIS REPO.
 >
-> DO NOT BUILD. DO NOT PLAN. DO NOT GENERATE CODE.
-> READ THIS FILE FIRST. VERIFY IT MATCHES THE REPO. THEN ACT.
+> This file is a repo-verified audit artifact.
+> Do not treat older reports, planning docs, or stale README text as runtime truth.
 >
-> If anything in this file contradicts what you see in the live repo,
-> STOP and update this file BEFORE doing anything else.
-> The loop breaks here.
+> If the repo contradicts this file, stop and update this file first.
 
 ---
 
 ## WHAT IS REGGIE
 
-REGGIE is the operational name for the entire OpenClaw platform
-deployed for Truth J Blue LLC.
+REGGIE is the operational name for the full OpenClaw runtime used by Truth J Blue LLC.
 
-**REGGIE = Runtime Engine Governing Global Integrations & Execution**
-
-REGGIE is NOT a single agent.  
-REGGIE IS the complete OpenClaw runtime — all 103 agents, all 9
-divisions, all skills, all integrations, all infrastructure.
+REGGIE is not a single agent.
+REGGIE is the entire governed system: workforce, routing, skills, integrations, monitoring, and deployment surfaces.
 
 | Field | Value |
 |---|---|
-| **Owner** | Jeremiah Van Wagner (Truth J Blue) |
-| **Governed by** | MIKE (Modular Intelligence & Knowledge Engine) |
-| **Repo** | github.com/jeremiahvanwagner-droid/openclaw |
-| **Production host** | Hetzner VPS |
+| Owner | Jeremiah Van Wagner (Truth J Blue) |
+| Governed by | MIKE (Modular Intelligence & Knowledge Engine) |
+| Repo | `github.com/jeremiahvanwagner-droid/openclaw` |
+| Production host | Hetzner VPS |
 
 ---
 
-## LAST VERIFIED STATE
+## LAST REPO-VERIFIED AUDIT
 
 | Field | Value |
 |---|---|
-| **Last audit commit** | Phase 1 cost-foundation session (April 2, 2026) — post-cost-guard state |
-| **Prior baseline commit** | WP-2 session (April 2, 2026) |
-| **Last human-verified date** | April 2, 2026 |
-| **Audit source** | Copilot Phase 1 execution + typecheck + 239 tests |
-| **Tests passing** | 239 Vitest tests ✅ (was 197 before WP-2 added test coverage) |
-| **TypeScript compile** | Clean — tsc --noEmit exit 0 ✅ |
-| **Dashboard build** | Green ✅ |
-| **GHL auth — TJB tenant** | 200 OK ✅ (GHL_LOCATION_ID drift warning resolved) |
-| **GHL auth — MSL tenant** | 200 OK ✅ |
-| **Governance drift** | Clean ✅ |
-| **Security hardening validator** | Exit 0 ✅ (was failing before WP-1) |
-| **Lint baseline** | 57/59 max ✅ |
-| **Deployment verdict** | ⚠️ DEPLOY WITH CONTROLS (all P0 blockers resolved) |
+| Audit date | April 5, 2026 |
+| Audit method | Repo inspection + validator runs + targeted regression tests |
+| Runtime parity | `runtime-config-parity.mjs` -> `ok: true` |
+| Security hardening validator | `validate-security-hardening.mjs` exit `0` |
+| Worker environment validator | `validate-worker-env.mjs --expected production` -> `ok: true` |
+| Offer matrix validator | `validate-offer-matrix.mjs` -> `ok: true` |
+| Targeted regression tests | `27/27` pass (`data-files` + `api-rate-governor`) |
+| Secret negative test | webhook handler refuses startup when `OPENCLAW_GHL_WEBHOOK_SECRET` is missing |
+| Live host verification | Not performed in this session |
 
 ---
 
-## VERIFIED ARCHITECTURE — DO NOT CONTRADICT WITHOUT PROOF
+## ARCHITECTURE TRUTH
 
-### Agent Workforce
+### Workforce
 
-- **Configured agents:** 103 (source: `config/agents_config.json`)
-- **Runtime entries:** 107 (source: `config/openclaw.prod.json`)
-  — 4 extra aliases: `main`, `marketing`, `sales`, `support`
-- **Supabase `agents` table:** 109 rows (6 ghost IDs — DB drift, not config drift)
-- **Divisions:** 9 (fully configured and internally consistent)
+- Configured agents: `103` (`config/agents_config.json`)
+- Runtime entries: `107` (`config/openclaw.prod.json`, `openclaw.json`)
+- Runtime aliases: `main`, `marketing`, `sales`, `support`
+- Divisions: `9`
+- Generated workforce snapshot: `AGENTS.md`
 
-> ❌ STALE: `README.md` says 75 agents / 7 divisions — DO NOT TRUST  
-> ❌ STALE: Training system files say 75 agents / 7 divisions — DO NOT TRUST  
-> ✅ TRUTH: `AGENTS.md` correctly shows 103 agents / 9 divisions
-
-### The 9 Divisions
+### Divisions
 
 | ID | Name | Agents |
 |---|---|---|
-| D1 | Core Operations (Truth J Blue LLC HQ) | 10 |
+| D1 | Core Company Operations (Truth J Blue LLC HQ) | 10 |
 | D2 | eCommerce Operations | 10 |
 | D3 | Consulting Practice | 10 |
-| D4 | Coaching & Community (BTV / DPW) | 10 |
+| D4 | Coaching & Community (Beyond the Veil / Divine Path Walkers) | 10 |
 | D5 | Publishing (Books & Media) | 10 |
-| D6 | Nonprofit (Inspire Build Motivate, Inc.) | 10 |
-| D7 | Shared Services & Runtime Supervisors | 20 |
-| D8 | SaaS Operations (GHL Enablement) | 13 |
-| D9 | Online Store (store.truthjblue.com) | 10 |
+| D6 | Nonprofit Operations (Inspire Build Motivate, Inc.) | 10 |
+| D7 | Cross-Division Shared Services & Runtime Supervisors | 20 |
+| D8 | SaaS Operations (Shared GHL Enablement) | 13 |
+| D9 | Online Store Operations (store.truthjblue.com - Books & Merch) | 10 |
 
-### LLM Routing Layer
+### Runtime And Models
 
-- **All 103 agent configs:** Fully Anthropic
-  — 74 Sonnet, 22 Haiku, 7 Opus
-  — 0 references to `gpt-4o`, `gpt-4o-mini`, `openai-codex` in agent configs
-- **5-tier migration status:** ✅ COMPLETE (resolved in WP-2)
-  — All 103 of 103 agents explicitly assigned (strategist:7, executor:11, communicator:72, analyst:9, guardian:4)
-  — 0 agents on fallback assignment
-  — `sovereign_isolation_verified: true`
-- **Legacy OpenAI NOT fully removed:**
-  — `openai-codex` provider blocks still in `openclaw.json`
-  — `memorySearch` still uses `text-embedding-3-small` (OpenAI)
-  — ✅ Legacy `ANTHROPIC_API_KEY` call paths RESOLVED in WP-1 + Phase 1:
-    - `lib/anthropic-client.ts` — split to `anthropicSovereign` + `anthropicShared`
-    - `lib/llm-router.ts` — `isSovereignRequest()` routing via `anthropic-tier-assignment.json`
-    - `lib/self-healing-supervisor.ts` — preflight checks `SHARED → SOVEREIGN → fallback` chain (fixed in Phase 1)
-    - `inngest/functions/self-healing-coding.ts` — delegates to `preflightCheck()` (fixed in Phase 1)
-    - `scripts/validate-env.mjs` — requires both split keys
-    - `scripts/upgrade/probe-anthropic-key.mjs` — probes both keys independently
+- `config/openclaw.prod.json` and `openclaw.json` are aligned for runtime agent/model assignment.
+- Repo-verified production rollout distribution:
+  - `78` Anthropic Sonnet
+  - `22` Anthropic Haiku
+  - `7` Anthropic Opus
+- OpenAI is still present for `memorySearch` embeddings only.
 
-### Memory Architecture
+### Integrations And Data
 
-- **pgvector:** Enabled ✅
-- **Business memory schemas (`ghl_leads`, `btv_clients`, `dpw_members`, `content_log`):** ❌ NOT LIVE IN SUPABASE
-  — These exist in planning docs but are NOT in the live DB
-  — Live tables are: `agents`, `agent_memory`, `agent_events`, `agent_metrics`, `agent_sessions`, `agent_heartbeat_log`
-- **Memory that survives restart:** SQLite (`memory/*.sqlite`), Supabase rows, rate-governor file state
-- **Memory lost on restart:** In-process response cache, unsaved transient state in `llm-router.ts`
+- GHL OAuth auto-refresh is implemented in `skills/ghl-oauth-manager.mjs` and initialized at webhook startup.
+- Rate governor state persists to `data/rate-governor-state.json`.
+- Required data files are present:
+  - `data/worker-environment-map.json`
+  - `data/tjb-offer-matrix.json`
+  - `data/ghl-funnel-paths.json`
+  - `data/recovery-automation-policies.json`
 
-### GHL Integration Layer
+### Infrastructure
 
-- **GHL connectivity:** Live for both TJB and MSL tenants ✅
-- **Env drift warning:** Missing `GHL_LOCATION_ID`, literal `${...}` alias in `GHL_TOKEN`
-- **GHL API implementation:** 8 namespaces, 55 methods
-  (NOT the claimed 39 endpoint groups — that was a planning doc figure)
-- **Active webhook event types:** 14 unique types
-  (NOT the claimed 50 — that was a planning doc figure)
-- **Active Inngest outbound webhooks:** 134 across 14 event types
-- **Webhook handler recognized events:** 15 keys
-- **Named pipelines in code:** ❌ NOT VERIFIABLE
-  — Divine Seeker Journey, Active Mentorship, Alumni Network
-    exist in planning docs but NOT as explicit code objects
-  — Active wiring is generic webhook/workflow routing only
-- **Speed-to-Lead chain:** Routes `contact.created` directly to `marketing` alias — NOT via COMMUNICATOR tier
+- Runtime stack is split:
+  - gateway on `18789`
+  - webhook handler on `8788`
+  - monitoring stack under `deploy/monitoring/`
+- Prometheus repo config now contains scrape targets for both gateway and webhook handler.
+- Current CI workflows in the repo:
+  - `.github/workflows/ci.yml`
+  - `.github/workflows/deploy-bot.yml`
 
-### Infrastructure Layer
+### Documentation Truth
 
-- **Docker stack:** Split (not single-stack)
-  — `docker-compose.yml` + `docker-compose.prod.yml`: bot/gateway on 18789, webhook on 8788
-  — `docker-compose.monitoring.yml`: Prometheus, Grafana, Loki, Promtail (separate stack)
-- **Inngest:** 65 function definitions, 51 unique event-triggered names, 12 cron schedules
-  (NOT the claimed 77 event types)
-  — `selfHealingScheduled` converted from cron to event-triggered (`healing/run.scheduled.trigger`)
-  — `integrationHealthCheck` reduced from `*/5` to `0 * * * *` (hourly)
-- **CI/CD:** 2 workflows (NOT 3)
-  — `ci.yml` ✅ (lint, typecheck, test, dashboard build)
-  — `deploy-bot.yml` ✅ (tests, parity, health checks, Telegram)
-  — `deploy-dashboard.yml` ❌ DOES NOT EXIST
-- **Staging environment:** ❌ DOES NOT EXIST — all deploys go directly to production
-
-### Skills
-
-- **Total skill modules:** 134 `.mjs` files under `/skills`
-  (NOT the claimed 111 under `/lib`)
-- **Clean scan passing:** 122 of 134
-- **Confirmed incomplete (stubs/TODOs):**
-  — `backup-manager.mjs`
-  — `browser-controller.mjs`
-  — `content-to-campaign-factory/index.mjs`
-  — `gh-fix-ci/index.mjs`
-  — `self-healing-integrations/index.mjs`
-  — `social-media-publisher.mjs`
-  — `social-poster.mjs`
-  — `traffic-coordinator.mjs`
+- Current operator docs: `REGGIE-STATE.md`, `README.md`, `AGENTS.md`, `SOUL.md`, `MEMORY.md`, `TOOLS.md`
+- Historical/planning docs are marked stale where still retained.
 
 ---
 
-## WHAT IS CONFIRMED WORKING (GREEN)
+## VERIFIED GREEN
 
-- ✅ Shell injection patched — `safe-exec.mjs` uses `execFile`
-- ✅ Webhook secret hardcoded fallback removed — gateway exits if `OPENCLAW_GHL_WEBHOOK_SECRET` unset
-- ✅ Credential inventory dates populated
-- ✅ GHL auth live for TJB and MSL tenants
-- ✅ Rate governor state persists across restarts (local file `data/rate-governor-state.json`)
-- ✅ 122/134 skills clean
-- ✅ 239 Vitest tests passing (was 197 after WP-1)
-- ✅ Governance drift validation clean
-- ✅ GHL scope enforcer implemented and tested
-- ✅ **Anthropic split-key routing LIVE** — `ANTHROPIC_API_KEY_SOVEREIGN` (Opus/guardian) + `ANTHROPIC_API_KEY_SHARED` (Sonnet/Haiku) fully wired
-- ✅ **`security_policy` block in `agents_config.json`** — alias agents, enforcement modes, HITL defaults, sovereign isolation policy all declared
-- ✅ **Governance docs regenerated** — SOUL.md, AGENTS.md, MEMORY.md, TOOLS.md all in sync with config
-- ✅ **GHL OAuth auto-refresh implemented** — `initAutoRefresh()` wired to gateway startup; 80% lifetime refresh + Telegram alert on failure
-- ✅ **`setGhlTokenStale()` / `isGhlTokenStale()`** exported from `api-rate-governor.ts`
-- ✅ **Env contract normalized** — `.env.example` has `GHL_LOCATION_ID`, `TELEGRAM_CHAT_ID`, capability/browser enforcement keys
-- ✅ **`validate-security-hardening.mjs` exits 0** — was failing before WP-1
-- ✅ Next.js dashboard builds green
-- ✅ `worker-environment-map.json` exists
-- ✅ SOUL.md governance layer current
-- ✅ **Supabase client singleton enforced** — `lib/supabase-client.ts` is the single import point; all other call sites removed
-- ✅ **Inngest idempotency keys wired** — all 50 event-triggered functions have `id:` key (dedup window: 24 h)
-- ✅ **Zod webhook validation active** — `validateGhlWebhookPayload()` gates all 15 event types; invalid payloads return 400 before handler logic
-- ✅ **Telegram chat-ID hardening complete** — `ab-testing.mjs`, `predictive-scoring.mjs`, `webhook-resilience.mjs` all read `TELEGRAM_CHAT_ID` from env
-- ✅ **Data source-of-truth files created** — `data/tjb-offer-matrix.json` (5 offers, 3 funnel stages), `data/ghl-funnel-paths.json`, `data/recovery-automation-policies.json`; `validate-offer-matrix.mjs` exits 0
-- ✅ **Rollout registry aligned** — biz_02 (BTV) and biz_03 (DPW) both at `rollout_wave: 1`
-- ✅ **5-tier Anthropic assignment complete** — all 103 agents explicitly assigned; 0 on fallback; `sovereign_isolation_verified: true`
-- ✅ **Phase 1 cost-foundation complete** — Anthropic cost bleed stopped:
-  - `selfHealingScheduled` converted from `*/30 * * * *` cron (48×/day) to event-triggered
-  - `integrationHealthCheck` reduced from `*/5 * * * *` (288×/day) to `0 * * * *` (24×/day)
-  - 7 training functions gated behind `TRAINING_PROTOCOL_ENABLED` env var
-  - 4 Phase 2 cron functions gated behind `PHASE2_INTELLIGENCE_ENABLED` env var
-  - `preflightCheck()` fixed to use `SHARED → SOVEREIGN → fallback` credential chain
-  - `lib/cost-guard.ts` created — `guardedLLMCall()` dry-run wrapper with `DRY_RUN` env gate
-  - `generatePatchProposals` in healing loop wrapped with `guardedLLMCall`
-  - `.env.example` updated with `DRY_RUN=false`
+### Supplied Failure Reclassification
 
----
-
-## ACTIVE BLOCKERS (P0 — NOTHING GOES LIVE UNTIL FIXED)
-
-> ✅ ALL WP-1 P0 BLOCKERS RESOLVED (April 2, 2026)
-
-~~### P0-1: Legacy Anthropic credential path~~  
-**RESOLVED** — Split-key routing wired across all 5 files. `ANTHROPIC_API_KEY` (singular) fully removed.
-
-~~### P0-2: GHL OAuth auto-refresh not implemented~~  
-**RESOLVED** — `initAutoRefresh()` exported from `skills/ghl-oauth-manager.mjs` and called at gateway startup. Schedules refresh at 80% token lifetime with 3 retries + Telegram alert.
-
-~~### P0-3: Missing `security_policy` in agents_config.json~~  
-**RESOLVED** — Full `security_policy` block added. `validate-security-hardening.mjs` exits 0.
-
-~~### P0-4: GHL env drift~~  
-**RESOLVED** — `GHL_LOCATION_ID` added to `.env.example`; `check-ghl-auth.mjs` accepts `GHL_LOCATION_ID_TJB` as fallback; `validate-env.mjs` updated.
-
-> ✅ ALL WP-2 P1 BLOCKERS RESOLVED (April 2, 2026)
-
-> No active P0 blockers. WP-2 complete. Next gate: WP-3 (production deploy readiness + staging environment).
-
----
-
-## OPEN GAPS BY PRIORITY
-
-### P1 — Required for Reliable Operation
-
-| Gap | File(s) | Impact |
+| Failure point | Status | Repo-verified result |
 |---|---|---|
-| ~~Hardcoded Telegram chat ID fallback in 3+ skills~~ | ~~`ab-testing.mjs`, `predictive-scoring.mjs`, `webhook-resilience.mjs`~~ | ✅ **RESOLVED in WP-2** |
-| ~~5-tier Anthropic assignment incomplete (89 fallbacks)~~ | ~~`anthropic-tier-assignment.json`~~ | ✅ **RESOLVED in WP-2** |
-| OpenAI embedding still active | `openclaw.json` (memorySearch) | Mixed provider, cost inefficiency |
-| ~~Supabase client not singleton everywhere~~ | ~~`self-healing-supervisor.ts`, Inngest functions~~ | ✅ **RESOLVED in WP-2** |
-| Per-agent circuit breakers absent | `api-rate-governor.ts` | One bad agent can exhaust all provider budget |
-| Agent config hot-reload absent | `agents_config.json` watcher | Every config change requires full restart |
-| Gateway (18789) not in Prometheus scrape | `deploy/monitoring/prometheus/prometheus.yml` | All agent/LLM metrics invisible to Grafana |
-| `/health/deep` endpoint absent | `handlers/ghl-webhook-handler.mjs` | Can't detect "running but broken" state |
-| Cron observability dashboard missing | `deploy/monitoring/grafana/dashboards/` | No visibility into scheduled operations |
-| ~~Inngest idempotency keys absent~~ | ~~All `inngest/functions/`~~ | ✅ **RESOLVED in WP-2** |
-| ~~Zod validation absent on webhook payloads~~ | ~~`handlers/ghl-webhook-handler.mjs`~~ | ✅ **RESOLVED in WP-2** |
-| ~~Missing data files (3 of 4)~~ | ~~`data/` directory~~ | ✅ **RESOLVED in WP-2** (1 remaining: business memory schemas) |
-| ~~Rollout registry misaligned with launch calendar~~ | ~~`data/business-registry.json`~~ | ✅ **RESOLVED in WP-2** |
-| Rate governor not multi-process durable | `lib/api-rate-governor.ts` | File state only — not safe for future scaling |
+| GHL OAuth token auto-refresh missing | `resolved-in-repo` | `initAutoRefresh()` exists and is called from `handlers/ghl-webhook-handler.mjs` |
+| Missing critical data files | `resolved-in-repo` | All four files exist; worker env and offer matrix validators pass; data-file tests pass |
+| Webhook secret placeholder in active runtime path | `resolved-in-repo` | handler fails closed without secret; install/register tooling now rejects missing or placeholder secrets |
+| Prometheus not scraping gateway | `resolved-in-repo` for repo config | `deploy/monitoring/prometheus/prometheus.yml` includes `host.docker.internal:18789` |
+| Rate governor state lost on restart | `resolved-in-repo` | state file persistence exists and rate-governor tests pass |
+| Docs stale at `75` agents / `7` divisions | `resolved-in-repo` for current docs | `README.md` and active config copy corrected; historical docs explicitly marked stale |
 
-### P2 — Required for Universe Mode
+### Additional Verified Improvements
 
-| Gap | Notes |
+- `validate-security-hardening.mjs` runs clean again.
+- `openclaw.json` now matches production agent/model rollout expectations.
+- `config/agents_config.json` and the repo-level `agents_config.json` no longer claim "all 75 agents" in the active master-orchestrator responsibility text.
+
+---
+
+## ACTIVE BLOCKERS
+
+| Blocker | Why it is still active |
 |---|---|
-| Staging environment | No staging compose or workflow exists |
-| Prompt versioning | No implementation found anywhere in repo |
-| Agent versioning + rollback | No `agent_versions` migration exists |
-| Horizontal scaling | Single `bot` + single `webhook` service only |
-| OpenTelemetry | Absent from all runtime code |
-| DLQ rotation inconsistency | `lib/ghl-api.mjs` writes DLQ without rotation |
-| Browser isolation (4 profiles) | Defined in config; runtime defaults to `chrome-relay` |
-| README accuracy | Still says 75 agents / 7 divisions |
-| Business memory schemas | `ghl_leads`, `btv_clients`, `dpw_members`, `content_log` not yet in live Supabase |
-| Named pipeline code objects | Divine Seeker, BTV, Alumni not modeled in code |
+| Live gateway metrics not verified | Repo scrape config is fixed, but this audit did not observe a running stack with `:18789/metrics` reachable |
+| Live Prometheus/Grafana target health not verified | No repo-local proof in this session that both targets are `UP` in Grafana/Prometheus |
+| `/health/deep` endpoint absent | The repo still exposes `/health` but not a deeper "running but broken" check |
+| No staging environment | Repo still deploys without a verified staging layer |
 
 ---
 
-## UNIVERSE MODE SCORECARD (April 1, 2026)
+## UNVERIFIED RUNTIME CLAIMS
 
-| Condition | Score | Status |
-|---|---|---|
-| Total Autonomy | 3/5 | 13 crons exist; OAuth + observability not autonomous |
-| Real-Time Responsiveness | 3/5 | Webhooks fire; E2E <5min not verified |
-| Predictive Intelligence | 2/5 | Intelligence modules exist; business schemas not live |
-| Full Lifecycle Control | 2/5 | Payments/appts wired; named pipelines not in code |
-| Unified Ecosystem Integration | 3/5 | GHL+Supabase+Inngest connected; bridges incomplete |
-| Executive-Level Reporting | 3/5 | Dashboard + Grafana exist; gateway metrics blind |
-| Continuous Evolution | 2/5 | CI + tests exist; no staging, versioning, or rollback |
+Do not state any of the following as fact without a fresh live-system check:
 
-**Universe Mode Declaration Target: July–August 2026**  
-(Original May 15 target was based on planning doc assumptions, not verified repo state)
+| Claim | Current status |
+|---|---|
+| Hetzner gateway and webhook services are healthy | Unverified in this audit |
+| Grafana is receiving gateway metrics in live operation | Unverified in this audit |
+| Prometheus shows both gateway and webhook scrape targets as `UP` | Unverified in this audit |
+| Live TJB and MSL auth health is `200 OK` today | Not re-run in this audit |
+| Current Supabase row counts, ghost IDs, and business-schema presence | Not re-verified in this audit |
+| Deployed webhook secret value on the live host is rotated and current | Not re-verified in this audit |
 
 ---
 
-## DEPLOYMENT DECISION HISTORY
+## OPERATOR RULE
 
-| Date | Verdict | Authority |
-|---|---|---|
-| March 31, 2026 | ⚠️ DEPLOY WITH CONTROLS | Codex audit (commit ecd5fb3) |
-| April 1, 2026 | ❌ NOT READY for full production | Codex audit (commit dc22a1e) |
-| April 2, 2026 | ✅ WP-1 P0 BLOCKERS CLEARED — Deploy with controls approved | Copilot WP-1 execution + exit gate |
-| April 2, 2026 | ✅ WP-2 P1 BLOCKERS CLEARED — All 7 issues resolved, 239 tests pass | Copilot WP-2 execution + exit gate |
-| April 2, 2026 | ✅ Phase 1 cost-foundation — cron throttle + env gates + cost-guard, 239 tests pass | Copilot Phase 1 execution |
-| April 2026 | Foundation + Soft Launch only | MIKE operational directive |
+Before making runtime claims, prefer this order of trust:
 
----
+1. Current repo evidence
+2. Current validator/test output
+3. Fresh live-system checks
+4. Older reports and planning documents
 
-## PLANNING DOCUMENTS — READ WITH CAUTION
-
-The following documents describe **VISION STATE**, not current state.  
-Do not treat any number or claim in these docs as verified without checking against this file first:
-
-- `OpenClaw_True_Current_State_Architecture_March_30_2026.md`
-  — Some figures are planning-doc numbers, not code-verified
-- `OpenClaw × GoHighLevel Master of HighLevel Universe Mode.md`
-  — Universe Mode architecture; not yet fully built
-- `Premium and Professional Open Claw Architectures.md`
-  — Design reference; partially implemented
-- `STRATEGIC-UPGRADE-PLAN.md`
-  — 50-item roadmap; check item status before assuming complete
-- **Any document claiming 39 API endpoint groups, 50 webhook types, 77 Inngest events, 111 skills, or 4 live business memory schemas**
-  — ALL OF THESE ARE PLANNING FIGURES. Verified reality is lower.
-
----
-
-## MISSING FILES (Must Be Created Before Phase 2)
-
-| File | Status | Blocks |
-|---|---|---|
-| `data/tjb-offer-matrix.json` | ✅ PRESENT | Created in WP-2 — 5 offers, 3 funnel stages, validates clean |
-| `data/ghl-funnel-paths.json` | ✅ PRESENT | Created in WP-2 — 4 funnels, checkout path routing |
-| `data/recovery-automation-policies.json` | ✅ PRESENT | Created in WP-2 — abandoned cart, dunning, churn winback |
-| Business memory schemas (Supabase migrations) | ❌ NOT LIVE | Lead tracking, BTV tracking, DPW tracking |
-
----
-
-## RULES FOR EVERY AI SESSION WORKING ON REGGIE
-
-1. **Read this file before writing a single line of code.**
-
-2. **Every number you use must come from the VERIFIED ARCHITECTURE section above — not from any planning document.**
-
-3. **If you find a contradiction between this file and the live repo, STOP. Update this file. Then continue.**
-
-4. **Do not regenerate what already exists.**
-   Before building anything, grep the repo to confirm it doesn't already exist.
-   If it exists and is working, leave it alone.
-
-5. **Do not delete working code to replace it with a "better" version unless you have run the tests first and confirmed they still pass.**
-
-6. **No direct production deploys without:**
-   - Tests passing
-   - This file updated to reflect the change
-   - A Telegram notification sent to Jeremiah
-
-7. **The business memory schemas (`ghl_leads`, `btv_clients`, `dpw_members`, `content_log`) are NOT live. Do not write code that assumes they exist. Create the migrations first.**
-
-8. **REGGIE is at Month 6+ of development. It is not Week 1. Do not rebuild the foundation. Fix the gaps. Ship the blockers.**
-
----
-
-## HOW TO UPDATE THIS FILE
-
-After any meaningful change to the repo, update:
-
-- `## LAST VERIFIED STATE` — new commit hash and date
-- `## WHAT IS CONFIRMED WORKING` — add newly completed items
-- `## ACTIVE BLOCKERS` — remove resolved P0 items
-- `## OPEN GAPS BY PRIORITY` — mark resolved items, add new ones
-- `## UNIVERSE MODE SCORECARD` — update scores if warranted
-
-**Commit this file with every meaningful PR.**  
-Treat it as the repo's single source of truth.
-
----
-
-*REGGIE-STATE.md | Truth J Blue LLC | OpenClaw Platform*  
-*Maintained by MIKE — Executive Systems Architect*  
-*Last updated: April 2, 2026 | WP-2 complete — all P1 blockers resolved, 239 tests passing*
+If an older doc conflicts with this file, this file wins until a new audit proves otherwise.

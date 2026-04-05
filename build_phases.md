@@ -1,5 +1,7 @@
 # Build Phases — Open Claw 75-Agent Implementation Guide
 
+> Historical planning document. It does not describe the current repo-verified architecture. Current truth is 103 configured agents across 9 divisions; see `AGENTS.md` and `REGGIE-STATE.md`.
+
 > **Truth J Blue LLC** | Phased Deployment Roadmap for Multi-Agent Architecture
 
 ---

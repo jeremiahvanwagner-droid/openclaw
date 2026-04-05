@@ -1,5 +1,7 @@
 # OpenClaw Agent Training System
 
+> Historical training document. It does not describe the current repo-verified architecture. Current truth is 103 configured agents across 9 divisions; see `AGENTS.md` and `REGGIE-STATE.md`.
+
 **Truth J Blue LLC** | Senior Director of Digital Strategy & Operations
 
 ---

@@ -1,6 +1,8 @@
 # OpenClaw Agent Training & Development Plan
 ## Truth J Blue LLC | Senior Director of Digital Strategy & Operations
 
+> Historical planning document. It does not describe the current repo-verified architecture. Current truth is 103 configured agents across 9 divisions; see `AGENTS.md` and `REGGIE-STATE.md`.
+
 **Document Version:** 1.0  
 **Date:** March 13, 2026  
 **Owner:** Jeremiah Van Wagner, CFO / Senior Director of Digital Strategy & Operations  

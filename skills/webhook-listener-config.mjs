@@ -55,6 +55,20 @@ function normalizeAuthMode(value) {
   return mode;
 }
 
+function resolveRequiredSigningSecret(opts) {
+  const secret = opts.signing_secret || process.env.OPENCLAW_GHL_WEBHOOK_SECRET || '';
+  if (!secret) {
+    throw new Error('hmac auth requires --signing-secret or OPENCLAW_GHL_WEBHOOK_SECRET');
+  }
+  if (['replace-with-32byte-random-secret', 'your-32-byte-random-webhook-secret'].includes(secret)) {
+    throw new Error('hmac auth requires a non-placeholder signing secret');
+  }
+  if (secret.length < 32) {
+    throw new Error('hmac auth requires a signing secret with at least 32 characters');
+  }
+  return secret;
+}
+
 function buildAuthConfig(opts) {
   const authMode = normalizeAuthMode(opts.auth_mode);
 
@@ -70,7 +84,7 @@ function buildAuthConfig(opts) {
     return { mode: 'bearer', token };
   }
 
-  const secret = opts.signing_secret || process.env.OPENCLAW_GHL_WEBHOOK_SECRET || randomBytes(16).toString('hex');
+  const secret = resolveRequiredSigningSecret(opts);
   return { mode: 'hmac', signingSecret: secret };
 }
 

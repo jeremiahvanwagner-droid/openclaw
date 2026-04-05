@@ -2,7 +2,8 @@
  * OpenClaw Agent Training Card Initializer
  * Truth J Blue LLC
  * 
- * This script initializes training cards for all 75 agents
+ * Historical bootstrap script for the original 75-agent rollout.
+ * The current repo-verified architecture is 103 configured agents across 9 divisions.
  * based on the template at templates/agent-training-card.template.md
  */
 
