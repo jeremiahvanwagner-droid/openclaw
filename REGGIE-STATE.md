@@ -32,7 +32,7 @@ REGGIE is the entire governed system: workforce, routing, skills, integrations, 
 
 | Field | Value |
 |---|---|
-| Audit date | April 5, 2026 |
+| Audit date | April 6, 2026 |
 | Audit method | Repo inspection + validator runs + targeted regression tests |
 | Runtime parity | `runtime-config-parity.mjs` -> `ok: true` |
 | Security hardening validator | `validate-security-hardening.mjs` exit `0` |
@@ -40,6 +40,10 @@ REGGIE is the entire governed system: workforce, routing, skills, integrations, 
 | Offer matrix validator | `validate-offer-matrix.mjs` -> `ok: true` |
 | Targeted regression tests | `27/27` pass (`data-files` + `api-rate-governor`) |
 | Secret negative test | webhook handler refuses startup when `OPENCLAW_GHL_WEBHOOK_SECRET` is missing |
+| GHL API v2 coverage | `coverage-report.mjs` -> `413/413` operations (100%) across 35 namespaces |
+| GHL skill syntax | All 5 new skill files pass `node --check` |
+| agents_config.json | Valid JSON after 13-agent skill wiring update |
+| inngest/client.ts | Clean `tsc --noEmit` after 60 GHL event type expansion |
 | Live host verification | Not performed in this session |
 
 ---
@@ -77,6 +81,24 @@ REGGIE is the entire governed system: workforce, routing, skills, integrations, 
   - `7` Anthropic Opus
 - OpenAI is still present for `memorySearch` embeddings only.
 
+### GHL API v2 Integration (Auto-Generated)
+
+- **Code generation pipeline**: `scripts/ghl-codegen/fetch-schemas.mjs` → `generate-client.mjs` → `lib/ghl/*.mjs`
+- **API surface**: 35 namespaces, 413 operations, 100% coverage verified by `coverage-report.mjs`
+- **Client facade**: `lib/ghl-client-v2.mjs` — Proxy-based lazy namespace loading, RBAC via `guardNamespace()`, multipart/FormData support
+- **Migration shim**: `lib/ghl-client.mjs` re-exports `createGhlClientV2` — zero breaking changes for existing skills
+- **Scope manifest**: `config/ghl-scopes.json` — 29 namespaces, 288 scoped operations (auto-generated)
+- **Webhook events**: `lib/ghl-webhook.mjs` PLATFORM_EVENT_MAP: 60 events; `inngest/client.ts`: 60 typed GHL event definitions
+- **New skills** (5):
+  - `skills/ghl-saas-manager.mjs` — 11 commands (SaaS sub-account provisioning)
+  - `skills/ghl-social-planner.mjs` — 12 commands (social media posting)
+  - `skills/ghl-media-manager.mjs` — 7 commands (media library CRUD)
+  - `skills/ghl-email-service.mjs` — 6 commands (email campaigns & verification)
+  - `skills/ghl-course-manager.mjs` — 2 commands (course import)
+- **Agent wiring**: Skills assigned to 13 agents across D2, D4, D8 in `config/agents_config.json`
+- **Token groups**: `config/ghl-token-groups.json` expanded with `token_content_ops` and `token_saas_admin`
+- **Rate limiting**: All v2 API calls route through `withGovernor('ghl')` (20 req/min, 400/hr, 5 concurrent)
+
 ### Integrations And Data
 
 - GHL OAuth auto-refresh is implemented in `skills/ghl-oauth-manager.mjs` and initialized at webhook startup.
@@ -86,6 +108,7 @@ REGGIE is the entire governed system: workforce, routing, skills, integrations, 
   - `data/tjb-offer-matrix.json`
   - `data/ghl-funnel-paths.json`
   - `data/recovery-automation-policies.json`
+  - `data/ghl-api-schemas/` (35 OpenAPI specs + metadata)
 
 ### Infrastructure
 
@@ -101,6 +124,7 @@ REGGIE is the entire governed system: workforce, routing, skills, integrations, 
 ### Documentation Truth
 
 - Current operator docs: `REGGIE-STATE.md`, `README.md`, `AGENTS.md`, `SOUL.md`, `MEMORY.md`, `TOOLS.md`
+- GHL API architecture documented in repo memory (`openclaw-architecture.md` §10)
 - Historical/planning docs are marked stale where still retained.
 
 ---
@@ -123,6 +147,9 @@ REGGIE is the entire governed system: workforce, routing, skills, integrations, 
 - `validate-security-hardening.mjs` runs clean again.
 - `openclaw.json` now matches production agent/model rollout expectations.
 - `config/agents_config.json` and the repo-level `agents_config.json` no longer claim "all 75 agents" in the active master-orchestrator responsibility text.
+- GHL API v2 full-surface integration completed (5 phases): schema ingestion → code generation (413 ops) → client v2 facade → webhook expansion (60 events) → 5 new skills wired to 13 agents → Inngest event types expanded → token groups added.
+- All generated namespace modules pass syntax check and route through existing rate governor + RBAC infrastructure.
+- Existing v1 skills (`ghl-api.mjs`, `webhook-listener-config.mjs`, `native-ghl-build-refactor`) continue working via migration shim — zero breaking changes.
 
 ---
 
