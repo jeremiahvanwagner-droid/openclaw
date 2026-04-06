@@ -200,6 +200,56 @@ type OpenClawEvent =
       };
     }
   | {
+      name: "ghl/contact.updated";
+      data: {
+        contact_id: string;
+        changed_fields?: string[];
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/contact.deleted";
+      data: {
+        contact_id: string;
+      };
+    }
+  | {
+      name: "ghl/contact.tag.updated";
+      data: {
+        contact_id: string;
+        tags?: string[];
+        added?: string[];
+        removed?: string[];
+      };
+    }
+  | {
+      name: "ghl/contact.dnd.updated";
+      data: {
+        contact_id: string;
+        dnd_settings?: JsonObject;
+      };
+    }
+  | {
+      name: "ghl/opportunity.created";
+      data: {
+        opportunity_id: string;
+        contact_id: string;
+        pipeline_id: string;
+        stage_id?: string;
+        monetary_value?: number;
+      };
+    }
+  | {
+      name: "ghl/opportunity.updated";
+      data: {
+        opportunity_id: string;
+        contact_id: string;
+        pipeline_id: string;
+        changed_fields?: string[];
+        [key: string]: unknown;
+      };
+    }
+  | {
       name: "ghl/opportunity.stage_changed";
       data: {
         opportunity_id: string;
@@ -210,6 +260,39 @@ type OpenClawEvent =
       };
     }
   | {
+      name: "ghl/opportunity.status.changed";
+      data: {
+        opportunity_id: string;
+        contact_id: string;
+        old_status?: string;
+        new_status: string;
+      };
+    }
+  | {
+      name: "ghl/opportunity.deleted";
+      data: {
+        opportunity_id: string;
+        contact_id?: string;
+        pipeline_id?: string;
+      };
+    }
+  | {
+      name: "ghl/opportunity.assigned.updated";
+      data: {
+        opportunity_id: string;
+        assigned_to: string;
+        previous_assignee?: string;
+      };
+    }
+  | {
+      name: "ghl/opportunity.monetary.updated";
+      data: {
+        opportunity_id: string;
+        old_value?: number;
+        new_value: number;
+      };
+    }
+  | {
       name: "ghl/appointment.scheduled";
       data: {
         appointment_id: string;
@@ -217,6 +300,375 @@ type OpenClawEvent =
         calendar_id: string;
         start_time: string;
         end_time: string;
+      };
+    }
+  | {
+      name: "ghl/appointment.updated";
+      data: {
+        appointment_id: string;
+        contact_id: string;
+        calendar_id?: string;
+        start_time?: string;
+        end_time?: string;
+      };
+    }
+  | {
+      name: "ghl/appointment.deleted";
+      data: {
+        appointment_id: string;
+        contact_id?: string;
+      };
+    }
+  // ── GHL Task Events ──
+  | {
+      name: "ghl/task.created";
+      data: {
+        task_id: string;
+        contact_id?: string;
+        title?: string;
+        due_date?: string;
+      };
+    }
+  | {
+      name: "ghl/task.completed";
+      data: {
+        task_id: string;
+        contact_id?: string;
+        completed_by?: string;
+      };
+    }
+  | {
+      name: "ghl/task.deleted";
+      data: {
+        task_id: string;
+      };
+    }
+  // ── GHL Invoice & Payment Events ──
+  | {
+      name: "ghl/invoice.created";
+      data: {
+        invoice_id: string;
+        contact_id?: string;
+        amount: number;
+        currency?: string;
+        status?: string;
+      };
+    }
+  | {
+      name: "ghl/invoice.updated";
+      data: {
+        invoice_id: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/invoice.deleted";
+      data: {
+        invoice_id: string;
+      };
+    }
+  | {
+      name: "ghl/invoice.sent";
+      data: {
+        invoice_id: string;
+        contact_id?: string;
+        sent_to?: string;
+      };
+    }
+  | {
+      name: "ghl/invoice.voided";
+      data: {
+        invoice_id: string;
+        reason?: string;
+      };
+    }
+  | {
+      name: "ghl/payment.received";
+      data: {
+        invoice_id: string;
+        contact_id?: string;
+        amount: number;
+        currency?: string;
+      };
+    }
+  | {
+      name: "ghl/invoice.partially.paid";
+      data: {
+        invoice_id: string;
+        contact_id?: string;
+        amount_paid: number;
+        amount_remaining: number;
+      };
+    }
+  // ── GHL Location & User Events ──
+  | {
+      name: "ghl/location.created";
+      data: {
+        location_id: string;
+        name?: string;
+      };
+    }
+  | {
+      name: "ghl/location.updated";
+      data: {
+        location_id: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/user.created";
+      data: {
+        user_id: string;
+        email?: string;
+        role?: string;
+      };
+    }
+  | {
+      name: "ghl/user.updated";
+      data: {
+        user_id: string;
+        [key: string]: unknown;
+      };
+    }
+  // ── GHL Note Events ──
+  | {
+      name: "ghl/note.created";
+      data: {
+        note_id: string;
+        contact_id?: string;
+        body?: string;
+      };
+    }
+  | {
+      name: "ghl/note.updated";
+      data: {
+        note_id: string;
+        contact_id?: string;
+      };
+    }
+  | {
+      name: "ghl/note.deleted";
+      data: {
+        note_id: string;
+      };
+    }
+  // ── GHL Campaign Events ──
+  | {
+      name: "ghl/campaign.status.updated";
+      data: {
+        campaign_id: string;
+        status: string;
+      };
+    }
+  // ── GHL Conversation / Message Events ──
+  | {
+      name: "ghl/conversation.message.inbound";
+      data: {
+        conversation_id: string;
+        contact_id?: string;
+        message_type?: string;
+        body?: string;
+        channel?: string;
+      };
+    }
+  | {
+      name: "ghl/conversation.message.outbound";
+      data: {
+        conversation_id: string;
+        contact_id?: string;
+        message_type?: string;
+        body?: string;
+        channel?: string;
+      };
+    }
+  | {
+      name: "ghl/conversation.message.provider.outbound";
+      data: {
+        conversation_id: string;
+        provider?: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/conversation.unread";
+      data: {
+        conversation_id: string;
+        contact_id?: string;
+        unread_count?: number;
+      };
+    }
+  // ── GHL Order Events ──
+  | {
+      name: "ghl/order.created";
+      data: {
+        order_id: string;
+        contact_id?: string;
+        total: number;
+        currency?: string;
+        items?: Array<{ product_id: string; quantity: number; price: number }>;
+      };
+    }
+  | {
+      name: "ghl/order.status.updated";
+      data: {
+        order_id: string;
+        old_status?: string;
+        new_status: string;
+      };
+    }
+  // ── GHL Product & Price Events ──
+  | {
+      name: "ghl/product.created";
+      data: {
+        product_id: string;
+        name?: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/product.updated";
+      data: {
+        product_id: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/product.deleted";
+      data: {
+        product_id: string;
+      };
+    }
+  | {
+      name: "ghl/price.created";
+      data: {
+        price_id: string;
+        product_id?: string;
+        amount?: number;
+      };
+    }
+  | {
+      name: "ghl/price.updated";
+      data: {
+        price_id: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/price.deleted";
+      data: {
+        price_id: string;
+      };
+    }
+  // ── GHL Plan, App, & Auth Events ──
+  | {
+      name: "ghl/plan.changed";
+      data: {
+        location_id?: string;
+        old_plan?: string;
+        new_plan: string;
+      };
+    }
+  | {
+      name: "ghl/app.installed";
+      data: {
+        app_id: string;
+        location_id?: string;
+        company_id?: string;
+      };
+    }
+  | {
+      name: "ghl/app.uninstalled";
+      data: {
+        app_id: string;
+        location_id?: string;
+        company_id?: string;
+      };
+    }
+  | {
+      name: "ghl/auth.external.connected";
+      data: {
+        provider: string;
+        location_id?: string;
+      };
+    }
+  // ── GHL Custom Objects / Records Events ──
+  | {
+      name: "ghl/object.schema.created";
+      data: {
+        object_key: string;
+        schema_id?: string;
+      };
+    }
+  | {
+      name: "ghl/object.schema.updated";
+      data: {
+        object_key: string;
+        schema_id?: string;
+      };
+    }
+  | {
+      name: "ghl/record.created";
+      data: {
+        record_id: string;
+        object_key: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/record.updated";
+      data: {
+        record_id: string;
+        object_key: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/record.deleted";
+      data: {
+        record_id: string;
+        object_key: string;
+      };
+    }
+  | {
+      name: "ghl/relation.created";
+      data: {
+        relation_id: string;
+        from_id: string;
+        to_id: string;
+      };
+    }
+  | {
+      name: "ghl/relation.deleted";
+      data: {
+        relation_id: string;
+      };
+    }
+  | {
+      name: "ghl/association.created";
+      data: {
+        association_id: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/association.updated";
+      data: {
+        association_id: string;
+        [key: string]: unknown;
+      };
+    }
+  | {
+      name: "ghl/association.deleted";
+      data: {
+        association_id: string;
+      };
+    }
+  // ── GHL Email Stats ──
+  | {
+      name: "ghl/email.stats.updated";
+      data: {
+        location_id?: string;
+        stats?: JsonObject;
       };
     }
   | {

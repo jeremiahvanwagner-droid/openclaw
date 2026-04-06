@@ -1,0 +1,930 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "description": "Auto-generated GHL API scope manifest. Maps namespace.operation to required OAuth scopes.",
+  "generatedAt": "2026-04-06T13:47:12.941Z",
+  "namespaces": {
+    "associations": {
+      "createRelation": [
+        "associations/relation.write"
+      ],
+      "getRelationsByRecordId": [
+        "associations/relation.readonly"
+      ],
+      "deleteRelation": [
+        "associations/relation.write"
+      ],
+      "getAssociationKeyByKeyName": [
+        "associations.readonly"
+      ],
+      "getAssociationByObjectKeys": [
+        "associations.readonly"
+      ],
+      "getAssociationByID": [
+        "associations.readonly"
+      ],
+      "updateAssociation": [
+        "associations.write"
+      ],
+      "deleteAssociation": [
+        "associations.write"
+      ],
+      "findAssociations": [
+        "associations.readonly"
+      ],
+      "createAssociation": [
+        "associations.write"
+      ]
+    },
+    "blogs": {
+      "checkUrlSlugExists": [
+        "blogs/check-slug.readonly"
+      ],
+      "updateBlogPost": [
+        "blogs/post-update.write"
+      ],
+      "createBlogPost": [
+        "blogs/post.write"
+      ],
+      "getAllBlogAuthorsByLocation": [
+        "blogs/author.readonly"
+      ],
+      "getAllCategoriesByLocation": [
+        "blogs/category.readonly"
+      ],
+      "getBlogPost": [
+        "blogs/posts.readonly"
+      ],
+      "getBlogs": [
+        "blogs/list.readonly"
+      ]
+    },
+    "businesses": {
+      "getBusiness": [
+        "businesses.readonly"
+      ],
+      "updateBusiness": [
+        "businesses.write"
+      ],
+      "deleteBusiness": [
+        "businesses.write"
+      ],
+      "getBusinessesByLocation": [
+        "businesses.readonly"
+      ],
+      "createBusiness": [
+        "businesses.write"
+      ]
+    },
+    "calendars": {
+      "getGroups": [
+        "calendars/groups.readonly"
+      ],
+      "createCalendarGroup": [
+        "calendars/groups.write"
+      ],
+      "validateGroupsSlug": [
+        "calendars/groups.write"
+      ],
+      "editGroup": [
+        "calendars/groups.write"
+      ],
+      "deleteGroup": [
+        "calendars/groups.write"
+      ],
+      "disableGroup": [
+        "calendars/groups.write"
+      ],
+      "createAppointment": [
+        "calendars/events.write"
+      ],
+      "getAppointment": [
+        "calendars/events.readonly"
+      ],
+      "editAppointment": [
+        "calendars/events.write"
+      ],
+      "getCalendarEvents": [
+        "calendars/events.readonly"
+      ],
+      "getBlockedSlots": [
+        "calendars/events.readonly"
+      ],
+      "createBlockSlot": [
+        "calendars/events.write"
+      ],
+      "editBlockSlot": [
+        "calendars/events.write"
+      ],
+      "getSlots": [
+        "calendars.readonly"
+      ],
+      "getCalendar": [
+        "calendars.readonly"
+      ],
+      "updateCalendar": [
+        "calendars.write"
+      ],
+      "deleteCalendar": [
+        "calendars.write"
+      ],
+      "deleteEvent": [
+        "calendars/events.write"
+      ],
+      "getAppointmentNotes": [
+        "calendars/events.readonly"
+      ],
+      "createAppointmentNote": [
+        "calendars/events.write"
+      ],
+      "updateAppointmentNote": [
+        "calendars/events.write"
+      ],
+      "deleteAppointmentNote": [
+        "calendars/events.write"
+      ],
+      "getCalendarResource": [
+        "calendars/resources.readonly"
+      ],
+      "updateCalendarResource": [
+        "calendars/resources.write"
+      ],
+      "deleteCalendarResource": [
+        "calendars/resources.write"
+      ],
+      "fetchCalendarResources": [
+        "calendars/resources.readonly"
+      ],
+      "createCalendarResource": [
+        "calendars/resources.write"
+      ],
+      "getEventNotification": [
+        "calendars/events.readonly"
+      ],
+      "createEventNotification": [
+        "calendars/events.write"
+      ],
+      "findEventNotification": [
+        "calendars/events.readonly"
+      ],
+      "updateEventNotification": [
+        "calendars/events.write"
+      ],
+      "deleteEventNotification": [
+        "calendars/events.write"
+      ],
+      "getCalendars": [
+        "calendars.readonly"
+      ],
+      "createCalendar": [
+        "calendars.write"
+      ]
+    },
+    "campaigns": {
+      "getCampaigns": [
+        "campaigns.readonly"
+      ]
+    },
+    "companies": {
+      "getCompany": [
+        "companies.readonly"
+      ]
+    },
+    "contacts": {
+      "searchContactsAdvanced": [
+        "contacts.readonly"
+      ],
+      "getDuplicateContact": [
+        "contacts.readonly"
+      ],
+      "getAllTasks": [
+        "contacts.readonly"
+      ],
+      "createTask": [
+        "contacts.write"
+      ],
+      "getTask": [
+        "contacts.readonly"
+      ],
+      "updateTask": [
+        "contacts.write"
+      ],
+      "deleteTask": [
+        "contacts.write"
+      ],
+      "updateTaskCompleted": [
+        "contacts.write"
+      ],
+      "getAppointmentsForContact": [
+        "contacts.readonly"
+      ],
+      "addTags": [
+        "contacts.write"
+      ],
+      "removeTags": [
+        "contacts.write"
+      ],
+      "getAllNotes": [
+        "contacts.readonly"
+      ],
+      "createNote": [
+        "contacts.write"
+      ],
+      "getNote": [
+        "contacts.readonly"
+      ],
+      "updateNote": [
+        "contacts.write"
+      ],
+      "deleteNote": [
+        "contacts.write"
+      ],
+      "getContact": [
+        "contacts.readonly"
+      ],
+      "updateContact": [
+        "contacts.write"
+      ],
+      "deleteContact": [
+        "contacts.write"
+      ],
+      "upsertContact": [
+        "contacts.write"
+      ],
+      "getContactsByBusinessId": [
+        "contacts.readonly"
+      ],
+      "addFollowersContact": [
+        "contacts.write"
+      ],
+      "removeFollowersContact": [
+        "contacts.write"
+      ],
+      "addContactToCampaign": [
+        "contacts.write"
+      ],
+      "removeContactFromCampaign": [
+        "contacts.write"
+      ],
+      "removeContactFromEveryCampaign": [
+        "contacts.write"
+      ],
+      "addContactToWorkflow": [
+        "contacts.write"
+      ],
+      "deleteContactFromWorkflow": [
+        "contacts.write"
+      ],
+      "getContacts": [
+        "contacts.readonly"
+      ],
+      "createContact": [
+        "contacts.write"
+      ]
+    },
+    "conversations": {
+      "searchConversation": [
+        "conversations.readonly"
+      ],
+      "getConversation": [
+        "conversations.readonly"
+      ],
+      "updateConversation": [
+        "conversations.write"
+      ],
+      "deleteConversation": [
+        "conversations.write"
+      ],
+      "getMessage": [
+        "conversations/message.readonly"
+      ],
+      "getMessages": [
+        "conversations/message.readonly"
+      ],
+      "sendANewMessage": [
+        "conversations/message.write"
+      ],
+      "addAnInboundMessage": [
+        "conversations/message.write"
+      ],
+      "addAnOutboundMessage": [
+        "conversations/message.write"
+      ],
+      "cancelScheduledMessage": [
+        "conversations/message.write"
+      ],
+      "uploadFileAttachments": [
+        "conversations/message.write"
+      ],
+      "updateMessageStatus": [
+        "conversations/message.write"
+      ],
+      "liveChatAgentTyping": [
+        "conversations/livechat.write"
+      ],
+      "createConversation": [
+        "conversations.write"
+      ]
+    },
+    "customFields": {
+      "getCustomFieldById": [
+        "locations/customFields.readonly"
+      ],
+      "updateCustomField": [
+        "locations/customFields.write"
+      ],
+      "deleteCustomField": [
+        "locations/customFields.write"
+      ],
+      "getCustomFieldsByObjectKey": [
+        "locations/customFields.readonly"
+      ],
+      "createCustomFieldFolder": [
+        "locations/customFields.write"
+      ],
+      "updateCustomFieldFolder": [
+        "locations/customFields.write"
+      ],
+      "deleteCustomFieldFolder": [
+        "locations/customFields.write"
+      ],
+      "createCustomField": [
+        "locations/customFields.write"
+      ]
+    },
+    "customMenus": {
+      "getCustomMenuById": [
+        "custom-menu-link.readonly"
+      ],
+      "updateCustomMenu": [
+        "custom-menu-link.write"
+      ],
+      "deleteCustomMenu": [
+        "custom-menu-link.write"
+      ],
+      "getCustomMenus": [
+        "custom-menu-link.readonly"
+      ],
+      "createCustomMenu": [
+        "custom-menu-link.write"
+      ]
+    },
+    "emails": {
+      "fetchCampaigns": [
+        "emails/schedule.readonly"
+      ],
+      "fetchTemplate": [
+        "emails/builder.readonly"
+      ],
+      "createTemplate": [
+        "emails/builder.write"
+      ],
+      "updateTemplate": [
+        "emails/builder.write"
+      ]
+    },
+    "forms": {
+      "getFormsSubmissions": [
+        "forms.readonly"
+      ],
+      "uploadToCustomFields": [
+        "forms.write"
+      ],
+      "getForms": [
+        "forms.readonly"
+      ]
+    },
+    "funnels": {
+      "createRedirect": [
+        "funnels/redirect.write"
+      ],
+      "updateRedirectById": [
+        "funnels/redirect.write"
+      ],
+      "deleteRedirectById": [
+        "funnels/redirect.write"
+      ],
+      "fetchRedirectsList": [
+        "funnels/redirect.readonly"
+      ]
+    },
+    "invoices": {
+      "listInvoiceTemplates": [
+        "invoices/template.readonly"
+      ],
+      "createInvoiceTemplate": [
+        "invoices/template.write"
+      ],
+      "getInvoiceTemplate": [
+        "invoices/template.readonly"
+      ],
+      "updateInvoiceTemplate": [
+        "invoices/template.write"
+      ],
+      "deleteInvoiceTemplate": [
+        "invoices/template.write"
+      ],
+      "listInvoiceSchedules": [
+        "invoices/schedule.readonly"
+      ],
+      "createInvoiceSchedule": [
+        "invoices/schedule.write"
+      ],
+      "getInvoiceSchedule": [
+        "invoices/schedule.readonly"
+      ],
+      "updateInvoiceSchedule": [
+        "invoices/schedule.write"
+      ],
+      "deleteInvoiceSchedule": [
+        "invoices/schedule.write"
+      ],
+      "updateAndScheduleInvoiceSchedule": [
+        "invoices/schedule.write"
+      ],
+      "scheduleInvoiceSchedule": [
+        "invoices/schedule.write"
+      ],
+      "autoPaymentInvoiceSchedule": [
+        "invoices/schedule.write"
+      ],
+      "cancelInvoiceSchedule": [
+        "invoices/schedule.write"
+      ],
+      "text2payInvoice": [
+        "invoices.write"
+      ],
+      "generateInvoiceNumber": [
+        "invoices.readonly"
+      ],
+      "getInvoice": [
+        "invoices.readonly"
+      ],
+      "updateInvoice": [
+        "invoices.write"
+      ],
+      "deleteInvoice": [
+        "invoices.write"
+      ],
+      "voidInvoice": [
+        "invoices.write"
+      ],
+      "sendInvoice": [
+        "invoices.write"
+      ],
+      "recordInvoice": [
+        "invoices.write"
+      ],
+      "createNewEstimate": [
+        "invoices/estimate.write"
+      ],
+      "updateEstimate": [
+        "invoices/estimate.write"
+      ],
+      "deleteEstimate": [
+        "invoices/estimate.write"
+      ],
+      "generateEstimateNumber": [
+        "invoices/estimate.readonly"
+      ],
+      "sendEstimate": [
+        "invoices/estimate.write"
+      ],
+      "createInvoiceFromEstimate": [
+        "invoices/estimate.write"
+      ],
+      "listEstimates": [
+        "invoices/estimate.readonly"
+      ],
+      "listEstimateTemplates": [
+        "invoices/estimate.readonly"
+      ],
+      "createEstimateTemplate": [
+        "invoices/estimate.write"
+      ],
+      "updateEstimateTemplate": [
+        "invoices/estimate.write"
+      ],
+      "deleteEstimateTemplate": [
+        "invoices/estimate.write"
+      ],
+      "previewEstimateTemplate": [
+        "invoices/estimate.readonly"
+      ],
+      "listInvoices": [
+        "invoices.readonly"
+      ],
+      "createInvoice": [
+        "invoices.write"
+      ]
+    },
+    "links": {
+      "updateLink": [
+        "links.write"
+      ],
+      "deleteLink": [
+        "links.write"
+      ],
+      "getLinks": [
+        "links.readonly"
+      ],
+      "createLink": [
+        "links.write"
+      ]
+    },
+    "locations": {
+      "searchLocations": [
+        "locations.readonly"
+      ],
+      "getLocation": [
+        "locations.readonly"
+      ],
+      "putLocation": [
+        "locations.write"
+      ],
+      "deleteLocation": [
+        "locations.internal-access-only"
+      ],
+      "getLocationTags": [
+        "locations/tags.readonly"
+      ],
+      "createTag": [
+        "locations/tags.write"
+      ],
+      "taskSearch": [
+        "locations/tasks.readonly"
+      ],
+      "getCustomFields": [
+        "locations/customFields.readonly"
+      ],
+      "createCustomField": [
+        "locations/customFields.write"
+      ],
+      "uploadFileCustomFields": [
+        "locations/customFields.write"
+      ],
+      "getCustomValues": [
+        "locations/customValues.readonly"
+      ],
+      "createCustomValue": [
+        "locations/customValues.write"
+      ],
+      "getTimezones": [
+        "locations.readonly"
+      ],
+      "gETAllOrEmailSmsTemplates": [
+        "locations/templates.readonly"
+      ],
+      "createLocation": [
+        "locations.write"
+      ]
+    },
+    "marketplace": {
+      "getCharges": [
+        "charges.readonly"
+      ],
+      "charge": [
+        "charges.write"
+      ],
+      "getSpecificCharge": [
+        "charges.readonly"
+      ],
+      "deleteCharge": [
+        "charges.write"
+      ],
+      "hasFunds": [
+        "charges.readonly"
+      ]
+    },
+    "medias": {
+      "fetchMediaContent": [
+        "medias.readonly"
+      ],
+      "uploadMediaContent": [
+        "medias.write"
+      ],
+      "deleteMediaContent": [
+        "medias.write"
+      ]
+    },
+    "oauth": {
+      "getLocationAccessToken": [
+        "oauth.write"
+      ],
+      "getInstalledLocation": [
+        "oauth.readonly"
+      ]
+    },
+    "objects": {
+      "getObjectSchemaByKey": [
+        "objects/schema.readonly"
+      ],
+      "updateCustomObject": [
+        "objects/schema.write"
+      ],
+      "createObjectRecord": [
+        "objects/record.write"
+      ],
+      "searchObjectRecords": [
+        "objects/record.readonly"
+      ],
+      "getObjectByLocationId": [
+        "objects/schema.readonly"
+      ],
+      "createCustomObjectSchema": [
+        "objects/schema.write"
+      ]
+    },
+    "opportunities": {
+      "searchOpportunity": [
+        "opportunities.readonly"
+      ],
+      "getPipelines": [
+        "opportunities.readonly"
+      ],
+      "getOpportunity": [
+        "opportunities.readonly"
+      ],
+      "updateOpportunity": [
+        "opportunities.write"
+      ],
+      "deleteOpportunity": [
+        "opportunities.write"
+      ],
+      "updateOpportunityStatus": [
+        "opportunities.write"
+      ],
+      "upsertOpportunity": [
+        "opportunities.write"
+      ],
+      "addFollowersOpportunity": [
+        "opportunities.write"
+      ],
+      "removeFollowersOpportunity": [
+        "opportunities.write"
+      ],
+      "createOpportunity": [
+        "opportunities.write"
+      ]
+    },
+    "payments": {
+      "listIntegrationProviders": [
+        "payments/integration.readonly"
+      ],
+      "createIntegrationProvider": [
+        "payments/integration.write"
+      ],
+      "listOrders": [
+        "payments/orders.readonly"
+      ],
+      "getOrderById": [
+        "payments/orders.readonly"
+      ],
+      "recordOrderPayment": [
+        "payments/orders.collectPayment"
+      ],
+      "listOrderFulfillment": [
+        "payments/orders.readonly"
+      ],
+      "createOrderFulfillment": [
+        "payments/orders.write"
+      ],
+      "listTransactions": [
+        "payments/transactions.readonly"
+      ],
+      "getTransactionById": [
+        "payments/transactions.readonly"
+      ],
+      "listSubscriptions": [
+        "payments/subscriptions.readonly"
+      ],
+      "getSubscriptionById": [
+        "payments/subscriptions.readonly"
+      ],
+      "listCoupons": [
+        "payments/coupons.readonly"
+      ],
+      "getCoupon": [
+        "payments/coupons.readonly"
+      ],
+      "createCoupon": [
+        "payments/coupons.write"
+      ],
+      "updateCoupon": [
+        "payments/coupons.write"
+      ],
+      "deleteCoupon": [
+        "payments/coupons.write"
+      ],
+      "createIntegration": [
+        "payments/custom-provider.write"
+      ],
+      "deleteIntegration": [
+        "payments/custom-provider.write"
+      ],
+      "fetchConfig": [
+        "payments/custom-provider.readonly"
+      ],
+      "createConfig": [
+        "payments/custom-provider.write"
+      ],
+      "disconnectConfig": [
+        "payments/custom-provider.write"
+      ],
+      "customProviderMarketplaceAppUpdateCapabilities": [
+        "payments/custom-provider.write"
+      ]
+    },
+    "phoneSystem": {
+      "getNumberPoolList": [
+        "numberpools.read"
+      ],
+      "activeNumbers": [
+        "phonenumbers.read"
+      ]
+    },
+    "products": {
+      "bulkUpdate": [
+        "products.write"
+      ],
+      "listPricesForProduct": [
+        "products/prices.readonly"
+      ],
+      "createPriceForProduct": [
+        "products/prices.write"
+      ],
+      "getListInventory": [
+        "products/prices.readonly"
+      ],
+      "updateInventory": [
+        "products/prices.write"
+      ],
+      "getPriceByIdForProduct": [
+        "products/prices.readonly"
+      ],
+      "updatePriceByIdForProduct": [
+        "products/prices.write"
+      ],
+      "deletePriceByIdForProduct": [
+        "products/prices.write"
+      ],
+      "getProductStoreStats": [
+        "products.readonly"
+      ],
+      "updateStoreStatus": [
+        "products.write"
+      ],
+      "getProductCollection": [
+        "products/collection.readonly"
+      ],
+      "createProductCollection": [
+        "products/collection.write"
+      ],
+      "getProductCollectionId": [
+        "products/collection.readonly"
+      ],
+      "updateProductCollection": [
+        "products/collection.write"
+      ],
+      "deleteProductCollection": [
+        "products/collection.write"
+      ],
+      "getProductReviews": [
+        "products.readonly"
+      ],
+      "getReviewsCount": [
+        "products.readonly"
+      ],
+      "updateProductReview": [
+        "products.write"
+      ],
+      "deleteProductReview": [
+        "products.write"
+      ],
+      "bulkUpdateProductReview": [
+        "products.write"
+      ],
+      "getProductById": [
+        "products.readonly"
+      ],
+      "updateProductById": [
+        "products.write"
+      ],
+      "deleteProductById": [
+        "products.write"
+      ],
+      "listInvoices": [
+        "products.readonly"
+      ],
+      "createProduct": [
+        "products.write"
+      ]
+    },
+    "socialMediaPosting": {
+      "startGoogleOauth": [
+        "socialplanner/oauth.readonly"
+      ],
+      "getPosts": [
+        "socialplanner/post.readonly"
+      ],
+      "createPost": [
+        "socialplanner/post.write"
+      ],
+      "getAccount": [
+        "socialplanner/account.readonly"
+      ],
+      "startInstagramOauth": [
+        "socialplanner/oauth.readonly"
+      ],
+      "startTwitterOauth": [
+        "socialplanner/oauth.readonly"
+      ],
+      "uploadCsv": [
+        "socialplanner/csv.write"
+      ],
+      "setAccounts": [
+        "socialplanner/csv.write"
+      ],
+      "startTiktokOauth": [
+        "socialplanner/oauth.readonly"
+      ],
+      "startTiktokBusinessOauth": [
+        "socialplanner/oauth.readonly"
+      ],
+      "getCategoriesLocationId": [
+        "socialplanner/category.readonly"
+      ]
+    },
+    "surveys": {
+      "getSurveysSubmissions": [
+        "surveys.readonly"
+      ],
+      "getSurveys": [
+        "surveys.readonly"
+      ]
+    },
+    "users": {
+      "searchUsers": [
+        "users.readonly"
+      ],
+      "filterUsersByEmail": [
+        "users.readonly"
+      ],
+      "getUser": [
+        "users.readonly"
+      ],
+      "updateUser": [
+        "users.write"
+      ],
+      "deleteUser": [
+        "users.write"
+      ],
+      "getUserByLocation": [
+        "users.readonly"
+      ],
+      "createUser": [
+        "users.write"
+      ]
+    },
+    "voiceAi": {
+      "getAgents": [
+        "voice-ai-agents.readonly"
+      ],
+      "createAgent": [
+        "voice-ai-agents.write"
+      ],
+      "getAgent": [
+        "voice-ai-agents.readonly"
+      ],
+      "patchAgent": [
+        "voice-ai-agents.write"
+      ],
+      "deleteAgent": [
+        "voice-ai-agents.write"
+      ],
+      "getCallLogs": [
+        "voice-ai-dashboard.readonly"
+      ],
+      "getCallLog": [
+        "voice-ai-dashboard.readonly"
+      ],
+      "createAction": [
+        "voice-ai-agent-goals.write"
+      ],
+      "getAction": [
+        "voice-ai-agent-goals.readonly"
+      ],
+      "updateAction": [
+        "voice-ai-agent-goals.write"
+      ],
+      "deleteAction": [
+        "voice-ai-agent-goals.write"
+      ]
+    },
+    "workflows": {
+      "getWorkflow": [
+        "workflows.readonly"
+      ]
+    }
+  }
+}

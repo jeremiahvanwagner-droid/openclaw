@@ -49,6 +49,50 @@
       "tenant": "TJB",
       "ghl_integration_name": "OpenClaw – Payments ReadOnly",
       "rotation_days": 90
+    },
+    "token_content_ops": {
+      "description": "Content & Social agents — social media posting, media library, email campaigns, blogs",
+      "scope_sets": ["social_media", "media_library", "email_campaigns"],
+      "env_var": "GHL_TOKEN_CONTENT_OPS_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – Content Ops",
+      "rotation_days": 90,
+      "namespaces": ["socialMediaPosting", "medias", "emails", "emailIsv", "blogs"],
+      "scopes": [
+        "socialplanner/oauth.readonly",
+        "socialplanner/post.readonly",
+        "socialplanner/post.write",
+        "socialplanner/account.readonly",
+        "socialplanner/csv.write",
+        "socialplanner/category.readonly",
+        "medias.readonly",
+        "medias.write",
+        "emails/schedule.readonly",
+        "emails/builder.readonly",
+        "emails/builder.write",
+        "blogs/posts.readonly",
+        "blogs/post.write",
+        "blogs/post-update.write",
+        "blogs/list.readonly",
+        "blogs/author.readonly",
+        "blogs/category.readonly",
+        "blogs/check-slug.readonly"
+      ]
+    },
+    "token_saas_admin": {
+      "description": "SaaS administration — sub-account provisioning, plan management, billing, rebilling",
+      "scope_sets": ["saas_administration"],
+      "env_var": "GHL_TOKEN_SAAS_ADMIN_TJB",
+      "tenant": "TJB",
+      "ghl_integration_name": "OpenClaw – SaaS Admin",
+      "rotation_days": 60,
+      "namespaces": ["saasApi"],
+      "scopes": [
+        "saas/location.write",
+        "saas/location.readonly",
+        "saas/company.readonly",
+        "saas/company.write"
+      ]
     }
   }
 }
