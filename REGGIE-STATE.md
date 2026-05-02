@@ -24,7 +24,7 @@ REGGIE is the entire governed system: workforce, routing, skills, integrations, 
 | Owner | Jeremiah Van Wagner (Truth J Blue) |
 | Governed by | MIKE (Modular Intelligence & Knowledge Engine) |
 | Repo | `github.com/jeremiahvanwagner-droid/openclaw` |
-| Production host | Hetzner VPS |
+| Production host | Hostinger VPS (177.7.32.224) |
 
 ---
 

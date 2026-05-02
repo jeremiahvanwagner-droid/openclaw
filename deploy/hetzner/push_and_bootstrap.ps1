@@ -1,7 +1,7 @@
 param(
   [Parameter(Mandatory = $true)]
   [string]$ServerIp,
-  [string]$SshKeyPath = "$env:USERPROFILE\.ssh\openclaw_hetzner"
+  [string]$SshKeyPath = "$env:USERPROFILE\.ssh\id_ed25519"
 )
 
 $ErrorActionPreference = "Stop"

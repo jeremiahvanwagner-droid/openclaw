@@ -1,7 +1,7 @@
 # OpenClaw Deployment Checklist — Anthropic Migration
 
 > Branch: `fix/anthropic-migration-stabilization`  
-> Target: Hetzner Ubuntu 24.04 LTS · `/opt/openclaw/`  
+> Target: Hostinger Ubuntu 24.04 LTS · `/opt/openclaw/`  
 > Systemd unit: `openclaw-gateway.service` (user unit)
 
 ---

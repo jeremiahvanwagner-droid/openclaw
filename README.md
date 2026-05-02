@@ -165,8 +165,8 @@ openclaw gateway status
 If remote access fails, inspect the Hetzner host directly:
 
 ```powershell
-ssh -i $env:USERPROFILE\\.ssh\\openclaw_hetzner root@87.99.138.98 "journalctl -u openclaw -n 100 --no-pager"
-ssh -i $env:USERPROFILE\\.ssh\\openclaw_hetzner root@87.99.138.98 "journalctl -u caddy -n 100 --no-pager"
+ssh root@177.7.32.224 "journalctl -u openclaw -n 100 --no-pager"
+ssh root@177.7.32.224 "journalctl -u caddy -n 100 --no-pager"
 ```
 
 ## Known Current Gaps
