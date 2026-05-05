@@ -1,0 +1,66 @@
+REGGIE PHASE 1 DISCOVERY SWEEP — SUMMARY
+Generated: 2026-05-05T12:31:00
+======================================================================
+
+Total files swept:    208846
+  LOCAL:              168166
+  VPS:                 40680
+
+BUCKET DISTRIBUTION
+  ACTIVE         3423
+  ARCHIVE         321
+  SHRED        148986
+  UNKNOWN          96
+  PROTECTED     56020
+
+BUCKET BY SOURCE
+  ACTIVE     {'LOCAL': 2594, 'VPS': 829}
+  ARCHIVE    {'LOCAL': 287, 'VPS': 34}
+  SHRED      {'LOCAL': 109242, 'VPS': 39744}
+  UNKNOWN    {'LOCAL': 87, 'VPS': 9}
+  PROTECTED  {'LOCAL': 55956, 'VPS': 64}
+
+TOP SHRED REASONS
+  148740  inside transient/regenerable dir (node_modules/.venv/__pycache__/etc)
+      94  obsolete agent session marker (.deleted/.reset)
+      90  basename matches shred hint (tmp/temp/orig/copy/untitled)
+      54  trailing-timestamp reset/deleted artifact
+       4  zero-byte file (auto-shred per spec)
+       4  editor/temp file (.tmp)
+
+TOP ARCHIVE REASONS
+     102  matches archive hint (old/legacy/backup/draft/wp-/v1/v2/plan/roadmap)
+      74  session-memory file older than 30 days (53d)
+      36  agent session jsonl older than 30 days (44d)
+      24  agent session jsonl older than 30 days (52d)
+      21  agent session jsonl older than 30 days (53d)
+      14  agent session jsonl older than 30 days (46d)
+      10  agent session jsonl older than 30 days (51d)
+       9  log file older than 7 days
+       5  agent session jsonl older than 30 days (62d)
+       5  agent session jsonl older than 30 days (47d)
+
+TOP UNKNOWN REASONS
+      47  image asset (.png) — manual review
+      18  binary state blob (.sqlite) — manual review
+       6  image asset (.jpg) — manual review
+       3  no rule matched (ext=none, size=7)
+       2  no rule matched (ext=.txt, size=33522)
+       2  no rule matched (ext=.sqlite-shm, size=32768)
+       2  no rule matched (ext=.sqlite-wal, size=37112)
+       2  no rule matched (ext=.patch, size=4313)
+       1  no rule matched (ext=.disabled, size=2385)
+       1  no rule matched (ext=.lock, size=61)
+
+Zero-byte files: 18268
+Probable duplicate (same name+size, different paths): 35311
+
+HIGH-PRIORITY FLAGS
+  [MULTIPLE_REGGIE_STATE] C:\Users\JeremiahVanWagner\.openclaw\REGGIE-STATE.md
+  [MULTIPLE_REGGIE_STATE] /root/openclaw/REGGIE-STATE.md
+  [MULTIPLE_SANITIZER] C:\Users\JeremiahVanWagner\.openclaw\.venv\Lib\site-packages\torch\cuda\_sanitizer.py
+  [MULTIPLE_SANITIZER] C:\Users\JeremiahVanWagner\.openclaw\.venv\Lib\site-packages\torch\cuda\__pycache__\_sanitizer.cpython-314.pyc
+  [MULTIPLE_SANITIZER] C:\Users\JeremiahVanWagner\.openclaw\node_modules\.pnpm\import-in-the-middle@1.15.0\node_modules\import-in-the-middle\test\low-level\sanitized-url.mjs
+  [MULTIPLE_SANITIZER] C:\Users\JeremiahVanWagner\.openclaw\node_modules\@traceloop\instrumentation-anthropic\node_modules\import-in-the-middle\test\low-level\sanitized-url.mjs
+  [MULTIPLE_SANITIZER] /root/openclaw/node_modules/.pnpm/import-in-the-middle@1.15.0/node_modules/import-in-the-middle/test/low-level/sanitized-url.mjs
+  [MULTIPLE_SANITIZER] /root/openclaw/deploy/sanitize-runtime-config.py

@@ -1,0 +1,24 @@
+# REGGIE SHRED MANIFEST — VPS — sweep 2026-05-05
+# Total individual files: 6
+# Total vendor directories (bulk reclaim): pending Option 1 dedupe
+# Generated: 2026-05-05T17:54:19.081337Z
+
+## INDIVIDUAL FILES (deleted one by one)
+/root/openclaw/tmp_memory_stats.py
+/root/openclaw/tmp_inspect_schema.py
+/root/openclaw/tmp_orphan_check.py
+/root/openclaw/tmp_agent_memory_cleanup.py
+/root/openclaw/deploy/docker-compose.prod.yml.orig
+/root/openclaw/tmp_inspect_memory_dbs.py
+
+## VENDOR DIRECTORIES (bulk reclaim — Option 1)
+# Each line is a directory tree that will be removed wholesale.
+# Reinstall via `pnpm install` / `npm ci` / `pip install -r requirements.txt`
+# after the sweep. Total per-file count covered by these dirs is
+# approximately: 39738 files.
+/root/openclaw/dashboard/.next
+/root/openclaw/dashboard/node_modules
+/root/openclaw/deploy/hetzner/__pycache__
+/root/openclaw/node_modules
+/root/openclaw/skills/node_modules
+/root/openclaw/training/node_modules

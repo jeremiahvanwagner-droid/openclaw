@@ -1,0 +1,97 @@
+bucket,reason,source,path,size,mtime,ext,name
+UNKNOWN,"no rule matched (ext=.txt, size=33522)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\lint-output.txt,33522,2026-03-29T18:25:09,.txt,lint-output.txt
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\assets\designs\thumbnails\1773418694498-the-sacred-blueprint.png,30803,2026-03-21T09:58:01,.png,1773418694498-the-sacred-blueprint.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\assets\designs\thumbnails\1773419165972-sacred-blueprint.png,30324,2026-03-21T09:58:01,.png,1773419165972-sacred-blueprint.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\assets\designs\thumbnails\1773419166033-divine-excellence.png,29547,2026-03-21T09:58:01,.png,1773419166033-divine-excellence.png
+UNKNOWN,"no rule matched (ext=.disabled, size=2385)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\backups\auth-profiles.json.20260301-194228.disabled,2385,2026-03-01T18:27:57,.disabled,auth-profiles.json.20260301-194228.disabled
+UNKNOWN,"no rule matched (ext=.lock, size=61)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\backups\sessions-main-20260313-092556\5c867f94-a1f9-4e1c-9679-764d533abf3c.jsonl.lock,61,2026-03-13T09:25:39,.lock,5c867f94-a1f9-4e1c-9679-764d533abf3c.jsonl.lock
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\browser\chrome-extension\icons\icon128.png,614,2026-03-11T16:58:19,.png,icon128.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\browser\chrome-extension\icons\icon16.png,265,2026-03-11T16:58:19,.png,icon16.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\browser\chrome-extension\icons\icon32.png,318,2026-03-11T16:58:19,.png,icon32.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\browser\chrome-extension\icons\icon48.png,370,2026-03-11T16:58:19,.png,icon48.png
+UNKNOWN,"no rule matched (ext=.bash, size=9926)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\completions\openclaw.bash,9926,2026-03-11T17:09:09,.bash,openclaw.bash
+UNKNOWN,"no rule matched (ext=.fish, size=194763)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\completions\openclaw.fish,194763,2026-03-11T17:09:09,.fish,openclaw.fish
+UNKNOWN,"no rule matched (ext=.zsh, size=136230)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\completions\openclaw.zsh,136230,2026-03-11T17:09:09,.zsh,openclaw.zsh
+UNKNOWN,"no rule matched (ext=.tsbuildinfo, size=161214)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\dashboard\tsconfig.tsbuildinfo,161214,2026-03-31T17:58:45,.tsbuildinfo,tsconfig.tsbuildinfo
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-dashboard-1773420438629.png,8515,2026-03-13T11:47:18,.png,ghl-dashboard-1773420438629.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-dashboard-1773420438645.png,8515,2026-03-13T11:47:18,.png,ghl-dashboard-1773420438645.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-dashboard-1773420438661.png,8515,2026-03-13T11:47:18,.png,ghl-dashboard-1773420438661.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-login-debug-1773423972745.png,8515,2026-03-13T12:46:12,.png,ghl-login-debug-1773423972745.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-login-debug-1773424064547.png,8515,2026-03-13T12:47:44,.png,ghl-login-debug-1773424064547.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-login-debug-1773424095901.png,8515,2026-03-13T12:48:15,.png,ghl-login-debug-1773424095901.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-login-debug-1773424403778.png,8515,2026-03-13T12:53:23,.png,ghl-login-debug-1773424403778.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-login-debug-1773590071840.png,8515,2026-03-15T10:54:31,.png,ghl-login-debug-1773590071840.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\ghl-login-debug-1773590118046.png,8515,2026-03-15T10:55:18,.png,ghl-login-debug-1773590118046.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\test-1773419908103.png,18046,2026-03-13T11:38:28,.png,test-1773419908103.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\data\screenshots\test-1773459153983.png,18046,2026-03-13T22:32:34,.png,test-1773459153983.png
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\flows\registry.sqlite,4096,2026-04-08T12:46:15,.sqlite,registry.sqlite
+UNKNOWN,"no rule matched (ext=.sqlite-shm, size=32768)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\flows\registry.sqlite-shm,32768,2026-04-08T15:31:49,.sqlite-shm,registry.sqlite-shm
+UNKNOWN,"no rule matched (ext=.sqlite-wal, size=37112)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\flows\registry.sqlite-wal,37112,2026-04-08T12:46:15,.sqlite-wal,registry.sqlite-wal
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\0243274e-5ce6-40f6-b55c-1177c105fb9d.png,5056,2026-03-03T11:47:18,.png,0243274e-5ce6-40f6-b55c-1177c105fb9d.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\044a7279-05c5-445b-9555-669d53e7ee5b.png,102843,2026-03-03T02:17:48,.png,044a7279-05c5-445b-9555-669d53e7ee5b.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\0af7dff9-c5cb-487d-ad57-5e143776f99d.png,107770,2026-03-03T12:58:28,.png,0af7dff9-c5cb-487d-ad57-5e143776f99d.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\117b812a-b343-4117-a36f-3c1531f496e3.png,43174,2026-03-03T01:02:12,.png,117b812a-b343-4117-a36f-3c1531f496e3.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\1568f321-c608-4fa5-8388-9c1dc0c7918e.png,140444,2026-03-03T12:58:10,.png,1568f321-c608-4fa5-8388-9c1dc0c7918e.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\1c2686b2-9d7c-4a70-861f-da05eeb7c9e0.png,90170,2026-03-03T09:25:24,.png,1c2686b2-9d7c-4a70-861f-da05eeb7c9e0.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\1e54596b-403c-4153-b707-35c13051f0c1.png,7255,2026-03-02T01:18:30,.png,1e54596b-403c-4153-b707-35c13051f0c1.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\38ce00f2-65e2-447b-b41b-30b4cae05bba.png,58309,2026-03-03T02:17:19,.png,38ce00f2-65e2-447b-b41b-30b4cae05bba.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\3bd28572-6dd6-4ba8-bc14-32ce8ef7dbf0.png,6330,2026-03-03T11:23:42,.png,3bd28572-6dd6-4ba8-bc14-32ce8ef7dbf0.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\42fcf7d9-9047-488e-b60f-a06b7afa59af.png,142148,2026-03-03T02:18:47,.png,42fcf7d9-9047-488e-b60f-a06b7afa59af.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\5e4d0f8e-26e2-4f64-b4f7-ed184351b783.png,106889,2026-03-03T02:18:20,.png,5e4d0f8e-26e2-4f64-b4f7-ed184351b783.png
+UNKNOWN,image asset (.jpg) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\615ee073-8089-4df0-8998-dfeae4b78490.jpg,10727,2026-03-02T05:15:02,.jpg,615ee073-8089-4df0-8998-dfeae4b78490.jpg
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\6458becd-46ba-4601-a98f-3c5dc8e327cf.png,5056,2026-03-03T11:47:17,.png,6458becd-46ba-4601-a98f-3c5dc8e327cf.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\78f5b0b0-c67c-4885-b5b7-b118bde7cd3c.png,72787,2026-03-03T12:31:55,.png,78f5b0b0-c67c-4885-b5b7-b118bde7cd3c.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\90cc21d9-167e-4f71-b0d5-61457d01abba.png,142148,2026-03-03T02:18:59,.png,90cc21d9-167e-4f71-b0d5-61457d01abba.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\9a4d7d7f-c2cb-4c1a-a9ac-2d06a8d1c787.png,5056,2026-03-03T12:09:55,.png,9a4d7d7f-c2cb-4c1a-a9ac-2d06a8d1c787.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\9a95e025-cee5-424e-b547-a96fcb06edec.png,58374,2026-03-03T12:38:43,.png,9a95e025-cee5-424e-b547-a96fcb06edec.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\a43f3078-1d4c-45c0-8383-f16c960503e3.png,5056,2026-03-03T12:02:20,.png,a43f3078-1d4c-45c0-8383-f16c960503e3.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\b241b719-8ca4-4c40-ae74-fc3b73fcd957.png,5056,2026-03-03T11:41:18,.png,b241b719-8ca4-4c40-ae74-fc3b73fcd957.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\c0d65c23-d19f-49e6-964b-da415696e21e.png,7255,2026-03-02T04:29:25,.png,c0d65c23-d19f-49e6-964b-da415696e21e.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\ddffbbee-9fd3-418a-b8bf-6edd7b3f48c3.png,72787,2026-03-03T12:38:26,.png,ddffbbee-9fd3-418a-b8bf-6edd7b3f48c3.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\e5b0aa8d-d701-4f54-8bde-4fde7cc17ccb.png,58400,2026-03-03T03:33:45,.png,e5b0aa8d-d701-4f54-8bde-4fde7cc17ccb.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\eae5924c-2a0f-4007-be67-9eb8e1d6b13f.png,54475,2026-03-03T09:55:51,.png,eae5924c-2a0f-4007-be67-9eb8e1d6b13f.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\ed557670-cfe1-4523-9fb4-7a865909ca64.png,7255,2026-03-02T07:14:09,.png,ed557670-cfe1-4523-9fb4-7a865909ca64.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\edde08bd-fd29-464b-bcea-1e8e4c076b9e.png,7255,2026-03-03T12:37:39,.png,edde08bd-fd29-464b-bcea-1e8e4c076b9e.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\f3e3c970-fdc1-4f70-aa48-cf4dcca324b5.png,61642,2026-03-03T12:57:45,.png,f3e3c970-fdc1-4f70-aa48-cf4dcca324b5.png
+UNKNOWN,image asset (.png) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\browser\f87ddf1a-785e-4024-998c-e6c2d970e3e3.png,7255,2026-03-02T01:53:27,.png,f87ddf1a-785e-4024-998c-e6c2d970e3e3.png
+UNKNOWN,image asset (.jpg) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\inbound\file_0---afabe1a6-607c-47c9-9992-70786f0df650.jpg,52838,2026-03-01T23:49:19,.jpg,file_0---afabe1a6-607c-47c9-9992-70786f0df650.jpg
+UNKNOWN,image asset (.jpg) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\inbound\file_3---8bc5284e-0485-4c98-aa74-23f3286b550e.jpg,43251,2026-03-13T16:08:30,.jpg,file_3---8bc5284e-0485-4c98-aa74-23f3286b550e.jpg
+UNKNOWN,image asset (.jpg) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\inbound\file_4---df4fe14d-0622-4fe5-a470-f3a0d1515398.jpg,44446,2026-03-13T16:15:15,.jpg,file_4---df4fe14d-0622-4fe5-a470-f3a0d1515398.jpg
+UNKNOWN,image asset (.jpg) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\inbound\file_5---9a50919e-07b9-4551-b169-56a976623dfc.jpg,42616,2026-03-13T16:15:38,.jpg,file_5---9a50919e-07b9-4551-b169-56a976623dfc.jpg
+UNKNOWN,image asset (.jpg) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\media\inbound\file_6---010b58c7-47b5-4393-b3e1-77c84196d244.jpg,80938,2026-03-13T16:16:02,.jpg,file_6---010b58c7-47b5-4393-b3e1-77c84196d244.jpg
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d1_ceo.sqlite,6635520,2026-03-15T05:47:29,.sqlite,d1_ceo.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d1_cto.sqlite,6676480,2026-03-15T05:47:30,.sqlite,d1_cto.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d2_director.sqlite,6586368,2026-03-15T05:47:30,.sqlite,d2_director.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d3_ceo.sqlite,6553600,2026-03-15T05:47:30,.sqlite,d3_ceo.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d4_cvo.sqlite,6549504,2026-03-15T05:47:30,.sqlite,d4_cvo.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d5_publisher.sqlite,6586368,2026-03-15T05:47:30,.sqlite,d5_publisher.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d6_executive_director.sqlite,6529024,2026-03-15T05:47:30,.sqlite,d6_executive_director.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\d8_saas_director.sqlite,6529024,2026-03-19T14:07:43,.sqlite,d8_saas_director.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\main.sqlite,21782528,2026-03-21T18:46:01,.sqlite,main.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\marketing.sqlite,6549504,2026-03-15T08:45:45,.sqlite,marketing.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\sales.sqlite,6549504,2026-03-15T05:47:31,.sqlite,sales.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\shared_exec_orchestrator.sqlite,102400,2026-03-21T18:45:26,.sqlite,shared_exec_orchestrator.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\shared_master_orchestrator.sqlite,7008256,2026-03-15T05:47:32,.sqlite,shared_master_orchestrator.sqlite
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\memory\support.sqlite,6545408,2026-03-15T05:47:32,.sqlite,support.sqlite
+UNKNOWN,"no rule matched (ext=.patch, size=4313)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\openclaw-enhanced-artifacts\enhanced-artifacts\fix-webhook-secret.patch,4313,2026-03-20T10:42:00,.patch,fix-webhook-secret.patch
+UNKNOWN,"no rule matched (ext=.example, size=553)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\openclaw-prod\templates\systemd\openclaw-ghl-webhook.env.example,553,2026-03-03T11:30:52,.example,openclaw-ghl-webhook.env.example
+UNKNOWN,"no rule matched (ext=none, size=7)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\cli-latest,7,2026-03-14T17:58:35,,cli-latest
+UNKNOWN,"no rule matched (ext=none, size=8)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\gotrue-version,8,2026-03-14T18:00:32,,gotrue-version
+UNKNOWN,"no rule matched (ext=none, size=92)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\pooler-url,92,2026-03-14T18:00:32,,pooler-url
+UNKNOWN,"no rule matched (ext=none, size=10)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\postgres-version,10,2026-03-14T18:00:31,,postgres-version
+UNKNOWN,"no rule matched (ext=none, size=20)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\project-ref,20,2026-03-14T18:00:32,,project-ref
+UNKNOWN,"no rule matched (ext=none, size=5)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\rest-version,5,2026-03-14T18:00:32,,rest-version
+UNKNOWN,"no rule matched (ext=none, size=29)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\storage-migration,29,2026-03-14T18:00:32,,storage-migration
+UNKNOWN,"no rule matched (ext=none, size=7)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\supabase\.temp\storage-version,7,2026-03-14T18:00:32,,storage-version
+UNKNOWN,binary state blob (.sqlite) — manual review,LOCAL,C:\Users\JeremiahVanWagner\.openclaw\tasks\runs.sqlite,53248,2026-04-08T15:35:47,.sqlite,runs.sqlite
+UNKNOWN,"no rule matched (ext=.txt, size=16)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\telegram\command-hash-default-6f0312f3532b9d42.txt,16,2026-03-14T06:43:19,.txt,command-hash-default-6f0312f3532b9d42.txt
+UNKNOWN,"no rule matched (ext=none, size=7)",LOCAL,C:\Users\JeremiahVanWagner\.openclaw\workspace\supabase\.temp\cli-latest,7,2026-03-12T22:02:45,,cli-latest
+UNKNOWN,binary state blob (.sqlite) — manual review,VPS,/root/openclaw/tasks/runs.sqlite,53248,2026-04-30T19:42:31.4097985160,.sqlite,runs.sqlite
+UNKNOWN,"no rule matched (ext=.txt, size=33522)",VPS,/root/openclaw/lint-output.txt,33522,2026-04-30T19:42:31.3717987590,.txt,lint-output.txt
+UNKNOWN,image asset (.png) — manual review,VPS,/root/openclaw/assets/designs/thumbnails/1773419166033-divine-excellence.png,29547,2026-04-30T19:42:31.3527988810,.png,1773419166033-divine-excellence.png
+UNKNOWN,image asset (.png) — manual review,VPS,/root/openclaw/assets/designs/thumbnails/1773418694498-the-sacred-blueprint.png,30803,2026-04-30T19:42:31.3517988870,.png,1773418694498-the-sacred-blueprint.png
+UNKNOWN,image asset (.png) — manual review,VPS,/root/openclaw/assets/designs/thumbnails/1773419165972-sacred-blueprint.png,30324,2026-04-30T19:42:31.3517988870,.png,1773419165972-sacred-blueprint.png
+UNKNOWN,"no rule matched (ext=.sqlite-shm, size=32768)",VPS,/root/openclaw/flows/registry.sqlite-shm,32768,2026-04-30T19:42:31.3647988040,.sqlite-shm,registry.sqlite-shm
+UNKNOWN,"no rule matched (ext=.sqlite-wal, size=37112)",VPS,/root/openclaw/flows/registry.sqlite-wal,37112,2026-04-30T19:42:31.3647988040,.sqlite-wal,registry.sqlite-wal
+UNKNOWN,binary state blob (.sqlite) — manual review,VPS,/root/openclaw/flows/registry.sqlite,4096,2026-04-30T19:42:31.3647988040,.sqlite,registry.sqlite
+UNKNOWN,"no rule matched (ext=.patch, size=4313)",VPS,/root/openclaw/openclaw-enhanced-artifacts/enhanced-artifacts/fix-webhook-secret.patch,4313,2026-04-30T19:42:31.3717987590,.patch,fix-webhook-secret.patch
