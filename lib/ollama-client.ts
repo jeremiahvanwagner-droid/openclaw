@@ -16,6 +16,24 @@ import { logger } from "./logger.js";
 
 const log = logger.child({ module: "ollama-client" });
 
+/**
+ * Wraps fetch() with an AbortController-based timeout.
+ * The WHATWG fetch spec (and Node 22's built-in fetch) does not accept a
+ * `timeout` property in RequestInit, so we abort the request via signal
+ * instead. The timer is always cleared in the finally block to avoid leaks.
+ */
+function fetchWithTimeout(
+  url: string,
+  options: RequestInit,
+  timeoutMs: number
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal }).finally(() =>
+    clearTimeout(timer)
+  );
+}
+
 // Configuration
 const OLLAMA_HOST = process.env.OLLAMA_HOST || "http://localhost:11434";
 const OLLAMA_REQUEST_TIMEOUT_MS = parseInt(process.env.OLLAMA_REQUEST_TIMEOUT_MS || "300000", 10);
@@ -60,10 +78,9 @@ export interface OllamaChatResponse {
  */
 export async function healthcheck(): Promise<boolean> {
   try {
-    const response = await fetch(`${OLLAMA_HOST}/api/tags`, {
+    const response = await fetchWithTimeout(`${OLLAMA_HOST}/api/tags`, {
       method: "GET",
-      timeout: 5000,
-    });
+    }, 5000);
     return response.ok;
   } catch (err) {
     log.warn({ err }, "Ollama healthcheck failed");
@@ -76,10 +93,9 @@ export async function healthcheck(): Promise<boolean> {
  */
 export async function listModels(): Promise<string[]> {
   try {
-    const response = await fetch(`${OLLAMA_HOST}/api/tags`, {
+    const response = await fetchWithTimeout(`${OLLAMA_HOST}/api/tags`, {
       method: "GET",
-      timeout: 5000,
-    });
+    }, 5000);
     if (!response.ok) {
       log.error({ status: response.status }, "Failed to list Ollama models");
       return [];
@@ -111,12 +127,11 @@ export async function* chatStream(
   };
 
   try {
-    const response = await fetch(`${OLLAMA_HOST}/api/chat`, {
+    const response = await fetchWithTimeout(`${OLLAMA_HOST}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
-      timeout: OLLAMA_REQUEST_TIMEOUT_MS,
-    });
+    }, OLLAMA_REQUEST_TIMEOUT_MS);
 
     if (!response.ok) {
       throw new Error(`Ollama API error: ${response.statusText}`);
@@ -181,12 +196,11 @@ export async function chat(
 
   try {
     const startTime = Date.now();
-    const response = await fetch(`${OLLAMA_HOST}/api/chat`, {
+    const response = await fetchWithTimeout(`${OLLAMA_HOST}/api/chat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(request),
-      timeout: OLLAMA_REQUEST_TIMEOUT_MS,
-    });
+    }, OLLAMA_REQUEST_TIMEOUT_MS);
 
     if (!response.ok) {
       throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
