@@ -36,14 +36,14 @@ This resolves the deployment-model ambiguity from the initial diagnostic pass an
   - Local compose: `docker-compose.yml`
   - Production compose: `deploy/docker-compose.prod.yml`
   - Env file: `.env`
-  - Credential inventory: `deploy/hetzner/credential-inventory.csv`
+  - Credential inventory: `deploy/hostinger/credential-inventory.csv`
   - Runtime baseline config: `config/openclaw.prod.json`
   - Runtime-equivalent repo config: `openclaw.json`
   - Prometheus config: `deploy/monitoring/prometheus/prometheus.yml`
 - `/root/.openclaw/openclaw.json` is not present in this workspace, so repo baselines are available but the live host-mounted runtime file is not.
 - The repo shows two deployment paths:
   - Docker Compose via `deploy/docker-compose.prod.yml`
-  - systemd via `deploy/hetzner/deploy.sh` and `deploy/hetzner/webhook.service`
+  - systemd via `deploy/hostinger/deploy.sh` and `deploy/hostinger/webhook.service`
 
 ## TASK 1 - WEBHOOK HEALTHCHECK FIX
 
@@ -52,7 +52,7 @@ This resolves the deployment-model ambiguity from the initial diagnostic pass an
 **Status:** DIAGNOSING
 
 **Finding:**
-The active webhook server is `handlers/ghl-webhook-handler.mjs`, not the root-level copy. It binds `OPENCLAW_GHL_WEBHOOK_PORT || 8788` at `handlers/ghl-webhook-handler.mjs:91`, and exposes `GET /health` at `handlers/ghl-webhook-handler.mjs:579-591`. The root `docker-compose.yml` has no `healthcheck` for `webhook` at `docker-compose.yml:31-45`, so it would inherit the image-wide Dockerfile probe to `http://localhost:18789/health` from `Dockerfile:93-94`, which is wrong for the webhook container. However, the production compose file already overrides this correctly to `http://localhost:8788/health` at `deploy/docker-compose.prod.yml:69-74`, and the Hetzner deploy health check also probes `8788/health` at `deploy/hetzner/deploy.sh:120-123`.
+The active webhook server is `handlers/ghl-webhook-handler.mjs`, not the root-level copy. It binds `OPENCLAW_GHL_WEBHOOK_PORT || 8788` at `handlers/ghl-webhook-handler.mjs:91`, and exposes `GET /health` at `handlers/ghl-webhook-handler.mjs:579-591`. The root `docker-compose.yml` has no `healthcheck` for `webhook` at `docker-compose.yml:31-45`, so it would inherit the image-wide Dockerfile probe to `http://localhost:18789/health` from `Dockerfile:93-94`, which is wrong for the webhook container. However, the production compose file already overrides this correctly to `http://localhost:8788/health` at `deploy/docker-compose.prod.yml:69-74`, and the Hostinger deploy health check also probes `8788/health` at `deploy/hostinger/deploy.sh:120-123`.
 
 Live validation from the server confirms Docker Compose is the active control plane and that a targeted webhook container recreate returned the service to `healthy` without disrupting `openclaw-bot`.
 
@@ -67,7 +67,7 @@ handlers/ghl-webhook-handler.mjs:579  GET /health returns 200 JSON
 docker-compose.yml:31-45             webhook service has no healthcheck block
 Dockerfile:93-94                     default image healthcheck -> localhost:18789/health
 deploy/docker-compose.prod.yml:69-74 explicit webhook healthcheck -> localhost:8788/health
-deploy/hetzner/deploy.sh:120-123     systemd health check -> localhost:8788/health
+deploy/hostinger/deploy.sh:120-123     systemd health check -> localhost:8788/health
 ```
 
 **Verification Required:**
@@ -250,7 +250,7 @@ No - this is execution-ready. The remaining task is to apply the live host confi
 **Status:** DIAGNOSING
 
 **Finding:**
-The prompt's statement about blank CSV dates is stale for the repo copy. `deploy/hetzner/credential-inventory.csv` already has populated `created_date`, `rotate_by`, and `last_rotated` for tracked credentials. The real problem is incomplete coverage: `.env` contains many more live secrets than the CSV tracks, including Anthropic, per-tenant GHL PITs, Supabase service role, Inngest keys, gateway auth, OpenRouter, and Microsoft app secrets.
+The prompt's statement about blank CSV dates is stale for the repo copy. `deploy/hostinger/credential-inventory.csv` already has populated `created_date`, `rotate_by`, and `last_rotated` for tracked credentials. The real problem is incomplete coverage: `.env` contains many more live secrets than the CSV tracks, including Anthropic, per-tenant GHL PITs, Supabase service role, Inngest keys, gateway auth, OpenRouter, and Microsoft app secrets.
 
 **Action:**
 Inventory captured below. No rotations or file edits have been performed.
@@ -259,7 +259,7 @@ Inventory captured below. No rotations or file edits have been performed.
 
 | Credential Name | Type | Location | Exposure Risk | Rotation Priority | Rotation Method |
 | --- | --- | --- | --- | --- | --- |
-| HCLOUD_TOKEN | Cloud API token | `credential-inventory.csv` only | No | P1 | Hetzner Console revoke/regenerate |
+| HCLOUD_TOKEN | Cloud API token | `credential-inventory.csv` only | No | P1 | Hostinger Console revoke/regenerate |
 | ANTHROPIC_API_KEY_SOVEREIGN | API key | `.env` | Possible | P0 | Anthropic Console revoke/regenerate |
 | ANTHROPIC_API_KEY_SHARED | API key | `.env` | Possible | P0 | Anthropic Console revoke/regenerate |
 | OPENAI_API_KEY | API key | `.env`, `credential-inventory.csv` | Possible | P1 | OpenAI Platform revoke/regenerate |

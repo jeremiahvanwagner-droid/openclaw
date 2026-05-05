@@ -110,7 +110,7 @@ export function clusterIncidents(incidents) {
  * @returns {{ proposals: Array<{id: string, description: string, patch_hint: string, confidence: number, requires_human_review: boolean}> }}
  */
 export async function generatePatchProposals(cluster, options = {}) {
-  const model = options.model ?? 'gpt-4o-mini';
+  const model = options.model ?? 'claude-haiku-4-5';
 
   // Build a structured prompt for minimal-blast-radius patch suggestions
   const systemPrompt = [

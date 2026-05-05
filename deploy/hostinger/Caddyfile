@@ -1,5 +1,5 @@
 # OpenClaw Caddy reverse proxy
-# Place at /etc/caddy/Caddyfile on the Hetzner VPS
+# Place at /etc/caddy/Caddyfile on the Hostinger VPS
 
 # Dashboard (Next.js — port 3001)
 truthjblue.dev, www.truthjblue.dev {

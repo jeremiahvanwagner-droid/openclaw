@@ -1,5 +1,5 @@
 # ═══════════════════════════════════════════════════════════════
-# OpenClaw — Production Docker Compose (Hetzner VPS)
+# OpenClaw — Production Docker Compose (Hostinger VPS)
 # Usage: docker compose -f deploy/docker-compose.prod.yml up -d
 # ═══════════════════════════════════════════════════════════════
 

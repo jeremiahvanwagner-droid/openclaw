@@ -2,7 +2,7 @@ version: "3.8"
 
 # OpenClaw Monitoring Stack
 # Prometheus + Grafana + Loki + Promtail
-# Deploy on Hetzner VPS alongside the main stack.
+# Deploy on Hostinger VPS alongside the main stack.
 
 services:
   prometheus:

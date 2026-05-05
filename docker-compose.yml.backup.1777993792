@@ -25,19 +25,14 @@ services:
     volumes:
       - ./data:/opt/openclaw/data
       - ./logs:/opt/openclaw/logs
-      - /root/.openclaw/openclaw.json:/opt/openclaw/.openclaw/openclaw.json
-      - /root/.openclaw/openclaw.json:/opt/openclaw/config/openclaw.json
+      - /root/.openclaw/openclaw.json:/opt/openclaw/.openclaw/openclaw.json:ro
+      - /root/.openclaw/openclaw.json:/opt/openclaw/config/openclaw.json:ro
       - ./backups:/opt/openclaw/backups
-      - ./templates/AGENTS.md.template:/opt/openclaw/docs/reference/templates/AGENTS.md:ro
-      - ./templates/MEMORY.md.template:/opt/openclaw/docs/reference/templates/MEMORY.md:ro
-      - ./templates/SOUL.md.template:/opt/openclaw/docs/reference/templates/SOUL.md:ro
-      - ./templates/TOOLS.md.template:/opt/openclaw/docs/reference/templates/TOOLS.md:ro
-      - ./templates/USER.md.template:/opt/openclaw/docs/reference/templates/USER.md:ro
       - ./media:/opt/openclaw/media
       - ./memory:/opt/openclaw/memory
     # Sandbox browser support
     shm_size: "512m"
-    restart: "on-failure"
+    restart: "no"  # systemd manages production — Docker is dev-only
     depends_on:
       redis:
         condition: service_healthy
@@ -98,7 +93,7 @@ services:
     volumes:
       - ./data:/opt/openclaw/data
       - ./logs:/opt/openclaw/logs
-    restart: "on-failure"
+    restart: "no"  # systemd manages production — Docker is dev-only
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8788/health"]
       interval: 30s

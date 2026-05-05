@@ -89,13 +89,13 @@ Repo-verified hardening:
 
 - the webhook handler fails closed if `OPENCLAW_GHL_WEBHOOK_SECRET` is unset
 - webhook registration tooling now requires an explicit non-placeholder HMAC secret
-- Hetzner webhook install tooling now fails if the secret is missing or placeholder-shaped
+- Hostinger webhook install tooling now fails if the secret is missing or placeholder-shaped
 
 ## Deployment
 
 Production shape in the repo:
 
-- bot/gateway runtime on Hetzner VPS
+- bot/gateway runtime on Hostinger VPS
 - webhook handler on the same host
 - Caddy in front of runtime services
 - dashboard deployed separately under `dashboard/`
@@ -162,7 +162,7 @@ openclaw health
 openclaw gateway status
 ```
 
-If remote access fails, inspect the Hetzner host directly:
+If remote access fails, inspect the Hostinger host directly:
 
 ```powershell
 ssh root@177.7.32.224 "journalctl -u openclaw -n 100 --no-pager"

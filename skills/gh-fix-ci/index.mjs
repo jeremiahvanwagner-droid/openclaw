@@ -166,7 +166,7 @@ export async function extractFailureLogs(owner, repo, runId) {
  * @returns {{ description: string, patch_hint: string, files: Array<{path: string, change: string}>, confidence: number, requires_human_review: boolean }}
  */
 export async function generateCiFix(failureContext, opts = {}) {
-  const model = opts.model ?? 'gpt-4o-mini';
+  const model = opts.model ?? 'claude-haiku-4-5';
 
   const systemPrompt = [
     'You are a DevOps engineer fixing a failing GitHub Actions CI pipeline.',

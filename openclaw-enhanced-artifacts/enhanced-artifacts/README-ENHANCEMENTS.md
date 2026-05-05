@@ -31,7 +31,7 @@ This directory contains code fixes and architectural improvements derived from t
 **Fixes:** SEC-01 (Hardcoded Supabase anon key in deploy.sh)
 
 **What it does:**
-The current `deploy/hetzner/deploy.sh` lines 91–93 hardcode the Supabase project URL (`https://aagqvfwuixpxtdcrdxmv.supabase.co`) and anon JWT directly in the script, which is committed to git. Anyone with repository read access has these credentials.
+The current `deploy/hostinger/deploy.sh` lines 91–93 hardcode the Supabase project URL (`https://aagqvfwuixpxtdcrdxmv.supabase.co`) and anon JWT directly in the script, which is committed to git. Anyone with repository read access has these credentials.
 
 This replacement script:
 - Reads `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from `/etc/openclaw/secrets` (restricted file, not in git)

@@ -4,7 +4,7 @@
 
 ```
 ┌──────────────┐     ┌─────────────────────────────────────────────┐
-│   Telegram   │     │        Hetzner VPS (24/7)                   │
+│   Telegram   │     │        Hostinger VPS (24/7)                   │
 │   Bot Users  │◄───►│  ┌─────────┐  ┌───────────────────────┐    │
 └──────────────┘     │  │  Caddy   │  │   OpenClaw Gateway    │    │
                      │  │  (TLS)   │─►│   Port 18789          │    │
@@ -35,7 +35,7 @@
 
 ## Prerequisites
 
-- **Hetzner VPS** — CX21 or better (2 vCPU, 4GB RAM, ~€5/mo)
+- **Hostinger VPS** — CX21 or better (2 vCPU, 4GB RAM, ~€5/mo)
 - **Domain name** — with DNS A records for `api.` and `webhook.` subdomains
 - **GitHub account** — for private repo + Actions CI/CD
 - **Vercel account** — paid tier for dashboard
@@ -63,11 +63,11 @@ docker compose up
 
 ---
 
-## Production Deployment — Hetzner VPS
+## Production Deployment — Hostinger VPS
 
 ### 1. Create the VPS
 
-Create an Ubuntu 22.04 VPS on Hetzner Cloud (CX21 recommended). Note the IP address.
+Create an Ubuntu 22.04 VPS on Hostinger Cloud (CX21 recommended). Note the IP address.
 
 ### 2. Point DNS
 
@@ -84,7 +84,7 @@ webhook.yourdomain.com → VPS_IP
 ssh root@YOUR_VPS_IP
 
 # Download and run the provisioning script
-curl -sSL https://raw.githubusercontent.com/truthjblue/openclaw/main/deploy/hetzner/provision.sh | bash
+curl -sSL https://raw.githubusercontent.com/truthjblue/openclaw/main/deploy/hostinger/provision.sh | bash
 ```
 
 This installs Node.js 22.x, OpenClaw CLI, Caddy, creates the `openclaw` system user, clones the repo, installs systemd services, and configures the firewall.
@@ -128,10 +128,10 @@ curl http://localhost:18789/health
 ```bash
 # Add health check cron (runs every 5 minutes)
 sudo crontab -e
-# Add: */5 * * * * /opt/openclaw/deploy/hetzner/health-check.sh
+# Add: */5 * * * * /opt/openclaw/deploy/hostinger/health-check.sh
 
 # Add daily backup (runs at 3 AM)
-# Add: 0 3 * * * /opt/openclaw/deploy/hetzner/backup.sh
+# Add: 0 3 * * * /opt/openclaw/deploy/hostinger/backup.sh
 ```
 
 ---
@@ -144,9 +144,9 @@ Go to **Settings → Secrets and variables → Actions** in your GitHub repo:
 
 | Secret | Description |
 |--------|-------------|
-| `HETZNER_HOST` | VPS IP address |
-| `HETZNER_USER` | SSH user (e.g., `root` or `openclaw`) |
-| `HETZNER_SSH_KEY` | Private SSH key for VPS access |
+| `HOSTINGER_HOST` | VPS IP address |
+| `HOSTINGER_USER` | SSH user (e.g., `root` or `openclaw`) |
+| `HOSTINGER_SSH_KEY` | Private SSH key for VPS access |
 | `TELEGRAM_BOT_TOKEN` | For deploy notifications |
 | `TELEGRAM_ALERT_CHAT_ID` | Chat ID for notifications |
 | `VERCEL_TOKEN` | Vercel deployment token |
@@ -157,7 +157,7 @@ Go to **Settings → Secrets and variables → Actions** in your GitHub repo:
 
 ### How It Works
 
-- **Manual trigger (`Deploy Bot to Hetzner VPS (Manual)`)** -> test + deploy bot/webhook to Hetzner VPS
+- **Manual trigger (`Deploy Bot to Hostinger VPS (Manual)`)** -> test + deploy bot/webhook to Hostinger VPS
 - **Push to `main` (dashboard files)** -> auto-deploy dashboard to Vercel
 - **Manual trigger (`Deploy Dashboard to Vercel`)** -> manual dashboard deploy via GitHub Actions UI
 
@@ -203,15 +203,15 @@ sudo systemctl restart openclaw-webhook
 
 # Manual deploy
 cd /opt/openclaw
-sudo bash deploy/hetzner/deploy.sh           # Pull + restart
-sudo bash deploy/hetzner/deploy.sh --upgrade # Also update CLI
+sudo bash deploy/hostinger/deploy.sh           # Pull + restart
+sudo bash deploy/hostinger/deploy.sh --upgrade # Also update CLI
 ```
 
 ---
 
 ## Credential Rotation
 
-See [deploy/hetzner/ROTATION-CHECKLIST.md](../deploy/hetzner/ROTATION-CHECKLIST.md) for the full checklist.
+See [deploy/hostinger/ROTATION-CHECKLIST.md](../deploy/hostinger/ROTATION-CHECKLIST.md) for the full checklist.
 
 Quick reference:
 1. Update the value in `/etc/openclaw/.env` on the VPS

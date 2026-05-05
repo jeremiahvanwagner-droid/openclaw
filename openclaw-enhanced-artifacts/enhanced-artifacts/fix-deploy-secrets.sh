@@ -5,7 +5,7 @@
 #
 # Fixes audit finding SEC-01: "Hardcoded Supabase Anon Key in deploy.sh"
 #
-# Problem (lines 91-93 of deploy/hetzner/deploy.sh):
+# Problem (lines 91-93 of deploy/hostinger/deploy.sh):
 #   NEXT_PUBLIC_SUPABASE_URL="https://aagqvfwuixpxtdcrdxmv.supabase.co" \
 #   NEXT_PUBLIC_SUPABASE_ANON_KEY="eyJhbGci...KouvQ" \
 #   npx next build
@@ -24,13 +24,13 @@
 #
 # HOW TO USE THIS FILE:
 #   This script is the replacement for the "Build & deploy dashboard" section
-#   of deploy/hetzner/deploy.sh (steps 5/8).
+#   of deploy/hostinger/deploy.sh (steps 5/8).
 #
 #   Option A — Drop-in replacement:
 #     Source or call this script from deploy.sh instead of the current block.
 #
 #   Option B — Inline the changes:
-#     Replace lines 82-98 of deploy/hetzner/deploy.sh with the function below.
+#     Replace lines 82-98 of deploy/hostinger/deploy.sh with the function below.
 #
 # SERVER SETUP (one-time, before first deploy):
 #   Create /etc/openclaw/secrets with restricted permissions:
@@ -150,7 +150,7 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 fi
 
 # ── INSTRUCTIONS FOR deploy.sh INTEGRATION ─────────────────────────────────────
-# Replace lines 82-98 in deploy/hetzner/deploy.sh with:
+# Replace lines 82-98 in deploy/hostinger/deploy.sh with:
 #
 #   # ── 5. Build & deploy dashboard ──────────────────────────────────────────────
 #   if [ -f dashboard/package.json ]; then

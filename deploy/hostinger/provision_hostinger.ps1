@@ -5,7 +5,7 @@ param(
   [string]$Location = "ash",
   [string]$FirewallName = "openclaw-prod-fw",
   [string]$SshKeyName = "openclaw-prod-key",
-  [string]$PublicKeyPath = "$env:USERPROFILE\.ssh\openclaw_hetzner.pub",
+  [string]$PublicKeyPath = "$env:USERPROFILE\.ssh\openclaw_hostinger.pub",
   [string]$AllowedSshCidr = "0.0.0.0/0"
 )
 
@@ -13,7 +13,7 @@ $ErrorActionPreference = "Stop"
 
 function Get-HcloudExe {
   $candidates = @(
-    "C:\Users\$env:USERNAME\AppData\Local\Microsoft\WinGet\Packages\HetznerCloud.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe\hcloud.exe",
+    "C:\Users\$env:USERNAME\AppData\Local\Microsoft\WinGet\Packages\HostingerCloud.CLI_Microsoft.Winget.Source_8wekyb3d8bbwe\hcloud.exe",
     "C:\Program Files\hcloud\hcloud.exe"
   )
   foreach ($candidate in $candidates) {
@@ -21,7 +21,7 @@ function Get-HcloudExe {
       return $candidate
     }
   }
-  throw "hcloud.exe not found. Install with: winget install --id HetznerCloud.CLI"
+  throw "hcloud.exe not found. Install with: winget install --id HostingerCloud.CLI"
 }
 
 if (-not $env:HCLOUD_TOKEN) {
@@ -48,7 +48,7 @@ if (-not $ctxRaw -or ($ctxRaw.Trim() -eq "[]")) {
   Invoke-Hcloud -Args @("context", "create", "default", "--token-from-env") | Out-Null
 }
 
-# Ensure SSH key exists in Hetzner project.
+# Ensure SSH key exists in Hostinger project.
 $keysRaw = Invoke-Hcloud -Args @("ssh-key", "list", "-o", "json")
 $keys = if ($keysRaw) { $keysRaw | ConvertFrom-Json } else { @() }
 $sshExists = $false
@@ -113,4 +113,4 @@ $ipv6 = $serverInfo.public_net.ipv6.ip
 Write-Output "SERVER_NAME=$ServerName"
 Write-Output "SERVER_IPV4=$ipv4"
 Write-Output "SERVER_IPV6=$ipv6"
-Write-Output "SSH_COMMAND=ssh -i `"$env:USERPROFILE\.ssh\openclaw_hetzner`" root@$ipv4"
+Write-Output "SSH_COMMAND=ssh -i `"$env:USERPROFILE\.ssh\openclaw_hostinger`" root@$ipv4"

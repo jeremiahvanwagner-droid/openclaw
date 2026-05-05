@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-OpenClaw is a sophisticated multi-agent AI orchestration platform operating 90 agents across 7 divisions with 200+ skills, backed by Supabase pgvector, Inngest event orchestration, and an LLM routing layer (Anthropic + OpenAI). The platform currently runs on a Hetzner VPS with Caddy reverse proxy, Prometheus/Grafana monitoring, and a Next.js 14 dashboard.
+OpenClaw is a sophisticated multi-agent AI orchestration platform operating 90 agents across 7 divisions with 200+ skills, backed by Supabase pgvector, Inngest event orchestration, and an LLM routing layer (Anthropic + OpenAI). The platform currently runs on a Hostinger VPS with Caddy reverse proxy, Prometheus/Grafana monitoring, and a Next.js 14 dashboard.
 
 This analysis identifies **50 high-impact upgrades** organized into **5 priority tiers** spanning security hardening, performance optimization, architectural improvements, operational excellence, and growth enablement. Each item includes severity, current state assessment, expected impact, and implementation guidance.
 
@@ -50,7 +50,7 @@ This analysis identifies **50 high-impact upgrades** organized into **5 priority
 
 ### 3. Credential Inventory Gaps
 - **Severity:** HIGH | **Status:** PARTIAL
-- **Current State:** `deploy/hetzner/credential-inventory.csv` has empty `Created Date`, `Rotate By`, `Last Rotated`, and `Revoke Procedure` columns for all 6 credentials. `ROTATION-CHECKLIST.md` identifies 5 tokens that were in plaintext config.
+- **Current State:** `deploy/hostinger/credential-inventory.csv` has empty `Created Date`, `Rotate By`, `Last Rotated`, and `Revoke Procedure` columns for all 6 credentials. `ROTATION-CHECKLIST.md` identifies 5 tokens that were in plaintext config.
 - **Fix:** Populate all CSV fields immediately. Establish 90-day rotation policy. Automate rotation reminders via cron Telegram alert.
 - **Impact:** Compliance readiness and reduced blast radius of credential leaks.
 
@@ -201,7 +201,7 @@ This analysis identifies **50 high-impact upgrades** organized into **5 priority
 
 ### 26. Health Check Depth
 - **Severity:** MEDIUM | **Status:** PARTIAL
-- **Current State:** `deploy/hetzner/health-check.sh` checks basic HTTP 200 on `/health` endpoints. It does not verify Supabase connectivity, LLM provider availability, or cron scheduler state.
+- **Current State:** `deploy/hostinger/health-check.sh` checks basic HTTP 200 on `/health` endpoints. It does not verify Supabase connectivity, LLM provider availability, or cron scheduler state.
 - **Fix:** Implement a deep health check endpoint (`/health/deep`) that verifies: Supabase read, LLM provider reachability (lightweight ping), cron scheduler running, no circuits open. Return structured JSON with per-subsystem status.
 - **Impact:** Catches "running but broken" states that shallow health checks miss.
 
@@ -225,7 +225,7 @@ This analysis identifies **50 high-impact upgrades** organized into **5 priority
 
 ### 30. Backup Verification Testing
 - **Severity:** MEDIUM | **Status:** NEW
-- **Current State:** `deploy/hetzner/backup.sh` creates daily tarballs but never verifies them. No restore test exists. Backup integrity is assumed.
+- **Current State:** `deploy/hostinger/backup.sh` creates daily tarballs but never verifies them. No restore test exists. Backup integrity is assumed.
 - **Fix:** After creating the backup, run a verification step: extract to a temp directory, check file count against manifest, verify JSON parsability of config files. Monthly: full restore test to staging.
 - **Impact:** Guarantees recoverability. Untested backups are not backups.
 
@@ -242,7 +242,7 @@ This analysis identifies **50 high-impact upgrades** organized into **5 priority
 ### 32. Staging Environment
 - **Severity:** HIGH | **Status:** PLANNED
 - **Current State:** No staging. All changes go directly to production.
-- **Fix:** Provision second Hetzner VPS (CX11). Separate Supabase project. Deploy from `develop` branch. Subdomain: `staging.truthjblue.dev`.
+- **Fix:** Provision second Hostinger VPS (CX11). Separate Supabase project. Deploy from `develop` branch. Subdomain: `staging.truthjblue.dev`.
 - **Impact:** Safe testing ground. Zero-risk validation of changes before production.
 
 ### 33. Migration to text-embedding-3-large for Critical Memories
@@ -259,8 +259,8 @@ This analysis identifies **50 high-impact upgrades** organized into **5 priority
 
 ### 35. High-Availability Multi-Node
 - **Severity:** MEDIUM | **Status:** PLANNED
-- **Current State:** Single VPS (Hetzner). Total failure = total outage.
-- **Fix:** Second VPS in different availability zone. Hetzner Load Balancer fronting both. Shared Supabase + Inngest (already cloud-hosted). DNS + Caddy update.
+- **Current State:** Single VPS (Hostinger). Total failure = total outage.
+- **Fix:** Second VPS in different availability zone. Hostinger Load Balancer fronting both. Shared Supabase + Inngest (already cloud-hosted). DNS + Caddy update.
 - **Impact:** Zero-downtime resilience. Sub-10s failover.
 
 ### 36. Horizontal Agent Scaling via Worker Queues

@@ -170,7 +170,7 @@ Do not state any of the following as fact without a fresh live-system check:
 
 | Claim | Current status |
 |---|---|
-| Hetzner gateway and webhook services are healthy | Unverified in this audit |
+| Hostinger gateway and webhook services are healthy | Unverified in this audit |
 | Grafana is receiving gateway metrics in live operation | Unverified in this audit |
 | Prometheus shows both gateway and webhook scrape targets as `UP` | Unverified in this audit |
 | Live TJB and MSL auth health is `200 OK` today | Not re-run in this audit |

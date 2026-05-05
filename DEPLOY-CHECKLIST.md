@@ -27,23 +27,25 @@ grep 'ANTHROPIC_API_KEY' .env
 
 ## Server — Environment Setup
 
-SSH into the production server as the `openclaw` service user, then:
+SSH into the production server, then:
 
 ```bash
-cd /opt/openclaw
-
-# 5. Edit the live env file (chmod 600)
-nano .openclaw/openclaw.env
+# 5. Edit the live env file — loaded by BOTH systemd units via EnvironmentFile=
+sudo nano /etc/openclaw/.env
 
 # REQUIRED lines to add/verify:
 #   ANTHROPIC_API_KEY=sk-ant-<your-key>
+#   OPENAI_API_KEY=sk-<your-key>          # Retained for text-embedding-3-small only
 #   SUPABASE_URL=https://<project>.supabase.co
 #   SUPABASE_SERVICE_ROLE_KEY=<jwt>
 #   OPENCLAW_GATEWAY_AUTH_TOKEN=<64-char-hex>
+#   INNGEST_SIGNING_KEY=signkey-prod-<key>
+#   INNGEST_EVENT_KEY=<key>
 
-# 6. Verify file permissions
-chmod 600 .openclaw/openclaw.env
-ls -la .openclaw/openclaw.env
+# 6. Verify file permissions (must be readable by the openclaw user only)
+sudo chmod 600 /etc/openclaw/.env
+sudo chown openclaw:openclaw /etc/openclaw/.env
+sudo ls -la /etc/openclaw/.env
 ```
 
 ---
@@ -120,21 +122,27 @@ kill $TAIL_PID
 
 ## Server — Supabase Circuit Breaker Table
 
-The self-healing circuit breaker requires a Supabase table. Run this SQL once in the Supabase SQL Editor:
+The self-healing circuit breaker table is now provisioned via the Supabase migration
+`supabase/migrations/20260506000011_healing_circuit_breaker.sql`.
+
+Run `supabase db push` (or apply via Supabase Dashboard SQL Editor) to create it.
+The column is named `circuit_key` — **do not use the old manual SQL** (it used `key`, which
+will cause a `column "circuit_key" does not exist` runtime error).
+
+If you already ran the old manual SQL, rename the column before running the migration:
 
 ```sql
-CREATE TABLE IF NOT EXISTS healing_circuit_breaker (
-  key          TEXT PRIMARY KEY,
-  failures     INTEGER NOT NULL DEFAULT 0,
-  open_until   TIMESTAMPTZ,
-  last_failure TIMESTAMPTZ,
-  updated_at   TIMESTAMPTZ NOT NULL DEFAULT now()
-);
+-- Only needed if the table already exists with the wrong column name
+ALTER TABLE healing_circuit_breaker RENAME COLUMN "key" TO circuit_key;
+```
 
--- Seed a clean state for the scheduled healing key
-INSERT INTO healing_circuit_breaker (key, failures)
-VALUES ('scheduled_healing', 0)
-ON CONFLICT (key) DO NOTHING;
+After the migration runs, verify:
+
+```sql
+SELECT column_name FROM information_schema.columns
+WHERE table_name = 'healing_circuit_breaker'
+ORDER BY ordinal_position;
+-- Expected columns: circuit_key, failure_count, last_failure, state, opened_at, updated_at
 ```
 
 ---
@@ -192,9 +200,4 @@ sed -i 's/^# OPENAI_API_KEY=/OPENAI_API_KEY=/' .openclaw/openclaw.env
 | `config/openclaw.json` | 89× `openai/gpt-5.3-codex` → `anthropic/claude-opus-4-5`; 20× `openai/gpt-4o-mini` → `anthropic/claude-haiku-4-5`; `memorySearch.enabled=false`; fixed duplicate key; stripped BOM |
 | `agents_config.json` | 22× `gpt-4o-mini` → `claude-haiku-4-5`; 15× `gpt-4o` → `claude-sonnet-4.5`; stripped BOM |
 | `config/agents_config.json` | Same as above; stripped BOM |
-| `inngest/functions/self-healing-coding.ts` | Full circuit breaker (Supabase-backed, MAX_FAILURES=3, COOLDOWN=30min); preflight `ANTHROPIC_API_KEY` check |
-| `lib/self-healing-supervisor.ts` | `preflightCheck()` added; integrated into `runHealingLoop()` early-return guard |
-| `ops/configs/openclaw-gateway.service` | `RestartSec=60s`; `StartLimitInterval=300s`; `StartLimitBurst=3` |
-| `.env.example` | `ANTHROPIC_API_KEY` at top as REQUIRED; `OPENAI_API_KEY` commented as LEGACY |
-| `ops/configs/openclaw.env.template` | `ANTHROPIC_API_KEY` added as REQUIRED; OpenAI section commented as LEGACY |
-| `DEPLOY-CHECKLIST.md` | **NEW** — this file |
+| `inngest/functions/self-hea

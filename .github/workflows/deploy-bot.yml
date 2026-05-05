@@ -1,4 +1,4 @@
-name: Deploy Bot to Hetzner VPS (Manual)
+name: Deploy Bot to Hostinger VPS (Manual)
 
 on:
   workflow_dispatch:
@@ -50,10 +50,10 @@ jobs:
       - name: Run tests
         run: corepack pnpm test
       - name: Runtime config parity gate
-        run: node scripts/upgrade/runtime-config-parity.mjs --primary config/openclaw.prod.json --secondary config/openclaw.json --agents config/agents_config.json --rollout full --expected-agent-count 107 --strict
+        run: node scripts/upgrade/runtime-config-parity.mjs --primary config/openclaw.prod.json --secondary config/openclaw.json --agents config/agents_config.json --rollout full --expected-agent-count 103 --strict
 
   deploy:
-    name: Deploy to Hetzner
+    name: Deploy to Hostinger
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -63,13 +63,13 @@ jobs:
       - id: validate_ssh_secrets
         name: Validate SSH secrets
         env:
-          HETZNER_HOST: ${{ secrets.HETZNER_HOST }}
-          HETZNER_USER: ${{ secrets.HETZNER_USER }}
-          HETZNER_SSH_KEY: ${{ secrets.HETZNER_SSH_KEY }}
+          HOSTINGER_HOST: ${{ secrets.HOSTINGER_HOST }}
+          HOSTINGER_USER: ${{ secrets.HOSTINGER_USER }}
+          HOSTINGER_SSH_KEY: ${{ secrets.HOSTINGER_SSH_KEY }}
         run: |
           set -euo pipefail
           missing=()
-          for secret in HETZNER_HOST HETZNER_USER HETZNER_SSH_KEY; do
+          for secret in HOSTINGER_HOST HOSTINGER_USER HOSTINGER_SSH_KEY; do
             if [ -z "${!secret:-}" ]; then
               missing+=("${secret}")
             fi
@@ -83,9 +83,9 @@ jobs:
       - name: Preflight server checkout state
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: ${{ secrets.HETZNER_USER }}
-          key: ${{ secrets.HETZNER_SSH_KEY }}
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             set -eu
             git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
@@ -109,9 +109,9 @@ jobs:
       - name: Validate sudo access
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: ${{ secrets.HETZNER_USER }}
-          key: ${{ secrets.HETZNER_SSH_KEY }}
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             sudo -n true 2>/dev/null || { echo "::error::User $USER does not have passwordless sudo. deploy.sh requires sudo."; exit 1; }
 
@@ -119,9 +119,9 @@ jobs:
         name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: ${{ secrets.HETZNER_USER }}
-          key: ${{ secrets.HETZNER_SSH_KEY }}
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           command_timeout: 20m
           script: |
             cd /opt/openclaw
@@ -134,17 +134,17 @@ jobs:
               ROLLOUT_MODE="canary"
             fi
             if [ "${{ github.event.inputs.upgrade_cli }}" = "true" ]; then
-              sudo bash deploy/hetzner/deploy.sh --upgrade --rollout "${ROLLOUT_MODE}"
+              sudo bash deploy/hostinger/deploy.sh --upgrade --rollout "${ROLLOUT_MODE}"
             else
-              sudo bash deploy/hetzner/deploy.sh --rollout "${ROLLOUT_MODE}"
+              sudo bash deploy/hostinger/deploy.sh --rollout "${ROLLOUT_MODE}"
             fi
 
       - name: Health Check
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: ${{ secrets.HETZNER_USER }}
-          key: ${{ secrets.HETZNER_SSH_KEY }}
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           command_timeout: 3m
           script: |
             sleep 10
@@ -166,9 +166,9 @@ jobs:
         if: failure() && steps.validate_ssh_secrets.outcome == 'success'
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.HETZNER_HOST }}
-          username: ${{ secrets.HETZNER_USER }}
-          key: ${{ secrets.HETZNER_SSH_KEY }}
+          host: ${{ secrets.HOSTINGER_HOST }}
+          username: ${{ secrets.HOSTINGER_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
           command_timeout: 5m
           script: |
             set +e

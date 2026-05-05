@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # ═══════════════════════════════════════════════════════════════
-# OpenClaw — Hetzner VPS Provisioning Script
+# OpenClaw — Hostinger VPS Provisioning Script
 # Run once on a fresh Ubuntu 22.04+ VPS to bootstrap everything
 #
-# Usage: curl -sSL <raw-github-url>/deploy/hetzner/provision.sh | bash
+# Usage: curl -sSL <raw-github-url>/deploy/hostinger/provision.sh | bash
 #    OR: scp provision.sh root@YOUR_VPS_IP:~ && ssh root@YOUR_VPS_IP 'bash provision.sh'
 # ═══════════════════════════════════════════════════════════════
 set -euo pipefail
@@ -118,9 +118,9 @@ fi
 
 # ── 11. Install systemd services ────────────────────────────
 echo "[11/12] Installing systemd services..."
-cp "$OPENCLAW_HOME/deploy/hetzner/openclaw.service" /etc/systemd/system/
-cp "$OPENCLAW_HOME/deploy/hetzner/webhook.service" /etc/systemd/system/openclaw-webhook.service
-cp "$OPENCLAW_HOME/deploy/hetzner/openclaw-dashboard.service" /etc/systemd/system/
+cp "$OPENCLAW_HOME/deploy/hostinger/openclaw.service" /etc/systemd/system/
+cp "$OPENCLAW_HOME/deploy/hostinger/webhook.service" /etc/systemd/system/openclaw-webhook.service
+cp "$OPENCLAW_HOME/deploy/hostinger/openclaw-dashboard.service" /etc/systemd/system/
 
 # Compatibility path for legacy webhook skill imports
 mkdir -p "$OPENCLAW_HOME/handlers/workspace"
@@ -128,7 +128,7 @@ ln -sfn "$OPENCLAW_HOME/skills" "$OPENCLAW_HOME/handlers/workspace/skills"
 chown -h "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME/handlers/workspace/skills" || true
 
 # Install Caddyfile
-cp "$OPENCLAW_HOME/deploy/hetzner/Caddyfile" /etc/caddy/Caddyfile
+cp "$OPENCLAW_HOME/deploy/hostinger/Caddyfile" /etc/caddy/Caddyfile
 
 # Build the Next.js dashboard
 # --prod was used for the bot above; dashboard needs devDeps (next, typescript)

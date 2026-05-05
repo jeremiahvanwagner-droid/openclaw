@@ -45,7 +45,7 @@ global:
   # Labels added to every time series and alert from this Prometheus instance
   external_labels:
     environment: "production"
-    cluster: "openclaw-hetzner"
+    cluster: "openclaw-hostinger"
 
 # ── Alertmanager (configure your alertmanager endpoint) ───────────────────────
 # Uncomment and set the correct address when Alertmanager is deployed.
@@ -136,7 +136,7 @@ scrape_configs:
     scrape_interval: 30s
 
   # ── 5. Node Exporter (host metrics) ─────────────────────────────────────────
-  # Uncomment if node_exporter is installed on the Hetzner VPS.
+  # Uncomment if node_exporter is installed on the Hostinger VPS.
   # Exposes: CPU, memory, disk, network for the host machine.
   # Install: apt install prometheus-node-exporter
   # - job_name: "node-exporter"

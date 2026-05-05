@@ -4,7 +4,7 @@
 # Checks gateway + webhook + sends Telegram alert on failure
 #
 # Usage: Add to crontab:
-#   */5 * * * * /opt/openclaw/deploy/hetzner/health-check.sh
+#   */5 * * * * /opt/openclaw/deploy/hostinger/health-check.sh
 # ═══════════════════════════════════════════════════════════════
 set -uo pipefail
 

@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
   [string]$ServerIp = "87.99.138.98",
-  [string]$SshKeyPath = "$env:USERPROFILE\.ssh\openclaw_hetzner",
+  [string]$SshKeyPath = "$env:USERPROFILE\.ssh\openclaw_hostinger",
   [switch]$ListOnly
 )
 

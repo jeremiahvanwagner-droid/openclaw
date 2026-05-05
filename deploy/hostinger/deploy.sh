@@ -12,7 +12,7 @@ ROLLOUT_MODE="canary"
 
 usage() {
     cat <<'EOF'
-Usage: deploy/hetzner/deploy.sh [--upgrade] [--rollout <canary|full>]
+Usage: deploy/hostinger/deploy.sh [--upgrade] [--rollout <canary|full>]
 
 Options:
   --upgrade              Upgrade OpenClaw CLI before deploy.
@@ -273,10 +273,10 @@ mkdir -p handlers/workspace
 ln -sfn /opt/openclaw/skills /opt/openclaw/handlers/workspace/skills
 chown -h openclaw:openclaw /opt/openclaw/handlers/workspace/skills || true
 
-cp deploy/hetzner/openclaw.service /etc/systemd/system/
-cp deploy/hetzner/webhook.service /etc/systemd/system/openclaw-webhook.service
-cp deploy/hetzner/openclaw-dashboard.service /etc/systemd/system/
-cp deploy/hetzner/Caddyfile /etc/caddy/Caddyfile
+cp deploy/hostinger/openclaw.service /etc/systemd/system/
+cp deploy/hostinger/webhook.service /etc/systemd/system/openclaw-webhook.service
+cp deploy/hostinger/openclaw-dashboard.service /etc/systemd/system/
+cp deploy/hostinger/Caddyfile /etc/caddy/Caddyfile
 systemctl daemon-reload
 
 # 6. Build dashboard

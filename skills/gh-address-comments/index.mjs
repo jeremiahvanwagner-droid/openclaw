@@ -130,7 +130,7 @@ export async function fetchFileContent(owner, repo, filePath, branch) {
  * @returns {{ fixed_content: string|null, description: string, confidence: number, requires_human_review: boolean }}
  */
 export async function generateCommentFix(comment, fileContent, opts = {}) {
-  const model = opts.model ?? 'gpt-4o-mini';
+  const model = opts.model ?? 'claude-haiku-4-5';
   const category = categorizeComment(comment);
 
   if (HUMAN_REVIEW_CATEGORIES.includes(category)) {

@@ -81,6 +81,7 @@ import {
   offerOptimizationSuggested,
   offerPerformanceCollected,
 } from "./functions/phase3-execution";
+import { selfHealingCodingFunctions } from "./functions/self-healing-coding";
 
 export const handler = serve({
   client: inngest,
@@ -147,5 +148,7 @@ export const handler = serve({
     offerAnalysisScheduled,
     offerOptimizationSuggested,
     offerPerformanceCollected,
+    // Self-Healing: CI auto-fix, integration checks, escalation, cron & on-demand triggers
+    ...selfHealingCodingFunctions,
   ],
 });

@@ -309,7 +309,7 @@ what's happening before you optimize it.*
 `deploy/monitoring/grafana/dashboards/openclaw.json`,
 `deploy/monitoring/prometheus/prometheus.yml`
 **What:**
-- Add Prometheus + Grafana as Docker services on the Hetzner VPS.
+- Add Prometheus + Grafana as Docker services on the Hostinger VPS.
 - Prometheus scrapes `localhost:18789/metrics` every 15s.
 - Grafana dashboard with 6 panels:
   1. LLM request rate + latency (p50/p95/p99)
@@ -330,7 +330,7 @@ circuit breaker opens.
 
 #### Task 4.3 — Centralized Log Aggregation (#24)
 **Files:** `deploy/monitoring/docker-compose.monitoring.yml` (add Loki + Promtail),
-`deploy/hetzner/openclaw.service`, `deploy/hetzner/webhook.service`
+`deploy/hostinger/openclaw.service`, `deploy/hostinger/webhook.service`
 **What:**
 - Add Grafana Loki + Promtail to monitoring stack.
 - Promtail tails systemd journals for `openclaw` and `openclaw-webhook` units.
@@ -616,7 +616,7 @@ OpenAI embedding API is called only once.
 **Files:** New `deploy/staging/docker-compose.staging.yml`,
 new `.github/workflows/deploy-staging.yml`
 **What:**
-- Provision a second Hetzner VPS (CX11 — smaller is fine for staging).
+- Provision a second Hostinger VPS (CX11 — smaller is fine for staging).
 - Create separate Supabase project for staging.
 - New GitHub Actions workflow: deploys to staging on pushes to `develop` branch.
 - Staging uses `.env.staging` with separate tokens/keys.
@@ -664,7 +664,7 @@ until tests pass.
 connection is caught within 30s of deploy.
 
 #### Task 8.4 — Deployment Rollback (#18)
-**Files:** `deploy/hetzner/deploy.sh`, `.github/workflows/deploy-bot.yml`
+**Files:** `deploy/hostinger/deploy.sh`, `.github/workflows/deploy-bot.yml`
 **What:**
 - Before deploying, `deploy.sh` records the current commit SHA in `/opt/openclaw/.last-good-deploy`.
 - After deploy, if smoke tests fail:
@@ -677,10 +677,10 @@ connection is caught within 30s of deploy.
 Services return to the previous working state.
 
 #### Task 8.5 — Supabase Backups to Object Storage (#27)
-**Files:** New `deploy/hetzner/backup-supabase.sh`, cron entry
+**Files:** New `deploy/hostinger/backup-supabase.sh`, cron entry
 **What:**
 - Daily `pg_dump` of Supabase database (via connection string from env).
-- Compress with `gzip`, upload to Backblaze B2 (or Hetzner Object Storage).
+- Compress with `gzip`, upload to Backblaze B2 (or Hostinger Object Storage).
 - Keep 30 days of backup retention.
 - Schedule via cron at 4 AM (after local backup at 3 AM).
 - Verify restore: monthly test restore to staging Supabase project.
@@ -764,10 +764,10 @@ reduced p50 latency for cached agents.
 ### Sprint 10 — Scale & Harden
 
 #### Task 10.1 — High-Availability Setup (#22)
-**Files:** New `deploy/hetzner/haproxy.cfg`, update provisioning
+**Files:** New `deploy/hostinger/haproxy.cfg`, update provisioning
 **What:**
-- Provision second Hetzner VPS (CX21) in different datacenter zone.
-- Add Hetzner Load Balancer in front of both VPS instances.
+- Provision second Hostinger VPS (CX21) in different datacenter zone.
+- Add Hostinger Load Balancer in front of both VPS instances.
 - Both run identical `openclaw` and `openclaw-webhook` services.
 - Supabase is already shared (cloud-hosted, no change).
 - Inngest is already shared (cloud-hosted, no change).

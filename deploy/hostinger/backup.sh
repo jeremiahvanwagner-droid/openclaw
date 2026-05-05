@@ -4,7 +4,7 @@
 # Daily backup of runtime data with 7-day rotation
 #
 # Usage: Add to crontab:
-#   0 3 * * * /opt/openclaw/deploy/hetzner/backup.sh
+#   0 3 * * * /opt/openclaw/deploy/hostinger/backup.sh
 # ═══════════════════════════════════════════════════════════════
 set -euo pipefail
 

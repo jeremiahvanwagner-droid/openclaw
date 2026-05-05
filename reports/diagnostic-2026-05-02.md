@@ -105,7 +105,7 @@ This token has been revoked by BotFather (confirmed by 401 response from Telegra
 
 **Fix (requires user action — see §9):**  
 1. Open Telegram → `@BotFather` → `/mybots` → select bot → `API Token` → revoke & regenerate  
-2. Update two env vars in `deploy/hetzner/.env.prod`  
+2. Update two env vars in `deploy/hostinger/.env.prod`  
 3. SCP to server and restart `openclaw-bot`
 
 ---
@@ -261,14 +261,14 @@ GHL webhook endpoint is live and processing. Health check (`GET /health`) respon
 
 1. Open Telegram → search `@BotFather` → `/mybots`
 2. Select your bot → tap **API Token** → **Revoke current token** → copy new token
-3. Edit `deploy/hetzner/.env.prod` — update both lines:
+3. Edit `deploy/hostinger/.env.prod` — update both lines:
    ```
    TELEGRAM_BOT_TOKEN=<NEW_TOKEN>
    OPENCLAW_TELEGRAM_BOT_TOKEN=<NEW_TOKEN>
    ```
 4. Deploy to server:
    ```powershell
-   scp deploy/hetzner/.env.prod root@177.7.32.224:/root/openclaw/.env
+   scp deploy/hostinger/.env.prod root@177.7.32.224:/root/openclaw/.env
    ```
 5. Restart bot container:
    ```powershell
@@ -327,7 +327,7 @@ To activate the cleaned 171,296-byte config and suppress schema warnings:
 | Path | Purpose |
 |---|---|
 | `/root/openclaw/` | Docker Compose working directory |
-| `/root/openclaw/.env` | Runtime env (source: `deploy/hetzner/.env.prod`) |
+| `/root/openclaw/.env` | Runtime env (source: `deploy/hostinger/.env.prod`) |
 | `/root/openclaw/docker-compose.yml` | Container definitions |
 | `/root/.openclaw/openclaw.json` | Active config (395,481 bytes) |
 | `/root/openclaw/data/` | Persistent data volume |
@@ -337,7 +337,7 @@ To activate the cleaned 171,296-byte config and suppress schema warnings:
 ### Local Paths
 | Path | Purpose |
 |---|---|
-| `deploy/hetzner/.env.prod` | Env source of truth (local) |
+| `deploy/hostinger/.env.prod` | Env source of truth (local) |
 | `config/openclaw.prod.cleaned.json` | Cleaned config (not active on server) |
 | `cron/jobs.json` | 42 cron jobs (not deployed to server) |
 

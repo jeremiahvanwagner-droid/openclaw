@@ -86,7 +86,7 @@ OpenClaw's power comes with proportional risk — critical to understand before 
 - v2026.2.6 introduced multi-engine malware scanning on ClawHub skill submissions with daily rescanning[^4]
 
 **Security Protocols:**
-- Run on dedicated VPS (Hetzner) — never on personal machine[^4]
+- Run on dedicated VPS (Hostinger) — never on personal machine[^4]
 - Use Tailscale for private encrypted network[^4]
 - Rotate GHL API tokens every 90 days[^4]
 - Use minimal API scopes — only grant what each agent actually needs[^4]
@@ -540,7 +540,7 @@ The Steward generates the weekly report against these targets:[^4]
 
 | Component | Provider | Specs | Monthly Cost |
 |-----------|----------|-------|-------------|
-| Primary VPS | Hetzner Cloud CPX21 | 3 vCPU, 4 GB RAM | $5–10[^4] |
+| Primary VPS | Hostinger Cloud CPX21 | 3 vCPU, 4 GB RAM | $5–10[^4] |
 | Network Security | Tailscale | Private encrypted network | Free[^4] |
 | Messaging Gateway | Telegram via BotFather | Full bidirectional | Free[^4] |
 | Web Search | Brave Search API | Research capability | Free tier[^4] |
@@ -555,7 +555,7 @@ The Steward generates the weekly report against these targets:[^4]
 
 | Week | Priority | Goal |
 |------|----------|------|
-| **Week 1 — Foundation** | Install OpenClaw on Hetzner VPS via Docker; configure SOUL.md; connect Telegram; deploy HighLevel Skill with full scopes; test Speed-to-Lead and Pipeline Briefing | Live daily briefing + instant lead response |
+| **Week 1 — Foundation** | Install OpenClaw on Hostinger VPS via Docker; configure SOUL.md; connect Telegram; deploy HighLevel Skill with full scopes; test Speed-to-Lead and Pipeline Briefing | Live daily briefing + instant lead response |
 | **Week 2 — Intelligence** | Deploy Pre-Call Briefings, Lead Scoring, Support Drafting; configure Tavily and Agent Browser for web enrichment | Zero unprepped discovery calls |
 | **Week 3 — Growth** | Deploy Cold Lead Revival, Review Sequence, Value Ladder Automation; configure Capability Evolver for self-optimization | Active cold database + automated ascension triggers |
 | **Week 4 — Creative** | Connect HeyGen Video Agent API; build Content Pipeline workflow; configure Suno integration; deploy Weekly Performance Report | Full content-to-distribution automation live |

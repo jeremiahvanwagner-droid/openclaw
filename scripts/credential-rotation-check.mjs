@@ -3,7 +3,7 @@
  * Credential Rotation Checker
  * OpenClaw Multi-Agent Network
  *
- * Reads deploy/hetzner/credential-inventory.csv and alerts via Telegram
+ * Reads deploy/hostinger/credential-inventory.csv and alerts via Telegram
  * when credentials are within 14 days of their rotate_by date or overdue.
  *
  * Usage:  node scripts/credential-rotation-check.mjs
@@ -17,7 +17,7 @@ import { openclawSend } from '../lib/safe-exec.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const CSV_PATH = path.join(__dirname, '..', 'deploy', 'hetzner', 'credential-inventory.csv');
+const CSV_PATH = path.join(__dirname, '..', 'deploy', 'hostinger', 'credential-inventory.csv');
 const WARN_DAYS = 14;
 
 function parseCSV(text) {

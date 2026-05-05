@@ -149,7 +149,7 @@ COMMIT;
 -- ──────────────────────────────────────────────────────────────────
 -- [ ] Rotate the leaked Supabase anon key (project: aagqvfwuixpxtdcrdxmv)
 --     via Supabase Dashboard → Settings → API → Regenerate anon key
--- [ ] Remove hardcoded keys from deploy/hetzner/deploy.sh (see fix-deploy-secrets.sh)
+-- [ ] Remove hardcoded keys from deploy/hostinger/deploy.sh (see fix-deploy-secrets.sh)
 -- [ ] Update dashboard to use authenticated server-side Supabase client
 --     for all reads — the anon client in dashboard/app/supabase.ts will
 --     now receive empty result sets for all protected tables.
