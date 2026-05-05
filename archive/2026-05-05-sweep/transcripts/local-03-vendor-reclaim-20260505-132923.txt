@@ -1,0 +1,22 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260505132923
+Username: AzureAD\JeremiahVanWagner
+RunAs User: AzureAD\JeremiahVanWagner
+Configuration Name: 
+Machine: EMPOWERMENT-CEN (Microsoft Windows NT 10.0.26200.0)
+Host Application: C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe -noexit -command try { . "c:\Users\JeremiahVanWagner\AppData\Local\Programs\Microsoft VS Code\034f571df5\resources\app\out\vs\workbench\contrib\terminal\common\scripts\shellIntegration.ps1" } catch {}
+Process ID: 41184
+PSVersion: 5.1.26100.8328
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8328
+BuildVersion: 10.0.26100.8328
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is archive\2026-05-05-sweep\transcripts\local-03-vendor-reclaim-20260505-132923.txt
+
+CONFIRM VENDOR RECLAIM: 9 directory trees will be permanently deleted (LOCAL).
+These contain ~109002 regenerable files (node_modules / .venv / caches).

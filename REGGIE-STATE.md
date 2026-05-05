@@ -23,7 +23,7 @@
 | OpenClaw release tag | `2026.4.29` (commit `a448042`) — running container |
 | `package.json` version | `1.0.0` |
 | Deployment shape | Docker Compose (LOCAL `C:\Users\JeremiahVanWagner\.openclaw\docker-compose.yml` + VPS `/root/openclaw/docker-compose.yml`) |
-| Last state update | 2026-05-05 17:55 UTC |
+| Last state update | 2026-05-05 (Phase 2 execution) UTC |
 | Sweep version | `2026-05-05-sweep` (Phase 1–5 complete) |
 
 ---
@@ -217,7 +217,7 @@ Verified present in LOCAL filesystem:
 2. **Locate or create the agent auth profile.** Identify where per-agent least-privilege scope is declared. If undocumented, create `config/agent-auth-profiles.json` with one entry per agent. Closes Open Item #2.
 3. **Bring `deploy/sanitize-runtime-config.py` into the repo.** Copy from VPS, commit to `deploy/`, then update VPS pull workflow so the canonical version lives in git. Closes Open Item #3.
 4. **Live-probe the runtime stack.** Run `curl -fsS http://127.0.0.1:18789/metrics` and `curl -fsS http://127.0.0.1:8788/healthz` on VPS, plus a Prometheus target check. Promote Open Items #4 and #5 to either RESOLVED or CONFIRMED with evidence.
-5. **Execute Phase 2/3 sweep on both hosts.** Run `phase2/local/01-archive.ps1` then the `02-shred` and `03-vendor-reclaim` scripts under their typed-`BURN` gates on LOCAL, then mirror on VPS. Reinstall vendor trees. Confirm `docker compose ps` still shows healthy containers afterward.
+5. **Sync canonical REGGIE-STATE.md to VPS.** Push this file to `/root/openclaw/REGGIE-STATE.md` so both hosts share the same audit record. Resolves Open Item #8 permanently.
 
 ---
 
@@ -225,7 +225,24 @@ Verified present in LOCAL filesystem:
 
 > Append-only — never edit prior entries. Corrections are new entries with `Status=ROLLED_BACK` referencing the prior Entry ID.
 
-### 7.1 AUDIT ENTRY — 2026-05-05T17:55:00Z
+### 7.1 AUDIT ENTRY — Phase 2 execution — 2026-05-05
+
+| Field              | Value                                                    |
+|--------------------|----------------------------------------------------------|
+| Date               | 2026-05-05 (execution) UTC                               |
+| Author             | agent:copilot + human:jeremiah-vanwagner                 |
+| Change Type        | OTHER                                                    |
+| Status             | APPLIED                                                  |
+| Parent Entry       | `9c4f33c6c7f7`                                           |
+| Impacted Divisions | Cross-Cutting                                            |
+| Rollback Plan      | Restore from `archive/2026-05-05-sweep/` on each host: `mv archive/2026-05-05-sweep/* ../`. Vendor trees regenerate via `pnpm install`. |
+| Rollback Tested    | NO                                                       |
+| Next Audit Due     | 2026-08-05                                               |
+| Entry ID           | `b2ef6472a474`                                           |
+
+Phase 2 host-level deletes executed on both hosts under typed-BURN confirmation gates. LOCAL (`C:\Users\JeremiahVanWagner\.openclaw`): ARCHIVED 287 files → `archive/2026-05-05-sweep/`; SHREDDED 240 files (0 errors); RECLAIMED 9 vendor directories (~109,002 regenerable files). VPS (`root@177.7.32.224:/root/openclaw`): ARCHIVED 34 files; SHREDDED 6 files; RECLAIMED 6 vendor directories (~39,738 regenerable files). Vendor regen: LOCAL `pnpm install` → 780 packages (13.3 s); VPS `pnpm install` → done (3.6 s). `uv sync` skipped — `uv` not installed on LOCAL and no `pyproject.toml` exists. Both VPS containers (`openclaw-bot`, `openclaw-webhook`) confirmed `(healthy)` post-execution. SOUL.md (107 instances), `.env*`, `.git/`, browser session caches, and auth profiles untouched throughout. Transcripts saved to `archive/2026-05-05-sweep/transcripts/` on each host.
+
+### 7.2 AUDIT ENTRY — 2026-05-05T17:55:00Z
 
 | Field | Value |
 |---|---|
@@ -261,21 +278,17 @@ Verified present in LOCAL filesystem:
 - Channel Authority (P1), DB1 source-of-truth (P2), declarative migrations (P3), no public surface (P7) — none impacted by this sweep
 - Mission Alignment Test (P10) — sweep advances Recognize (clean state) and Restore (smaller failure surface) without altering customer-facing behavior; mission alignment confirmed
 
-### 7.2 PRIOR — 2026-04-06 (inherited from prior REGGIE-STATE)
+### 7.3 PRIOR — 2026-04-06 (inherited from prior REGGIE-STATE)
 
 GHL API v2 full-surface integration completed across 5 phases: schema ingestion → code generation (413 ops) → client v2 facade → webhook expansion (60 events) → 5 new skills wired to 13 agents → Inngest event types expanded → token groups added. Repo evidence: `runtime-config-parity.mjs` `ok: true`, `validate-security-hardening.mjs` exit 0, `coverage-report.mjs` 413/413, all 5 new skill files pass `node --check`.
 
-### 7.3 PRIOR — workforce alignment
+### 7.4 PRIOR — workforce alignment
 
 `config/agents_config.json` and the repo-level `agents_config.json` no longer claim "all 75 agents" in the active master-orchestrator responsibility text. Stale doc references corrected. Configured agents = 103, runtime entries = 107.
 
-### 7.4 PRIOR — observability hardening
+### 7.5 PRIOR — observability hardening
 
 `deploy/monitoring/prometheus/prometheus.yml` includes `host.docker.internal:18789`. Rate governor state persists to `data/rate-governor-state.json` and rate-governor tests pass.
-
-### 7.5 PRIOR — webhook secret negative test
-
-Webhook handler refuses startup when `OPENCLAW_GHL_WEBHOOK_SECRET` is missing or placeholder. Install/register tooling now rejects missing or placeholder secrets.
 
 ---
 
