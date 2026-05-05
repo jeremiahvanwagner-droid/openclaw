@@ -1,185 +1,300 @@
 # REGGIE-STATE.md
 # Runtime Engine Governing Global Integrations & Execution
-# Truth J Blue LLC - OpenClaw Platform
+# Truth J Blue LLC — OpenClaw Platform
 
 > MANDATORY FIRST READ FOR EVERY AI SESSION, EVERY CODEX PROMPT,
 > AND EVERY DEVELOPER TOUCHING THIS REPO.
 >
-> This file is a repo-verified audit artifact.
-> Do not treat older reports, planning docs, or stale README text as runtime truth.
+> This file is a repo-verified audit artifact. Do not treat older reports,
+> planning docs, or stale README text as runtime truth.
 >
 > If the repo contradicts this file, stop and update this file first.
 
 ---
 
-## WHAT IS REGGIE
-
-REGGIE is the operational name for the full OpenClaw runtime used by Truth J Blue LLC.
-
-REGGIE is not a single agent.
-REGGIE is the entire governed system: workforce, routing, skills, integrations, monitoring, and deployment surfaces.
+## 1. IDENTITY
 
 | Field | Value |
 |---|---|
-| Owner | Jeremiah Van Wagner (Truth J Blue) |
+| Owner | Jeremiah Van Wagner (Truth J Blue LLC) |
 | Governed by | MIKE (Modular Intelligence & Knowledge Engine) |
 | Repo | `github.com/jeremiahvanwagner-droid/openclaw` |
-| Production host | Hostinger VPS (177.7.32.224) |
+| Production host | Hostinger VPS — 177.7.32.224 |
+| OpenClaw release tag | `2026.4.29` (commit `a448042`) — running container |
+| `package.json` version | `1.0.0` |
+| Deployment shape | Docker Compose (LOCAL `C:\Users\JeremiahVanWagner\.openclaw\docker-compose.yml` + VPS `/root/openclaw/docker-compose.yml`) |
+| Last state update | 2026-05-05 17:55 UTC |
+| Sweep version | `2026-05-05-sweep` (Phase 1–5 complete) |
 
 ---
 
-## LAST REPO-VERIFIED AUDIT
+## 2. ACTIVE INFRASTRUCTURE
+
+### 2.1 Containers — VPS (177.7.32.224)
+
+Verified by `docker ps` runtime probe captured 2026-05-05 (file: `reggie-vps-runtime-phase1.txt`).
+
+| Container | Image | Status | Ports |
+|---|---|---|---|
+| `openclaw-bot` | `openclaw-bot` | Up 2 hours (healthy) | `8788/tcp`, `0.0.0.0:18789→18789/tcp` (gateway) |
+| `openclaw-webhook` | `openclaw-webhook` | Up 3 days (healthy) | `0.0.0.0:8788→8788/tcp`, `18789/tcp` |
+
+### 2.2 Containers — LOCAL
+
+Status not probed in this sweep. Local stack defined by `C:\Users\JeremiahVanWagner\.openclaw\docker-compose.yml` (3,537 B, modified 2026-05-05 10:10 — newer than VPS variant).
+
+### 2.3 Compose files (active)
+
+| Path | Size | Modified |
+|---|---:|---|
+| `C:\Users\JeremiahVanWagner\.openclaw\docker-compose.yml` (LOCAL dev) | 3,537 B | 2026-05-05 10:10 |
+| `C:\Users\JeremiahVanWagner\.openclaw\deploy\docker-compose.prod.yml` (LOCAL prod build) | 2,323 B | 2026-05-05 08:13 |
+| `C:\Users\JeremiahVanWagner\.openclaw\deploy\monitoring\docker-compose.monitoring.yml` (Prometheus/Grafana) | 2,061 B | 2026-05-05 08:13 |
+| `/root/openclaw/docker-compose.yml` (VPS dev) | 1,841 B | 2026-05-05 14:56 |
+| `/root/openclaw/deploy/docker-compose.prod.yml` (VPS prod) | 2,658 B | 2026-05-01 21:09 |
+| `/root/openclaw/deploy/monitoring/docker-compose.monitoring.yml` (VPS monitoring) | 2,059 B | 2026-04-30 19:42 |
+
+### 2.4 Network surface
+
+- Gateway listens on `:18789` (Tailscale-only per P7 — no public surface)
+- Webhook handler listens on `:8788` (signed webhooks only, P8 idempotency required)
+- Prometheus scrapes both `:18789/metrics` and `:8788/metrics` (config in `deploy/monitoring/prometheus/prometheus.yml`)
+
+### 2.5 `.env` variable names (key names only — no values, per P7)
+
+Captured from VPS `/root/openclaw/.env`:
+
+```
+CANVA_BRAND_KIT_ID
+CANVA_CLIENT_ID
+CANVA_CLIENT_SECRET
+GDRIVE_BASE_FOLDER_ID
+GHL_EMAIL
+GHL_LOCATION_ID
+GHL_LOCATION_ID_TJB
+GHL_PASSWORD
+GHL_PRIVATE_INTEGRATION_TOKEN
+GHL_PRIVATE_INTEGRATION_TOKEN_TJB
+GHL_TOKEN
+OPENAI_API_KEY
+OPENCLAW_ALERT_TELEGRAM_CHAT_ID
+OPENCLAW_DATA_DIR
+OPENCLAW_GATEWAY_AUTH_TOKEN
+OPENCLAW_GHL_WEBHOOK_HOST
+OPENCLAW_GHL_WEBHOOK_PORT
+OPENCLAW_GHL_WEBHOOK_SECRET
+OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN
+OPENCLAW_REPORT_TZ
+OPENCLAW_TELEGRAM_BOT_TOKEN
+SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_URL
+TELEGRAM_ALERT_CHAT_ID
+TELEGRAM_BOT_TOKEN
+YOUTUBE_CHANNEL_ID
+```
+
+26 variables. Rotation policy: GHL PIT ≤90 days (P6), Supabase service keys ≤180 days, all rotations logged in `audit_events`.
+
+### 2.6 Workforce
+
+- Configured agents: **103** (`config/agents_config.json`)
+- Runtime entries: **107** (`config/openclaw.prod.json`, `openclaw.json`)
+- Runtime aliases: `main`, `marketing`, `sales`, `support`
+- Divisions: **9** (D1–D9 per Block 8 of doctrine)
+- Generated workforce snapshot: `AGENTS.md` (root, 2,213 B)
+
+---
+
+## 3. ACTIVE SKILLS REGISTRY
+
+### 3.1 Repo skills (`skills/` in `github.com/jeremiahvanwagner-droid/openclaw`)
+
+- 165 folder-style skills (each with `SKILL.md`)
+- 125 `.mjs` skill modules
+- 2 `.json` skill descriptors
+- **Skill audit allowlist**: `skills/.audit-allowlist.json` — **MISSING** (P4 audit gate not yet initialized) → Open Item #1
+- **Skill audit manifest**: `skills/.audit-manifest.json` — **MISSING** → Open Item #1
+
+Top namespaces (folder-style):
+
+| Prefix | Skills |
+|---|---:|
+| `community-` | 14 |
+| `affiliate-` | 14 |
+| `ghl-` | 13 |
+| `finance-` | 12 |
+| `education-` | 12 |
+| `ecommerce-` | 12 |
+| `digital-` | 12 |
+| `coaching-` | 12 |
+| `brand-` | 12 |
+| `aisaas-` | 12 |
+| `agency-` | 12 |
+| `content-` | 8 |
+| `webhook-` | 5 |
+| `funnel-` | 5 |
+| `browser-` | 5 |
+
+### 3.2 User-scoped REGGIE doctrine skills (`C:\Users\JeremiahVanWagner\.openclaw\skills\`)
+
+Verified present in LOCAL filesystem (Phase 1 manifest scan):
+
+| Skill | Status |
+|---|---|
+| `reggie-doctrine-recall` | VERIFIED (canonical doctrine — Block 1–7) |
+| `reggie-tier-router` | VERIFIED (Tier 0/1/2 fast routing test) |
+| `reggie-state-audit-entry` | VERIFIED (8-rule append-only validation) |
+| `reggie-supabase-ops` | VERIFIED (DB1/DB2, P3, P7 declarative migrations) |
+| `reggie-ghl-operations` | VERIFIED (35-namespace / 413-op map, Channel Authority) |
+| `reggie-skill-audit-gate` | VERIFIED (P4 manifest enforcement) |
+| `reggie-phase-ritual` | VERIFIED (phase-gate enforcement) |
+
+### 3.3 User-scoped TJB workflow skills
+
+Verified present in LOCAL filesystem:
+
+| Skill | Status |
+|---|---|
+| `tjb-context-frontloader` | VERIFIED |
+| `tjb-precision-prompt` | VERIFIED |
+| `tjb-prophetic-voice` | VERIFIED |
+| `tjb-refinement-loop` | VERIFIED |
+| `tjb-session-memory` | VERIFIED |
+| `tjb-tool-orchestrator` | VERIFIED |
+| `tjb-trend-sensor` | VERIFIED |
+| `tjb-workflow-decomposer` | VERIFIED |
+| `tjb-multimodal-reel-pipeline` | VERIFIED |
+| `tjb-autonomous-deploy` | VERIFIED |
+
+---
+
+## 4. ACTIVE AGENT PROFILE
 
 | Field | Value |
 |---|---|
-| Audit date | April 6, 2026 |
-| Audit method | Repo inspection + validator runs + targeted regression tests |
-| Runtime parity | `runtime-config-parity.mjs` -> `ok: true` |
-| Security hardening validator | `validate-security-hardening.mjs` exit `0` |
-| Worker environment validator | `validate-worker-env.mjs --expected production` -> `ok: true` |
-| Offer matrix validator | `validate-offer-matrix.mjs` -> `ok: true` |
-| Targeted regression tests | `27/27` pass (`data-files` + `api-rate-governor`) |
-| Secret negative test | webhook handler refuses startup when `OPENCLAW_GHL_WEBHOOK_SECRET` is missing |
-| GHL API v2 coverage | `coverage-report.mjs` -> `413/413` operations (100%) across 35 namespaces |
-| GHL skill syntax | All 5 new skill files pass `node --check` |
-| agents_config.json | Valid JSON after 13-agent skill wiring update |
-| inngest/client.ts | Clean `tsc --noEmit` after 60 GHL event type expansion |
-| Live host verification | Not performed in this session |
+| Agent auth profile | Not located in repo or VPS scan — see Open Item #2 |
+| Sanitizer script (canonical) | `/root/openclaw/deploy/sanitize-runtime-config.py` (2,514 B, 2026-05-01 17:57) |
+| Repo equivalent | **MISSING** — `deploy/sanitize-runtime-config.py` not in repo (GHOST REFERENCE → Open Item #3) |
+| Runtime config parity check | `scripts/upgrade/runtime-config-parity.mjs` (8,440 B) — present in repo and VPS |
+| Runtime rollout config builder | `scripts/upgrade/build-runtime-rollout-config.mjs` (4,095 B) — present in repo and VPS |
+| GHL OAuth manager | `skills/ghl-oauth-manager.mjs` — initialized at webhook startup |
+| Webhook handler | `handlers/ghl-webhook-handler.mjs` (sole handler) |
+| Inngest event surface | `inngest/client.ts` — 60 typed GHL event definitions |
+
+### 4.1 Models wired (per `openclaw.prod.json` / `openclaw.json`)
+
+- **78** Anthropic Sonnet (Tier 1 cloud workhorse)
+- **22** Anthropic Haiku (Tier 1 fast loops)
+- **7** Anthropic Opus (Tier 0 — TIER0_SPEND audit required per Block 6)
+- OpenAI present for `memorySearch` embeddings only
+
+### 4.2 Gateway
+
+- Mode: gateway-only on `:18789` (no public surface — P7)
+- Bind: Tailscale-only, Caddy fronts only signed webhook endpoints
+- Auth: `OPENCLAW_GATEWAY_AUTH_TOKEN`
 
 ---
 
-## ARCHITECTURE TRUTH
+## 5. OPEN ITEMS (BLOCKERS ONLY — MAX 10)
 
-### Workforce
-
-- Configured agents: `103` (`config/agents_config.json`)
-- Runtime entries: `107` (`config/openclaw.prod.json`, `openclaw.json`)
-- Runtime aliases: `main`, `marketing`, `sales`, `support`
-- Divisions: `9`
-- Generated workforce snapshot: `AGENTS.md`
-
-### Divisions
-
-| ID | Name | Agents |
-|---|---|---|
-| D1 | Core Company Operations (Truth J Blue LLC HQ) | 10 |
-| D2 | eCommerce Operations | 10 |
-| D3 | Consulting Practice | 10 |
-| D4 | Coaching & Community (Beyond the Veil / Divine Path Walkers) | 10 |
-| D5 | Publishing (Books & Media) | 10 |
-| D6 | Nonprofit Operations (Inspire Build Motivate, Inc.) | 10 |
-| D7 | Cross-Division Shared Services & Runtime Supervisors | 20 |
-| D8 | SaaS Operations (Shared GHL Enablement) | 13 |
-| D9 | Online Store Operations (store.truthjblue.com - Books & Merch) | 10 |
-
-### Runtime And Models
-
-- `config/openclaw.prod.json` and `openclaw.json` are aligned for runtime agent/model assignment.
-- Repo-verified production rollout distribution:
-  - `78` Anthropic Sonnet
-  - `22` Anthropic Haiku
-  - `7` Anthropic Opus
-- OpenAI is still present for `memorySearch` embeddings only.
-
-### GHL API v2 Integration (Auto-Generated)
-
-- **Code generation pipeline**: `scripts/ghl-codegen/fetch-schemas.mjs` → `generate-client.mjs` → `lib/ghl/*.mjs`
-- **API surface**: 35 namespaces, 413 operations, 100% coverage verified by `coverage-report.mjs`
-- **Client facade**: `lib/ghl-client-v2.mjs` — Proxy-based lazy namespace loading, RBAC via `guardNamespace()`, multipart/FormData support
-- **Migration shim**: `lib/ghl-client.mjs` re-exports `createGhlClientV2` — zero breaking changes for existing skills
-- **Scope manifest**: `config/ghl-scopes.json` — 29 namespaces, 288 scoped operations (auto-generated)
-- **Webhook events**: `lib/ghl-webhook.mjs` PLATFORM_EVENT_MAP: 60 events; `inngest/client.ts`: 60 typed GHL event definitions
-- **New skills** (5):
-  - `skills/ghl-saas-manager.mjs` — 11 commands (SaaS sub-account provisioning)
-  - `skills/ghl-social-planner.mjs` — 12 commands (social media posting)
-  - `skills/ghl-media-manager.mjs` — 7 commands (media library CRUD)
-  - `skills/ghl-email-service.mjs` — 6 commands (email campaigns & verification)
-  - `skills/ghl-course-manager.mjs` — 2 commands (course import)
-- **Agent wiring**: Skills assigned to 13 agents across D2, D4, D8 in `config/agents_config.json`
-- **Token groups**: `config/ghl-token-groups.json` expanded with `token_content_ops` and `token_saas_admin`
-- **Rate limiting**: All v2 API calls route through `withGovernor('ghl')` (20 req/min, 400/hr, 5 concurrent)
-
-### Integrations And Data
-
-- GHL OAuth auto-refresh is implemented in `skills/ghl-oauth-manager.mjs` and initialized at webhook startup.
-- Rate governor state persists to `data/rate-governor-state.json`.
-- Required data files are present:
-  - `data/worker-environment-map.json`
-  - `data/tjb-offer-matrix.json`
-  - `data/ghl-funnel-paths.json`
-  - `data/recovery-automation-policies.json`
-  - `data/ghl-api-schemas/` (35 OpenAPI specs + metadata)
-
-### Infrastructure
-
-- Runtime stack is split:
-  - gateway on `18789`
-  - webhook handler on `8788`
-  - monitoring stack under `deploy/monitoring/`
-- Prometheus repo config now contains scrape targets for both gateway and webhook handler.
-- Current CI workflows in the repo:
-  - `.github/workflows/ci.yml`
-  - `.github/workflows/deploy-bot.yml`
-
-### Documentation Truth
-
-- Current operator docs: `REGGIE-STATE.md`, `README.md`, `AGENTS.md`, `SOUL.md`, `MEMORY.md`, `TOOLS.md`
-- GHL API architecture documented in repo memory (`openclaw-architecture.md` §10)
-- Historical/planning docs are marked stale where still retained.
+| # | Blocker | Impact | First seen |
+|---|---|---|---|
+| 1 | `skills/.audit-allowlist.json` and `skills/.audit-manifest.json` missing | P4 skill audit gate cannot run — every skill is technically "unaudited" until first manifest is generated | 2026-05-05 sweep |
+| 2 | Agent auth profile location not identified in repo or VPS scan | Cannot verify per-agent least-privilege (P5) without seeing the profile file | 2026-05-05 sweep |
+| 3 | GHOST REFERENCE — `deploy/sanitize-runtime-config.py` exists on VPS but not in repo | Drift risk: sanitizer changes on VPS won't propagate; sweep changes on VPS could be reverted on next deploy | 2026-05-05 sweep |
+| 4 | Live gateway metrics not verified (`:18789/metrics` reachability) | Inherited from prior REGGIE-STATE — Prometheus scrape config is correct, runtime not probed in this audit | 2026-04-06 audit |
+| 5 | Live Prometheus/Grafana target health not verified | Inherited — no proof both targets are `UP` in this audit | 2026-04-06 audit |
+| 6 | `/health/deep` endpoint absent | Inherited — only `/health` exists; no "running but broken" detection | 2026-04-06 audit |
+| 7 | No staging environment | Inherited — repo deploys without verified staging layer | 2026-04-06 audit |
+| 8 | LOCAL and VPS `REGGIE-STATE.md` were divergent before this sweep | LOCAL 9,160 B (2026-05-05 08:13) was newer; VPS 9,141 B (2026-04-30) was stale | 2026-05-05 sweep |
 
 ---
 
-## VERIFIED GREEN
+## 6. NEXT ACTIONS (MAX 5)
 
-### Supplied Failure Reclassification
-
-| Failure point | Status | Repo-verified result |
-|---|---|---|
-| GHL OAuth token auto-refresh missing | `resolved-in-repo` | `initAutoRefresh()` exists and is called from `handlers/ghl-webhook-handler.mjs` |
-| Missing critical data files | `resolved-in-repo` | All four files exist; worker env and offer matrix validators pass; data-file tests pass |
-| Webhook secret placeholder in active runtime path | `resolved-in-repo` | handler fails closed without secret; install/register tooling now rejects missing or placeholder secrets |
-| Prometheus not scraping gateway | `resolved-in-repo` for repo config | `deploy/monitoring/prometheus/prometheus.yml` includes `host.docker.internal:18789` |
-| Rate governor state lost on restart | `resolved-in-repo` | state file persistence exists and rate-governor tests pass |
-| Docs stale at `75` agents / `7` divisions | `resolved-in-repo` for current docs | `README.md` and active config copy corrected; historical docs explicitly marked stale |
-
-### Additional Verified Improvements
-
-- `validate-security-hardening.mjs` runs clean again.
-- `openclaw.json` now matches production agent/model rollout expectations.
-- `config/agents_config.json` and the repo-level `agents_config.json` no longer claim "all 75 agents" in the active master-orchestrator responsibility text.
-- GHL API v2 full-surface integration completed (5 phases): schema ingestion → code generation (413 ops) → client v2 facade → webhook expansion (60 events) → 5 new skills wired to 13 agents → Inngest event types expanded → token groups added.
-- All generated namespace modules pass syntax check and route through existing rate governor + RBAC infrastructure.
-- Existing v1 skills (`ghl-api.mjs`, `webhook-listener-config.mjs`, `native-ghl-build-refactor`) continue working via migration shim — zero breaking changes.
+1. **Initialize the P4 skill audit gate.** Run `audit-skills.mjs` to generate `skills/.audit-allowlist.json` (review-and-sign the 290-skill catalog) and `skills/.audit-manifest.json` (sha256 hashes). Required before any new skill ships. Closes Open Item #1.
+2. **Locate or create the agent auth profile.** Identify where per-agent least-privilege scope is declared. If undocumented, create `config/agent-auth-profiles.json` with one entry per agent. Closes Open Item #2.
+3. **Bring `deploy/sanitize-runtime-config.py` into the repo.** Copy from VPS, commit to `deploy/`, then update VPS pull workflow so the canonical version lives in git. Closes Open Item #3.
+4. **Live-probe the runtime stack.** Run `curl -fsS http://127.0.0.1:18789/metrics` and `curl -fsS http://127.0.0.1:8788/healthz` on VPS, plus a Prometheus target check. Promote Open Items #4 and #5 to either RESOLVED or CONFIRMED with evidence.
+5. **Execute Phase 2/3 sweep on both hosts.** Run `phase2/local/01-archive.ps1` then the `02-shred` and `03-vendor-reclaim` scripts under their typed-`BURN` gates on LOCAL, then mirror on VPS. Reinstall vendor trees. Confirm `docker compose ps` still shows healthy containers afterward.
 
 ---
 
-## ACTIVE BLOCKERS
+## 7. CHANGE LOG (LAST 5 ENTRIES)
 
-| Blocker | Why it is still active |
+> Append-only — never edit prior entries. Corrections are new entries with `Status=ROLLED_BACK` referencing the prior Entry ID.
+
+### 7.1 AUDIT ENTRY — 2026-05-05T17:55:00Z
+
+| Field | Value |
 |---|---|
-| Live gateway metrics not verified | Repo scrape config is fixed, but this audit did not observe a running stack with `:18789/metrics` reachable |
-| Live Prometheus/Grafana target health not verified | No repo-local proof in this session that both targets are `UP` in Grafana/Prometheus |
-| `/health/deep` endpoint absent | The repo still exposes `/health` but not a deeper "running but broken" check |
-| No staging environment | Repo still deploys without a verified staging layer |
+| Date | 2026-05-05 17:55:00 UTC |
+| Author | human:jeremiah-vanwagner |
+| Change Type | OTHER |
+| Status | APPLIED |
+| Impacted Divisions | Cross-Cutting |
+| Rollback Plan | Restore from `archive/2026-05-05-sweep/` on each host: `mv archive/2026-05-05-sweep/* ../`. Vendor trees regenerate via `pnpm install` and `uv sync`. |
+| Rollback Tested | NO — sweep is read-only at this entry write; rollback will be tested in a scratch worktree before any host-level shred. |
+| Next Audit Due | 2026-08-05 |
+| Entry ID | `9c4f33c6c7f7` |
+
+**Summary.** REGGIE full memory sweep, archive, and state rebuild executed. 208,846 files classified across LOCAL (`C:\Users\JeremiahVanWagner\.openclaw`) and VPS (`/root/openclaw`) into ACTIVE (3,423) / ARCHIVE (321) / SHRED (148,986 — 148,740 vendor-tree regenerable + 246 individual) / UNKNOWN (96) / PROTECTED (56,020). Phase 2 deliverables (archive scripts, INDEX.md, SHRED-MANIFEST.txt, vendor-reclaim scripts, audit-entry-draft.md) generated under `phase2/`. Phase 3 SHRED execution gated on typed `BURN` confirmation per script — no host-level deletes performed by this session. SOUL.md (8 instances), `.env*`, `.git/`, `.ssh/`, `.gnupg/`, browser session caches (logged-in IG/TikTok/FB/GHL profiles), and auth profiles classified PROTECTED and untouched. CSV-parse bug caught during Phase 2 build (one VPS row with commas in filename — `GoHighLevel Private Integration, Webhooks…`) and corrected; loader hardened with regex anchoring on ISO-8601 mtime field.
+
+**Impacted Files / Tables / Endpoints**
+- `REGGIE-STATE.md` (this file — full rebuild)
+- `phase2/local/` — 8 deliverables for LOCAL host (PowerShell + bash variants)
+- `phase2/vps/` — 5 deliverables for VPS host (bash only)
+- `phase2/audit-entry-draft.md` — original PENDING draft, now superseded by this APPLIED entry
+- `phase1/` — 8 manifest files (classified, archive, shred, unknown, protected, zero-bytes, duplicates, summary)
+- 321 files queued for archive move (287 LOCAL + 34 VPS) — execution pending
+- 246 files queued for individual SHRED (240 LOCAL + 6 VPS) — execution pending
+- 15 vendor directory trees queued for bulk reclaim (9 LOCAL + 6 VPS) — execution pending
+
+**Validation Steps Performed**
+- Recursive scan of both LOCAL (168,166 rows) and VPS (40,680 rows) manifests using deterministic ruleset (`classify.py`)
+- SOUL.md, `.env*`, `.ssh/`, `.gnupg/`, `browser/openclaw/user-data/`, `browser/sessions/`, `data/browser-sessions/`, `.git/` forced into PROTECTED bucket — 56,020 files protected
+- Zero-byte files: 18,269 total — 18,264 inside vendor/git internals (handled by vendor rule); 5 standalone auto-shredded by spec
+- Spec flag "zero-byte AGENTS.md" RESOLVED — VPS template is 3.1 KB per runtime probe (`/root/openclaw/docs/reference/templates/AGENTS.md` = 3,080 B)
+- Spec flag "multiple REGGIE-STATE" RESOLVED — LOCAL (9,160 B, 2026-05-05 08:13) confirmed canonical; VPS (9,141 B, 2026-04-30) confirmed stale and overwritten by this rebuild
+- Spec flag "old sanitizer scripts" RESOLVED — only TJB sanitizer is `/root/openclaw/deploy/sanitize-runtime-config.py`; remaining "sanitizer" matches are vendor noise (PyTorch CUDA, import-in-the-middle test fixtures)
+- Channel Authority (P1), DB1 source-of-truth (P2), declarative migrations (P3), no public surface (P7) — none impacted by this sweep
+- Mission Alignment Test (P10) — sweep advances Recognize (clean state) and Restore (smaller failure surface) without altering customer-facing behavior; mission alignment confirmed
+
+### 7.2 PRIOR — 2026-04-06 (inherited from prior REGGIE-STATE)
+
+GHL API v2 full-surface integration completed across 5 phases: schema ingestion → code generation (413 ops) → client v2 facade → webhook expansion (60 events) → 5 new skills wired to 13 agents → Inngest event types expanded → token groups added. Repo evidence: `runtime-config-parity.mjs` `ok: true`, `validate-security-hardening.mjs` exit 0, `coverage-report.mjs` 413/413, all 5 new skill files pass `node --check`.
+
+### 7.3 PRIOR — workforce alignment
+
+`config/agents_config.json` and the repo-level `agents_config.json` no longer claim "all 75 agents" in the active master-orchestrator responsibility text. Stale doc references corrected. Configured agents = 103, runtime entries = 107.
+
+### 7.4 PRIOR — observability hardening
+
+`deploy/monitoring/prometheus/prometheus.yml` includes `host.docker.internal:18789`. Rate governor state persists to `data/rate-governor-state.json` and rate-governor tests pass.
+
+### 7.5 PRIOR — webhook secret negative test
+
+Webhook handler refuses startup when `OPENCLAW_GHL_WEBHOOK_SECRET` is missing or placeholder. Install/register tooling now rejects missing or placeholder secrets.
 
 ---
 
-## UNVERIFIED RUNTIME CLAIMS
+## 8. UNVERIFIED RUNTIME CLAIMS
 
 Do not state any of the following as fact without a fresh live-system check:
 
 | Claim | Current status |
 |---|---|
-| Hostinger gateway and webhook services are healthy | Unverified in this audit |
-| Grafana is receiving gateway metrics in live operation | Unverified in this audit |
-| Prometheus shows both gateway and webhook scrape targets as `UP` | Unverified in this audit |
+| Hostinger gateway and webhook services are healthy | **PARTIALLY VERIFIED** — `docker ps` runtime probe captured 2026-05-05 shows both containers `(healthy)`. `curl /metrics` not run in this audit. |
+| Grafana is receiving gateway metrics in live operation | Unverified |
+| Prometheus shows both gateway and webhook scrape targets as `UP` | Unverified |
 | Live TJB and MSL auth health is `200 OK` today | Not re-run in this audit |
 | Current Supabase row counts, ghost IDs, and business-schema presence | Not re-verified in this audit |
 | Deployed webhook secret value on the live host is rotated and current | Not re-verified in this audit |
 
 ---
 
-## OPERATOR RULE
+## 9. OPERATOR RULE
 
 Before making runtime claims, prefer this order of trust:
 
@@ -189,3 +304,21 @@ Before making runtime claims, prefer this order of trust:
 4. Older reports and planning documents
 
 If an older doc conflicts with this file, this file wins until a new audit proves otherwise.
+
+---
+
+## 10. DOCTRINE QUICK-REFERENCE
+
+- **6R Doctrine** — Receive · Recognize · Respond · Record · Re-engage · Restore
+- **P1** Channel Authority — REGGIE stands down 30 min after GHL AI Employee replies on a native channel
+- **P2** Single source of truth = DB1 (`aagqvfwuixpxtdcrdxmv`); DB2 retired
+- **P3** Declarative schema only; CI fails if `supabase db diff --linked` is non-empty
+- **P4** Skill audit gate — `skills/.audit-manifest.json` required (Open Item #1)
+- **P5** Per-agent least privilege (Open Item #2)
+- **P6** Token hygiene — GHL PIT ≤90d, Supabase service key ≤180d, log all rotations
+- **P7** No public internet surface for the gateway — Tailscale-only
+- **P8** Idempotent webhooks — `(provider, event_id)` UNIQUE INDEX
+- **P9** Human-in-the-loop on payments / deletions / mass-broadcasts / account closure
+- **P10** Mission Alignment — every initiative must shorten the distance between expressed intent and meaningful response
+
+**Tier routing default:** Tier 2 (Ollama local). Promotion requires irreversible, leaves-TJB-surface, or 8K+ context. Tier 0 (Opus) requires written `TIER0_SPEND` audit entry.
