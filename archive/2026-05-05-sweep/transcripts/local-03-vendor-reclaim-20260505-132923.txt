@@ -20,3 +20,19 @@ Transcript started, output file is archive\2026-05-05-sweep\transcripts\local-03
 
 CONFIRM VENDOR RECLAIM: 9 directory trees will be permanently deleted (LOCAL).
 These contain ~109002 regenerable files (node_modules / .venv / caches).
+PS>TerminatingError(Remove-Item): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot remove item C:\Users\JeremiahVanWagner\.openclaw\.venv\Scripts\python.exe: Access to the path 'python.exe' is denied."
+>> TerminatingError(Remove-Item): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot remove item C:\Users\JeremiahVanWagner\.openclaw\.venv\Scripts\python.exe: Access to the path 'python.exe' is denied."
+>> TerminatingError(Remove-Item): "The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot remove item C:\Users\JeremiahVanWagner\.openclaw\.venv\Scripts\python.exe: Access to the path 'python.exe' is denied."
+The running command stopped because the preference variable "ErrorActionPreference" or common parameter is set to Stop: Cannot remove item C:\Users\JeremiahVanWagner\.openclaw\.venv\Scripts\python.exe: Access to the path 'python.exe' is denied.
+Remove-Item : Cannot remove item
+C:\Users\JeremiahVanWagner\.openclaw\.venv\Scripts\python.exe: Access to the
+path 'python.exe' is denied.
+At C:\Users\JeremiahVanWagner\.openclaw\docs\sweeps\2026-05-05\phase2\local\03-
+vendor-reclaim.ps1:22 char:63
++ ... w\.venv') { Remove-Item -LiteralPath 'C:\Users\JeremiahVanWagner\.ope ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : PermissionDenied: (python.exe:FileInfo) [Remove-
+   Item], UnauthorizedAccessException
+    + FullyQualifiedErrorId : RemoveFileSystemItemUnAuthorizedAccess,Microsoft
+   .PowerShell.Commands.RemoveItemCommand
+]633;D;1]633;A]633;P;Cwd=C:\x5cUsers\x5cJeremiahVanWagner\x5c.openclawPS C:\Users\JeremiahVanWagner\.openclaw> ]633;B
