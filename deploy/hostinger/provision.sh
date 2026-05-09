@@ -35,6 +35,12 @@ if ! command -v node &>/dev/null || [[ "$(node -v | cut -d. -f1 | tr -d v)" -lt 
 fi
 echo "  Node $(node -v) | npm $(npm -v)"
 
+# Enable Corepack so pnpm (declared in packageManager field) is available to all users
+# Must happen before any workspace install steps.
+corepack enable
+corepack prepare pnpm@10.32.1 --activate
+echo "  pnpm $(pnpm --version)"
+
 # ── 3. Install OpenClaw CLI ──────────────────────────────────
 echo "[3/12] Installing OpenClaw CLI..."
 npm install -g openclaw@latest
@@ -86,8 +92,9 @@ fi
 echo "[8/12] Installing workspace dependencies..."
 PNPM_INSTALL_CMD='cd "'"$OPENCLAW_HOME"'" && (node scripts/pnpm.mjs install --frozen-lockfile --prod || node scripts/pnpm.mjs install --prod)'
 if ! sudo -u "$OPENCLAW_USER" bash -lc "$PNPM_INSTALL_CMD"; then
-    echo "  pnpm/corepack unavailable; installing pnpm globally and retrying..."
-    npm install -g pnpm
+    echo "  pnpm unavailable for openclaw user; re-activating via corepack and retrying..."
+    corepack enable
+    corepack prepare pnpm@10.32.1 --activate
     sudo -u "$OPENCLAW_USER" bash -lc "$PNPM_INSTALL_CMD"
 fi
 chown -R "$OPENCLAW_USER":"$OPENCLAW_USER" "$OPENCLAW_HOME"

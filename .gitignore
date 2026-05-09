@@ -72,9 +72,10 @@ node_modules/
 out/
 dist/
 *.tsbuildinfo
-# Dashboard uses pnpm (pnpm-lock.yaml at root); ignore npm lockfile
+# This is a pnpm monorepo — ignore npm lockfiles if accidentally generated
 dashboard/package-lock.json
-# Root project is pnpm — ignore npm lockfile if accidentally generated
+skills/package-lock.json
+training/package-lock.json
 package-lock.json
 
 # ── OS Files ──────────────────────────────────────────────────
