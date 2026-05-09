@@ -88,9 +88,9 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           script: |
             set -eu
-            git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
+            git config --global --add safe.directory /root/openclaw 2>/dev/null || true
             CLEAN_SERVER_CHECKOUT="${{ github.event.inputs.clean_server_checkout }}"
-            cd /opt/openclaw
+            cd /root/openclaw
             # Only check tracked files; untracked dirs like .openclaw/ are created by deploy itself
             status="$(git status --porcelain --untracked-files=no)"
             if [ -n "${status}" ]; then
@@ -101,7 +101,7 @@ jobs:
                 git reset --hard HEAD
                 git clean -fd
               else
-                echo "::error::Remote checkout is dirty. Re-run workflow_dispatch with clean_server_checkout=true or clean /opt/openclaw manually."
+                echo "::error::Remote checkout is dirty. Re-run workflow_dispatch with clean_server_checkout=true or clean /root/openclaw manually."
                 exit 1
               fi
             fi
@@ -124,11 +124,11 @@ jobs:
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           command_timeout: 20m
           script: |
-            cd /opt/openclaw
+            cd /root/openclaw
             # Pull code first so deploy.sh is always the latest version
-            sudo -u openclaw git config --global --add safe.directory /opt/openclaw 2>/dev/null || true
-            sudo -u openclaw git fetch origin main
-            sudo -u openclaw git pull --ff-only origin main
+            git config --global --add safe.directory /root/openclaw 2>/dev/null || true
+            git fetch origin main
+            git pull --ff-only origin main
             ROLLOUT_MODE="${{ github.event.inputs.rollout_mode }}"
             if [ -z "${ROLLOUT_MODE}" ]; then
               ROLLOUT_MODE="canary"
