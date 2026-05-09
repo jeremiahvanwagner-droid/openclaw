@@ -118,12 +118,13 @@ CREATE TABLE IF NOT EXISTS agent_sessions (
   session_type TEXT NOT NULL CHECK (session_type IN ('main', 'isolated', 'cron')),
   started_at TIMESTAMPTZ DEFAULT NOW(),
   ended_at TIMESTAMPTZ,
-  context JSONB DEFAULT '{}',
-  CONSTRAINT one_active_session UNIQUE (agent_id, session_type) WHERE ended_at IS NULL
+  context JSONB DEFAULT '{}'
 );
 
 CREATE INDEX IF NOT EXISTS agent_sessions_agent_idx ON agent_sessions(agent_id);
 CREATE INDEX IF NOT EXISTS agent_sessions_active_idx ON agent_sessions(agent_id) WHERE ended_at IS NULL;
+-- Partial unique index replacing the invalid WHERE clause in the original CONSTRAINT definition
+CREATE UNIQUE INDEX IF NOT EXISTS agent_sessions_one_active_idx ON agent_sessions(agent_id, session_type) WHERE ended_at IS NULL;
 
 -- ═══════════════════════════════════════════════════════════════════
 -- FUNCTIONS

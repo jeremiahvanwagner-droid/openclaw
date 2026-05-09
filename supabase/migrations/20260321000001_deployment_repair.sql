@@ -55,6 +55,7 @@ CREATE INDEX IF NOT EXISTS health_snapshots_pod_idx ON health_snapshots(pod_id);
 CREATE INDEX IF NOT EXISTS health_snapshots_created_idx ON health_snapshots(created_at DESC);
 
 ALTER TABLE health_snapshots ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on health_snapshots" ON health_snapshots;
 CREATE POLICY "Service role full access on health_snapshots" ON health_snapshots
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -80,6 +81,7 @@ CREATE INDEX IF NOT EXISTS credential_registry_key_idx ON credential_registry(cr
 CREATE INDEX IF NOT EXISTS credential_registry_expires_idx ON credential_registry(expires_at);
 
 ALTER TABLE credential_registry ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on credential_registry" ON credential_registry;
 CREATE POLICY "Service role full access on credential_registry" ON credential_registry
   FOR ALL USING (auth.role() = 'service_role');
 
@@ -111,6 +113,7 @@ CREATE INDEX IF NOT EXISTS agent_performance_agent_idx ON agent_performance(agen
 CREATE INDEX IF NOT EXISTS agent_performance_period_idx ON agent_performance(period_start, period_end);
 
 ALTER TABLE agent_performance ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role full access on agent_performance" ON agent_performance;
 CREATE POLICY "Service role full access on agent_performance" ON agent_performance
   FOR ALL USING (auth.role() = 'service_role');
 

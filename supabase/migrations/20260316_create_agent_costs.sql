@@ -20,6 +20,7 @@ CREATE INDEX idx_agent_costs_provider    ON agent_costs (provider);
 -- Enable RLS but allow service_role full access
 ALTER TABLE agent_costs ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role full access" ON agent_costs;
 CREATE POLICY "Service role full access" ON agent_costs
   FOR ALL
   USING (true)
