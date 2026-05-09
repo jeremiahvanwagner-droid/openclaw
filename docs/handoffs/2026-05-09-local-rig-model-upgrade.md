@@ -417,3 +417,86 @@ Do not silently abandon. The operator is reading both this handoff and your repo
 ---
 
 ## END OF HANDOFF
+
+---
+
+## EXECUTION REPORT
+
+**Executor:** Claude Code (Opus 4.7) running in VS Code IDE
+**Execution date:** 2026-05-09 (start ~17:55 UTC, finish ~18:42 UTC)
+**Time taken:** ~47 minutes wall-clock (network-bound on the qwen3:8b pull, plus ~10 min diagnosing the F:\ FAT32 issue and ~5 min repairing the inherited bind-mount problem)
+**Commit pushed:** `4cf2773` — `feat(models): align local Tier-2 lineup with VPS (qwen3:8b + qwen3:14b + nomic-embed-text)`
+**Branch:** `main` (fast-forward from `e76323b`)
+**Final disk on C:** 113 GiB free / 931 GiB total (88% used) — within the 10% safety floor; ~6 GiB consumed since start (qwen3:8b pull onto C:; qwen3:14b and nomic-embed-text were already resident).
+
+### Models pulled / verified
+
+| Model | Size on disk | Status |
+|---|---|---|
+| `qwen3:8b` | 4983 MB | NEW — pulled via `/api/pull` after redirecting `OLLAMA_MODELS` to C: |
+| `qwen3:14b` | 8846 MB | already present (modified 2026-04-08; predated this session) |
+| `nomic-embed-text` | 262 MB | already present (modified 2026-05-02; predated this session) |
+
+Plus 4 pre-existing legacy models (llama3.2:3b, llama3.1:8b, qwen2.5:7b, qwen2.5:14b) left in place — not load-bearing, not removed.
+
+### Definition of Done — all 10 checks passed
+
+1. ✅ `ollama list` shows the 3 required models on Windows host (plus 4 pre-existing).
+2. ✅ `docker compose config --services` returns exactly `bot`, `redis`, `webhook`.
+3. ✅ `docker compose ps` — all 3 `(healthy)` after ~10 s startup.
+4. ✅ `docker exec openclaw-bot curl -fsS http://host.docker.internal:11434/api/tags` returns the model list.
+5. ✅ `docker exec openclaw-bot curl -fsS http://127.0.0.1:18789/health` → `{"ok":true,"status":"live"}`.
+6. ✅ `agents/main/agent/models.json` parses as valid JSON; ollama provider lists `qwen3:8b, qwen3:14b, nomic-embed-text`.
+7. ✅ `REGGIE-STATE.md` has new audit entry `r11-2026-05-09-local-models` (inserted as §7.0; prior 7.0→7.0a, 7.0a→7.0b).
+8. ✅ Commit `4cf2773` pushed to `origin/main`.
+9. ✅ `git status` clean (override file gitignored).
+10. ✅ `docker logs openclaw-bot --tail=30` shows `[gateway] ready` plus the standard startup chatter; no permission/connection errors related to Ollama. (Telegram getUpdates 409 is expected — VPS holds the polling lock; not a regression.)
+
+Bonus — Step 10 (optional) sanity:
+
+- `pnpm typecheck` → exit 0, clean.
+- `pnpm test` → **22 test files, 239 tests passed (9.69 s)**. Zero failures.
+
+Tier-2 smoke test (matches r10-2026-05-09-vps-resize methodology):
+```
+docker exec openclaw-bot curl -fsS http://host.docker.internal:11434/api/generate \
+  -d '{"model":"qwen3:8b","prompt":"reply with the single word: PASS","stream":false}'
+→ {"response":"PASS","thinking":"Okay, the user wants me to reply with the single word PASS..."}
+```
+The `thinking` field confirms hybrid thinking mode is active locally, matching the VPS verification in r10. Inference completed in ~3 s — GPU acceleration on the RTX 5060 Ti 16 GB VRAM is working (a CPU-only call on this prompt would take 30+ s on the 5900X).
+
+### Deviations from the plan (with reasoning)
+
+1. **Entry ID changed from `r10-2026-05-09-local-models` → `r11-2026-05-09-local-models`.** When this handoff was written, the prior MIKE session had not yet committed the VPS resize, but commit `e76323b` (now in `main`) added entry `r10-2026-05-09-vps-resize`. Using `r10` again would have collided. The Open Item in §7.0 of REGGIE-STATE explicitly anticipated this entry would be `r11-2026-05-09-local-models`, so I matched that name. Section numbering followed the established 7.0/7.0a/7.0b chain pattern (newest at top, prior entries shift down one letter).
+
+2. **`apiKey` value preserved as `"OLLAMA_API_KEY"` (env-var reference) rather than the literal `"ollama-local"` from the handoff template.** The current `agents/main/agent/models.json` uses env-var references for every other provider's `apiKey` (e.g., `"OPENROUTER_API_KEY"`), and the existing ollama entry already used `"OLLAMA_API_KEY"` after the r9 repair. Hardcoding a literal token-like string would have been a one-off inconsistency and a P6 token-hygiene smell. Kept the env-var reference; functionally identical for a no-auth local Ollama, doctrine-aligned for posterity if local Ollama ever requires a real key.
+
+3. **`docker-compose.override.yml` extended beyond the handoff template** — added `volumes: !override` for the `bot` service and a `volumes: openclaw-local-config:` block at the bottom (which I subsequently replaced with a bind-mount to `./.openclaw-dev/`). Reason: the handoff anticipated that `/root/.openclaw:/opt/openclaw/.openclaw` (Linux-style absolute bind mount in the base compose) would fail on Windows, but did not specify the fix — left it as a "Common cause to investigate IF the bot is in a restart loop." The bot WAS in a restart loop with `EACCES` errors, so I applied the anticipated fix. Used a Docker named volume first (caused a config-schema mismatch because the image's bundled `openclaw.json` has newer keys the runtime rejects), then switched to bind-mounting the in-repo `./.openclaw-dev/` directory which contains a runtime-compatible `openclaw.json`. This is a per-developer override file (gitignored), so the change does not affect other developers or the VPS.
+
+### Issues encountered (all surfaced in r11 audit entry; not silently swallowed)
+
+- **`OLLAMA_MODELS=F:\` was set as a User-scope persistent env var on the rig**, pointing at a removable FAT32 USB stick ("MINI BLACK", 115 GiB). FAT32's 4 GiB single-file limit silently failed every blob >4 GB with "There is not enough space on the disk." Repaired to `C:\Users\JeremiahVanWagner\.ollama\models` (the Ollama default, NTFS) per operator decision via in-line `AskUserQuestion`. **The original source of `OLLAMA_MODELS=F:\` is unidentified** — it was not in `HKCU:\Environment`, `HKLM:\…\Environment`, `~/.ollama/config.json`, the Ollama autostart `.lnk`, or `HKCU:\Software\Ollama` at the time I checked. Possibly an OllamaSetup.exe install-time script or a removable-drive autorun. Worth a 15-min follow-up.
+- **The Ollama tray-app autostart will revive the F:\ behavior on next reboot** because it inherits Explorer's frozen-at-logon environment. Recommended fix: disable the `Startup\Ollama.lnk` and replace with a Task Scheduler entry that runs `ollama serve` with the corrected env. Until then, after every reboot the operator must manually kill the tray-spawned `ollama.exe` and relaunch via a shell whose env was opened AFTER the `setx`. Logged as Open Item in r11.
+- **The base `docker-compose.yml` has a Linux-only bind mount (`/root/.openclaw:/opt/openclaw/.openclaw`) that breaks on Docker Desktop / Windows.** Worked around in the per-developer override file by bind-mounting `./.openclaw-dev/` instead. Worth considering a more durable fix in the base compose (e.g., parameterize the host-side path with a default like `${OPENCLAW_HOST_CONFIG_DIR:-/root/.openclaw}`), but out of scope here.
+- **The named-volume seed-from-image behavior surfaced a config schema drift**: the Docker image bundles an `openclaw.json` that has `meta.rollout_mode`, `meta.rollout_generated_by`, and `agents.list[*].business_scope/ghl_token_group/operational_boundaries` keys the runtime validator now rejects with "Unrecognized keys." This is a pre-existing image/runtime version skew, not caused by this handoff. The bind-mount workaround sidesteps it locally. The 11 sub-agent `models.json` files flagged in the prior r9/r10 entries are likely the source of those keys; auditing them remains an Open Item.
+
+### Files changed in commit `4cf2773`
+
+- `agents/main/agent/models.json` (+13/−24 lines) — providers.ollama.models replaced.
+- `REGGIE-STATE.md` (+64/−2 lines) — new §7.0 entry; renumbering of prior §7.0→§7.0a, §7.0a→§7.0b.
+- `.gitignore` (+3/−0 lines) — `docker-compose.override.yml` ignore rule (carried in from `e76323b`'s prior staging; finalized here).
+
+NOT in commit (per handoff): `docker-compose.override.yml` (gitignored, per-developer).
+
+### Open items carried forward
+
+Listed in r11-2026-05-09-local-models §7.0 of REGGIE-STATE.md. Summary:
+
+1. Audit the 11 sub-agent `models.json` files for Tier-2 compliance (carried from r9, r10).
+2. Tray-autostart hygiene — replace Startup\Ollama.lnk with a Task Scheduler entry that uses the corrected env.
+3. Identify the persistent source of `OLLAMA_MODELS=F:\` and remove it.
+4. Reclaim ~4 GiB on F:\blobs\ from the failed FAT32 partial pull (operator confirmation needed before deleting; F: also holds VHD-1.vhdx and files.zip).
+5. Consider parameterizing the `/root/.openclaw` bind mount in the base `docker-compose.yml` so Windows developers don't need a per-developer override fix for it.
+
+### Status: COMPLETE
+
