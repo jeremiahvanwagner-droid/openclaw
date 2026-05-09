@@ -1,14 +1,5 @@
 {
   "providers": {
-    "anthropic": {
-      "baseUrl": "https://api.anthropic.com/v1",
-      "api": "anthropic-messages",
-      "models": [
-        "claude-opus-4-latest",
-        "claude-sonnet-4.5-latest",
-        "claude-haiku-4.5-latest"
-      ]
-    },
     "openrouter": {
       "baseUrl": "https://openrouter.ai/v1",
       "api": "openai-completions",
@@ -65,11 +56,6 @@
         }
       ],
       "apiKey": "OPENROUTER_API_KEY"
-    },
-    "openai-codex": {
-      "baseUrl": "https://chatgpt.com/backend-api/v1",
-      "api": "openai-codex-responses",
-      "models": []
     },
     "arcee": {
       "baseUrl": "https://openrouter.ai/v1",

@@ -3,9 +3,6 @@
 # Usage: docker compose up
 # ═══════════════════════════════════════════════════════════════
 
-volumes:
-  redis-data:
-
 services:
   bot:
     build:
@@ -16,52 +13,20 @@ services:
     environment:
       - HOME=/opt/openclaw
       - OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - OLLAMA_HOST=http://ollama:11434
-    command: ["openclaw", "gateway", "--port", "18789", "--allow-unconfigured"]
+    command: ["openclaw", "gateway", "--bind", "lan", "--port", "18789", "--allow-unconfigured"]
     ports:
       - "18789:18789"
     volumes:
       - ./data:/opt/openclaw/data
       - ./logs:/opt/openclaw/logs
-      - /root/.openclaw:/opt/openclaw/.openclaw
+      - /root/.openclaw/openclaw.json:/opt/openclaw/.openclaw/openclaw.json:ro
+      - /root/.openclaw/openclaw.json:/opt/openclaw/config/openclaw.json:ro
       - ./backups:/opt/openclaw/backups
-      - ./templates/AGENTS.md.template:/opt/openclaw/docs/reference/templates/AGENTS.md:ro
-      - ./templates/MEMORY.md.template:/opt/openclaw/docs/reference/templates/MEMORY.md:ro
-      - ./templates/SOUL.md.template:/opt/openclaw/docs/reference/templates/SOUL.md:ro
-      - ./templates/TOOLS.md.template:/opt/openclaw/docs/reference/templates/TOOLS.md:ro
-      - ./templates/USER.md.template:/opt/openclaw/docs/reference/templates/USER.md:ro
       - ./media:/opt/openclaw/media
       - ./memory:/opt/openclaw/memory
     # Sandbox browser support
     shm_size: "512m"
-    restart: "on-failure"
-    depends_on:
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  redis:
-    image: redis:7-alpine
-    container_name: openclaw-redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
-    restart: "no"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    command: redis-server --appendonly yes
+    restart: "no"  # systemd manages production — Docker is dev-only
 
   webhook:
     build:
@@ -75,7 +40,7 @@ services:
     volumes:
       - ./data:/opt/openclaw/data
       - ./logs:/opt/openclaw/logs
-    restart: "on-failure"
+    restart: "no"  # systemd manages production — Docker is dev-only
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8788/health"]
       interval: 30s
@@ -84,4 +49,3 @@ services:
       start_period: 10s
     depends_on:
       - bot
-      - redis
