@@ -678,6 +678,26 @@ const server = http.createServer(async (req, res) => {
       webhook_auth_strategy: auth.strategy,
     };
 
+    // PHASE 8 DEBUG: log payload shape (keys only, no values) to identify GHL Custom Data placement
+    try {
+      const topKeys = Object.keys(payload || {});
+      const customDataKeys = payload && typeof payload.customData === 'object' && payload.customData ? Object.keys(payload.customData) : null;
+      const customKeys = payload && typeof payload.custom === 'object' && payload.custom ? Object.keys(payload.custom) : null;
+      const dataKeys = payload && typeof payload.data === 'object' && payload.data ? Object.keys(payload.data) : null;
+      log.info({
+        trace_id: traceId,
+        topKeys,
+        customDataKeys,
+        customKeys,
+        dataKeys,
+        hasType: Boolean(payload && payload.type),
+        hasEvent: Boolean(payload && payload.event),
+        hasEventType: Boolean(payload && payload.eventType),
+      }, 'PHASE8-DEBUG payload shape');
+    } catch (e) {
+      log.warn({ trace_id: traceId, err: e.message }, 'PHASE8-DEBUG failed');
+    }
+
     log.info({
       trace_id: traceId,
       path: pathname,
