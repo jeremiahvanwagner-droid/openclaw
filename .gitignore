@@ -95,3 +95,6 @@ ehthumbs.db
 *.tmp
 *.log
 *.pid
+
+# Local-only compose overrides (per-developer)
+docker-compose.override.yml

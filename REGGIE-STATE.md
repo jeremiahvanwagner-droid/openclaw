@@ -225,7 +225,69 @@ Verified present in LOCAL filesystem:
 
 > Append-only — never edit prior entries. Corrections are new entries with `Status=ROLLED_BACK` referencing the prior Entry ID.
 
-### 7.0 AUDIT ENTRY — VPS resize + Tier-2 model upgrade — 2026-05-09
+### 7.0 AUDIT ENTRY — Local rig model lineup + native-Ollama path repair — 2026-05-09
+
+| Field | Value |
+|---|---|
+| Date | 2026-05-09 18:30 UTC |
+| Author | agent:claude-code-ide + human:jeremiah-vanwagner |
+| Change Type | CONFIG_INTEGRITY (model lineup standardization + Ollama storage repair) |
+| Status | APPLIED |
+| Parent Entry | `r9-2026-05-09-repair` |
+| Sibling Entry | `r10-2026-05-09-vps-resize` (matching VPS-side change) |
+| Impacted Divisions | shared_runtime_ops |
+| Rollback Plan | `git revert <this-commit>` returns `agents/main/agent/models.json` to the pre-`r10` placeholder lineup. Override removal: `rm docker-compose.override.yml` (gitignored, local-only). Native-Ollama models removable with `ollama rm qwen3:8b` (qwen3:14b and nomic-embed-text are pre-existing on the rig and predate this entry — do not remove on rollback). Restoring `OLLAMA_MODELS=F:\` is possible via `[Environment]::SetEnvironmentVariable('OLLAMA_MODELS','F:\','User')` but is NOT recommended (FAT32 4 GB single-file limit blocks every model >4 GB). |
+| Rollback Tested | NO |
+| Next Audit Due | 2026-08-09 |
+| Entry ID | `r11-2026-05-09-local-models` |
+
+**Summary.** Local rig (`C:\Users\JeremiahVanWagner\.openclaw`, RTX 5060 Ti 16 GB VRAM, Ryzen 9 5900X, 64 GB RAM) brought into model-lineup parity with the VPS, completing the open item from `r10-2026-05-09-vps-resize`. Three changes:
+
+1. **`docker-compose.override.yml`** (per-developer, gitignored, NOT committed) replaced with a `!reset`-based version that disables the in-compose `ollama` service locally, points the bot at `http://host.docker.internal:11434` (the native Windows Ollama), and clears `webhook.depends_on: [ollama]` and `bot.depends_on.ollama` inherited from the base file. Prior override used `profiles: [never-run-locally]`, which does not remove a service from the dependency graph — `docker compose config` failed with `service "webhook" depends on undefined service "ollama"`. Now resolves cleanly to 3 services (`bot`, `redis`, `webhook`).
+
+2. **`agents/main/agent/models.json`** — `providers.ollama.models[]` array updated from the placeholder lineup (`gemma4`, `kimi-k2.5:cloud`, `minimax-m2.7:cloud`, `glm-5.1:cloud` — restored on `r9-2026-05-09-repair` as a stop-gap) to the real, pulled-into-runtime lineup that matches the VPS exactly: `qwen3:8b` (5.2 GB, daily Tier-2 with hybrid thinking), `qwen3:14b` (9.3 GB, heavy reasoner), `nomic-embed-text` (274 MB, embeddings). The `baseUrl` deliberately stays `http://127.0.0.1:11434/v1` (the in-container loopback the gateway uses); the `host.docker.internal` redirect is local-only, applied via the `OLLAMA_HOST` env in the Compose override, so the VPS continues to use its containerized ollama via the same `models.json`. `apiKey` retained as `OLLAMA_API_KEY` (env-var reference, doctrine-aligned, not the literal `ollama-local` from the original handoff template — preserves P6 token hygiene and matches the convention used by every other provider in this file).
+
+3. **Native-Ollama models path repaired.** Pre-existing rig config had `OLLAMA_MODELS=F:\\` set as a User-scope persistent env var (origin unknown, predates this engagement; F: is a removable FAT32 USB stick labeled "MINI BLACK"). FAT32's 4 GiB single-file limit was silently failing every blob >4 GB with "There is not enough space on the disk" mid-download — observed ~4 GB partial of `qwen3:8b` (5.2 GB target) stuck on F:\blobs\. Fix: `[Environment]::SetEnvironmentVariable('OLLAMA_MODELS', 'C:\\Users\\JeremiahVanWagner\\.ollama\\models', 'User')` — points models to the NTFS C: drive (default Ollama location). The actual `ollama serve` process needed to be relaunched from a PowerShell process with `$psi.EnvironmentVariables['OLLAMA_MODELS']` set explicitly because the tray-app autostart inherits a frozen logon-time env. Pre-existing models in `C:\Users\JeremiahVanWagner\.ollama\models` (7 prior models including `qwen3:14b` and `nomic-embed-text:latest`) were re-discovered automatically — only `qwen3:8b` actually needed pulling.
+
+Coding work continues to route to Claude (Tier 1) per operator decision; no local coder model added. `ollama-data:` volume declaration in base `docker-compose.yml` is left in place as a no-op (orphan declaration with no service consumer locally) for VPS compatibility — VPS does NOT load this override file and continues to mount `ollama-data` for its containerized ollama.
+
+**Impacted Files**
+- `agents/main/agent/models.json` — `providers.ollama.models[]` array updated (3 real models replacing 4 placeholders)
+- `REGGIE-STATE.md` — this entry (renumbered prior 7.0→7.0a, 7.0a→7.0b)
+- `docker-compose.override.yml` — local-only, gitignored, NOT committed (per-developer file)
+- `.gitignore` — `docker-compose.override.yml` was added in commit `e76323b`; verified still present
+- Runtime: `HKCU:\Environment\OLLAMA_MODELS` changed `F:\` → `C:\Users\JeremiahVanWagner\.ollama\models` (persistent user env var, not in repo)
+
+**Validation Steps Performed**
+- Doctrine load: REGGIE Doctrine active (6R + P1–P10 + Channel Authority + Tiers + P10).
+- `ollama list` (via `/api/tags`) on Windows host shows `qwen3:8b`, `qwen3:14b`, `nomic-embed-text:latest` (plus 4 pre-existing legacy models — left in place, not removed; not load-bearing).
+- `docker compose config --services` returns exactly `bot`, `redis`, `webhook` (no `ollama`).
+- `docker compose ps` shows all 3 services healthy.
+- `docker exec openclaw-bot curl -fsS http://host.docker.internal:11434/api/tags` returns the model list from the native Ollama.
+- `docker exec openclaw-bot curl -fsS http://127.0.0.1:18789/health` returns `{"ok":true,"status":"live"}`.
+- `node -e "JSON.parse(require('fs').readFileSync('agents/main/agent/models.json'))"` exits 0 (valid JSON; ollama models = qwen3:8b, qwen3:14b, nomic-embed-text).
+- Channel Authority (P1) — not impacted (no inbound channel handler touched).
+- DB1 source-of-truth (P2) — not impacted.
+- Declarative schema (P3) — `agents/main/agent/models.json` change is in repo and PR-reviewable.
+- Skill audit gate (P4) — no `SKILL.md` touched.
+- Per-agent least privilege (P5) — `models.json` `apiKey` kept as env-var reference (`OLLAMA_API_KEY`), not a literal token.
+- Token hygiene (P6) — no rotations; preserved env-var-based credential pattern.
+- No public surface (P7) — `host.docker.internal:host-gateway` is host-loopback, not a public bind; native Ollama still listens on 0.0.0.0:11434 (matches pre-existing rig config, not changed in this entry).
+- Idempotency (P8) — no webhook handler touched.
+- HITL (P9) — not applicable (no payment / deletion / mass-broadcast triggered).
+- Mission Alignment Test (P10) — confirmed: change advances Recognize (local Tier-2 routing now matches VPS exactly, eliminating "works on prod, broken locally" debugging gap), Restore (local rig can self-heal with native-GPU acceleration on the RTX 5060 Ti instead of dropping to cloud-only when VPS is unreachable), and Re-engage (no degraded path during local development sessions).
+
+**Operator Decision Log**
+- Asked operator at 2026-05-09 18:10 UTC where to relocate Ollama models from the broken FAT32 F:\ path. Operator selected: `C:\Users\JeremiahVanWagner\.ollama\models` (NTFS, default Ollama location). C: post-pull free space drops from ~119 GB (12.8% free) to ~114 GB (~12.2% free) — above the 10% safety floor but tighter; flagged for monitoring.
+
+**Open Items (NOT closed by this entry)**
+- Audit the 11 new sub-agent `models.json` files for Tier-2 compliance before they enter routing (carried over from `r9-2026-05-09-repair` and `r10-2026-05-09-vps-resize`).
+- Capture a Tier-2 smoke test from inside `openclaw-bot` container against the native Ollama: `docker exec openclaw-bot curl -fsS http://host.docker.internal:11434/api/generate -d '{"model":"qwen3:8b","prompt":"ping","stream":false}'`.
+- **Tray-autostart hygiene.** The Ollama tray app (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Ollama.lnk`) will revive at next logon with whatever env Explorer holds at that moment. Recommend either (a) removing the tray autostart and replacing with a Task Scheduler entry that runs `ollama serve` with the corrected `OLLAMA_MODELS=C:\…` env, or (b) determining the original source of `OLLAMA_MODELS=F:\` (not in HKCU\Environment, HKLM\Environment, or `~/.ollama/config.json` — possibly set by a prior install script or removable-drive autorun) and removing it. Until resolved, after every reboot the operator must manually kill the tray-spawned `ollama.exe` and relaunch via a PS process whose env was opened AFTER the `setx`.
+- Source of `OLLAMA_MODELS=F:\` in process env remains unidentified — was set somewhere not in HKCU/HKLM Environment, possibly from an OllamaSetup.exe install-time script or USB-stick autorun. Worth a 15-minute deep-dive in a follow-up.
+- Reclaim ~4 GB of wasted partial-blob space on F:\blobs\ from the failed FAT32 pull attempt (`F:\blobs\sha256-a3de86cd1c13...-partial` and 16 part files). Manual `Remove-Item -Recurse F:\blobs, F:\manifests` when operator confirms F: contents are dispensable (currently also holds `VHD-1.vhdx` and `files.zip` — do NOT touch those).
+
+### 7.0a AUDIT ENTRY — VPS resize + Tier-2 model upgrade — 2026-05-09
 
 | Field | Value |
 |---|---|
@@ -277,7 +339,7 @@ Verified present in LOCAL filesystem:
 - Update `agents/main/agent/models.json` providers.ollama.models to reflect the new lineup (qwen3:8b + qwen3:14b + nomic-embed-text). Will close as part of `r11-2026-05-09-local-models` (handoff to Claude Code at `docs/handoffs/2026-05-09-local-rig-model-upgrade.md`)
 - Capture a Tier-2 smoke test from inside `openclaw-bot` container (not just `openclaw-ollama`) on next deploy: `docker exec openclaw-bot curl -fsS http://ollama:11434/api/generate -d '{"model":"qwen3:8b","prompt":"ping","stream":false}'`
 
-### 7.0a AUDIT ENTRY — REGGIE repair sweep — 2026-05-09 (parent of 7.0)
+### 7.0b AUDIT ENTRY — REGGIE repair sweep — 2026-05-09 (parent of 7.0 and 7.0a)
 
 | Field | Value |
 |---|---|
