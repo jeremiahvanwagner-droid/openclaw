@@ -5,6 +5,7 @@
 
 volumes:
   redis-data:
+  ollama-data:
 
 services:
   bot:
@@ -40,6 +41,8 @@ services:
     depends_on:
       redis:
         condition: service_healthy
+      ollama:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
       interval: 30s
@@ -63,6 +66,26 @@ services:
       start_period: 10s
     command: redis-server --appendonly yes
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: openclaw-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    # Note: Models are loaded on first request. To pre-load models, run:
+    #   docker exec openclaw-ollama ollama pull llama3.1:8b
+    #   docker exec openclaw-ollama ollama pull nomic-embed-text
+
   webhook:
     build:
       context: .
@@ -85,3 +108,4 @@ services:
     depends_on:
       - bot
       - redis
+      - ollama

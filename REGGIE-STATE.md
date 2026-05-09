@@ -225,6 +225,51 @@ Verified present in LOCAL filesystem:
 
 > Append-only — never edit prior entries. Corrections are new entries with `Status=ROLLED_BACK` referencing the prior Entry ID.
 
+### 7.0 AUDIT ENTRY — REGGIE repair sweep — 2026-05-09
+
+| Field | Value |
+|---|---|
+| Date | 2026-05-09 13:45 UTC |
+| Author | agent:MIKE + human:jeremiah-vanwagner |
+| Change Type | CONFIG_INTEGRITY (rollback of unauthorized runtime change) |
+| Status | APPLIED |
+| Parent Entry | `b2ef6472a474` |
+| Impacted Divisions | shared_runtime_ops, shared_data_control |
+| Rollback Plan | `git revert <repair-commit-sha>` returns repo to commit `6208ede` state. Local Ollama service restart: `docker compose up -d ollama`. |
+| Rollback Tested | NO |
+| Next Audit Due | 2026-08-09 |
+| Entry ID | `r9-2026-05-09-repair` |
+
+**Summary.** Repaired four runtime-config violations introduced by an external IDE coding agent (Claude Code) in commits `26aba32` ("database updates and finaliaztions") and `010fc01` ("finalization and production") between 2026-05-09 07:58 and 08:10 CDT. The Hostinger pnpm/corepack fix in commits `c9579ef` and `6208ede` is correct and was preserved. (1) `docker-compose.yml` — restored the `ollama` service, `ollama-data` volume, `bot.depends_on.ollama: service_healthy`, and `webhook.depends_on: [ollama]`. Without this, the `bot` container's `OLLAMA_HOST=http://ollama:11434` env points at a non-existent service and every Tier-2 (default) call fails connection — direct violation of the Local-First Compute Doctrine. (2) `db.js` at repo root — removed; this file ran a top-level `await supabase.from('agents').select('*')` with the service-role key on import, a P5 + P3 + P7 surface risk. Reference snippet preserved at `docs/snippets/supabase-list-agents.example.mjs` with `main()` wrapper and env validation. (3) `agents/main/agent/auth-state.json` — restored the `openai-codex` provider order + lastGood fallback that was deleted. (4) `agents/main/agent/models.json` — reverted to the pre-`010fc01` form so Tier-2 (`ollama`) routes to the local provider with `gemma4`, `kimi-k2.5:cloud`, `minimax-m2.7:cloud`, `glm-5.1:cloud` instead of the cloud-only `kimi-k2.6:cloud` rewrite (which would have been a silent Tier-2 → Tier-1 promotion with no `tier_promotion` audit, violating the Local-First sovereignty clause). The 11 new sub-agent `models.json` files added by the same agent (`d8_compliance_auditor`, `d8_content_ops`, `d8_customer_success`, `d8_integration_engineer`, `d8_saas_director`, `marketing`, `sales`, `shared_data_control`, `shared_exec_orchestrator`, `shared_runtime_ops`, `support`) are LEFT IN PLACE pending CVO review — flagged for follow-up audit before they enter the routing path.
+
+**Impacted Files**
+- `docker-compose.yml` — `ollama` service + volume + depends_on restored
+- `db.js` — REMOVED from repo root
+- `docs/snippets/supabase-list-agents.example.mjs` — ADDED (governed reference snippet)
+- `agents/main/agent/auth-state.json` — RESTORED
+- `agents/main/agent/models.json` — REVERTED to commit `a4422ae` form
+- `REGGIE-STATE.md` — this entry
+
+**Validation Steps Performed**
+- Doctrine load: REGGIE Doctrine loaded; 6R + P1–P10 + Channel Authority + Tiers + P10 active
+- Diff review against last known-good commit `a4422ae` ("CHANGES NEEDED", 2026-05-05)
+- Channel Authority (P1) — not impacted (no inbound channel handler touched)
+- DB1 source-of-truth (P2) — not impacted (no Supabase migration applied)
+- Declarative schema (P3) — `db.js` removal closes a non-declarative DB read path
+- Skill audit gate (P4) — no `SKILL.md` touched
+- Per-agent least privilege (P5) — `db.js` removal closes a service-role-key read at module top-level
+- Token hygiene (P6) — no rotations performed in this entry
+- No public surface (P7) — `db.js` removal closes a potential bundle leak
+- Idempotency (P8) — no webhook handler touched
+- HITL (P9) — no payment / deletion / mass-broadcast path touched
+- Mission Alignment Test (P10) — repair restores Receive (gateway can route routine traffic to local Tier-2), Recognize (main agent regains its provider fallback memory), and Restore (system can self-heal without cloud egress for routine work). Mission alignment confirmed.
+- Hostinger build path verified: `package.json` declares `packageManager: pnpm@10.32.1`; `pnpm-workspace.yaml` lists `dashboard / skills / training`; `pnpm-lock.yaml` present (~292 KB); `provision.sh` runs `corepack enable && corepack prepare pnpm@10.32.1 --activate` BEFORE any workspace install; stale `package-lock.json` files are git-ignored.
+
+**Open Items (NOT closed by this entry)**
+- Audit the 11 new sub-agent `models.json` files for Tier-2 compliance before they enter routing
+- Capture a Tier-2 smoke test (`POST /v1/chat/completions` against the restored `ollama` service inside `openclaw-bot`) on next deploy
+- Confirm VPS `/root/openclaw/docker-compose.yml` is re-pulled and `docker compose up -d ollama` is run on host `177.7.32.224`
+
 ### 7.1 AUDIT ENTRY — Phase 2 execution — 2026-05-05
 
 | Field              | Value                                                    |
