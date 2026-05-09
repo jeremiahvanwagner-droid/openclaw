@@ -50,7 +50,7 @@ jobs:
       - name: Run tests
         run: corepack pnpm test
       - name: Runtime config parity gate
-        run: node scripts/upgrade/runtime-config-parity.mjs --primary config/openclaw.prod.json --secondary config/openclaw.json --agents config/agents_config.json --rollout full --expected-agent-count 103 --strict
+        run: node scripts/upgrade/runtime-config-parity.mjs --primary config/openclaw.prod.json --secondary config/openclaw.json --agents config/agents_config.json --rollout full --expected-agent-count 107 --strict
 
   deploy:
     name: Deploy to Hostinger
