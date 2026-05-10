@@ -1049,7 +1049,10 @@
       "denyCommands": []
     },
     "controlUi": {
-      "allowInsecureAuth": true
+      "allowInsecureAuth": true,
+      "allowedOrigins": [
+        "https://api.truthjblue.dev"
+      ]
     }
   },
   "skills": {
