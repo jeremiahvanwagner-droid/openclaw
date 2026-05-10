@@ -1052,7 +1052,8 @@
       "allowInsecureAuth": true,
       "allowedOrigins": [
         "https://api.truthjblue.dev"
-      ]
+      ],
+      "dangerouslyDisableDeviceAuth": true
     }
   },
   "skills": {
