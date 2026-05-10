@@ -23,8 +23,9 @@
 | OpenClaw release tag | `2026.4.29` (commit `a448042`) — running container |
 | `package.json` version | `1.0.0` |
 | Deployment shape | Docker Compose (LOCAL `C:\Users\JeremiahVanWagner\.openclaw\docker-compose.yml` + VPS `/root/openclaw/docker-compose.yml`) |
-| Last state update | 2026-05-05 (Phase 2 execution) UTC |
+| Last state update | 2026-05-10 (canary stabilization — r12) UTC |
 | Sweep version | `2026-05-05-sweep` (Phase 1–5 complete) |
+| Last audit entry | `r12-2026-05-10-canary-stabilize` |
 
 ---
 
@@ -225,7 +226,81 @@ Verified present in LOCAL filesystem:
 
 > Append-only — never edit prior entries. Corrections are new entries with `Status=ROLLED_BACK` referencing the prior Entry ID.
 
-### 7.0 AUDIT ENTRY — Local rig model lineup + native-Ollama path repair — 2026-05-09
+### 7.0 AUDIT ENTRY — Canary stabilization (watchdog + telegram + heartbeat) — 2026-05-10
+
+| Field | Value |
+|---|---|
+| Date | 2026-05-10 16:35 UTC |
+| Author | agent:claude-code-ide + human:jeremiah-vanwagner |
+| Change Type | CONFIG_INTEGRITY (systemd watchdog removal, Telegram channel hard-off, heartbeat interval throttle) |
+| Status | APPLIED |
+| Parent Entry | handoff `docs/handoffs/2026-05-10-vps-deploy-canary-stabilize.md` |
+| Sibling Entry | None |
+| Impacted Divisions | shared_runtime_ops |
+| Rollback Plan | Watchdog: `mv /etc/systemd/system/openclaw.service.bak.2026-05-10-watchdog /etc/systemd/system/openclaw.service && systemctl daemon-reload && systemctl restart openclaw` (NOT recommended — re-introduces the false-positive ABRT loop). Heartbeat: `sudo -u openclaw jq 'del(.agents.defaults.heartbeat)' /opt/openclaw/.openclaw/openclaw.json > /tmp/x && mv /tmp/x /opt/openclaw/.openclaw/openclaw.json && systemctl restart openclaw`. Telegram: set `channels.telegram.enabled = true` in live config + repo (only after `curl https://api.telegram.org/bot<TOKEN>/getMe` returns 200). |
+| Rollback Tested | NO |
+| Next Audit Due | 2026-08-10 |
+| Entry ID | `r12-2026-05-10-canary-stabilize` |
+
+**Summary.** Three causally-linked fixes after Phase B canary failed at 14:22:36 UTC and post-restart re-tries also watchdog-ABRT'd (PIDs 95814 → 96248 → 96698, three SIGABRTs in 20 min).
+
+(1) **Real root cause of the ABRT loop was a systemd misconfiguration**, not Telegram retries as the prior session's handoff inferred. `Type=simple` + `WatchdogSec=300` on `openclaw.service` is incompatible with the openclaw CLI dist — `/usr/lib/node_modules/openclaw/dist/server*.js` has no `sd_notify(WATCHDOG=1)` calls (verified by grep), so the systemd watchdog timer could never be reset and SIGABRT fired every ~5 min regardless of process health. Removed `WatchdogSec=300` from both the live unit (`/etc/systemd/system/openclaw.service`) and `deploy/hostinger/openclaw.service`; replaced with anti-regression doc-comment explaining why not to re-add it without first switching `Type=notify` and adding sd_notify in upstream openclaw. `WatchdogUSec=0` confirmed post-`daemon-reload` (was `300000000`).
+
+(2) **Telegram channel kept disabled in both live and repo (handoff Option B).** The 2026 March cost-incident concern (bad-token retry-loop → secondary Anthropic API spend) is still valid — Telegram was generating log noise and potential API cost in this session too — but it was NOT the proximate cause of the watchdog ABRTs. Until a fresh BotFather token is verified via `curl /getMe`, channel stays hard-off. `deploy/hostinger/server-openclaw.json` patched (`channels.telegram.enabled: true → false`) so a future `deploy-bot.yml` run does not regenerate `enabled: true`.
+
+(3) **Discovered new ~$150/mo idle Anthropic spend leak — openclaw built-in heartbeat agent.** Default 30-min polling fires `agent:main:main` Sonnet 4.5 turns to read `HEARTBEAT.md` and reply "HEARTBEAT_OK". Per-poll cost ≈ $0.0878 (mostly cache-write of the 22,938-token system prompt + skills snapshot + workspace bootstrap; `cost.cacheWrite/cost.total ≈ 0.97`). Throttled via `agents.defaults.heartbeat = {"every":"168h"}` in both live and repo (weekly = ~$0.40/mo, effectively nil). HEARTBEAT.md self-comment "Keep this file empty to skip API calls" is misleading — the call still fires; only the work *after* the call is skipped.
+
+After all three patches: gateway PID 101616 active since 16:31:30 UTC, `WatchdogUSec=0`, `[gateway] ready` in 12s, `[heartbeat] started`, no errors, no Telegram retries, `health: 200` (~50ms). 30-min strict-idle observation window pending (target end ~17:02 UTC).
+
+**Impacted Files**
+
+- `/etc/systemd/system/openclaw.service` (live VPS) — `WatchdogSec=300` line + comment removed (sed). Backup: `/etc/systemd/system/openclaw.service.bak.2026-05-10-watchdog`.
+- `deploy/hostinger/openclaw.service` (repo) — same change + 5-line anti-regression doc-comment.
+- `/opt/openclaw/.openclaw/openclaw.json` (live VPS) — `agents.defaults.heartbeat = {"every":"168h"}` added (jq patch). Backup: `/opt/openclaw/.openclaw/openclaw.json.bak.2026-05-10-heartbeat`. Confirmed survived `openclaw-pre-start.sh` governance-key strip. `channels.telegram.enabled = false` was already present from prior session.
+- `deploy/hostinger/server-openclaw.json` (repo) — `channels.telegram.enabled: true → false` AND `agents.defaults.heartbeat: {"every":"168h"}` added.
+- `REGGIE-STATE.md` — this entry (renumbered prior 7.0→7.1, 7.0a→7.1a, 7.0b→7.1b, 7.1→7.2, 7.2→7.3, 7.3 PRIOR→7.4 PRIOR, 7.4 PRIOR→7.5 PRIOR, 7.5 PRIOR→7.6 PRIOR; Section 1 `Last state update` field bumped + new `Last audit entry` field).
+
+**Validation Steps Performed**
+
+- Doctrine load: REGGIE Doctrine active (6R + P1–P10 + Channel Authority + Tiers + P10).
+- `systemctl show openclaw.service -p WatchdogUSec` returns `0` post-edit (was `300000000`).
+- `jq '.agents.defaults.heartbeat' /opt/openclaw/.openclaw/openclaw.json` returns `{"every":"168h"}` post-restart (survived pre-start governance-key strip).
+- `curl https://api.truthjblue.dev/health` returns `{"ok":true,"status":"live"}` (200, ~50ms).
+- `journalctl --since 16:31:30` shows clean boot: `[gateway] http server listening (8 plugins ...; 6.2s)`, `[gateway] ready`, `[heartbeat] started`, no errors.
+- Channel Authority (P1) — Telegram correctly disabled; no live channel handler runs until token re-verified.
+- DB1 source-of-truth (P2) — not impacted (no SQL touched).
+- Declarative schema (P3) — no migrations.
+- Skill audit gate (P4) — no `SKILL.md` touched.
+- Per-agent least privilege (P5) — heartbeat config affects defaults; no token surface change.
+- Token hygiene (P6) — no rotations; bad `TELEGRAM_BOT_TOKEN` still in `/etc/openclaw/.env` but channel is disabled (defense in depth).
+- No public surface (P7) — gateway still localhost:18789 via Caddy origin allowlist `["https://api.truthjblue.dev"]`.
+- Idempotency (P8) — webhook handler not touched.
+- HITL (P9) — no payment / deletion / mass-broadcast triggered.
+- Mission Alignment Test (P10) — confirmed: prevents auto-ABRT loop (Restore: gateway can stay up); halts background Anthropic spend on empty heartbeats (Restore: financial integrity); keeps Telegram cost vector explicitly off until token verified (Recognize: known-bad inputs cannot run).
+
+**Operator Decision Log**
+
+- 2026-05-10 ~15:55 UTC — operator chose "Stop service + diagnose" over "Close Control UI, watch" or "Stop service + revert containers". Aligned with doctrine ("do not 'let things stabilize'").
+- 2026-05-10 ~16:25 UTC — operator chose Option A (`every: "168h"`) for heartbeat throttle over Option C (try `every: "0"`/`"off"` sentinel) on the basis that an unknown sentinel value carried untested startup-failure risk.
+- 2026-05-10 ~16:30 UTC — operator chose handoff Option B (patch repo `server-openclaw.json` to keep Telegram disabled across deploys) rather than getting a fresh BotFather token immediately.
+
+**Diagnostic Insight (for future sessions)**
+
+When openclaw `[diagnostic] liveness warning` events with `eventLoopDelayMaxMs > 5000ms` correlate with `[trace:embedded-run] startup stages` lines for the same `sessionId` repeating ~22–30 min apart, the first hypothesis to test is the built-in heartbeat. Look in `agents/.../sessions/<sessionId>.jsonl` for entries with `thinking: "This is another heartbeat poll. According to the instructions..."` and `text: "HEARTBEAT_OK"`. Per-poll cost is dominated by cache-write — `cost.cacheWrite / cost.total ≈ 0.97`. To pacify, set `agents.defaults.heartbeat.every` to a longer duration string (`"168h"`, `"24h"`) before reaching for `isolatedSession: true` + `lightContext: true` (the type-def at `dist/plugin-sdk/src/config/types.agent-defaults.d.ts:313` documents all knobs).
+
+Likewise, when openclaw `WatchdogSec` is set on a `Type=simple` systemd unit and gateway processes get killed every ~5 min: openclaw lacks `sd_notify` (as of dist v2026.4.29). Either drop `WatchdogSec` entirely (current fix) or wait for upstream to add notify support and switch to `Type=notify`.
+
+**Open Items (NOT closed by this entry)**
+
+- Three repo patches uncommitted: `deploy/hostinger/openclaw.service`, `deploy/hostinger/server-openclaw.json`. MUST be committed to `main` before any future `deploy-bot.yml` run, else CI regenerates the broken state. Commit message draft is in the session transcript.
+- Phase B′ 30-min strict-idle observation window pending (started 16:31:30 UTC, target end ~17:02 UTC). Verification command: `journalctl -u openclaw.service --since '2026-05-10 16:31:30' --no-pager | grep -iE 'watchdog|ABRT|telegram|liveness warning|trace:embedded-run'` — clean = zero matches except possibly the first warmup `liveness warning` <2000ms.
+- Phase A.4 (Telegram restore): operator must obtain fresh token, verify via `curl https://api.telegram.org/bot<TOKEN>/getMe`, then re-enable in both live + repo.
+- Phase C (full rollout) blocked until Phase B′ window completes clean.
+- Operator's local `openclaw gateway run` may still be running per prior handoff — should be stopped to avoid two gateways diverging on session state.
+- Long-term: openclaw upstream lacks `sd_notify(WATCHDOG=1)`. Re-enabling `WatchdogSec` requires either an upstream change or a sidecar that emits notify on the gateway's behalf. Worth filing as an upstream issue.
+- Drift between sections 1–5 of this REGGIE-STATE.md and current production reality not corrected in this entry. Section 1 still describes Docker Compose at `/root/openclaw`; current production is systemd at `/opt/openclaw` with `openclaw-bot` and `openclaw-webhook` Docker containers stopped (orphan, restart: "no"). A future entry should reconcile this.
+
+### 7.1 AUDIT ENTRY — Local rig model lineup + native-Ollama path repair — 2026-05-09
 
 | Field | Value |
 |---|---|
@@ -287,7 +362,7 @@ Coding work continues to route to Claude (Tier 1) per operator decision; no loca
 - Source of `OLLAMA_MODELS=F:\` in process env remains unidentified — was set somewhere not in HKCU/HKLM Environment, possibly from an OllamaSetup.exe install-time script or USB-stick autorun. Worth a 15-minute deep-dive in a follow-up.
 - Reclaim ~4 GB of wasted partial-blob space on F:\blobs\ from the failed FAT32 pull attempt (`F:\blobs\sha256-a3de86cd1c13...-partial` and 16 part files). Manual `Remove-Item -Recurse F:\blobs, F:\manifests` when operator confirms F: contents are dispensable (currently also holds `VHD-1.vhdx` and `files.zip` — do NOT touch those).
 
-### 7.0a AUDIT ENTRY — VPS resize + Tier-2 model upgrade — 2026-05-09
+### 7.1a AUDIT ENTRY — VPS resize + Tier-2 model upgrade — 2026-05-09
 
 | Field | Value |
 |---|---|
@@ -339,7 +414,7 @@ Coding work continues to route to Claude (Tier 1) per operator decision; no loca
 - Update `agents/main/agent/models.json` providers.ollama.models to reflect the new lineup (qwen3:8b + qwen3:14b + nomic-embed-text). Will close as part of `r11-2026-05-09-local-models` (handoff to Claude Code at `docs/handoffs/2026-05-09-local-rig-model-upgrade.md`)
 - Capture a Tier-2 smoke test from inside `openclaw-bot` container (not just `openclaw-ollama`) on next deploy: `docker exec openclaw-bot curl -fsS http://ollama:11434/api/generate -d '{"model":"qwen3:8b","prompt":"ping","stream":false}'`
 
-### 7.0b AUDIT ENTRY — REGGIE repair sweep — 2026-05-09 (parent of 7.0 and 7.0a)
+### 7.1b AUDIT ENTRY — REGGIE repair sweep — 2026-05-09 (parent of 7.1 and 7.1a)
 
 | Field | Value |
 |---|---|
@@ -384,7 +459,7 @@ Coding work continues to route to Claude (Tier 1) per operator decision; no loca
 - Capture a Tier-2 smoke test (`POST /v1/chat/completions` against the restored `ollama` service inside `openclaw-bot`) on next deploy
 - Confirm VPS `/root/openclaw/docker-compose.yml` is re-pulled and `docker compose up -d ollama` is run on host `177.7.32.224`
 
-### 7.1 AUDIT ENTRY — Phase 2 execution — 2026-05-05
+### 7.2 AUDIT ENTRY — Phase 2 execution — 2026-05-05
 
 | Field              | Value                                                    |
 |--------------------|----------------------------------------------------------|
@@ -401,7 +476,7 @@ Coding work continues to route to Claude (Tier 1) per operator decision; no loca
 
 Phase 2 host-level deletes executed on both hosts under typed-BURN confirmation gates. LOCAL (`C:\Users\JeremiahVanWagner\.openclaw`): ARCHIVED 287 files → `archive/2026-05-05-sweep/`; SHREDDED 240 files (0 errors); RECLAIMED 9 vendor directories (~109,002 regenerable files). VPS (`root@177.7.32.224:/root/openclaw`): ARCHIVED 34 files; SHREDDED 6 files; RECLAIMED 6 vendor directories (~39,738 regenerable files). Vendor regen: LOCAL `pnpm install` → 780 packages (13.3 s); VPS `pnpm install` → done (3.6 s). `uv sync` skipped — `uv` not installed on LOCAL and no `pyproject.toml` exists. Both VPS containers (`openclaw-bot`, `openclaw-webhook`) confirmed `(healthy)` post-execution. SOUL.md (107 instances), `.env*`, `.git/`, browser session caches, and auth profiles untouched throughout. Transcripts saved to `archive/2026-05-05-sweep/transcripts/` on each host.
 
-### 7.2 AUDIT ENTRY — 2026-05-05T17:55:00Z
+### 7.3 AUDIT ENTRY — 2026-05-05T17:55:00Z
 
 | Field | Value |
 |---|---|
@@ -437,15 +512,15 @@ Phase 2 host-level deletes executed on both hosts under typed-BURN confirmation 
 - Channel Authority (P1), DB1 source-of-truth (P2), declarative migrations (P3), no public surface (P7) — none impacted by this sweep
 - Mission Alignment Test (P10) — sweep advances Recognize (clean state) and Restore (smaller failure surface) without altering customer-facing behavior; mission alignment confirmed
 
-### 7.3 PRIOR — 2026-04-06 (inherited from prior REGGIE-STATE)
+### 7.4 PRIOR — 2026-04-06 (inherited from prior REGGIE-STATE)
 
 GHL API v2 full-surface integration completed across 5 phases: schema ingestion → code generation (413 ops) → client v2 facade → webhook expansion (60 events) → 5 new skills wired to 13 agents → Inngest event types expanded → token groups added. Repo evidence: `runtime-config-parity.mjs` `ok: true`, `validate-security-hardening.mjs` exit 0, `coverage-report.mjs` 413/413, all 5 new skill files pass `node --check`.
 
-### 7.4 PRIOR — workforce alignment
+### 7.5 PRIOR — workforce alignment
 
 `config/agents_config.json` and the repo-level `agents_config.json` no longer claim "all 75 agents" in the active master-orchestrator responsibility text. Stale doc references corrected. Configured agents = 103, runtime entries = 107.
 
-### 7.5 PRIOR — observability hardening
+### 7.6 PRIOR — observability hardening
 
 `deploy/monitoring/prometheus/prometheus.yml` includes `host.docker.internal:18789`. Rate governor state persists to `data/rate-governor-state.json` and rate-governor tests pass.
 

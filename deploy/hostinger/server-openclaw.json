@@ -229,6 +229,9 @@
       },
       "timeoutSeconds": 1800,
       "maxConcurrent": 23,
+      "heartbeat": {
+        "every": "168h"
+      },
       "subagents": {
         "maxConcurrent": 8
       },
@@ -1002,7 +1005,7 @@
   },
   "channels": {
     "telegram": {
-      "enabled": true,
+      "enabled": false,
       "commands": {
         "nativeSkills": false
       },

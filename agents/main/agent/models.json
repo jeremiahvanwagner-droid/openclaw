@@ -134,15 +134,16 @@
     },
     "ollama": {
       "baseUrl": "http://127.0.0.1:11434/v1",
+      "apiKey": "ollama-local",
       "api": "ollama",
-      "apiKey": "OLLAMA_API_KEY",
       "models": [
         {
-          "id": "qwen3:8b",
-          "name": "Qwen3 8B (daily Tier-2, hybrid thinking)",
+          "id": "kimi-k2.6:cloud",
+          "name": "kimi-k2.6:cloud",
           "reasoning": true,
           "input": [
-            "text"
+            "text",
+            "image"
           ],
           "cost": {
             "input": 0,
@@ -150,40 +151,9 @@
             "cacheRead": 0,
             "cacheWrite": 0
           },
-          "contextWindow": 32768,
-          "maxTokens": 8192
-        },
-        {
-          "id": "qwen3:14b",
-          "name": "Qwen3 14B (heavy reasoner, deep thinking)",
-          "reasoning": true,
-          "input": [
-            "text"
-          ],
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cacheRead": 0,
-            "cacheWrite": 0
-          },
-          "contextWindow": 32768,
-          "maxTokens": 8192
-        },
-        {
-          "id": "nomic-embed-text",
-          "name": "Nomic Embed Text (embeddings)",
-          "reasoning": false,
-          "input": [
-            "text"
-          ],
-          "cost": {
-            "input": 0,
-            "output": 0,
-            "cacheRead": 0,
-            "cacheWrite": 0
-          },
-          "contextWindow": 8192,
-          "maxTokens": 0
+          "contextWindow": 262144,
+          "maxTokens": 8192,
+          "api": "ollama"
         }
       ]
     },

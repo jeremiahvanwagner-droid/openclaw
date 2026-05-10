@@ -30,8 +30,10 @@ ExecStart=/usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js gateway --p
 Restart=always
 RestartSec=10
 
-# Watchdog: restart if unresponsive for 5 minutes
-WatchdogSec=300
+# NOTE: Do NOT add WatchdogSec= here without first switching Type=notify and
+# implementing sd_notify(WATCHDOG=1) in the gateway. With Type=simple the
+# watchdog timer can never be reset and systemd will SIGABRT every Nsec
+# regardless of process health. (see incident 2026-05-10)
 
 # Security hardening
 NoNewPrivileges=true
