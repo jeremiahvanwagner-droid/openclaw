@@ -15,3 +15,18 @@ if jq -e '.agents.defaults.skills' "$CFG" >/dev/null 2>&1; then
   mv /tmp/oc_pre_patch.json "$CFG"
   echo "openclaw-pre-start: stripped agents.defaults.skills from $CFG"
 fi
+
+# Strip governance/rollout metadata keys not in openclaw CLI's zod schema.
+# Source-of-truth lives in scripts/upgrade/build-runtime-rollout-config.mjs;
+# these are runtime-only annotations the CLI does not need to validate.
+jq '
+  del(.meta.rollout_mode)
+  | del(.meta.rollout_generated_by)
+  | (.agents.list // []) as $list
+  | .agents.list = ($list | map(
+      del(.business_scope)
+      | del(.ghl_token_group)
+      | del(.operational_boundaries)
+    ))
+' "$CFG" > /tmp/oc_pre_patch.json && mv /tmp/oc_pre_patch.json "$CFG"
+echo "openclaw-pre-start: stripped governance metadata keys from $CFG"
