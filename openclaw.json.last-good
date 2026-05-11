@@ -1,0 +1,1827 @@
+{
+  "agents": {
+    "defaults": {
+      "compaction": {
+        "keepRecentTokens": 64000,
+        "maxHistoryShare": 0.8,
+        "mode": "safeguard",
+        "recentTurnsPreserve": 5,
+        "reserveTokens": 24000
+      },
+      "contextTokens": 240000,
+      "maxConcurrent": 23,
+      "memorySearch": {
+        "enabled": true,
+        "model": "text-embedding-3-small",
+        "provider": "openai"
+      },
+      "model": {
+        "fallbacks": [
+          "claude-cli/claude-opus-4-5",
+          "claude-cli/claude-sonnet-4-5",
+          "claude-cli/claude-haiku-4-5"
+        ],
+        "primary": "claude-cli/claude-opus-4-7"
+      },
+      "models": {
+        "ollama/qwen3:14b": {},
+        "claude-cli/claude-haiku-4-5": {},
+        "claude-cli/claude-opus-4-5": {},
+        "claude-cli/claude-sonnet-4-5": {},
+        "claude-cli/claude-opus-4-7": {},
+        "claude-cli/claude-sonnet-4-6": {},
+        "claude-cli/claude-opus-4-6": {}
+      },
+      "sandbox": {
+        "browser": {
+          "allowHostControl": false,
+          "autoStart": false,
+          "enabled": true
+        },
+        "mode": "off"
+      },
+      "subagents": {
+        "maxConcurrent": 8
+      },
+      "timeFormat": "24",
+      "timeoutSeconds": 1800,
+      "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace"
+    },
+    "list": [
+      {
+        "id": "main",
+        "model": "anthropic/claude-sonnet-4-5"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\marketing\\agent",
+        "id": "marketing",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "marketing",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-marketing"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\sales\\agent",
+        "id": "sales",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "sales",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-sales"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\support\\agent",
+        "id": "support",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "support",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-support"
+      },
+      {
+        "id": "d1_ceo",
+        "model": "anthropic/claude-opus-4-5",
+        "name": "CEO",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ceo"
+      },
+      {
+        "id": "d1_cto",
+        "model": "anthropic/claude-opus-4-5",
+        "name": "CTO",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cto"
+      },
+      {
+        "id": "d2_director",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "eCommerce Director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_director"
+      },
+      {
+        "id": "d3_ceo",
+        "model": "anthropic/claude-opus-4-5",
+        "name": "Consulting CEO",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ceo"
+      },
+      {
+        "id": "d4_cvo",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Chief Visionary Officer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_cvo"
+      },
+      {
+        "id": "d5_publisher",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Publisher",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_publisher"
+      },
+      {
+        "id": "d6_executive_director",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Nonprofit Executive Director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_executive_director"
+      },
+      {
+        "id": "d8_saas_director",
+        "model": "anthropic/claude-opus-4-5",
+        "name": "SaaS Operations Director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_saas_director"
+      },
+      {
+        "id": "d9_store_director",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Online Store Director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_store_director"
+      },
+      {
+        "id": "shared_master_orchestrator",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Master Orchestrator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_master_orchestrator"
+      },
+      {
+        "id": "shared_runtime_ops",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Shared Runtime Ops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_runtime_ops"
+      },
+      {
+        "id": "shared_exec_orchestrator",
+        "model": "anthropic/claude-opus-4-5",
+        "name": "Shared Executive Orchestrator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_exec_orchestrator"
+      },
+      {
+        "id": "shared_data_control",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Shared Data Control",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_control"
+      },
+      {
+        "id": "biz_01_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Truth J Blue Core Brand Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_01_pod_lead"
+      },
+      {
+        "id": "biz_02_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Beyond the Veil Mentorship Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_02_pod_lead"
+      },
+      {
+        "id": "biz_03_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Divine Path Walkers Community Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_03_pod_lead"
+      },
+      {
+        "id": "biz_04_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Truth J Blue Publishing Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_04_pod_lead"
+      },
+      {
+        "id": "biz_05_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Truth J Blue Consulting Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_05_pod_lead"
+      },
+      {
+        "id": "biz_06_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Inspire Build Motivate, Inc. Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_06_pod_lead"
+      },
+      {
+        "id": "biz_07_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Truth J Blue Online Store Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_07_pod_lead"
+      },
+      {
+        "id": "biz_08_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Truth J Blue Primary SaaS Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_08_pod_lead"
+      },
+      {
+        "id": "biz_09_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Incubator Shared Brands Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_09_pod_lead"
+      },
+      {
+        "id": "biz_10_pod_lead",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "Portfolio Control Pod Lead",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_10_pod_lead"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\browser_primary\\agent",
+        "id": "browser_primary",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "browser_primary",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\browser_primary"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\browser_secondary\\agent",
+        "id": "browser_secondary",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "browser_secondary",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\browser_secondary"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_cmo\\agent",
+        "id": "d1_cmo",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_cmo",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cmo"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_customer_success\\agent",
+        "id": "d1_customer_success",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_customer_success",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_customer_success"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_data_analyst\\agent",
+        "id": "d1_data_analyst",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_data_analyst",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_data_analyst"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_devops\\agent",
+        "id": "d1_devops",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_devops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_devops"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_fullstack_dev\\agent",
+        "id": "d1_fullstack_dev",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_fullstack_dev",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_fullstack_dev"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_product_dev_manager\\agent",
+        "id": "d1_product_dev_manager",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_product_dev_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_product_dev_manager"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_sales_manager\\agent",
+        "id": "d1_sales_manager",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_sales_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_sales_manager"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_ux_designer\\agent",
+        "id": "d1_ux_designer",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d1_ux_designer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ux_designer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_copywriter\\agent",
+        "id": "d2_copywriter",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d2_copywriter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_copywriter"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_customer_service\\agent",
+        "id": "d2_customer_service",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d2_customer_service",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_customer_service"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_digital_marketing\\agent",
+        "id": "d2_digital_marketing",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d2_digital_marketing",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_digital_marketing"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_graphic_designer\\agent",
+        "id": "d2_graphic_designer",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d2_graphic_designer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_graphic_designer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_inventory_specialist\\agent",
+        "id": "d2_inventory_specialist",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d2_inventory_specialist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_inventory_specialist"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_paid_ads\\agent",
+        "id": "d2_paid_ads",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d2_paid_ads",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_paid_ads"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_seo_strategist\\agent",
+        "id": "d2_seo_strategist",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d2_seo_strategist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_seo_strategist"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_store_manager\\agent",
+        "id": "d2_store_manager",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d2_store_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_store_manager"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_web_dev\\agent",
+        "id": "d2_web_dev",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d2_web_dev",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_web_dev"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_admin_coordinator\\agent",
+        "id": "d3_admin_coordinator",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d3_admin_coordinator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_admin_coordinator"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_biz_dev\\agent",
+        "id": "d3_biz_dev",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d3_biz_dev",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_biz_dev"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_business_analyst\\agent",
+        "id": "d3_business_analyst",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d3_business_analyst",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_business_analyst"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_client_relations\\agent",
+        "id": "d3_client_relations",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d3_client_relations",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_client_relations"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_lead_strategist\\agent",
+        "id": "d3_lead_strategist",
+        "model": "anthropic/claude-opus-4-5",
+        "name": "d3_lead_strategist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_lead_strategist"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_marketing_brand\\agent",
+        "id": "d3_marketing_brand",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d3_marketing_brand",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_marketing_brand"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_ops_manager\\agent",
+        "id": "d3_ops_manager",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d3_ops_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ops_manager"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_sales_closer\\agent",
+        "id": "d3_sales_closer",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d3_sales_closer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_sales_closer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_thought_leadership\\agent",
+        "id": "d3_thought_leadership",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d3_thought_leadership",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_thought_leadership"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_client_experience\\agent",
+        "id": "d4_client_experience",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d4_client_experience",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_client_experience"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_community_manager\\agent",
+        "id": "d4_community_manager",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d4_community_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_community_manager"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_curriculum_head\\agent",
+        "id": "d4_curriculum_head",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d4_curriculum_head",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_curriculum_head"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_enrollment\\agent",
+        "id": "d4_enrollment",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d4_enrollment",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_enrollment"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_funnel_strategist\\agent",
+        "id": "d4_funnel_strategist",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d4_funnel_strategist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_funnel_strategist"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_lead_coach\\agent",
+        "id": "d4_lead_coach",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d4_lead_coach",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_lead_coach"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_social_creator\\agent",
+        "id": "d4_social_creator",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d4_social_creator",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_social_creator"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_tech_automation\\agent",
+        "id": "d4_tech_automation",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d4_tech_automation",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_tech_automation"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_video_production\\agent",
+        "id": "d4_video_production",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d4_video_production",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_video_production"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_acquisitions\\agent",
+        "id": "d5_acquisitions",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d5_acquisitions",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_acquisitions"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_author_relations\\agent",
+        "id": "d5_author_relations",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d5_author_relations",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_author_relations"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_book_marketing\\agent",
+        "id": "d5_book_marketing",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d5_book_marketing",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_book_marketing"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_copywriter\\agent",
+        "id": "d5_copywriter",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d5_copywriter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_copywriter"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_cover_artist\\agent",
+        "id": "d5_cover_artist",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d5_cover_artist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_cover_artist"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_digital_distribution\\agent",
+        "id": "d5_digital_distribution",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d5_digital_distribution",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_digital_distribution"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_managing_editor\\agent",
+        "id": "d5_managing_editor",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d5_managing_editor",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_managing_editor"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_pr_media\\agent",
+        "id": "d5_pr_media",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d5_pr_media",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_pr_media"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_sales_affiliate\\agent",
+        "id": "d5_sales_affiliate",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d5_sales_affiliate",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_sales_affiliate"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_board_liaison\\agent",
+        "id": "d6_board_liaison",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d6_board_liaison",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_board_liaison"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_communications\\agent",
+        "id": "d6_communications",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d6_communications",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_communications"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_coo\\agent",
+        "id": "d6_coo",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d6_coo",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_coo"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_dev_director\\agent",
+        "id": "d6_dev_director",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d6_dev_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_dev_director"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_finance\\agent",
+        "id": "d6_finance",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d6_finance",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_finance"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_grant_writer\\agent",
+        "id": "d6_grant_writer",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d6_grant_writer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_grant_writer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_outreach\\agent",
+        "id": "d6_outreach",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d6_outreach",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_outreach"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_program_director\\agent",
+        "id": "d6_program_director",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d6_program_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_program_director"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_volunteer\\agent",
+        "id": "d6_volunteer",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d6_volunteer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_volunteer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_automation_architect\\agent",
+        "id": "d8_automation_architect",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d8_automation_architect",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_automation_architect"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_community_manager\\agent",
+        "id": "d8_community_manager",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_community_manager",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_community_manager"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_compliance_auditor\\agent",
+        "id": "d8_compliance_auditor",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d8_compliance_auditor",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_compliance_auditor"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_content_ops\\agent",
+        "id": "d8_content_ops",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_content_ops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_content_ops"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_crm_ops\\agent",
+        "id": "d8_crm_ops",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_crm_ops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_crm_ops"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_customer_success\\agent",
+        "id": "d8_customer_success",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_customer_success",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_customer_success"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_funnel_engineer\\agent",
+        "id": "d8_funnel_engineer",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d8_funnel_engineer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_funnel_engineer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_integration_engineer\\agent",
+        "id": "d8_integration_engineer",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_integration_engineer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_integration_engineer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_marketing_automation\\agent",
+        "id": "d8_marketing_automation",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_marketing_automation",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_marketing_automation"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_membership_director\\agent",
+        "id": "d8_membership_director",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_membership_director",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_membership_director"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_platform_architect\\agent",
+        "id": "d8_platform_architect",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d8_platform_architect",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_platform_architect"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_revenue_ops\\agent",
+        "id": "d8_revenue_ops",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d8_revenue_ops",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_revenue_ops"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_analytics\\agent",
+        "id": "d9_analytics",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_analytics",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_analytics"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_customer_experience\\agent",
+        "id": "d9_customer_experience",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "d9_customer_experience",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_customer_experience"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_merchandiser\\agent",
+        "id": "d9_merchandiser",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_merchandiser",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_merchandiser"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_offer_strategist\\agent",
+        "id": "d9_offer_strategist",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_offer_strategist",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_offer_strategist"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_sales_copywriter\\agent",
+        "id": "d9_sales_copywriter",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_sales_copywriter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_sales_copywriter"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_seo_content\\agent",
+        "id": "d9_seo_content",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_seo_content",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_seo_content"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_social_promoter\\agent",
+        "id": "d9_social_promoter",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_social_promoter",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_social_promoter"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_web_designer\\agent",
+        "id": "d9_web_designer",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_web_designer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_web_designer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_wp_developer\\agent",
+        "id": "d9_wp_developer",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "d9_wp_developer",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_wp_developer"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\shared_api_gateway\\agent",
+        "id": "shared_api_gateway",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "shared_api_gateway",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_api_gateway"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\shared_data_analytics\\agent",
+        "id": "shared_data_analytics",
+        "model": "anthropic/claude-sonnet-4-5",
+        "name": "shared_data_analytics",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_analytics"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\shared_knowledge_base\\agent",
+        "id": "shared_knowledge_base",
+        "model": "anthropic/claude-haiku-4-5",
+        "name": "shared_knowledge_base",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_knowledge_base"
+      },
+      {
+        "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\shared_legal_compliance\\agent",
+        "id": "shared_legal_compliance",
+        "model": "anthropic/claude-opus-4-5",
+        "name": "shared_legal_compliance",
+        "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_legal_compliance"
+      }
+    ]
+  },
+  "auth": {
+    "order": {
+      "openai-codex": [
+        "openai-codex:default",
+        "openai-codex:manual"
+      ]
+    },
+    "profiles": {
+      "ollama:default": {
+        "mode": "api_key",
+        "provider": "ollama"
+      },
+      "openai-codex:default": {
+        "mode": "oauth",
+        "provider": "openai-codex"
+      },
+      "openai-codex:manual": {
+        "mode": "token",
+        "provider": "openai-codex"
+      },
+      "anthropic:claude-cli": {
+        "provider": "claude-cli",
+        "mode": "oauth"
+      }
+    }
+  },
+  "browser": {
+    "defaultProfile": "chrome-relay",
+    "headless": true,
+    "profiles": {
+      "chrome": {
+        "cdpPort": 9222,
+        "color": "#00AA00"
+      }
+    }
+  },
+  "channels": {
+    "msteams": {
+      "dmPolicy": "pairing",
+      "enabled": false,
+      "groupAllowFrom": [
+        "7737707872"
+      ],
+      "groupPolicy": "allowlist"
+    },
+    "telegram": {
+      "allowFrom": [
+        7737707872
+      ],
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "commands": {
+        "nativeSkills": false
+      },
+      "dmPolicy": "allowlist",
+      "enabled": true,
+      "groupPolicy": "allowlist",
+      "streaming": {
+        "mode": "off"
+      }
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "ownerDisplay": "raw",
+    "restart": true
+  },
+  "gateway": {
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}"
+    },
+    "bind": "loopback",
+    "controlUi": {
+      "allowInsecureAuth": true
+    },
+    "mode": "local",
+    "nodes": {
+      "denyCommands": []
+    },
+    "port": 18789,
+    "remote": {
+      "token": "${OPENCLAW_GATEWAY_AUTH_TOKEN}",
+      "url": "https://api.truthjblue.dev"
+    },
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "trustedProxies": [
+      "127.0.0.1/32",
+      "::1/128"
+    ]
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        },
+        "session-memory": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions"
+  },
+  "meta": {
+    "lastTouchedAt": "2026-05-09T10:52:45.449Z",
+    "lastTouchedVersion": "2026.4.15"
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "ollama": {
+        "api": "ollama",
+        "apiKey": "ollama-local",
+        "baseUrl": "http://127.0.0.1:11434",
+        "models": [
+          {
+            "contextWindow": 262144,
+            "cost": {
+              "cacheRead": 0,
+              "cacheWrite": 0,
+              "input": 0,
+              "output": 0
+            },
+            "id": "kimi-k2.6:cloud",
+            "input": [
+              "text",
+              "image"
+            ],
+            "name": "kimi-k2.6:cloud",
+            "reasoning": true
+          }
+        ]
+      }
+    }
+  },
+  "plugins": {
+    "entries": {
+      "anthropic": {
+        "enabled": true
+      },
+      "brave": {
+        "config": {
+          "webSearch": {
+            "apiKey": "BSAAbyI0XgX_DJ9jgQz3IqjnJ77iFK3"
+          }
+        },
+        "enabled": true
+      },
+      "browser": {
+        "enabled": true
+      },
+      "msteams": {
+        "enabled": false
+      },
+      "ollama": {
+        "enabled": true
+      },
+      "telegram": {
+        "enabled": true
+      },
+      "voice-call": {
+        "enabled": true
+      }
+    }
+  },
+  "secrets": {
+    "providers": {
+      "canva_brand_kit_id_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('CANVA_BRAND_KIT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "canva_client_id_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "canva_client_secret_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('CANVA_CLIENT_SECRET','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "ghl_email_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_EMAIL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "ghl_location_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_LOCATION_ID','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "ghl_password_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_PASSWORD','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "ghl_token_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('GHL_PRIVATE_INTEGRATION_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "openai_embeddings_key_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('OPENAI_API_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "supabase_service_role_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_SERVICE_ROLE_KEY','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "supabase_url_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('SUPABASE_URL','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "telegram_token_env": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_TELEGRAM_BOT_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      },
+      "user_env_exec": {
+        "allowInsecurePath": true,
+        "args": [
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$v=[Environment]::GetEnvironmentVariable('OPENCLAW_OPENAI_CODEX_MANUAL_TOKEN','User'); if ([string]::IsNullOrWhiteSpace($v)) { exit 1 }; [Console]::Out.Write($v)"
+        ],
+        "command": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+        "jsonOnly": false,
+        "maxOutputBytes": 65536,
+        "noOutputTimeoutMs": 5000,
+        "source": "exec",
+        "timeoutMs": 5000
+      }
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "skills": {
+    "entries": {
+      "affiliate-manager": {
+        "config": {
+          "affiliateTiers": true,
+          "commissionStructures": [
+            "percentage",
+            "flat-rate",
+            "tiered",
+            "recurring",
+            "two-tier"
+          ],
+          "payoutManagement": true,
+          "platforms": [
+            "thrivecart",
+            "firstpromoter",
+            "refersion",
+            "rewardful",
+            "custom"
+          ]
+        },
+        "enabled": true
+      },
+      "agent-coordinator": {
+        "enabled": true
+      },
+      "audience-analyzer": {
+        "config": {
+          "demographicCategories": [
+            "age",
+            "income",
+            "education"
+          ],
+          "personaCount": 4
+        },
+        "enabled": true
+      },
+      "browser-controller": {
+        "config": {
+          "headless": true,
+          "timeout": 30000
+        },
+        "enabled": true
+      },
+      "checkout-integrator": {
+        "config": {
+          "abandonmentRecovery": true,
+          "checkoutTypes": [
+            "one-time",
+            "subscription",
+            "payment-plan",
+            "order-bump"
+          ],
+          "gateways": [
+            "stripe",
+            "paypal",
+            "thrivecart",
+            "samcart",
+            "gumroad"
+          ],
+          "revenueAnalytics": true
+        },
+        "enabled": true
+      },
+      "competitor-watch": {
+        "config": {
+          "alertThreshold": "medium",
+          "monitorCategories": [
+            "pricing",
+            "products",
+            "marketing",
+            "content",
+            "social"
+          ]
+        },
+        "enabled": true
+      },
+      "content-analyzer": {
+        "config": {
+          "competitorAnalysis": true,
+          "metricsCategories": [
+            "awareness",
+            "engagement",
+            "conversion",
+            "roi"
+          ],
+          "performanceReporting": true,
+          "qualityScoring": true
+        },
+        "enabled": true
+      },
+      "content-gap-finder": {
+        "config": {
+          "contentTypes": [
+            "blog-post",
+            "video",
+            "guide",
+            "template",
+            "case-study"
+          ],
+          "gapCategories": [
+            "topic-coverage",
+            "depth-gap",
+            "format-gap",
+            "freshness-gap"
+          ]
+        },
+        "enabled": true
+      },
+      "content-pipeline": {
+        "enabled": true
+      },
+      "content-repurposer": {
+        "config": {
+          "atomization": true,
+          "formatMatrix": true,
+          "repurposeTypes": [
+            "blog-to-social",
+            "video-to-blog",
+            "thread-to-blog"
+          ]
+        },
+        "enabled": true
+      },
+      "content-scheduler": {
+        "config": {
+          "batchPlanning": true,
+          "optimalTiming": true,
+          "platforms": [
+            "blog",
+            "email",
+            "twitter",
+            "instagram",
+            "linkedin",
+            "youtube"
+          ],
+          "seasonalContent": true
+        },
+        "enabled": true
+      },
+      "content-writer": {
+        "config": {
+          "contentTypes": [
+            "blog",
+            "article",
+            "guide",
+            "tutorial"
+          ],
+          "defaultTone": "professional",
+          "frameworks": [
+            "AIDA",
+            "PAS",
+            "storytelling"
+          ]
+        },
+        "enabled": true
+      },
+      "copywriter": {
+        "config": {
+          "copyTypes": [
+            "sales-page",
+            "landing-page",
+            "ad-copy",
+            "cta"
+          ],
+          "guaranteeTypes": [
+            "money-back",
+            "results-based"
+          ],
+          "persuasionFrameworks": [
+            "AIDA",
+            "PAS",
+            "BAB",
+            "4Ps"
+          ]
+        },
+        "enabled": true
+      },
+      "course-builder": {
+        "config": {
+          "assessmentTypes": [
+            "quiz",
+            "assignment",
+            "project"
+          ],
+          "courseTypes": [
+            "mini-course",
+            "signature",
+            "flagship",
+            "certification",
+            "bootcamp"
+          ],
+          "pricingStrategy": true
+        },
+        "enabled": true
+      },
+      "deal-closer": {
+        "config": {
+          "closingTechniques": [
+            "assumptive",
+            "summary",
+            "urgency",
+            "alternative",
+            "question",
+            "puppy",
+            "takeaway",
+            "silence"
+          ],
+          "followUpStages": [
+            "postDemo",
+            "postProposal",
+            "ghosted"
+          ],
+          "lostDealRecovery": true,
+          "negotiationTactics": true,
+          "objectionHandlers": [
+            "price",
+            "time",
+            "spouse",
+            "competitor",
+            "trust",
+            "notReady"
+          ]
+        },
+        "enabled": true
+      },
+      "delivery-system": {
+        "config": {
+          "accessManagement": true,
+          "contentProtection": true,
+          "deliveryMethods": [
+            "direct-download",
+            "email",
+            "member-area",
+            "drip",
+            "api",
+            "license"
+          ],
+          "dripScheduling": true
+        },
+        "enabled": true
+      },
+      "email-broadcaster": {
+        "config": {
+          "abTesting": true,
+          "broadcastTypes": [
+            "solo",
+            "newsletter",
+            "promotional",
+            "launch",
+            "reengagement"
+          ],
+          "segmentation": true,
+          "warmupPlans": true
+        },
+        "enabled": true
+      },
+      "email-sequence": {
+        "config": {
+          "defaultSequenceLength": 7,
+          "sequenceTypes": [
+            "welcome",
+            "launch",
+            "cart-abandonment",
+            "nurture"
+          ],
+          "subjectLineFormulas": true
+        },
+        "enabled": true
+      },
+      "funnel-builder": {
+        "config": {
+          "automationMapping": true,
+          "conversionTracking": true,
+          "funnelTypes": [
+            "lead-magnet",
+            "tripwire",
+            "webinar",
+            "product-launch",
+            "challenge",
+            "vsl",
+            "evergreen"
+          ],
+          "upsellSequences": true
+        },
+        "enabled": true
+      },
+      "ghl": {
+        "config": {
+          "apiToken": "$env:GHL_PRIVATE_INTEGRATION_TOKEN",
+          "apiVersion": "2021-07-28",
+          "locationId": "$env:GHL_LOCATION_ID"
+        },
+        "enabled": true
+      },
+      "google-drive-manager": {
+        "config": {
+          "baseFolderId": "$env:GDRIVE_BASE_FOLDER_ID"
+        },
+        "enabled": true
+      },
+      "guarantee-designer": {
+        "config": {
+          "badgeGeneration": true,
+          "copyTemplates": true,
+          "guaranteeTypes": [
+            "moneyBack",
+            "conditional",
+            "results",
+            "betterThan",
+            "satisfaction",
+            "trial",
+            "lifetime",
+            "proRata"
+          ],
+          "refundPolicyCreation": true,
+          "riskReversalStrategies": true
+        },
+        "enabled": true
+      },
+      "headline-generator": {
+        "config": {
+          "emotionalTriggers": true,
+          "formulas": [
+            "how-to",
+            "listicle",
+            "question",
+            "curiosity"
+          ],
+          "maxLength": 70
+        },
+        "enabled": true
+      },
+      "keyword-finder": {
+        "config": {
+          "intentTypes": [
+            "informational",
+            "commercial",
+            "transactional"
+          ],
+          "maxDifficulty": 50,
+          "minVolume": 500
+        },
+        "enabled": true
+      },
+      "landing-page-builder": {
+        "config": {
+          "conversionOptimization": true,
+          "headlineFormulas": true,
+          "pageTypes": [
+            "optin",
+            "sales",
+            "webinar",
+            "thank-you",
+            "coming-soon",
+            "waitlist"
+          ],
+          "sectionTemplates": true
+        },
+        "enabled": true
+      },
+      "lead-magnet-creator": {
+        "config": {
+          "landingPageIntegration": true,
+          "magnetTypes": [
+            "checklist",
+            "guide",
+            "cheat-sheet",
+            "template",
+            "mini-course",
+            "swipe-file"
+          ]
+        },
+        "enabled": true
+      },
+      "market-intel": {
+        "config": {
+          "dataSources": [
+            "google-trends",
+            "statista",
+            "semrush",
+            "social-blade"
+          ],
+          "industries": [
+            "digital-products",
+            "coaching",
+            "ecommerce",
+            "saas",
+            "content-creation"
+          ]
+        },
+        "enabled": true
+      },
+      "niche-validator": {
+        "config": {
+          "criteria": [
+            "marketSize",
+            "demand",
+            "competition",
+            "profitability",
+            "accessibility",
+            "scalability"
+          ],
+          "minimumScore": 50
+        },
+        "enabled": true
+      },
+      "notion": {
+        "apiKey": "skip"
+      },
+      "objection-handler": {
+        "enabled": true
+      },
+      "offer-architect": {
+        "config": {
+          "bonusCreation": true,
+          "offerTypes": [
+            "standalone",
+            "bundle",
+            "valueStack",
+            "grandSlam",
+            "hybrid"
+          ],
+          "positioning": true,
+          "urgencyStrategies": [
+            "deadline",
+            "quantity",
+            "bonusRemoval",
+            "priceIncrease",
+            "launchWindow"
+          ],
+          "valueEquation": true
+        },
+        "enabled": true
+      },
+      "openai-image-gen": {},
+      "price-researcher": {
+        "config": {
+          "charmPrices": true,
+          "pricingModels": [
+            "oneTime",
+            "subscription",
+            "paymentPlan",
+            "tiered"
+          ]
+        },
+        "enabled": true
+      },
+      "pricing-strategist": {
+        "config": {
+          "priceTestingFramework": true,
+          "pricingModels": [
+            "oneTime",
+            "subscription",
+            "paymentPlan",
+            "tiered",
+            "valueBased",
+            "freemium"
+          ],
+          "psychologyPrinciples": [
+            "charm",
+            "prestige",
+            "anchoring",
+            "decoy",
+            "bundling",
+            "framing",
+            "scarcity"
+          ],
+          "tierDesign": true,
+          "valuePricing": true
+        },
+        "enabled": true
+      },
+      "proposal-generator": {
+        "config": {
+          "followUpSequences": true,
+          "pricingFrameworks": [
+            "tiered",
+            "single",
+            "modular",
+            "value"
+          ],
+          "proposalTypes": [
+            "consulting",
+            "service",
+            "project",
+            "retainer",
+            "productized"
+          ],
+          "sectionTemplates": true,
+          "termsGeneration": true
+        },
+        "enabled": true
+      },
+      "sag": {
+        "apiKey": "84f20f4efe54d945956aa3fbdbb47a10d5a0df569aabdc5d69a4e8729884deca"
+      },
+      "sales-page-optimizer": {
+        "config": {
+          "abTesting": true,
+          "conversionElements": [
+            "headline",
+            "subheadline",
+            "copy",
+            "cta",
+            "guarantee",
+            "testimonials"
+          ],
+          "mobileOptimization": true,
+          "pageTypes": [
+            "long-form",
+            "short-form",
+            "hybrid",
+            "vsl"
+          ],
+          "sectionAnalysis": true
+        },
+        "enabled": true
+      },
+      "script-writer": {
+        "config": {
+          "bRollCues": true,
+          "scriptTypes": [
+            "youtube",
+            "podcast",
+            "vsl",
+            "webinar",
+            "shorts"
+          ],
+          "timestamps": true
+        },
+        "enabled": true
+      },
+      "seo-optimizer": {
+        "config": {
+          "contentScoring": true,
+          "keywordIntentAnalysis": true,
+          "onPageFactors": true,
+          "technicalSEO": true
+        },
+        "enabled": true
+      },
+      "social-content": {
+        "config": {
+          "hashtagOptimization": true,
+          "platforms": [
+            "twitter",
+            "instagram",
+            "linkedin",
+            "facebook",
+            "tiktok"
+          ],
+          "postTypes": [
+            "single",
+            "thread",
+            "carousel",
+            "story"
+          ]
+        },
+        "enabled": true
+      },
+      "social-distributor": {
+        "config": {
+          "crossPosting": true,
+          "platforms": [
+            "twitter",
+            "instagram",
+            "linkedin",
+            "facebook",
+            "tiktok",
+            "youtube",
+            "pinterest"
+          ],
+          "queueManagement": true,
+          "scheduledPosting": true
+        },
+        "enabled": true
+      },
+      "social-poster": {
+        "config": {
+          "platforms": [
+            "facebook",
+            "instagram",
+            "tiktok"
+          ]
+        },
+        "enabled": true
+      },
+      "testimonial-collector": {
+        "config": {
+          "caseStudyBuilder": true,
+          "collectionWorkflows": true,
+          "displayFormats": [
+            "card",
+            "featured",
+            "sidebar",
+            "inline",
+            "wall"
+          ],
+          "testimonialTypes": [
+            "text",
+            "video",
+            "audio",
+            "screenshot",
+            "casestudy",
+            "data"
+          ],
+          "videoScripts": true
+        },
+        "enabled": true
+      },
+      "traffic-coordinator": {
+        "config": {
+          "attributionModels": [
+            "last-click",
+            "first-click",
+            "linear",
+            "time-decay",
+            "position-based"
+          ],
+          "budgetAllocation": true,
+          "roiTracking": true,
+          "scaleRecommendations": true,
+          "trafficSources": [
+            "facebook",
+            "google",
+            "youtube",
+            "tiktok",
+            "organic",
+            "seo",
+            "email",
+            "affiliates"
+          ]
+        },
+        "enabled": true
+      },
+      "trend-spotter": {
+        "config": {
+          "platforms": [
+            "google-trends",
+            "youtube",
+            "twitter",
+            "tiktok",
+            "reddit"
+          ],
+          "scanFrequency": "daily"
+        },
+        "enabled": true
+      },
+      "webinar-engine": {
+        "config": {
+          "followUpSequences": [
+            "preWebinar",
+            "postWebinarAttended",
+            "postWebinarMissed"
+          ],
+          "frameworks": [
+            "perfectWebinar",
+            "teaching",
+            "demo",
+            "interview"
+          ],
+          "pitchDesign": true,
+          "qaScripts": true,
+          "registrationOptimization": true,
+          "replayStrategies": true
+        },
+        "enabled": true
+      },
+      "youtube-manager": {
+        "config": {
+          "channelId": "$env:YOUTUBE_CHANNEL_ID"
+        },
+        "enabled": true
+      }
+    }
+  },
+  "tools": {
+    "profile": "coding",
+    "web": {
+      "search": {
+        "enabled": true,
+        "provider": "brave"
+      }
+    }
+  },
+  "wizard": {
+    "lastRunAt": "2026-04-08T21:54:03.373Z",
+    "lastRunCommand": "configure",
+    "lastRunMode": "local",
+    "lastRunVersion": "2026.4.8"
+  }
+}

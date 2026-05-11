@@ -1,23 +1,5 @@
 {
   "version": 1,
-  "order": {
-    "openai-codex": [
-      "openai-codex:manual",
-      "openai-codex:default"
-    ]
-  },
-  "lastGood": {
-    "openai-codex": "openai-codex:default"
-  },
-  "usageStats": {
-    "openai-codex:default": {
-      "lastUsed": 1773490185077,
-      "errorCount": 0
-    },
-    "openai-codex:manual": {
-      "lastUsed": 1773488811235,
-      "errorCount": 0,
-      "lastFailureAt": 1773409470945
-    }
-  }
+  "lastGood": {},
+  "usageStats": {}
 }
