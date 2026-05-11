@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-import { supabase } from "./supabase";
-
 interface DivisionStats {
   division: string;
   total: number;
@@ -319,95 +317,31 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const portfolioResponse = await fetch("/api/portfolio", { cache: "no-store" });
+        const [portfolioResponse, dashResponse] = await Promise.all([
+          fetch("/api/portfolio", { cache: "no-store" }),
+          fetch("/api/dashboard", { cache: "no-store" }),
+        ]);
+
         if (portfolioResponse.ok) {
           const portfolio = (await portfolioResponse.json()) as PortfolioSummary;
           setPortfolioSummary(portfolio);
         }
 
-        if (!supabase) {
+        if (!dashResponse.ok) {
+          const body = await dashResponse.json().catch(() => ({}));
           setErrorMessage(
-            "Dashboard is missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY.",
+            `Dashboard API returned ${dashResponse.status}${body?.error ? `: ${body.error}` : ""}`,
           );
           return;
         }
 
-        const { data: agents, error: agentsError } = await supabase
-          .from("agents")
-          .select("*");
-
-        if (agentsError) throw agentsError;
+        const dash = await dashResponse.json();
         setErrorMessage(null);
-
-        if (agents) {
-          setTotalAgents(agents.length);
-          setActiveAgents(agents.filter((agent) => agent.status === "active").length);
-
-          const nextDivisionStats: Record<string, DivisionStats> = {};
-          agents.forEach((agent) => {
-            const division = agent.org_unit || "unknown";
-            if (!nextDivisionStats[division]) {
-              nextDivisionStats[division] = {
-                division,
-                total: 0,
-                active: 0,
-                idle: 0,
-                error: 0,
-              };
-            }
-
-            nextDivisionStats[division].total += 1;
-            if (agent.status === "active") nextDivisionStats[division].active += 1;
-            else if (agent.status === "idle") nextDivisionStats[division].idle += 1;
-            else if (agent.status === "error") nextDivisionStats[division].error += 1;
-          });
-
-          setDivisionStats(
-            Object.values(nextDivisionStats).sort((left, right) =>
-              left.division.localeCompare(right.division),
-            ),
-          );
-
-          const agentSummaries: AgentSummary[] = agents
-            .map((agent) => ({
-              agent_id: agent.agent_id,
-              division: agent.org_unit,
-              role: agent.display_name || agent.config?.role || "Agent",
-              status: agent.status,
-              last_heartbeat: agent.last_heartbeat_at,
-              metrics: agent.config?.metrics || {},
-            }))
-            .sort(
-              (left, right) =>
-                new Date(right.last_heartbeat || 0).getTime() -
-                new Date(left.last_heartbeat || 0).getTime(),
-            );
-
-          setRecentAgents(agentSummaries);
-        }
-
-        const { count: totalEvents } = await supabase
-          .from("agent_events")
-          .select("*", { count: "exact", head: true });
-
-        const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-        const { count: recentEvents } = await supabase
-          .from("agent_events")
-          .select("*", { count: "exact", head: true })
-          .gte("created_at", oneHourAgo);
-
-        const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-        const { count: failedEvents } = await supabase
-          .from("agent_events")
-          .select("*", { count: "exact", head: true })
-          .not("error_message", "is", null)
-          .gte("created_at", oneDayAgo);
-
-        setEventStats({
-          total: totalEvents || 0,
-          last_hour: recentEvents || 0,
-          failed: failedEvents || 0,
-        });
+        setTotalAgents(dash.totalAgents ?? 0);
+        setActiveAgents(dash.activeAgents ?? 0);
+        setDivisionStats(dash.divisionStats ?? []);
+        setRecentAgents(dash.recentAgents ?? []);
+        setEventStats(dash.eventStats ?? { total: 0, last_hour: 0, failed: 0 });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         const message =
