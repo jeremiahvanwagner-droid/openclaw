@@ -6,18 +6,31 @@ rule_files:
   - "/etc/prometheus/rules/*.yml"
 
 scrape_configs:
-  - job_name: "openclaw-gateway"
-    static_configs:
-      - targets: ["host.docker.internal:18789"]
-        labels:
-          service: "gateway"
-    metrics_path: /metrics
-    scrape_interval: 15s
+  # Gateway health check — openclaw does not expose a /metrics endpoint (confirmed 2026-05-13).
+  # Using blackbox-style HTTP probe against /healthz until upstream adds Prometheus metrics.
+  # To restore scraping when /metrics is available, uncomment the block below and remove this note.
+  #
+  # DISABLED — dead scrape targets (404) — r14-2026-05-13-metrics-endpoint-confirmed-missing
+  #
+  # - job_name: "openclaw-gateway"
+  #   static_configs:
+  #     - targets: ["host.docker.internal:18789"]
+  #       labels:
+  #         service: "gateway"
+  #   metrics_path: /metrics
+  #   scrape_interval: 15s
+  #
+  # - job_name: "openclaw-webhook"
+  #   static_configs:
+  #     - targets: ["host.docker.internal:8788"]
+  #       labels:
+  #         service: "webhook-handler"
+  #   metrics_path: /metrics
+  #   scrape_interval: 15s
 
-  - job_name: "openclaw-webhook"
+  # Prometheus self-monitoring — always active
+  - job_name: "prometheus"
     static_configs:
-      - targets: ["host.docker.internal:8788"]
+      - targets: ["localhost:9090"]
         labels:
-          service: "webhook-handler"
-    metrics_path: /metrics
-    scrape_interval: 15s
+          service: "prometheus"
