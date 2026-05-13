@@ -50,6 +50,11 @@ gateway.cmd
 node.cmd
 node.json
 subagents/runs.json
+plugins/installs.json
+tasks/*.sqlite
+tasks/*.sqlite-shm
+tasks/*.sqlite-wal
+/npm/
 
 # ── Cron Run History ──────────────────────────────────────────
 cron/
