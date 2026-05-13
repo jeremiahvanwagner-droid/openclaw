@@ -1,12 +1,16 @@
 # REGGIE — Sovereign Agent State File
-_Last Updated: 2026-05-13 16:00 CDT | Updated by: MIKE (Perplexity Computer session)_
+_Last Updated: 2026-05-13 16:25 CDT | Updated by: MIKE (Perplexity Computer session)_
 
 ---
 
 ## 🔴 CURRENT OPERATIONAL STATUS
 
-**Phase:** 9.1.1 — Compose Reconciliation (HOTFIX, PR OPEN)
-**Overall System Health:** 🔴 DEGRADED — OpenClaw runtime is DOWN. Only `openclaw-redis` is healthy. `openclaw-bot` and `openclaw-webhook` failing due to legacy `depends_on: ollama` healthcheck against a container that cannot bind port 11434 (host systemd Ollama already owns it). Phase 9.1.1 compose-reconcile PR resolves this.
+**Phase:** 9.1.2 — Host-Native Architecture Reconciliation (HOTFIX #2, PR OPEN)
+**Overall System Health:** 🟢 OPERATIONAL (host runtime) / 🟡 PARTIAL (Phase 9.1 cutover not yet in effect)
+  - Host `openclaw.service` has been running 20h on PRE-Phase-9.1 config (cached in memory).
+  - Host `ollama.service` running 33h with qwen3.6:latest + qwen3:8b + kimi-k2.5:cloud loaded.
+  - Containers (`bot`, `webhook`, `ollama` services) have NEVER been the real runtime. Compose drift discharged this phase.
+  - Phase 9.1.1's docker-compose fix was insufficient — it tried to start container services that fight with host services for ports. Phase 9.1.2 drops them entirely.
 **Last Human Interaction:** 2026-05-13, Perplexity Computer (MIKE Space)
 **Last Known Heartbeat:** Not yet initiated on local model stack
 
@@ -127,6 +131,25 @@ All sub-agents held in standby until local model routing is confirmed operationa
 ---
 
 ## 📜 AUDIT LOG (Append-Only)
+
+### Entry 2026-05-13-003 — Phase 9.1.2 OPEN (Host-Native Reconciliation)
+- **Timestamp:** 2026-05-13T16:25:00-05:00
+- **Change Type:** CONFIG (P2 violation discharge, second-order)
+- **Status:** PENDING
+- **Initiative:** host-native-reconcile phase 9.1.2
+- **Owner:** MIKE (via Perplexity Computer)
+- **CVO:** Jeremiah Van Wagner (sign-off pending)
+- **Summary:** Phase 9.1.1's docker-compose fix exposed a deeper P2 violation: OpenClaw itself runs natively on the host via `openclaw.service` (systemd), NOT in a container. The compose-declared `bot` and `webhook` services have never been the real runtime; they failed every restart due to port conflict on 18789 with the host process. Same architectural pattern as the Ollama port conflict resolved in 9.1.1. Fix: strip `bot` and `webhook` from compose; keep only `redis` containerized. Document host-native architecture in compose header + operator runbook. After merge + `systemctl restart openclaw`, Phase 9.1's Haiku→qwen3:8b cutover finally takes effect.
+- **Files Changed:** 1 (`docker-compose.yml`) + 1 new (`docs/phases/host-native-reconcile-phase-9-1-2.md`)
+- **Rollback Plan:** Documented but intentionally unattractive — previous state was broken.
+- **Rollback Tested:** NO. See phase doc section 5.
+- **Doctrine Violations Discharged:** P2 (orphaned change — compose declared services not in deployed reality). Duration: ≥0 hours (host openclaw.service uptime) but likely much longer based on install age.
+- **Doctrine Violations Open:** None new. P9 (rollback tested) yellow-flagged pending operator post-restart.
+- **Forensic Notes:** Host process is PID 141406, running as `openclaw` user, command `/usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js gateway --port 18789 --allow-unconfigured`. systemd unit `openclaw.service` is `loaded; disabled; preset: enabled` — NOT auto-starting on boot; should be enabled after this phase closes.
+- **Open observation:** liveness warning `reasons=event_l...` (truncated) at 2026-05-13 20:54:15 UTC. Investigate in Phase 9.2 entry criteria.
+- **PR Link:** (to be added once PR is opened)
+- **Phase Close Entry ID:** (pending merge + systemctl restart + smoke test)
+- **Unblocks:** Phase 9.1 close (Entry 2026-05-13-001) AND Phase 9.1.1 close (Entry 2026-05-13-002)
 
 ### Entry 2026-05-13-002 — Phase 9.1.1 OPEN (Compose Reconciliation)
 - **Timestamp:** 2026-05-13T16:00:00-05:00

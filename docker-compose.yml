@@ -1,67 +1,39 @@
 # ═══════════════════════════════════════════════════════════════
-# OpenClaw — Local Development Docker Compose
-# Usage: docker compose up
+# OpenClaw — Docker Compose (Phase 9.1.2 reconciliation, 2026-05-13)
 #
-# Phase 9.1.1 reconciliation (2026-05-13):
-#   - The `ollama` service has been REMOVED. Host Ollama (systemd)
-#     owns 127.0.0.1:11434 on this VPS and serves qwen3.6:latest +
-#     qwen3:8b. The previous container service silently failed on
-#     every restart due to port conflict (P2 violation).
-#   - `bot` and `webhook` now reach host Ollama via
-#     `host.docker.internal:11434` (Docker bridge gateway).
+# ARCHITECTURAL REALITY:
+#   OpenClaw runs NATIVELY on the host as a systemd service:
+#       systemd unit: openclaw.service
+#       binary:       /usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js
+#       user:         openclaw
+#       port:         127.0.0.1:18789
+#
+#   Ollama also runs NATIVELY on the host as a systemd service:
+#       systemd unit: ollama.service
+#       binary:       /usr/local/bin/ollama serve
+#       port:         127.0.0.1:11434
+#
+#   This compose file ONLY runs the supporting services that are not
+#   host-installed (currently: Redis). The previous `bot`, `webhook`,
+#   and `ollama` services in this file were never actually the runtime;
+#   they failed silently on every restart due to port conflicts with the
+#   host installs.
+#
+# OPERATOR RUNBOOK (after `git pull` of this commit):
+#   docker compose down --remove-orphans
+#   docker compose up -d                       # only redis comes up
+#   systemctl restart openclaw                 # reloads agents_config.json
+#   systemctl status openclaw --no-pager       # confirm active (running)
+#   systemctl restart ollama                   # (only if Ollama config changed)
+#
+#   To make the host services persistent across reboots:
+#     systemctl enable openclaw ollama
 # ═══════════════════════════════════════════════════════════════
 
 volumes:
   redis-data:
-  # ollama-data volume retained (orphaned) for safe rollback;
-  # remove in Phase 10 cleanup after host-Ollama setup is proven stable.
-  ollama-data:
 
 services:
-  bot:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: openclaw-bot
-    env_file: .env
-    environment:
-      - HOME=/opt/openclaw
-      - OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - OLLAMA_HOST=http://host.docker.internal:11434
-    command: ["openclaw", "gateway", "--port", "18789", "--allow-unconfigured"]
-    ports:
-      - "18789:18789"
-    volumes:
-      - ./data:/opt/openclaw/data
-      - ./logs:/opt/openclaw/logs
-      - /root/.openclaw:/opt/openclaw/.openclaw
-      - ./backups:/opt/openclaw/backups
-      - ./templates/AGENTS.md.template:/opt/openclaw/docs/reference/templates/AGENTS.md:ro
-      - ./templates/MEMORY.md.template:/opt/openclaw/docs/reference/templates/MEMORY.md:ro
-      - ./templates/SOUL.md.template:/opt/openclaw/docs/reference/templates/SOUL.md:ro
-      - ./templates/TOOLS.md.template:/opt/openclaw/docs/reference/templates/TOOLS.md:ro
-      - ./templates/USER.md.template:/opt/openclaw/docs/reference/templates/USER.md:ro
-      - ./media:/opt/openclaw/media
-      - ./memory:/opt/openclaw/memory
-    # Sandbox browser support
-    shm_size: "512m"
-    restart: "on-failure"
-    # Map host.docker.internal → host gateway IP so the container
-    # can reach the systemd-managed Ollama on the host network.
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    depends_on:
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
   redis:
     image: redis:7-alpine
     container_name: openclaw-redis
@@ -69,7 +41,7 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    restart: "no"
+    restart: "unless-stopped"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -78,37 +50,21 @@ services:
       start_period: 10s
     command: redis-server --appendonly yes
 
-  # ─────────────────────────────────────────────────────────────
-  # NOTE: The `ollama` service was removed in Phase 9.1.1.
-  # Host Ollama (systemd-managed at /etc/systemd/system/ollama.service)
-  # serves the qwen3.6 + qwen3:8b models on 127.0.0.1:11434.
-  # Containers reach it via host.docker.internal:11434.
-  # To verify host Ollama: `systemctl status ollama && ollama list`.
-  # ─────────────────────────────────────────────────────────────
-
-  webhook:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: openclaw-webhook
-    env_file: .env
-    environment:
-      - OLLAMA_HOST=http://host.docker.internal:11434
-    command: ["node", "handlers/ghl-webhook-handler.mjs"]
-    ports:
-      - "8788:8788"
-    volumes:
-      - ./data:/opt/openclaw/data
-      - ./logs:/opt/openclaw/logs
-    restart: "on-failure"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8788/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
-    depends_on:
-      - bot
-      - redis
+# ─────────────────────────────────────────────────────────────
+# REMOVED SERVICES (kept here as comments for forensic clarity):
+#
+#   bot      — Replaced by host systemd `openclaw.service`.
+#              The container could not bind 0.0.0.0:18789 because
+#              the host service already owns 127.0.0.1:18789.
+#
+#   webhook  — Replaced by host systemd OpenClaw webhook handler
+#              (same node process serves /webhooks endpoints).
+#
+#   ollama   — Replaced by host systemd `ollama.service`.
+#              The container could not bind 0.0.0.0:11434 because
+#              the host service already owns 127.0.0.1:11434.
+#
+# These were declared in compose but never the actual runtime.
+# Discharges P2 violations (orphaned config vs deployed reality).
+# Forensic detail in: docs/phases/host-native-reconcile-phase-9-1-2.md
+# ─────────────────────────────────────────────────────────────
