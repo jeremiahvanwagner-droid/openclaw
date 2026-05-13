@@ -13,8 +13,7 @@ import { supabase } from "../../lib/agent-memory.js";
 // Triggers: subaccount provisioning → snapshot deploy → CRM setup
 // ═══════════════════════════════════════════════════════════════════
 export const saasClientSignup = inngest.createFunction(
-  { id: "saas-client-signup", name: "SaaS Client Signup Handler", retries: 3, idempotency: "event.id" },
-  { event: "saas/client.signup" },
+  { id: "saas-client-signup", name: "SaaS Client Signup Handler", retries: 3, idempotency: "event.id", triggers: [{ event: "saas/client.signup" }] },
   async ({ event, step }) => {
     const { saas_instance_id, client_name, email, phone, plan_tier, niche, correlation_id } = event.data;
     const corrId = correlation_id || `signup_${Date.now()}`;
@@ -163,8 +162,7 @@ export const saasClientSignup = inngest.createFunction(
 // Triggers dunning sequence via d8_revenue_ops
 // ═══════════════════════════════════════════════════════════════════
 export const saasPaymentFailed = inngest.createFunction(
-  { id: "saas-payment-failed", name: "SaaS Payment Failed Handler", retries: 2, idempotency: "event.id" },
-  { event: "saas/payment.failed" },
+  { id: "saas-payment-failed", name: "SaaS Payment Failed Handler", retries: 2, idempotency: "event.id", triggers: [{ event: "saas/payment.failed" }] },
   async ({ event, step }) => {
     const { saas_instance_id, contact_id, location_id, amount, failure_reason, retry_count, plan_name, correlation_id } = event.data;
 
@@ -217,8 +215,7 @@ export const saasPaymentFailed = inngest.createFunction(
 // PAYMENT RECEIVED (dunning recovery or normal payment)
 // ═══════════════════════════════════════════════════════════════════
 export const saasPaymentReceived = inngest.createFunction(
-  { id: "saas-payment-received", name: "SaaS Payment Received Handler", retries: 2, idempotency: "event.id" },
-  { event: "saas/payment.received" },
+  { id: "saas-payment-received", name: "SaaS Payment Received Handler", retries: 2, idempotency: "event.id", triggers: [{ event: "saas/payment.received" }] },
   async ({ event, step }) => {
     const { saas_instance_id, contact_id, location_id, amount, correlation_id } = event.data;
 
@@ -245,8 +242,7 @@ export const saasPaymentReceived = inngest.createFunction(
 // Triggers win-back campaign + data archival
 // ═══════════════════════════════════════════════════════════════════
 export const saasClientChurn = inngest.createFunction(
-  { id: "saas-client-churn", name: "SaaS Client Churn Handler", retries: 2, idempotency: "event.id" },
-  { event: "saas/client.churn" },
+  { id: "saas-client-churn", name: "SaaS Client Churn Handler", retries: 2, idempotency: "event.id", triggers: [{ event: "saas/client.churn" }] },
   async ({ event, step }) => {
     const { saas_instance_id, client_id, location_id, reason, mrr_lost, correlation_id } = event.data;
 
@@ -308,8 +304,7 @@ export const saasClientChurn = inngest.createFunction(
 // SUBSCRIPTION CANCELLED
 // ═══════════════════════════════════════════════════════════════════
 export const saasSubscriptionCancelled = inngest.createFunction(
-  { id: "saas-subscription-cancelled", name: "SaaS Subscription Cancelled", retries: 2, idempotency: "event.id" },
-  { event: "saas/subscription.cancelled" },
+  { id: "saas-subscription-cancelled", name: "SaaS Subscription Cancelled", retries: 2, idempotency: "event.id", triggers: [{ event: "saas/subscription.cancelled" }] },
   async ({ event, step }) => {
     const { saas_instance_id, contact_id, location_id, plan_name, mrr_lost, correlation_id } = event.data;
 
@@ -350,8 +345,7 @@ export const saasSubscriptionCancelled = inngest.createFunction(
 // Triggers upsell via marketing automation
 // ═══════════════════════════════════════════════════════════════════
 export const saasUsageThreshold = inngest.createFunction(
-  { id: "saas-usage-threshold", name: "SaaS Usage Threshold Handler", retries: 1, idempotency: "event.id" },
-  { event: "saas/usage.threshold" },
+  { id: "saas-usage-threshold", name: "SaaS Usage Threshold Handler", retries: 1, idempotency: "event.id", triggers: [{ event: "saas/usage.threshold" }] },
   async ({ event, step }) => {
     const { saas_instance_id, location_id, metric, current_value, threshold_value, percent_used, correlation_id } = event.data;
 
@@ -380,8 +374,7 @@ export const saasUsageThreshold = inngest.createFunction(
 // Triggers QA checks via compliance auditor
 // ═══════════════════════════════════════════════════════════════════
 export const saasFunnelPublished = inngest.createFunction(
-  { id: "saas-funnel-published", name: "SaaS Funnel Published Handler", retries: 1, idempotency: "event.id" },
-  { event: "saas/funnel.published" },
+  { id: "saas-funnel-published", name: "SaaS Funnel Published Handler", retries: 1, idempotency: "event.id", triggers: [{ event: "saas/funnel.published" }] },
   async ({ event, step }) => {
     const { saas_instance_id, location_id, funnel_id, funnel_name, correlation_id } = event.data;
 

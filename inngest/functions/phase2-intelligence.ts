@@ -36,8 +36,8 @@ export const revenueDailyCollection = inngest.createFunction(
     id: "revenue-daily-collection",
     name: "Revenue Ops — Daily KPI Collection",
     retries: 3,
+    triggers: [{ cron: "0 6 * * *" }],
   },
-  { cron: "0 6 * * *" },
   async ({ step }) => {
     if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
       return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
@@ -110,8 +110,8 @@ export const revenueAnomalyDetected = inngest.createFunction(
     name: "Revenue Ops — Anomaly Response",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "revenue/anomaly.detected" }],
   },
-  { event: "revenue/anomaly.detected" },
   async ({ event, step }) => {
     const mod = await step.run("load-revenue-ops", () => loadRevenueOps());
 
@@ -155,8 +155,8 @@ export const revenueBriefingReady = inngest.createFunction(
     name: "Revenue Ops — Briefing Delivery",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "revenue/briefing.ready" }],
   },
-  { event: "revenue/briefing.ready" },
   async ({ step }) => {
     const mod = await step.run("load-revenue-ops", () => loadRevenueOps());
 
@@ -195,8 +195,8 @@ export const journeyTouchpointRecorded = inngest.createFunction(
     name: "Journey — Record Touchpoint",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "journey/touchpoint.recorded" }],
   },
-  { event: "journey/touchpoint.recorded" },
   async ({ event, step }) => {
     const mod = await step.run("load-journey", () => loadJourneyIntel());
 
@@ -234,8 +234,8 @@ export const journeyStallDetection = inngest.createFunction(
     id: "journey-stall-detection",
     name: "Journey — Daily Stall Detection",
     retries: 2,
+    triggers: [{ cron: "0 4 * * *" }],
   },
-  { cron: "0 4 * * *" },
   async ({ step }) => {
     if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
       return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
@@ -287,8 +287,8 @@ export const journeyHighIntent = inngest.createFunction(
     name: "Journey — High Intent Response",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "journey/intent.high" }],
   },
-  { event: "journey/intent.high" },
   async ({ event, step }) => {
     const mod = await step.run("load-journey", () => loadJourneyIntel());
 
@@ -321,8 +321,8 @@ export const journeyNextOfferTriggered = inngest.createFunction(
     name: "Journey — Next Offer Trigger",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "journey/next-offer.triggered" }],
   },
-  { event: "journey/next-offer.triggered" },
   async ({ event, step }) => {
     const mod = await step.run("load-journey", () => loadJourneyIntel());
 
@@ -346,8 +346,8 @@ export const commandCenterDailyBriefing = inngest.createFunction(
     id: "command-center-daily-briefing",
     name: "Command Center — Daily Briefing",
     retries: 2,
+    triggers: [{ cron: "0 7 * * *" }],
   },
-  { cron: "0 7 * * *" },
   async ({ step }) => {
     if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
       return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
@@ -375,8 +375,8 @@ export const commandCenterWeeklyDigest = inngest.createFunction(
     id: "command-center-weekly-digest",
     name: "Command Center — Weekly Digest",
     retries: 2,
+    triggers: [{ cron: "0 8 * * 1" }],
   },
-  { cron: "0 8 * * 1" },
   async ({ step }) => {
     if (!process.env.PHASE2_INTELLIGENCE_ENABLED) {
       return { status: "disabled", reason: "PHASE2_INTELLIGENCE_ENABLED not set" };
@@ -411,8 +411,8 @@ export const commandCenterCriticalAlert = inngest.createFunction(
     name: "Command Center — Critical Alert",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "command-center/alert.critical" }],
   },
-  { event: "command-center/alert.critical" },
   async ({ event, step }) => {
     const mod = await step.run("load-command-center", () => loadCommandCenter());
 

@@ -39,8 +39,8 @@ export const scopeAuditScheduled = inngest.createFunction(
     id: "scope-audit-scheduled",
     name: "Scope Audit — Daily Scheduled",
     retries: 2,
+    triggers: [{ cron: "0 2 * * *" }],
   },
-  { cron: "0 2 * * *" },
   async ({ step }) => {
     const { auditScopeCompliance, detectScopeDrift, crossBusinessIsolationCheck, policyGuardrailEnforcement } =
       await step.run("load-scope-governor", async () => {
@@ -119,8 +119,8 @@ export const scopeDriftDetected = inngest.createFunction(
     name: "Scope Drift — Auto-Correct Handler",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "scope/drift.detected" }],
   },
-  { event: "scope/drift.detected" },
   async ({ event, step }) => {
     const { autoCorrectDrift } = await step.run("load-scope-governor", async () => {
       return loadScopeGovernor();
@@ -160,8 +160,8 @@ export const scopeViolationAttempted = inngest.createFunction(
     name: "Scope Violation — Logger",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "scope/violation.attempted" }],
   },
-  { event: "scope/violation.attempted" },
   async ({ event, step }) => {
     const { logScopeViolation } = await step.run("load-scope-governor", async () => {
       return loadScopeGovernor();
@@ -199,8 +199,8 @@ export const integrationHealthCheck = inngest.createFunction(
     id: "integration-health-check",
     name: "Integration Health — Hourly Probe",
     retries: 1,
+    triggers: [{ cron: "0 * * * *" }],
   },
-  { cron: "0 * * * *" },
   async ({ step }) => {
     const { probeAllWebhooks, detectBrokenIntegrations, selfHealCircuitBreaker } =
       await step.run("load-self-healing", async () => {
@@ -270,8 +270,8 @@ export const integrationFailureDetected = inngest.createFunction(
     name: "Integration Failure — Auto-Heal Handler",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "integration/failure.detected" }],
   },
-  { event: "integration/failure.detected" },
   async ({ event, step }) => {
     const { autoRetryTransient } = await step.run(
       "load-self-healing",
@@ -319,8 +319,8 @@ export const integrationHealed = inngest.createFunction(
     name: "Integration Healed — Logger",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "integration/healed" }],
   },
-  { event: "integration/healed" },
   async ({ event, step }) => {
     await step.sendEvent("alert-healed", {
       name: "alert/telegram",
@@ -343,8 +343,8 @@ export const integrationEscalation = inngest.createFunction(
     name: "Integration Escalation — Human Required",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "integration/escalation.needed" }],
   },
-  { event: "integration/escalation.needed" },
   async ({ event, step }) => {
     await step.sendEvent("alert-escalation", {
       name: "alert/telegram",
@@ -374,8 +374,8 @@ export const qaScheduledAudit = inngest.createFunction(
     id: "qa-scheduled-audit",
     name: "QA Audit — Daily Scheduled",
     retries: 2,
+    triggers: [{ cron: "0 3 * * *" }],
   },
-  { cron: "0 3 * * *" },
   async ({ step }) => {
     const {
       runFunnelAudit,
@@ -452,8 +452,8 @@ export const qaFunnelPublished = inngest.createFunction(
     name: "QA — Funnel Published Audit",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "qa/funnel.published" }],
   },
-  { event: "qa/funnel.published" },
   async ({ event, step }) => {
     const {
       runFunnelAudit,
@@ -503,8 +503,8 @@ export const qaComplianceAlert = inngest.createFunction(
     name: "QA — Compliance Alert Handler",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "qa/compliance.alert" }],
   },
-  { event: "qa/compliance.alert" },
   async ({ event, step }) => {
     await step.sendEvent("alert-compliance", {
       name: "alert/telegram",
@@ -528,8 +528,8 @@ export const qaTrackingBroken = inngest.createFunction(
     name: "QA — Tracking Broken Alert",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "qa/tracking.broken" }],
   },
-  { event: "qa/tracking.broken" },
   async ({ event, step }) => {
     await step.sendEvent("alert-tracking", {
       name: "alert/telegram",

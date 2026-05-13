@@ -29,8 +29,8 @@ export const agentInvoke = inngest.createFunction(
     name: "Agent Invoke Router",
     retries: 3,
     idempotency: "event.data.correlation_id",
+    triggers: [{ event: "agent/invoke" }],
   },
-  { event: "agent/invoke" },
   async ({ event, step }) => {
     const {
       source_agent,
@@ -243,8 +243,8 @@ export const agentEscalate = inngest.createFunction(
     name: "Agent Escalation Handler",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "agent/escalate" }],
   },
-  { event: "agent/escalate" },
   async ({ event, step }) => {
     const {
       source_agent,
@@ -394,8 +394,8 @@ export const agentHealthCheck = inngest.createFunction(
   {
     id: "agent-health-check",
     name: "Hourly Agent Health Check",
+    triggers: [{ cron: "0 * * * *" }],
   },
-  { cron: "0 * * * *" }, // Every hour
   async ({ step }) => {
     // Step 1: Fetch supervisors with always_on heartbeat policy
     const agents = await step.run("fetch-agents", async () => {
@@ -524,8 +524,8 @@ export const telegramAlert = inngest.createFunction(
     name: "Telegram Alert Handler",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "alert/telegram" }],
   },
-  { event: "alert/telegram" },
   async ({ event, step }) => {
     const { channel, message, priority = "normal", agent_id } = event.data;
 
@@ -589,8 +589,8 @@ export const podQuarantine = inngest.createFunction(
     name: "Pod Quarantine Handler",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "pod/*/quarantine" }],
   },
-  { event: "pod/*/quarantine" },
   async ({ event, step }) => {
     const { pod_id, reason, triggered_by } = event.data;
 
@@ -666,8 +666,8 @@ export const podRestore = inngest.createFunction(
     name: "Pod Restore Handler",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "pod/*/restore" as any }],
   },
-  { event: "pod/*/restore" as any },
   async ({ event, step }) => {
     const { pod_id, restored_by } = event.data as { pod_id: string; restored_by: string };
 
@@ -726,8 +726,8 @@ export const credentialHealthCheck = inngest.createFunction(
     name: "Credential Health Check",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "credential/health.check" }],
   },
-  { event: "credential/health.check" },
   async ({ event, step }) => {
     // Step 1: Check GHL token validity with a lightweight API call
     const ghlStatus = await step.run("check-ghl-token", async () => {
@@ -834,8 +834,8 @@ export const bookLaunchReady = inngest.createFunction(
     id: "book-launch-ready",
     name: "Book Launch Cross-Promotion",
     idempotency: "event.id",
+    triggers: [{ event: "book.launch.ready" }],
   },
-  { event: "book.launch.ready" },
   async ({ event, step }) => {
     const { book_id, title, launch_date, author, description } = event.data;
 

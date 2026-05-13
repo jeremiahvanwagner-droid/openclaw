@@ -112,7 +112,8 @@ function createMockStep() {
 
 vi.mock("../../inngest/client", () => ({
   inngest: {
-    createFunction: vi.fn((config: any, trigger: any, handler: any) => {
+    createFunction: vi.fn((config: any, handler: any) => {
+      const trigger = config.triggers?.[0];
       capturedFunctions[config.id] = { config, trigger, handler };
       return { config, trigger, handler };
     }),

@@ -5,7 +5,7 @@
  * Event-driven orchestration for the OpenClaw runtime.
  */
 
-import { EventSchemas, Inngest } from "inngest";
+import { Inngest } from "inngest";
 
 type JsonObject = Record<string, unknown>;
 type Priority = "low" | "normal" | "high" | "critical";
@@ -1284,9 +1284,12 @@ type OpenClawEvent =
       };
     };
 
+// NOTE: schemas:fromUnion was removed in inngest v4. Re-introduce via
+// `staticSchema<RecordOfEvents>()` when we convert OpenClawEvent (a union with
+// template-literal names) into a record-shaped event map. For now, untyped to
+// unblock CI. See inngest/client.ts:67 for the OpenClawEvent union.
 export const inngest = new Inngest({
   id: "truth-j-blue-agents",
-  schemas: new EventSchemas().fromUnion<OpenClawEvent>(),
 });
 
 export const DIVISION_HEADS: Record<string, string> = {
