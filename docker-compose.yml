@@ -1,10 +1,20 @@
 # ═══════════════════════════════════════════════════════════════
 # OpenClaw — Local Development Docker Compose
 # Usage: docker compose up
+#
+# Phase 9.1.1 reconciliation (2026-05-13):
+#   - The `ollama` service has been REMOVED. Host Ollama (systemd)
+#     owns 127.0.0.1:11434 on this VPS and serves qwen3.6:latest +
+#     qwen3:8b. The previous container service silently failed on
+#     every restart due to port conflict (P2 violation).
+#   - `bot` and `webhook` now reach host Ollama via
+#     `host.docker.internal:11434` (Docker bridge gateway).
 # ═══════════════════════════════════════════════════════════════
 
 volumes:
   redis-data:
+  # ollama-data volume retained (orphaned) for safe rollback;
+  # remove in Phase 10 cleanup after host-Ollama setup is proven stable.
   ollama-data:
 
 services:
@@ -19,7 +29,7 @@ services:
       - OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - OLLAMA_HOST=http://ollama:11434
+      - OLLAMA_HOST=http://host.docker.internal:11434
     command: ["openclaw", "gateway", "--port", "18789", "--allow-unconfigured"]
     ports:
       - "18789:18789"
@@ -38,10 +48,12 @@ services:
     # Sandbox browser support
     shm_size: "512m"
     restart: "on-failure"
+    # Map host.docker.internal → host gateway IP so the container
+    # can reach the systemd-managed Ollama on the host network.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       redis:
-        condition: service_healthy
-      ollama:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:18789/health"]
@@ -66,26 +78,13 @@ services:
       start_period: 10s
     command: redis-server --appendonly yes
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: openclaw-ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama-data:/root/.ollama
-    restart: "no"
-    healthcheck:
-      # ollama image does not ship with curl; use the bundled `ollama` CLI instead
-      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    environment:
-      - OLLAMA_HOST=0.0.0.0:11434
-    # Note: Models are loaded on first request. To pre-load models, run:
-    #   docker exec openclaw-ollama ollama pull llama3.1:8b
-    #   docker exec openclaw-ollama ollama pull nomic-embed-text
+  # ─────────────────────────────────────────────────────────────
+  # NOTE: The `ollama` service was removed in Phase 9.1.1.
+  # Host Ollama (systemd-managed at /etc/systemd/system/ollama.service)
+  # serves the qwen3.6 + qwen3:8b models on 127.0.0.1:11434.
+  # Containers reach it via host.docker.internal:11434.
+  # To verify host Ollama: `systemctl status ollama && ollama list`.
+  # ─────────────────────────────────────────────────────────────
 
   webhook:
     build:
@@ -93,6 +92,8 @@ services:
       dockerfile: Dockerfile
     container_name: openclaw-webhook
     env_file: .env
+    environment:
+      - OLLAMA_HOST=http://host.docker.internal:11434
     command: ["node", "handlers/ghl-webhook-handler.mjs"]
     ports:
       - "8788:8788"
@@ -100,6 +101,8 @@ services:
       - ./data:/opt/openclaw/data
       - ./logs:/opt/openclaw/logs
     restart: "on-failure"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8788/health"]
       interval: 30s
@@ -109,4 +112,3 @@ services:
     depends_on:
       - bot
       - redis
-      - ollama
