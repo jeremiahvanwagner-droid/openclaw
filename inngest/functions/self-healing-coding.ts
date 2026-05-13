@@ -100,9 +100,9 @@ export const selfHealingScheduled = inngest.createFunction(
     name: "Self-Healing — Event-Triggered Run",
     retries: 1,
     idempotency: "event.id",
+    // WS-B: Converted from cron "*/30 * * * *" to event-triggered to stop cost bleed
+    triggers: [{ event: "healing/run.scheduled.trigger" }],
   },
-  // WS-B: Converted from cron "*/30 * * * *" to event-triggered to stop cost bleed
-  { event: "healing/run.scheduled.trigger" },
   async ({ step }) => {
     // ── Circuit Breaker Check ──────────────────────────────────
     const circuit = await step.run("circuit-breaker-check", async () => {
@@ -208,8 +208,8 @@ export const selfHealingOnDemand = inngest.createFunction(
     name: "Self-Healing — On-Demand Run",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "healing/run.requested" }],
   },
-  { event: "healing/run.requested" },
   async ({ event, step }) => {
     const { logs = [], model } = event.data;
 
@@ -242,8 +242,8 @@ export const supervisorIntegrationCheck = inngest.createFunction(
     name: "Supervisor — Integration Health Check",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "healing/integration.health_check" }],
   },
-  { event: "healing/integration.health_check" },
   async ({ step }) => {
     const health = await step.run("run-integration-check", async () => {
       return runIntegrationHealthCheck();
@@ -285,8 +285,8 @@ export const healingEscalationHandler = inngest.createFunction(
     name: "Self-Healing — Escalation Handler",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "healing/escalation.needed" }],
   },
-  { event: "healing/escalation.needed" },
   async ({ event, step }) => {
     const data = event.data;
 
@@ -325,8 +325,8 @@ export const ciAutoFix = inngest.createFunction(
     // Debounce: at most one CI fix per repo per 10 minutes
     debounce: { period: "10m", key: "event.data.owner + '/' + event.data.repo" },
     idempotency: "event.id",
+    triggers: [{ event: "ci/run.failed" }],
   },
-  { event: "ci/run.failed" },
   async ({ event, step }) => {
     const { owner, repo, branch } = event.data;
 
@@ -369,8 +369,8 @@ export const ciDailyCheck = inngest.createFunction(
     id: "ci-daily-check",
     name: "CI — Daily Scheduled Check",
     retries: 1,
+    triggers: [{ cron: "0 6 * * *" }],
   },
-  { cron: "0 6 * * *" },
   async ({ step }) => {
     const reposEnv = process.env.OPENCLAW_CI_REPOS ?? "";
     const repos = reposEnv

@@ -40,8 +40,8 @@ export const ghlBuildCreateRequested = inngest.createFunction(
     name: "GHL Builder — Create Requested",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "ghl-build/create.requested" }],
   },
-  { event: "ghl-build/create.requested" },
   async ({ event, step }) => {
     const mod = await step.run("load-ghl-builder", () => loadGHLBuilder());
 
@@ -102,8 +102,8 @@ export const ghlSnapshotCreated = inngest.createFunction(
     name: "GHL Builder — Snapshot Created",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "ghl-build/snapshot.created" }],
   },
-  { event: "ghl-build/snapshot.created" },
   async ({ event, step }) => {
     // Audit log — snapshot is already stored in Supabase by the skill
     const result = await step.run("log-snapshot", () => ({
@@ -127,8 +127,8 @@ export const ghlRollbackRequested = inngest.createFunction(
     name: "GHL Builder — Rollback Requested",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "ghl-build/rollback.requested" }],
   },
-  { event: "ghl-build/rollback.requested" },
   async ({ event, step }) => {
     const mod = await step.run("load-ghl-builder", () => loadGHLBuilder());
 
@@ -169,8 +169,8 @@ export const experimentCreated = inngest.createFunction(
     name: "Experiment Engine — Created",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "experiment/created" }],
   },
-  { event: "experiment/created" },
   async ({ event, step }) => {
     const mod = await step.run("load-experiment-engine", () => loadExperimentEngine());
 
@@ -199,8 +199,8 @@ export const experimentEvaluationScheduled = inngest.createFunction(
     id: "experiment-evaluation-scheduled",
     name: "Experiment Engine — Scheduled Evaluation",
     retries: 2,
+    triggers: [{ cron: "0 5 * * *" }],
   },
-  { cron: "0 5 * * *" },
   async ({ step }) => {
     const mod = await step.run("load-experiment-engine", () => loadExperimentEngine());
 
@@ -252,8 +252,8 @@ export const experimentSignificant = inngest.createFunction(
     name: "Experiment Engine — Significant Result",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "experiment/significant" }],
   },
-  { event: "experiment/significant" },
   async ({ event, step }) => {
     await step.run("load-experiment-engine", () => loadExperimentEngine());
 
@@ -280,8 +280,8 @@ export const experimentPromoted = inngest.createFunction(
     name: "Experiment Engine — Promote Winner",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "experiment/promoted" }],
   },
-  { event: "experiment/promoted" },
   async ({ event, step }) => {
     const mod = await step.run("load-experiment-engine", () => loadExperimentEngine());
 
@@ -315,8 +315,8 @@ export const campaignIdeaSubmitted = inngest.createFunction(
     name: "Campaign Factory — Idea Submitted",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "campaign/idea.submitted" }],
   },
-  { event: "campaign/idea.submitted" },
   async ({ event, step }) => {
     const mod = await step.run("load-campaign-factory", () => loadCampaignFactory());
 
@@ -359,8 +359,8 @@ export const campaignBundleReady = inngest.createFunction(
     name: "Campaign Factory — Bundle Ready",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "campaign/bundle.ready" }],
   },
-  { event: "campaign/bundle.ready" },
   async ({ event, step }) => {
     await step.sendEvent("alert-bundle-ready", {
       name: "alert/telegram" as const,
@@ -384,8 +384,8 @@ export const campaignApproved = inngest.createFunction(
     name: "Campaign Factory — Approved & Schedule",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "campaign/approved" }],
   },
-  { event: "campaign/approved" },
   async ({ event, step }) => {
     const mod = await step.run("load-campaign-factory", () => loadCampaignFactory());
 
@@ -417,8 +417,8 @@ export const campaignPerformanceCollect = inngest.createFunction(
     id: "campaign-performance-collect",
     name: "Campaign Factory — Daily Performance",
     retries: 2,
+    triggers: [{ cron: "0 8 * * *" }],
   },
-  { cron: "0 8 * * *" },
   async ({ step }) => {
     const mod = await step.run("load-campaign-factory", () => loadCampaignFactory());
 
@@ -458,8 +458,8 @@ export const offerAnalysisScheduled = inngest.createFunction(
     id: "offer-analysis-scheduled",
     name: "Offer Engineering — Scheduled Analysis",
     retries: 2,
+    triggers: [{ cron: "0 3 * * *" }],
   },
-  { cron: "0 3 * * *" },
   async ({ step }) => {
     const mod = await step.run("load-offer-engineering", () => loadOfferEngineering());
 
@@ -514,8 +514,8 @@ export const offerOptimizationSuggested = inngest.createFunction(
     name: "Offer Engineering — Optimization Alert",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "offer/optimization.suggested" }],
   },
-  { event: "offer/optimization.suggested" },
   async ({ event, step }) => {
     await step.sendEvent("alert-offer-optimization", {
       name: "alert/telegram" as const,
@@ -538,8 +538,8 @@ export const offerPerformanceCollected = inngest.createFunction(
     id: "offer-performance-collected",
     name: "Offer Engineering — Daily Performance",
     retries: 2,
+    triggers: [{ cron: "0 9 * * *" }],
   },
-  { cron: "0 9 * * *" },
   async ({ step }) => {
     const mod = await step.run("load-offer-engineering", () => loadOfferEngineering());
 

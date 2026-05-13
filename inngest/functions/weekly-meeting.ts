@@ -229,8 +229,8 @@ export const weeklyInterDivisionMeeting = inngest.createFunction(
     id: "weekly-interdivision-meeting",
     name: "Weekly Inter-Division Executive Meeting",
     retries: 2,
+    triggers: [{ cron: "0 21 * * 5" }], // Friday 4 PM ET (21:00 UTC)
   },
-  { cron: "0 21 * * 5" }, // Friday 4 PM ET (21:00 UTC)
   async ({ step }) => {
     const now = new Date();
     const weekStart = new Date(now);
@@ -285,9 +285,9 @@ export const weeklyInterDivisionMeeting = inngest.createFunction(
 
     // ── Step 4: Synthesize executive summary ──
     const summary = await step.run("synthesize-summary", async () => {
-      const totalRevenue = divisionKPIs.reduce((s, d) => s + d.revenue, 0);
-      const totalLeads = divisionKPIs.reduce((s, d) => s + d.leads, 0);
-      const totalConversions = divisionKPIs.reduce((s, d) => s + d.conversions, 0);
+      const totalRevenue = divisionKPIs.reduce((s: number, d: DivisionKPI) => s + d.revenue, 0);
+      const totalLeads = divisionKPIs.reduce((s: number, d: DivisionKPI) => s + d.leads, 0);
+      const totalConversions = divisionKPIs.reduce((s: number, d: DivisionKPI) => s + d.conversions, 0);
 
       const executiveHighlights: string[] = [];
       const actionItems: string[] = [];
@@ -319,7 +319,7 @@ export const weeklyInterDivisionMeeting = inngest.createFunction(
       }
 
       // Pod health check
-      const totalPodEscalations = podReports.reduce((s, p) => s + p.escalations, 0);
+      const totalPodEscalations = podReports.reduce((s: number, p: PodReport) => s + p.escalations, 0);
       if (totalPodEscalations > 5) {
         actionItems.push(`${totalPodEscalations} pod escalations this week — review escalation patterns`);
       }
@@ -416,8 +416,8 @@ export const onDemandMeeting = inngest.createFunction(
     name: "On-Demand Executive Meeting",
     retries: 1,
     idempotency: "event.id",
+    triggers: [{ event: "meeting/executive.request" }],
   },
-  { event: "meeting/executive.request" },
   async ({ event, step }) => {
     const { requested_by, focus_divisions, lookback_days = 7 } = event.data;
 
@@ -439,7 +439,7 @@ export const onDemandMeeting = inngest.createFunction(
       return results;
     });
 
-    const totalRevenue = kpis.reduce((s, d) => s + d.revenue, 0);
+    const totalRevenue = kpis.reduce((s: number, d: DivisionKPI) => s + d.revenue, 0);
 
     await step.sendEvent("send-briefing", {
       name: "alert/telegram",
@@ -448,8 +448,8 @@ export const onDemandMeeting = inngest.createFunction(
         message: formatExecutiveBriefing({
           week_of: now.toISOString().split("T")[0],
           total_revenue: totalRevenue,
-          total_leads: kpis.reduce((s, d) => s + d.leads, 0),
-          total_conversions: kpis.reduce((s, d) => s + d.conversions, 0),
+          total_leads: kpis.reduce((s: number, d: DivisionKPI) => s + d.leads, 0),
+          total_conversions: kpis.reduce((s: number, d: DivisionKPI) => s + d.conversions, 0),
           division_kpis: kpis,
           pod_reports: [],
           cross_division_tasks: [],

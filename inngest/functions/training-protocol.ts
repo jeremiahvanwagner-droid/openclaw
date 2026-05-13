@@ -60,8 +60,8 @@ export const trainingWeeklyReview = inngest.createFunction(
     name: "Training: Weekly Review & Planning",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "training.weekly_review" }],
   },
-  { event: "training.weekly_review" },
   async ({ event, step }) => {
     if (!process.env.TRAINING_PROTOCOL_ENABLED) {
       return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
@@ -136,8 +136,8 @@ export const trainingWeeklyReview = inngest.createFunction(
       const logFileName = `${new Date().getFullYear()}-W${weekNumber.toString().padStart(2, "0")}-training-log.md`;
       const logPath = path.join(TRAINING_DIR, "logs", logFileName);
 
-      const topPerformers = analysis.filter(a => a.tier === "A").slice(0, 3);
-      const needsAttention = analysis.filter(a => a.needs_training);
+      const topPerformers = analysis.filter((a: AgentAnalysis) => a.tier === "A").slice(0, 3);
+      const needsAttention = analysis.filter((a: AgentAnalysis) => a.needs_training);
 
       const logContent = `# Training Week ${weekNumber} Review Log
 
@@ -147,16 +147,16 @@ export const trainingWeeklyReview = inngest.createFunction(
 ## Performance Summary
 
 ### Top Performers 🏆
-${topPerformers.map(a => `- **${a.agent_id}**: ${a.overall_score.toFixed(1)}% (Tier ${a.tier})`).join("\n")}
+${topPerformers.map((a: AgentAnalysis) => `- **${a.agent_id}**: ${a.overall_score.toFixed(1)}% (Tier ${a.tier})`).join("\n")}
 
 ### Agents Needing Attention ⚠️
-${needsAttention.map(a => `- **${a.agent_id}**: ${a.overall_score.toFixed(1)}% (Tier ${a.tier})
+${needsAttention.map((a: AgentAnalysis) => `- **${a.agent_id}**: ${a.overall_score.toFixed(1)}% (Tier ${a.tier})
   - Task Success: ${a.task_success.toFixed(1)}%
   - Response Accuracy: ${a.response_accuracy.toFixed(1)}%
   - Escalation Rate: ${a.escalation_rate.toFixed(1)}%`).join("\n\n")}
 
 ## Training Priorities This Week
-${needsAttention.map((a, i) => `${i + 1}. ${a.agent_id} - Focus: ${getPriorityFocus(a)}`).join("\n")}
+${needsAttention.map((a: AgentAnalysis, i: number) => `${i + 1}. ${a.agent_id} - Focus: ${getPriorityFocus(a)}`).join("\n")}
 
 ## Division Summary
 | Division | Avg Score | Status |
@@ -176,7 +176,7 @@ ${getDivisionSummary(analysis)}
       data: {
         type: "weekly_review",
         week: weekNumber,
-        agents_needing_training: analysis.filter(a => a.needs_training).map(a => a.agent_id),
+        agents_needing_training: analysis.filter((a: AgentAnalysis) => a.needs_training).map((a: AgentAnalysis) => a.agent_id),
         log_path: logPath,
       },
     });
@@ -185,10 +185,10 @@ ${getDivisionSummary(analysis)}
       success: true,
       week: weekNumber,
       total_agents_analyzed: analysis.length,
-      tier_a_count: analysis.filter(a => a.tier === "A").length,
-      tier_b_count: analysis.filter(a => a.tier === "B").length,
-      tier_c_count: analysis.filter(a => a.tier === "C").length,
-      tier_d_count: analysis.filter(a => a.tier === "D").length,
+      tier_a_count: analysis.filter((a: AgentAnalysis) => a.tier === "A").length,
+      tier_b_count: analysis.filter((a: AgentAnalysis) => a.tier === "B").length,
+      tier_c_count: analysis.filter((a: AgentAnalysis) => a.tier === "C").length,
+      tier_d_count: analysis.filter((a: AgentAnalysis) => a.tier === "D").length,
       log_path: logPath,
     };
   }
@@ -203,8 +203,8 @@ export const trainingSkillDevelopment = inngest.createFunction(
     name: "Training: Skill Development",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "training.skill_development" }],
   },
-  { event: "training.skill_development" },
   async ({ event, step }) => {
     if (!process.env.TRAINING_PROTOCOL_ENABLED) {
       return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
@@ -314,8 +314,8 @@ export const trainingCrossDivision = inngest.createFunction(
     name: "Training: Cross-Division Collaboration",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "training.cross_division" }],
   },
-  { event: "training.cross_division" },
   async ({ event, step }) => {
     if (!process.env.TRAINING_PROTOCOL_ENABLED) {
       return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
@@ -426,7 +426,7 @@ export const trainingCrossDivision = inngest.createFunction(
         timestamp: new Date().toISOString(),
         outcomes: {
           scenarios_tested: simulationResults.length,
-          successful: simulationResults.filter(r => r.success).length,
+          successful: simulationResults.filter((r: ScenarioResult) => r.success).length,
           bottlenecks: bottlenecks,
         },
       });
@@ -437,8 +437,8 @@ export const trainingCrossDivision = inngest.createFunction(
     return {
       success: true,
       scenarios_tested: simulationResults.length,
-      scenarios_successful: simulationResults.filter(r => r.success).length,
-      avg_response_time_ms: simulationResults.reduce((a, b) => a + b.avg_handoff_ms, 0) / simulationResults.length,
+      scenarios_successful: simulationResults.filter((r: ScenarioResult) => r.success).length,
+      avg_response_time_ms: simulationResults.reduce((a: number, b: ScenarioResult) => a + b.avg_handoff_ms, 0) / simulationResults.length,
       bottlenecks_found: bottlenecks.length,
       bottlenecks,
       details: simulationResults,
@@ -455,8 +455,8 @@ export const trainingSoulRefinement = inngest.createFunction(
     name: "Training: SOUL.md Refinement",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "training.soul_refinement" }],
   },
-  { event: "training.soul_refinement" },
   async ({ event, step }) => {
     if (!process.env.TRAINING_PROTOCOL_ENABLED) {
       return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
@@ -512,7 +512,7 @@ export const trainingSoulRefinement = inngest.createFunction(
 
       for (const refinement of refinements) {
         // Only auto-apply low-risk changes
-        const lowRiskChanges = refinement.proposed_changes.filter(c => c.risk === "low");
+        const lowRiskChanges = refinement.proposed_changes.filter((c: ProposedChange) => c.risk === "low");
 
         for (const change of lowRiskChanges) {
           try {
@@ -552,7 +552,7 @@ export const trainingSoulRefinement = inngest.createFunction(
       refinements_proposed: refinements.length,
       refinements_applied: applied.length,
       applied_changes: applied,
-      pending_review: refinements.filter(r => r.proposed_changes.some(c => c.risk !== "low")),
+      pending_review: refinements.filter((r: SoulRefinement) => r.proposed_changes.some((c: ProposedChange) => c.risk !== "low")),
     };
   }
 );
@@ -566,8 +566,8 @@ export const trainingPerformanceReview = inngest.createFunction(
     name: "Training: Performance Review",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "training.performance_review" }],
   },
-  { event: "training.performance_review" },
   async ({ event, step }) => {
     if (!process.env.TRAINING_PROTOCOL_ENABLED) {
       return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
@@ -700,8 +700,8 @@ export const trainingMemoryConsolidation = inngest.createFunction(
     name: "Training: Memory Consolidation",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "training.memory_consolidation" }],
   },
-  { event: "training.memory_consolidation" },
   async ({ event, step }) => {
     if (!process.env.TRAINING_PROTOCOL_ENABLED) {
       return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
@@ -840,8 +840,8 @@ export const trainingHealthCheck = inngest.createFunction(
     name: "Training: System Health Check",
     retries: 2,
     idempotency: "event.id",
+    triggers: [{ event: "training.health_check" }],
   },
-  { event: "training.health_check" },
   async ({ event, step }) => {
     if (!process.env.TRAINING_PROTOCOL_ENABLED) {
       return { status: "disabled", reason: "TRAINING_PROTOCOL_ENABLED not set" };
