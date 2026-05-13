@@ -1,12 +1,12 @@
 # REGGIE — Sovereign Agent State File
-_Last Updated: 2026-05-13 13:05 CDT | Updated by: MIKE (Perplexity Computer session)_
+_Last Updated: 2026-05-13 16:00 CDT | Updated by: MIKE (Perplexity Computer session)_
 
 ---
 
 ## 🔴 CURRENT OPERATIONAL STATUS
 
-**Phase:** 9.1 — Ollama Cutover, Haiku Strip (PR OPEN, awaiting CVO merge)
-**Overall System Health:** 🟡 Partial — Phase 9.1 patches staged in feature branch `phase-9/ollama-cutover`; awaiting CVO PR review + VPS smoke test
+**Phase:** 9.1.1 — Compose Reconciliation (HOTFIX, PR OPEN)
+**Overall System Health:** 🔴 DEGRADED — OpenClaw runtime is DOWN. Only `openclaw-redis` is healthy. `openclaw-bot` and `openclaw-webhook` failing due to legacy `depends_on: ollama` healthcheck against a container that cannot bind port 11434 (host systemd Ollama already owns it). Phase 9.1.1 compose-reconcile PR resolves this.
 **Last Human Interaction:** 2026-05-13, Perplexity Computer (MIKE Space)
 **Last Known Heartbeat:** Not yet initiated on local model stack
 
@@ -127,6 +127,23 @@ All sub-agents held in standby until local model routing is confirmed operationa
 ---
 
 ## 📜 AUDIT LOG (Append-Only)
+
+### Entry 2026-05-13-002 — Phase 9.1.1 OPEN (Compose Reconciliation)
+- **Timestamp:** 2026-05-13T16:00:00-05:00
+- **Change Type:** CONFIG (P2 violation discharge)
+- **Status:** PENDING
+- **Initiative:** compose-reconcile phase 9.1.1
+- **Owner:** MIKE (via Perplexity Computer)
+- **CVO:** Jeremiah Van Wagner (sign-off pending)
+- **Summary:** Forced hotfix surfaced by Phase 9.1 post-merge smoke test. Docker-compose `ollama` service had been failing every restart cycle because host-installed systemd Ollama (PID 130666) owns 127.0.0.1:11434, blocking the container from binding. Consequence: `openclaw-bot` and `openclaw-webhook` could never satisfy their `depends_on: ollama` healthcheck and have been failing on every `docker compose up`. The OpenClaw runtime has been effectively down for an indeterminate window. Fix: remove `ollama` service from compose, repoint `bot`/`webhook` to `http://host.docker.internal:11434` via `extra_hosts: host-gateway`. Discharges pre-existing P2 violation (orphaned config drift between repo and VPS).
+- **Files Changed:** 1 (`docker-compose.yml`) + 1 new (`docs/phases/compose-reconcile-phase-9-1-1.md`)
+- **Rollback Plan:** `git revert` documented but intentionally unattractive — previous state was broken. Forward-fix preferred.
+- **Rollback Tested:** NO — see phase doc section 5.
+- **Doctrine Violations Discharged:** P2 (orphaned change, unknown duration; likely pre-dates 2026-05-12 11:27 UTC).
+- **Doctrine Violations Open:** None new. P9 (rollback tested) carries yellow flag pending operator post-restart.
+- **PR Link:** (to be added once PR is opened)
+- **Phase Close Entry ID:** (pending merge + `docker compose up -d` + healthcheck pass)
+- **Unblocks:** Phase 9.1 end-to-end smoke test (Entry 2026-05-13-001 close)
 
 ### Entry 2026-05-13-001 — Phase 9.1 OPEN
 - **Timestamp:** 2026-05-13T13:05:00-05:00
