@@ -1,12 +1,12 @@
 # REGGIE — Sovereign Agent State File
-_Last Updated: 2026-05-13 12:41 CDT | Updated by: MIKE (Perplexity Computer session)_
+_Last Updated: 2026-05-13 13:05 CDT | Updated by: MIKE (Perplexity Computer session)_
 
 ---
 
 ## 🔴 CURRENT OPERATIONAL STATUS
 
-**Phase:** 9 — Local AI Migration (IN PROGRESS)
-**Overall System Health:** 🟡 Partial — Local models confirmed running; model routing not yet validated end-to-end
+**Phase:** 9.1 — Ollama Cutover, Haiku Strip (PR OPEN, awaiting CVO merge)
+**Overall System Health:** 🟡 Partial — Phase 9.1 patches staged in feature branch `phase-9/ollama-cutover`; awaiting CVO PR review + VPS smoke test
 **Last Human Interaction:** 2026-05-13, Perplexity Computer (MIKE Space)
 **Last Known Heartbeat:** Not yet initiated on local model stack
 
@@ -27,104 +27,63 @@ REGGIE is the **Sovereign Agent** — the master orchestrator of the entire Open
 
 ### Infrastructure
 - [x] OpenClaw server running on VPS
-- [x] Ollama running at `localhost:11434`
-- [x] Models confirmed loaded: `qwen3.6:latest`, `qwen3:8b`, `kimi-k2.5:cloud`
+- [x] Ollama running at `127.0.0.1:11434`
+- [x] Models confirmed loaded on VPS: `qwen3.6:latest`, `qwen3:8b` (Kimi: NEVER INSTALLED — removed per CVO direction)
 - [x] Supabase connected
 - [x] GHL Private Integration active
 - [x] Inngest event queue operational
 - [x] Stripe connected
 
 ### Agent Config
-- [x] 5-agent topology defined in `agents_config.json`
+- [x] **CORRECTION:** Topology is 103 agents in a 10-pod runtime (`runtime_model: "10-pod"`), NOT 5 agents. Prior state file was outdated.
+- [x] 15 agent-class provider catalogs at `agents/<name>/agent/models.json`
+- [x] 103 per-agent pod bindings in `agents_config.json` and `config/agents_config.json` (duplicated — flagged for Phase 10 P2 fix)
 - [x] `SOUL.md` constraints loaded and governing
 - [x] `openclaw.json.last-good` available as rollback checkpoint
 
 ---
 
-## 🔴 BLOCKING ITEMS (Must Resolve Before Phase 9 Complete)
+## 🔴 BLOCKING ITEMS (Must Resolve Before Phase 9.1 Complete)
 
-### Item 1: models.json Schema Verification
-**Priority:** CRITICAL
-**Status:** ⛔ NOT DONE
-**Action Required:**
-```bash
-grep -r "models.json" /root/openclaw --include="*.ts" --include="*.mjs" --include="*.js" | head -20
-```
-This must be run BEFORE writing models.json to confirm the exact schema OpenClaw expects. Do NOT write the file blindly.
+### Item 1: ~~models.json Schema Verification~~ ✅ RESOLVED
+**Status:** ✅ DONE (2026-05-13)
+**Outcome:** Schema verified via GitHub repo inspection. **Critical correction:** there is NO single central `/root/openclaw/data/models.json` — OpenClaw uses 15 per-agent catalogs at `agents/<name>/agent/models.json` with schema `providers.<name>.{baseUrl, api, apiKey, models[]}`. Per-pod bindings live in `agents_config.json` as `llm_model` strings on each of 103 agents.
 
-### Item 2: models.json Write (After Schema Confirmed)
-**Priority:** CRITICAL
-**Status:** ⛔ NOT DONE
-**Proposed Content:**
-```json
-{
-  "providers": {
-    "ollama-vps": {
-      "type": "ollama",
-      "baseURL": "http://localhost:11434/v1",
-      "description": "VPS-local Ollama instance"
-    },
-    "ollama-vps-remote": {
-      "type": "ollama",
-      "baseURL": "http://localhost:11434/v1",
-      "description": "Remote-proxied models via VPS Ollama",
-      "note": "kimi-k2.5:cloud routes externally via ollama.com — requires internet"
-    }
-  },
-  "models": {
-    "qwen3.6": {
-      "provider": "ollama-vps",
-      "model": "qwen3.6:latest",
-      "description": "36B MoE — primary workhorse, replaces Sonnet (Phase 9)"
-    },
-    "qwen3-8b": {
-      "provider": "ollama-vps",
-      "model": "qwen3:8b",
-      "description": "8B — fast loops, low-latency, replaces Haiku"
-    },
-    "kimi-k2.5": {
-      "provider": "ollama-vps-remote",
-      "model": "kimi-k2.5:cloud",
-      "description": "Long-context overflow — proxied externally, not fully local"
-    }
-  },
-  "defaults": {
-    "workhorse": "qwen3.6",
-    "fast": "qwen3-8b",
-    "longContext": "kimi-k2.5"
-  }
-}
-```
-**Write to:** `/root/openclaw/data/models.json`
+### Item 2: ~~models.json Write~~ ✅ STAGED IN PR
+**Status:** ✅ STAGED (awaiting CVO merge)
+**Outcome:** All 15 per-agent `models.json` files patched in feature branch `phase-9/ollama-cutover`. Canonical `ollama` provider added with `qwen3.6:latest` + `qwen3:8b`. Kimi references purged (1 explicit, 12 via replacement). Prior proposed schema (`providers + flat models + defaults`) was incompatible with parser and has been discarded.
 
-### Item 3: agents_config.json Model Key Alignment
+### Item 3: ~~agents_config.json Model Key Alignment~~ ✅ STAGED IN PR
+**Status:** ✅ STAGED (awaiting CVO merge)
+**Outcome:** 22 Haiku-bound agents remapped to `qwen3:8b` in both `agents_config.json` and `config/agents_config.json`. 74 Sonnet bindings preserved (Phase 9.2). 7 Opus bindings preserved (Tier 0, P5).
+
+### Item 4: End-to-End Routing Test (POST-MERGE)
 **Priority:** HIGH
-**Status:** 🔲 NOT VERIFIED
-**Action Required:** Confirm that agent model references in `agents_config.json` match the new model keys (`qwen3.6`, `qwen3-8b`, `kimi-k2.5`). Update any that still reference old Anthropic model names.
-
-### Item 4: End-to-End Routing Test
-**Priority:** HIGH
-**Status:** 🔲 NOT DONE
-**Action Required:** Trigger a test heartbeat and confirm:
-- Fast loop routes to `qwen3:8b`
-- Primary reasoning routes to `qwen3.6:latest`
-- Long-context overflow routes to `kimi-k2.5:cloud`
-- All responses return valid JSON (no model format errors)
+**Status:** 🔲 BLOCKED on CVO merge
+**Action Required (operator side, post-merge):**
+- Pull merged `main` on VPS: `cd /root/openclaw && git pull`
+- Restart: `pm2 restart openclaw --update-env` OR `docker compose restart openclaw`
+- Tail logs 5 minutes — zero parse errors, zero "model not found"
+- Manually trigger one heartbeat per Haiku-remapped agent — confirm qwen3:8b response
+- Confirm at least one Sonnet agent still routes to Claude (proves no over-reach)
 
 ---
 
 ## 📋 PHASE 9 CHECKLIST
 
 - [x] Ollama installed on VPS
-- [x] Models pulled: qwen3.6, qwen3:8b, kimi-k2.5:cloud
-- [x] baseURL confirmed: `http://localhost:11434/v1`
-- [x] models.json draft prepared and audited
-- [ ] models.json schema verified from codebase
-- [ ] models.json written to `/root/openclaw/data/models.json`
-- [ ] agents_config.json updated to reference new model keys
-- [ ] Routing test passed
-- [ ] Full heartbeat cycle completed on local stack
-- [ ] Phase 9 marked COMPLETE → advance to Phase 10
+- [x] Models pulled: qwen3.6, qwen3:8b (Kimi removed per CVO)
+- [x] baseUrl confirmed: `http://127.0.0.1:11434/v1`
+- [x] models.json schema verified from codebase via GitHub repo
+- [x] All 15 per-agent models.json patched in feature branch
+- [x] agents_config.json (×2) updated — 22 Haiku → qwen3:8b
+- [x] Idempotent patch script committed (`scripts/phase9_patch.py`)
+- [x] Phase document written (`docs/phases/ollama-cutover-phase-9.md`)
+- [x] PR opened against `main`
+- [ ] CVO PR review + sign-off
+- [ ] PR merged to `main`
+- [ ] Operator-side smoke test on VPS
+- [ ] Phase 9.1 marked COMPLETE → advance to Phase 9.2
 
 ---
 
@@ -164,3 +123,22 @@ Key items:
 | Steward | Lifecycle management | 🔲 Pending Phase 9 validation |
 
 All sub-agents held in standby until local model routing is confirmed operational.
+
+---
+
+## 📜 AUDIT LOG (Append-Only)
+
+### Entry 2026-05-13-001 — Phase 9.1 OPEN
+- **Timestamp:** 2026-05-13T13:05:00-05:00
+- **Change Type:** CONFIG
+- **Status:** PENDING
+- **Initiative:** ollama-cutover phase 9.1
+- **Owner:** MIKE (via Perplexity Computer)
+- **CVO:** Jeremiah Van Wagner (sign-off pending)
+- **Summary:** Opened Phase 9.1 of the Ollama Cutover. Patched 15 per-agent `models.json` files to add canonical `ollama` provider (qwen3.6:latest + qwen3:8b). Remapped 22 Haiku-bound pod agents in both `agents_config.json` and `config/agents_config.json` to `qwen3:8b`. Purged all Kimi model references (1 explicit in main openrouter, 12 implicit via ollama-provider replacement). Sonnet (74) and Opus (7) bindings preserved per phased cutover doctrine. P10 Mission Alignment Test answered: cost sovereignty + operational independence (lowers price of access for Children of God + protects prophetic voice from third-party gatekeepers).
+- **Files Changed:** 17 (15 `agents/*/agent/models.json` + `agents_config.json` + `config/agents_config.json`) + 2 new (`scripts/phase9_patch.py`, `docs/phases/ollama-cutover-phase-9.md`)
+- **Rollback Plan:** `git revert <merge-sha>` + `pm2 restart openclaw --update-env`
+- **Rollback Tested:** NO — operator-side post-merge
+- **Doctrine Violations:** None. P9 (rollback tested) carries a yellow flag pending operator smoke test.
+- **PR Link:** https://github.com/jeremiahvanwagner-droid/openclaw/pull/11
+- **Phase Close Entry ID:** (pending merge + smoke test)

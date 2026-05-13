@@ -193,17 +193,16 @@
       ]
     },
     "ollama": {
-      "baseUrl": "http://127.0.0.1:11434/v1",
-      "apiKey": "ollama-local",
       "api": "ollama",
+      "apiKey": "ollama-local",
+      "baseUrl": "http://127.0.0.1:11434/v1",
       "models": [
         {
-          "id": "kimi-k2.6:cloud",
-          "name": "kimi-k2.6:cloud",
+          "id": "qwen3.6:latest",
+          "name": "Qwen 3.6 36B MoE (workhorse)",
           "reasoning": true,
           "input": [
-            "text",
-            "image"
+            "text"
           ],
           "cost": {
             "input": 0,
@@ -211,9 +210,24 @@
             "cacheRead": 0,
             "cacheWrite": 0
           },
-          "contextWindow": 262144,
-          "maxTokens": 8192,
-          "api": "ollama"
+          "contextWindow": 131072,
+          "maxTokens": 32768
+        },
+        {
+          "id": "qwen3:8b",
+          "name": "Qwen3 8B (fast)",
+          "reasoning": false,
+          "input": [
+            "text"
+          ],
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "contextWindow": 32768,
+          "maxTokens": 8192
         }
       ]
     }
