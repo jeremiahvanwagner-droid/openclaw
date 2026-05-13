@@ -141,7 +141,7 @@ All sub-agents held in standby until local model routing is confirmed operationa
 - **Rollback Tested:** NO — see phase doc section 5.
 - **Doctrine Violations Discharged:** P2 (orphaned change, unknown duration; likely pre-dates 2026-05-12 11:27 UTC).
 - **Doctrine Violations Open:** None new. P9 (rollback tested) carries yellow flag pending operator post-restart.
-- **PR Link:** (to be added once PR is opened)
+- **PR Link:** https://github.com/jeremiahvanwagner-droid/openclaw/pull/12
 - **Phase Close Entry ID:** (pending merge + `docker compose up -d` + healthcheck pass)
 - **Unblocks:** Phase 9.1 end-to-end smoke test (Entry 2026-05-13-001 close)
 
