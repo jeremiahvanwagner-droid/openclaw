@@ -140,5 +140,5 @@ All sub-agents held in standby until local model routing is confirmed operationa
 - **Rollback Plan:** `git revert <merge-sha>` + `pm2 restart openclaw --update-env`
 - **Rollback Tested:** NO — operator-side post-merge
 - **Doctrine Violations:** None. P9 (rollback tested) carries a yellow flag pending operator smoke test.
-- **PR Link:** (to be added once PR is opened)
+- **PR Link:** https://github.com/jeremiahvanwagner-droid/openclaw/pull/11
 - **Phase Close Entry ID:** (pending merge + smoke test)
