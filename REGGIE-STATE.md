@@ -147,7 +147,7 @@ All sub-agents held in standby until local model routing is confirmed operationa
 - **Doctrine Violations Open:** None new. P9 (rollback tested) yellow-flagged pending operator post-restart.
 - **Forensic Notes:** Host process is PID 141406, running as `openclaw` user, command `/usr/bin/node /usr/lib/node_modules/openclaw/dist/index.js gateway --port 18789 --allow-unconfigured`. systemd unit `openclaw.service` is `loaded; disabled; preset: enabled` — NOT auto-starting on boot; should be enabled after this phase closes.
 - **Open observation:** liveness warning `reasons=event_l...` (truncated) at 2026-05-13 20:54:15 UTC. Investigate in Phase 9.2 entry criteria.
-- **PR Link:** (to be added once PR is opened)
+- **PR Link:** https://github.com/jeremiahvanwagner-droid/openclaw/pull/13
 - **Phase Close Entry ID:** (pending merge + systemctl restart + smoke test)
 - **Unblocks:** Phase 9.1 close (Entry 2026-05-13-001) AND Phase 9.1.1 close (Entry 2026-05-13-002)
 
