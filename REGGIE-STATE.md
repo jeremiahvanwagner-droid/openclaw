@@ -23,9 +23,9 @@
 | OpenClaw release tag | `2026.4.29` (commit `a448042`) — running container |
 | `package.json` version | `1.0.0` |
 | Deployment shape | Docker Compose (LOCAL `C:\Users\JeremiahVanWagner\.openclaw\docker-compose.yml` + VPS `/root/openclaw/docker-compose.yml`) |
-| Last state update | 2026-05-10 (canary stabilization — r12) UTC |
+| Last state update | 2026-05-12 (inngest v4 migration — r13) UTC |
 | Sweep version | `2026-05-05-sweep` (Phase 1–5 complete) |
-| Last audit entry | `r12-2026-05-10-canary-stabilize` |
+| Last audit entry | `r13-2026-05-12-inngest-v4-createfunction-migration` |
 
 ---
 
@@ -225,6 +225,26 @@ Verified present in LOCAL filesystem:
 ## 7. CHANGE LOG (LAST 5 ENTRIES)
 
 > Append-only — never edit prior entries. Corrections are new entries with `Status=ROLLED_BACK` referencing the prior Entry ID.
+
+### 7.0a AUDIT ENTRY — Inngest v4 createFunction migration — 2026-05-12
+
+| Field | Value |
+|---|---|
+| Date | 2026-05-12 22:18 UTC |
+| Author | agent:claude-code (opus-4.7) + human:jeremiah-vanwagner |
+| Change Type | CODE_FIX (TypeScript build break / CI red 4 commits running) |
+| Status | APPLIED, pushed to `main` as commit `579da3c` |
+| Parent Entry | `r12-2026-05-10-canary-stabilize` |
+| Sibling Entry | None |
+| Impacted Divisions | shared_runtime_ops, all event-driven agents (Inngest is the orchestration bus) |
+| Trigger | `pnpm typecheck` failing on `inngest/functions/*.ts` after inngest@4.x upgrade — 4 successive CI runs failed since the v3.54+ → v4 jump |
+| Root cause | Two breaking changes in inngest v4: (a) `createFunction(config, trigger, handler)` collapsed to `createFunction(config, handler)` with triggers moved inside config as `triggers: [...]`; (b) `EventSchemas` removed from public exports. |
+| Files changed | `inngest/client.ts` (dropped EventSchemas import + `schemas:` field), `inngest/functions/agent-orchestrator.ts` (8 calls), `inngest/functions/d8-saas-operations.ts` (7 calls, single-line config), `inngest/functions/phase1-foundation.ts` (11 calls), `inngest/functions/phase2-intelligence.ts` (10 calls), `inngest/__tests__/agent-orchestrator.test.ts` (mock), `inngest/__tests__/d8-saas-operations.test.ts` (mock). 36 createFunction call sites migrated total via codemod. |
+| Verification | `pnpm lint:ci` (59 warnings, at baseline), `pnpm typecheck` clean, `pnpm test` 239/239 passing, `dashboard typecheck` clean — all green locally before push |
+| Outstanding debt | `OpenClawEvent` union (template-literal `name`s like `agent/${id}/task`) currently NOT wired into Inngest typing — handlers see untyped `event`. Re-introduce via `staticSchema<Record>()` after converting union to record-shaped event map. Note left at `inngest/client.ts:1287`. |
+| Rollback path | `git revert 579da3c` then pin `inngest@<4.0.0` in `package.json` |
+
+---
 
 ### 7.0 AUDIT ENTRY — Canary stabilization (watchdog + telegram + heartbeat) — 2026-05-10
 
