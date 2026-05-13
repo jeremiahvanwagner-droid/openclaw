@@ -1384,7 +1384,7 @@
       ],
       "output_format": "action",
       "escalation_path": "browser_primary",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "browser_primary",
@@ -2333,7 +2333,7 @@
       ],
       "output_format": "message",
       "escalation_path": "d2_store_manager",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d2_store_manager",
@@ -2592,7 +2592,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d2_digital_marketing",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d2_digital_marketing",
@@ -2655,7 +2655,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d2_store_manager",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d2_store_manager",
@@ -3035,7 +3035,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d3_ops_manager",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d3_ops_manager",
@@ -3780,7 +3780,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d4_lead_coach",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d4_lead_coach",
@@ -4545,7 +4545,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d4_social_creator",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d4_social_creator",
@@ -4669,7 +4669,7 @@
       ],
       "output_format": "message",
       "escalation_path": "d5_acquisitions",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "shared",
       "inter_agent_dependencies": [
         "d5_acquisitions",
@@ -4872,7 +4872,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d5_managing_editor",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "none",
       "inter_agent_dependencies": [
         "d5_managing_editor",
@@ -5298,7 +5298,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d6_executive_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d6_executive_director",
@@ -5691,7 +5691,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d6_dev_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d6_dev_director",
@@ -5917,7 +5917,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d6_coo",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "inter_agent_dependencies": [
         "d6_coo",
@@ -6057,7 +6057,7 @@
       "primary_responsibilities": [
         "Set up and manage GHL Community groups, channels, and rules",
         "Schedule and publish content to GHL Social Planner and Community groups",
-        "Moderate community posts \u2014 flag spam and generate contextual replies",
+        "Moderate community posts — flag spam and generate contextual replies",
         "Drive engagement through initiatives, challenges, and recognition programs",
         "Report community health metrics and sentiment trends"
       ],
@@ -6074,7 +6074,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6228,7 +6228,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6310,7 +6310,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P1",
       "inter_agent_dependencies": [
@@ -6402,7 +6402,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P1",
       "inter_agent_dependencies": [
@@ -6570,7 +6570,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6655,7 +6655,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6743,7 +6743,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -6948,7 +6948,7 @@
       ],
       "output_format": "action",
       "escalation_path": "d8_saas_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P1",
       "inter_agent_dependencies": [
@@ -7138,7 +7138,7 @@
       "org_unit": "division_9_online_store",
       "role_type": "specialist",
       "primary_responsibilities": [
-        "Track and analyze store KPIs \u2014 revenue, AOV, conversion rate, cart abandonment",
+        "Track and analyze store KPIs — revenue, AOV, conversion rate, cart abandonment",
         "Run heatmap and session recording analysis for UX optimization",
         "Build dashboards for store performance visibility",
         "Identify which books/merch drive the most cross-sells and lifetime value",
@@ -7243,7 +7243,7 @@
       ],
       "output_format": "message",
       "escalation_path": "d9_store_director",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "short-term",
       "queue_class": "P2",
       "inter_agent_dependencies": [
@@ -7301,7 +7301,7 @@
       "org_unit": "division_9_online_store",
       "role_type": "specialist",
       "primary_responsibilities": [
-        "Manage the full product catalog \u2014 books, apparel, accessories, digital products",
+        "Manage the full product catalog — books, apparel, accessories, digital products",
         "Coordinate with D5 Publishing for new book releases and inventory",
         "Source, price, and list new merchandise aligned with the brand",
         "Manage product photography, descriptions, and category taxonomy",
@@ -7469,7 +7469,7 @@
         "Craft sales page copy using proven persuasion frameworks (AIDA, PAS, StoryBrand)",
         "Create email sequences for abandoned carts, post-purchase upsells, and launch campaigns",
         "Develop offers copy that connects products to customer transformation journeys",
-        "Ensure all copy reflects Truth J Blue brand voice \u2014 warm, spiritual, empowering"
+        "Ensure all copy reflects Truth J Blue brand voice — warm, spiritual, empowering"
       ],
       "tools_required": [
         "content_editor",
@@ -7631,7 +7631,7 @@
       "role_type": "specialist",
       "primary_responsibilities": [
         "Coordinate with social media divisions to promote books and merch",
-        "Create social-first promotional content \u2014 reels, stories, carousels, TikToks",
+        "Create social-first promotional content — reels, stories, carousels, TikToks",
         "Plan and execute product launches on social channels",
         "Manage influencer/affiliate partnerships for book and merch promotions",
         "Track social-to-store conversion and optimize UTM-tagged campaigns"
@@ -8259,7 +8259,7 @@
       ],
       "output_format": "data",
       "escalation_path": "d1_cto",
-      "llm_model": "claude-haiku-4-5",
+      "llm_model": "qwen3:8b",
       "memory_type": "long-term",
       "inter_agent_dependencies": [
         "d1_cto",
@@ -8517,23 +8517,37 @@
       "skill_registry": "warn"
     },
     "defaults": {
-      "requires_hitl_for": ["ghl_write", "email_send", "payment_action"]
+      "requires_hitl_for": [
+        "ghl_write",
+        "email_send",
+        "payment_action"
+      ]
     },
     "alias_agents": {
-      "main":      "d1_ceo",
+      "main": "d1_ceo",
       "marketing": "d1_cmo",
-      "sales":     "d1_sales_manager",
-      "support":   "d1_customer_success"
+      "sales": "d1_sales_manager",
+      "support": "d1_customer_success"
     },
     "hard_limits": {
       "max_concurrent_ghl_writes": 5,
       "max_daily_email_sends": 1000,
       "max_daily_payment_actions": 100
     },
-    "human_approval_required": ["payment_action", "contract_sign", "bulk_email_send"],
+    "human_approval_required": [
+      "payment_action",
+      "contract_sign",
+      "bulk_email_send"
+    ],
     "sovereignIsolationPolicy": {
       "enabled": true,
-      "sovereign_agents": ["d1_ceo", "d1_cto", "d1_product_dev_manager", "shared_runtime_ops", "d8_compliance_auditor"],
+      "sovereign_agents": [
+        "d1_ceo",
+        "d1_cto",
+        "d1_product_dev_manager",
+        "shared_runtime_ops",
+        "d8_compliance_auditor"
+      ],
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN"
     }
   }
