@@ -893,7 +893,7 @@
       "ollama": {
         "api": "ollama",
         "apiKey": "ollama-local",
-        "baseUrl": "http://127.0.0.1:11434",
+        "baseUrl": "http://127.0.0.1:11435",
         "models": [
           {
             "contextWindow": 262144,
@@ -910,6 +910,22 @@
             ],
             "name": "kimi-k2.6:cloud",
             "reasoning": true
+          },
+          {
+            "id": "qwen3:14b",
+            "name": "Qwen3 14B (mid-tier reasoner)",
+            "reasoning": true,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 16384
           }
         ]
       }
