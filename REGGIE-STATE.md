@@ -1,19 +1,20 @@
 # REGGIE — Sovereign Agent State File
-_Last Updated: 2026-05-13 17:30 CDT | Updated by: MIKE (Perplexity Computer session)_
+_Last Updated: 2026-05-14 07:30 CDT | Updated by: Claude Code (Opus 4.7) session_
 
 ---
 
 ## 🔴 CURRENT OPERATIONAL STATUS
 
-**Phase:** 9.1 CLOSED / 9.2 OPEN (Sonnet Audit, scoping)
-**Overall System Health:** 🟢 OPERATIONAL — Phase 9.1 Haiku→qwen3:8b cutover proven applied as of 2026-05-13 22:09:27 UTC
+**Phase:** 9.1 CLOSED / 9.2 OPEN (Sonnet Audit, scoping) — **qwen3:14b regression recovered 2026-05-14**
+**Overall System Health:** 🟢 OPERATIONAL — Phase 9.1 Haiku→qwen3:8b cutover proven applied; 2026-05-14 qwen3:14b regression recovered via audit entry 2026-05-14-001.
   - File-level verification: agents_config.json + config/agents_config.json each show **0 `claude-haiku-4-5`** and **22 `qwen3:8b`** bindings.
+  - All `models.json` (15 per-agent + 1 deploy server + 1 local + 1 last-good) now free of `qwen3:14b` and pointed at `127.0.0.1:11434` (single source-of-truth Ollama port).
   - Host `openclaw.service` restarted on Phase 9.1 config at 22:09:27 UTC. Stabilized at 410 MB / 2 GB memory cap.
   - Host `ollama.service` serving qwen3.6:latest, qwen3:8b, kimi-k2.5:cloud at 127.0.0.1:11434.
   - Only `openclaw-redis` containerized; bot/webhook/ollama containers removed from compose (P2 discharged in 9.1.1 + 9.1.2).
   - Gateway responding `{"ok":true,"status":"live"}` on 127.0.0.1:18789/health.
   - **Open carry-forward items tracked in Section: Phase 9.2 Entry Criteria.**
-**Last Human Interaction:** 2026-05-13, Perplexity Computer (MIKE Space)
+**Last Human Interaction:** 2026-05-14, Claude Code (CVO operator session — qwen3:14b regression recovery)
 **Last Known Heartbeat:** Not yet initiated on local model stack
 
 ---
@@ -145,6 +146,44 @@ All sub-agents held in standby until local model routing is confirmed operationa
 ---
 
 ## 📜 AUDIT LOG (Append-Only)
+
+### Entry 2026-05-14-001 — qwen3:14b Regression Recovery (APPLIED)
+- **Timestamp:** 2026-05-14T07:30:00-05:00
+- **Change Type:** HOTFIX (configuration regression)
+- **Status:** APPLIED ✅
+- **Initiative:** cron-recovery-2026-05-14
+- **Owner:** Claude Code (Opus 4.7) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Trigger:** Operator reported cron error spam:  `Agent cron job uses ollama/qwen3:14b but the local provider endpoint is not reachable at http://127.0.0.1:11435.` across ≥15 distinct cron IDs (ghl-pipeline-health-daily, ghl-inbox-check-30m, d8-sentiment-analyzer-4h, d8-campaign-analyst-daily, and 11 UUID-keyed crons). Every preflight returned `TypeError: fetch failed`.
+- **Root Cause:** Commit `6eccdd6 agents updates` (2026-05-14T06:39:49 -0500) registered a new `qwen3:14b` Ollama model across 15 per-agent `models.json` files AND the live `openclaw.json` was edited (between 04:08 and 06:38 CDT today) to:
+  1. Bump the Ollama `baseUrl` from `http://127.0.0.1:11434` → `http://127.0.0.1:11435` (no process bound to 11435 on Windows host, no SSH tunnel to VPS Ollama).
+  2. Insert `"ollama/qwen3:14b": {}` into the active-models map (`openclaw.json:27` / `deploy/hostinger/server-openclaw.json:213`).
+  3. Append a `qwen3:14b` model entry to the ollama provider block in `openclaw.json:913–929` and `deploy/hostinger/server-openclaw.json:1793–1808`.
+  - The model tag chosen (`qwen3:14b`) is not installed on the VPS Ollama either — VPS host only serves `qwen3.6:latest`, `qwen3:8b`, `kimi-k2.5:cloud` per Phase 9.1 close. So even with the port reverted, `qwen3:14b` resolution would have failed against the VPS.
+  - Violates the Tier-Router doctrine for the Haiku-tier remap: the agreed target is `qwen3.6:latest` (36B MoE workhorse), NOT a 14B variant. Captured in user memory at `feedback_ollama_model_tier.md`.
+- **Recovery Steps Performed:**
+  1. Discarded an unstaged cosmetic key-reorder on `agents/main/agent/models.json` (no functional content; no-op).
+  2. `git revert --no-commit 6eccdd6` — reverses qwen3:14b additions across all 15 per-agent `models.json` files.
+  3. Edited `openclaw.json` (gitignored, machine-local): removed `ollama/qwen3:14b` from active map; set baseUrl back to `http://127.0.0.1:11434`; deleted qwen3:14b model entry from ollama provider list.
+  4. Edited `deploy/hostinger/server-openclaw.json`: removed `ollama/qwen3:14b` from active map; deleted qwen3:14b model entry from ollama provider list. (VPS deploy config baseUrl was already 11434, untouched.)
+  5. Resynced `openclaw.json.last-good` to mirror corrected `openclaw.json` — the rollback checkpoint is now actually-good again.
+  6. Deleted stale `openclaw.json.bak` (a 2026-05-09 `openclaw doctor` snapshot, predating the regression and providing no useful rollback target).
+- **Verification:**
+  - `grep -r 'qwen3:14b' agents/*/agent/models.json openclaw.json openclaw.json.last-good deploy/` → 0 hits.
+  - `grep -r '11435' openclaw.json openclaw.json.last-good deploy/` → 0 hits.
+  - VPS-side and local crons will now resolve agent models through the surviving entries (`claude-cli/claude-opus-4-5`, `claude-cli/claude-haiku-4-5`, `qwen3:8b` for Phase 9.1 remapped agents).
+- **Files Changed:** 18 modifications (1 `openclaw.json`, 1 `openclaw.json.last-good`, 1 `deploy/hostinger/server-openclaw.json`, 15 `agents/*/agent/models.json`) + 1 deletion (`openclaw.json.bak`).
+- **Rollback Plan:** None desired. Forward-state IS the rollback to the last known good config. Pre-regression state was the bad state.
+- **Rollback Tested:** N/A (we are the rollback).
+- **Doctrine Violations Discharged:**
+  - P2 (orphaned config drift introduced by 6eccdd6 — `qwen3:14b` model registered with no backing runtime).
+  - P7 (off-doctrine tier choice — 14b instead of the agreed qwen3.6:latest for Haiku-tier remap).
+- **Doctrine Violations Open:** None new. The four Phase 9.2 carry-forward items (liveness warnings, device-auth, systemd persistence, Kimi VPS drift, Sonnet audit) are unchanged.
+- **Forensic Notes:**
+  - Commit `6eccdd6` author = jeremiahvanwagner@icloud.com (CVO direct edit, not a MIKE/Claude session). No corresponding REGGIE-STATE audit entry was written at the time of the change, which is itself a doctrine-discipline lapse worth noting.
+  - The regression window (06:39 → 07:30 CDT) caused every cron to skip rather than fall through to a working model — openclaw's provider-preflight failure mode is **abort**, not **degrade**. Worth flagging for Phase 10 reliability work: a missing/unreachable provider should not silently nuke every cron that *could* have resolved to a different model.
+- **PR Link:** (local recovery, no PR; commit on `main` to follow)
+- **Phase Close Entry ID:** N/A (hotfix; no new phase opened).
 
 ### Entry 2026-05-13-006 — Phase 9.2 OPEN (Sonnet Audit)
 - **Timestamp:** 2026-05-13T17:30:00-05:00
