@@ -1,14 +1,13 @@
 {
   "version": 1,
-  "lastGood": {},
   "usageStats": {
     "anthropic:claude-cli": {
-      "errorCount": 3,
+      "errorCount": 2,
       "failureCounts": {
-        "billing": 3
+        "billing": 2
       },
-      "lastFailureAt": 1778721908407,
-      "disabledUntil": 1778739498819,
+      "lastFailureAt": 1778721373179,
+      "disabledUntil": 1778739262908,
       "disabledReason": "billing"
     }
   }

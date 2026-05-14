@@ -102,7 +102,7 @@
     "ollama": {
       "api": "ollama",
       "apiKey": "ollama-local",
-      "baseUrl": "http://127.0.0.1:11434/v1",
+      "baseUrl": "http://127.0.0.1:11435/v1",
       "models": [
         {
           "id": "qwen3.6:latest",
