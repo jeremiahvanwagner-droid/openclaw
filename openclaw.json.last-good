@@ -29,7 +29,8 @@
         "claude-cli/claude-sonnet-4-5": {},
         "claude-cli/claude-opus-4-7": {},
         "claude-cli/claude-sonnet-4-6": {},
-        "claude-cli/claude-opus-4-6": {}
+        "claude-cli/claude-opus-4-6": {},
+        "ollama/qwen3.5:27b": {}
       },
       "sandbox": {
         "browser": {
@@ -895,20 +896,40 @@
         "baseUrl": "http://127.0.0.1:11434",
         "models": [
           {
-            "contextWindow": 262144,
-            "cost": {
-              "cacheRead": 0,
-              "cacheWrite": 0,
-              "input": 0,
-              "output": 0
-            },
-            "id": "kimi-k2.6:cloud",
-            "input": [
-              "text",
-              "image"
-            ],
-            "name": "kimi-k2.6:cloud",
-            "reasoning": true
+            "id": "qwen3.6:latest",
+            "name": "Qwen 3.6 36B MoE (workhorse — dormant until 32GB VPS upgrade)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 131072,
+            "maxTokens": 32768
+          },
+          {
+            "id": "qwen3.5:27b",
+            "name": "Qwen 3.5 27B (interim Haiku-tier workhorse)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 131072,
+            "maxTokens": 32768
+          },
+          {
+            "id": "qwen3:14b",
+            "name": "Qwen3 14B (mid-tier reasoner — catalog reserve)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 32768,
+            "maxTokens": 16384
+          },
+          {
+            "id": "qwen3:8b",
+            "name": "Qwen3 8B (fast — catalog reserve)",
+            "reasoning": false,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 32768,
+            "maxTokens": 8192
           }
         ]
       }

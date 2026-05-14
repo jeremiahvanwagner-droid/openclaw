@@ -209,7 +209,8 @@
       "models": {
         "anthropic/claude-opus-4-5": {},
         "anthropic/claude-sonnet-4-5": {},
-        "anthropic/claude-haiku-4-5": {}
+        "anthropic/claude-haiku-4-5": {},
+        "ollama/qwen3.5:27b": {}
       },
       "workspace": "/opt/openclaw/workspace",
       "timeFormat": "24",
@@ -1774,19 +1775,39 @@
         "apiKey": "OLLAMA_API_KEY",
         "models": [
           {
-            "id": "gemma4",
-            "name": "gemma4",
+            "id": "qwen3.6:latest",
+            "name": "Qwen 3.6 36B MoE (workhorse — dormant until 32GB VPS upgrade)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 131072,
+            "maxTokens": 32768
+          },
+          {
+            "id": "qwen3.5:27b",
+            "name": "Qwen 3.5 27B (interim Haiku-tier workhorse)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 131072,
+            "maxTokens": 32768
+          },
+          {
+            "id": "qwen3:14b",
+            "name": "Qwen3 14B (mid-tier reasoner — catalog reserve)",
+            "reasoning": true,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 32768,
+            "maxTokens": 16384
+          },
+          {
+            "id": "qwen3:8b",
+            "name": "Qwen3 8B (fast — catalog reserve)",
             "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
+            "input": ["text"],
+            "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
+            "contextWindow": 32768,
             "maxTokens": 8192
           }
         ]

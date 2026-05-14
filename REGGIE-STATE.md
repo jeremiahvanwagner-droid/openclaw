@@ -1,12 +1,12 @@
 # REGGIE — Sovereign Agent State File
-_Last Updated: 2026-05-14 07:30 CDT | Updated by: Claude Code (Opus 4.7) session_
+_Last Updated: 2026-05-14 10:00 CDT | Updated by: Claude Code (Opus 4.7) session_
 
 ---
 
 ## 🔴 CURRENT OPERATIONAL STATUS
 
-**Phase:** 9.1 CLOSED / 9.2 OPEN (Sonnet Audit, scoping) — **qwen3:14b regression recovered 2026-05-14**
-**Overall System Health:** 🟢 OPERATIONAL — Phase 9.1 Haiku→qwen3:8b cutover proven applied; 2026-05-14 qwen3:14b regression recovered via audit entry 2026-05-14-001.
+**Phase:** 9.1 SUPERSEDED → 9.1-REDO APPLIED (qwen3:8b → qwen3.5:27b) / 9.2 OPEN (Sonnet Audit, scoping)
+**Overall System Health:** 🟢 OPERATIONAL — Phase 9.1-redo applied 2026-05-14: 22 Haiku-tier agents now bound to `qwen3.5:27b` (interim, until 32GB VPS upgrade enables `qwen3.6:latest`). Local Ollama at `127.0.0.1:11434` (Windows host) confirmed serving `qwen3.5:27b` (17 GB) + `qwen3:14b` (9.3 GB) + `kimi-k2.5:cloud` (routing). Per-agent ollama catalogs hold all four qwen3 tags. The 2026-05-14 morning regression (`qwen3:14b` registered with no backing runtime) recovered via audit 2026-05-14-001; the proper redo recorded in 2026-05-14-002.
   - File-level verification: agents_config.json + config/agents_config.json each show **0 `claude-haiku-4-5`** and **22 `qwen3:8b`** bindings.
   - All `models.json` (15 per-agent + 1 deploy server + 1 local + 1 last-good) now free of `qwen3:14b` and pointed at `127.0.0.1:11434` (single source-of-truth Ollama port).
   - Host `openclaw.service` restarted on Phase 9.1 config at 22:09:27 UTC. Stabilized at 410 MB / 2 GB memory cap.
@@ -146,6 +146,45 @@ All sub-agents held in standby until local model routing is confirmed operationa
 ---
 
 ## 📜 AUDIT LOG (Append-Only)
+
+### Entry 2026-05-14-002 — Phase 9.1 REDO: Haiku-tier remapped to qwen3.5:27b (APPLIED)
+- **Timestamp:** 2026-05-14T10:00:00-05:00
+- **Change Type:** CONFIG (phased cutover do-over)
+- **Status:** APPLIED ✅
+- **Initiative:** phase-9.1-redo (interim qwen3.5:27b)
+- **Owner:** Claude Code (Opus 4.7) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Context:** Phase 9.1 (commit 8aa64c5, 2026-05-13) had remapped 22 former-Haiku cron-firing agents to `qwen3:8b`. Operator review (memory `feedback_ollama_model_tier`) identified qwen3:8b as undersized for SLA/sentinel/classification workloads — too small a context window and reasoning=false. The doctrinal target is `qwen3.6:latest` (36B MoE), but qwen3.6 requires a 32GB VPS upgrade not in scope this cycle. **Interim selected: `qwen3.5:27b`** — closest reasoning-capable local model that fits current VPS RAM.
+- **Pre-conditions Established 2026-05-14 (before this entry):**
+  - Local Ollama install moved off F: thumbdrive → reinstalled cleanly on Windows host (binaries at `C:\Users\…\AppData\Local\Programs\Ollama`, models at `C:\Users\…\.ollama\models`).
+  - `OLLAMA_MODELS` env var reconciled across User scope + Machine scope → both point at `C:\Users\…\.ollama\models`.
+  - `qwen3.5:27b` (17 GB) and `qwen3:14b` (9.3 GB) confirmed local and served via daemon at `127.0.0.1:11434`. `qwen3.6:latest` deliberately not pulled (skipped pending 32GB upgrade).
+  - F: thumbdrive ejected by operator — no thumbdrive dependency anywhere in the stack.
+- **Changes Applied:**
+  1. **`scripts/phase9_2_patch.py`** added (idempotent patcher mirroring `phase9_patch.py` precedent). Encodes the canonical Phase-9.2 ollama provider block (qwen3.6:latest, qwen3.5:27b, qwen3:14b, qwen3:8b) and the `qwen3:8b → qwen3.5:27b` agent remap.
+  2. **15 per-agent `models.json`** files rewritten by the patch script: ollama provider catalog now lists all four qwen3 tags, `baseUrl` standardized to `http://127.0.0.1:11434` (was `:11435/v1` — a pre-existing drift). Every file: 1 change recorded by patch summary.
+  3. **`agents_config.json`** + **`config/agents_config.json`**: 22 agents remapped `qwen3:8b` → `qwen3.5:27b`. Both files in sync (identical 22-agent lists). Affected agents:
+     - browser_secondary, d2_customer_service, d2_graphic_designer, d2_inventory_specialist, d3_admin_coordinator, d4_client_experience, d4_video_production, d5_author_relations, d5_cover_artist, d6_board_liaison, d6_grant_writer, d6_volunteer, d8_community_manager, d8_content_ops, d8_crm_ops, d8_customer_success, d8_integration_engineer, d8_marketing_automation, d8_membership_director, d8_revenue_ops, d9_customer_experience, shared_knowledge_base
+  4. **`openclaw.json`** (gitignored, local Windows): active-models map adds `ollama/qwen3.5:27b`; ollama provider catalog replaced (was kimi-k2.6:cloud only) with the canonical 4-tag catalog.
+  5. **`deploy/hostinger/server-openclaw.json`** (VPS canon): active-models map adds `ollama/qwen3.5:27b`; ollama provider catalog replaced (was gemma4 placeholder only) with the canonical 4-tag catalog. `apiKey: "OLLAMA_API_KEY"` env reference preserved.
+  6. **`openclaw.json.last-good`**: resynced from corrected `openclaw.json`.
+- **Verification:**
+  - `python -c "import json; json.load(open(f))"` across all touched JSON files → all valid.
+  - Patch script summary recorded 15/15 agents updated and 22/22 bindings remapped in each config file.
+  - HTTP probe to `127.0.0.1:11434/api/tags` returns `qwen3.5:27b`, `qwen3:14b`, `kimi-k2.5:cloud` from a live daemon. Cron preflight should now succeed for the 22 redirected agents.
+- **Files Changed:** 21 (1 new `scripts/phase9_2_patch.py` + 15 per-agent models.json + 2 agents_config.json + 2 openclaw.json variants + 1 REGGIE-STATE.md).
+- **Rollback Plan:** `git revert <this-commit-sha>` restores Phase 9.1's `qwen3:8b` state. `scripts/phase9_2_patch.py` would be inert post-revert (the canonical block check is idempotent).
+- **Rollback Tested:** NO — operator-side post-deploy verification preferred over preemptive revert dry-run.
+- **Doctrine Violations Discharged:**
+  - P2 (per-agent baseUrl drift `:11435/v1`, predated this session — now normalized to `:11434`).
+  - P7 (off-doctrine tier choice — Phase 9.1 had used qwen3:8b; this redo aligns with the qwen3.5/qwen3.6 reasoning-tier doctrine).
+- **Doctrine Violations Open:** None new. Phase 9.2 carry-forward items (liveness warnings, device-auth, systemd persistence, Kimi VPS drift, 74-Sonnet audit) unchanged.
+- **Forensic Notes:**
+  - This redo treats Phase 9.1 as a valid step that was overtaken by better doctrine — not as a mistake. The Phase 9.1 cutover validated that the patch+restart flow works; this redo just swaps tags.
+  - The 22 agents in `agents_config.json` and `config/agents_config.json` are identical — this is the same Phase-10 duplicate-config-file issue flagged in REGGIE-STATE 2026-05-13 close (Section: ✅ CONFIRMED ACTIVE). Still flagged for Phase 10 P2 fix.
+  - The Phase-9.1 `scripts/phase9_patch.py` is kept untouched as the historical artifact for that phase. `scripts/phase9_2_patch.py` is the canonical for this state.
+- **PR Link:** (local commit; push pending operator OK)
+- **Phase Close Entry ID:** (immediate close — this entry IS the close)
 
 ### Entry 2026-05-14-001 — qwen3:14b Regression Recovery (APPLIED)
 - **Timestamp:** 2026-05-14T07:30:00-05:00

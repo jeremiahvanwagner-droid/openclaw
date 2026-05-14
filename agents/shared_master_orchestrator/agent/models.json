@@ -12,11 +12,11 @@
     "ollama": {
       "api": "ollama",
       "apiKey": "ollama-local",
-      "baseUrl": "http://127.0.0.1:11435/v1",
+      "baseUrl": "http://127.0.0.1:11434",
       "models": [
         {
           "id": "qwen3.6:latest",
-          "name": "Qwen 3.6 36B MoE (workhorse)",
+          "name": "Qwen 3.6 36B MoE (workhorse \u2014 dormant until 32GB VPS upgrade)",
           "reasoning": true,
           "input": [
             "text"
@@ -31,8 +31,40 @@
           "maxTokens": 32768
         },
         {
+          "id": "qwen3.5:27b",
+          "name": "Qwen 3.5 27B (interim Haiku-tier workhorse)",
+          "reasoning": true,
+          "input": [
+            "text"
+          ],
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "contextWindow": 131072,
+          "maxTokens": 32768
+        },
+        {
+          "id": "qwen3:14b",
+          "name": "Qwen3 14B (mid-tier reasoner \u2014 catalog reserve)",
+          "reasoning": true,
+          "input": [
+            "text"
+          ],
+          "cost": {
+            "input": 0,
+            "output": 0,
+            "cacheRead": 0,
+            "cacheWrite": 0
+          },
+          "contextWindow": 32768,
+          "maxTokens": 16384
+        },
+        {
           "id": "qwen3:8b",
-          "name": "Qwen3 8B (fast)",
+          "name": "Qwen3 8B (fast \u2014 catalog reserve)",
           "reasoning": false,
           "input": [
             "text"
