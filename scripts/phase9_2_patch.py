@@ -48,7 +48,7 @@ OLLAMA_PROVIDER_BLOCK = {
         },
         {
             "id": "qwen3.5:27b",
-            "name": "Qwen 3.5 27B (interim Haiku-tier workhorse)",
+            "name": "Qwen 3.5 27B (reserve — requires >15 GiB VPS RAM, dormant)",
             "reasoning": True,
             "input": ["text"],
             "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
@@ -57,7 +57,7 @@ OLLAMA_PROVIDER_BLOCK = {
         },
         {
             "id": "qwen3:14b",
-            "name": "Qwen3 14B (mid-tier reasoner — catalog reserve)",
+            "name": "Qwen3 14B (active Haiku-tier — fits 15 GiB VPS, 19s cold load)",
             "reasoning": True,
             "input": ["text"],
             "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
@@ -83,8 +83,12 @@ AGENT_DIRS = [
     "shared_runtime_ops", "store", "support",
 ]
 
-OLD_TAG = "qwen3:8b"
-NEW_TAG = "qwen3.5:27b"
+# Note: Initial Phase 9.2 attempt targeted qwen3.5:27b, but VPS smoke test
+# (2026-05-14, 15 GiB RAM) showed cold-load + reasoning at 1m56s — unusable
+# for cron preflight. qwen3:14b at 10 GB loaded in 19s with 5 GiB headroom.
+# Downshift recorded in REGGIE-STATE audit 2026-05-14-003.
+OLD_TAG = "qwen3.5:27b"
+NEW_TAG = "qwen3:14b"
 
 
 def patch_agent_models_json(path: Path):

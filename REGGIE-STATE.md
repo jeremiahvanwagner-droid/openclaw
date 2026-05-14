@@ -1,12 +1,12 @@
 # REGGIE — Sovereign Agent State File
-_Last Updated: 2026-05-14 10:00 CDT | Updated by: Claude Code (Opus 4.7) session_
+_Last Updated: 2026-05-14 10:45 CDT | Updated by: Claude Code (Opus 4.7) session_
 
 ---
 
 ## 🔴 CURRENT OPERATIONAL STATUS
 
-**Phase:** 9.1 SUPERSEDED → 9.1-REDO APPLIED (qwen3:8b → qwen3.5:27b) / 9.2 OPEN (Sonnet Audit, scoping)
-**Overall System Health:** 🟢 OPERATIONAL — Phase 9.1-redo applied 2026-05-14: 22 Haiku-tier agents now bound to `qwen3.5:27b` (interim, until 32GB VPS upgrade enables `qwen3.6:latest`). Local Ollama at `127.0.0.1:11434` (Windows host) confirmed serving `qwen3.5:27b` (17 GB) + `qwen3:14b` (9.3 GB) + `kimi-k2.5:cloud` (routing). Per-agent ollama catalogs hold all four qwen3 tags. The 2026-05-14 morning regression (`qwen3:14b` registered with no backing runtime) recovered via audit 2026-05-14-001; the proper redo recorded in 2026-05-14-002.
+**Phase:** 9.1 SUPERSEDED → 9.1-REDO APPLIED (qwen3:8b → qwen3:14b after RAM-fit downshift) / 9.2 OPEN (Sonnet Audit, scoping)
+**Overall System Health:** 🟢 OPERATIONAL — 22 Haiku-tier agents bound to **`qwen3:14b`** after VPS RAM-fit verification (audit 2026-05-14-003 downshifted from qwen3.5:27b, which proved unusable on 15 GiB VPS — 1m56s cold load, would swap-thrash). qwen3:14b confirmed: cold load + inference in 19s, 10 GiB resident, ~5 GiB headroom, no swap pressure. VPS Ollama at `127.0.0.1:11434` serving qwen3.5:27b + qwen3:14b + qwen3.6:latest + qwen3:8b + kimi-k2.5:cloud. Per-agent ollama catalogs hold all four qwen3 tags. The 2026-05-14 morning regression recovered via audit 2026-05-14-001; the redo recorded in 2026-05-14-002; the RAM-fit downshift in 2026-05-14-003.
   - File-level verification: agents_config.json + config/agents_config.json each show **0 `claude-haiku-4-5`** and **22 `qwen3:8b`** bindings.
   - All `models.json` (15 per-agent + 1 deploy server + 1 local + 1 last-good) now free of `qwen3:14b` and pointed at `127.0.0.1:11434` (single source-of-truth Ollama port).
   - Host `openclaw.service` restarted on Phase 9.1 config at 22:09:27 UTC. Stabilized at 410 MB / 2 GB memory cap.
@@ -147,7 +147,43 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
-### Entry 2026-05-14-002 — Phase 9.1 REDO: Haiku-tier remapped to qwen3.5:27b (APPLIED)
+### Entry 2026-05-14-003 — Phase 9.1-redo RAM-fit Downshift: qwen3.5:27b → qwen3:14b (APPLIED)
+- **Timestamp:** 2026-05-14T10:45:00-05:00
+- **Change Type:** HOTFIX (capacity-driven downshift)
+- **Status:** APPLIED ✅
+- **Initiative:** phase-9.1-redo-hotfix (qwen3:14b)
+- **Owner:** Claude Code (Opus 4.7) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving)
+- **References:** Supersedes the model binding in audit 2026-05-14-002. Catalog membership and patch infrastructure unchanged.
+- **Trigger:** Post-push VPS verification (`free -h` + smoke test) showed qwen3.5:27b is RAM-incompatible with current 15 GiB VPS hardware:
+  - VPS total RAM: 15 GiB
+  - qwen3.5:27b on disk: 17 GB (Q4 weights) → ~16-18 GiB resident with KV cache
+  - Cold load + 50-token reasoning request: **1m56s** (vs <30s viability threshold). `jq -r .response` came back empty (model spent the entire 50-token budget on its `<think>` block — likely a side-effect of trying to fit weights via swap).
+  - Conclusion: cron preflight would either fail outright or paging-thrash into the 8 GiB swap, making every cron unusably slow.
+- **Decision:** Downshift the active Haiku-tier binding to `qwen3:14b`, which fits comfortably in 15 GiB. qwen3.5:27b stays in every per-agent catalog and the global provider catalog as a **reserve** — usable when (a) a future VPS RAM upgrade lands, or (b) a single high-importance agent needs deeper reasoning on warm cache.
+- **Verification (pre-deploy, VPS-side):**
+  - `time curl ... qwen3:14b ... num_predict:50` → **18.994s** real (vs 1m56s for 27b — 6× faster).
+  - `ollama ps` post-load: qwen3:14b, 10 GB, 100% CPU, 4-min keep-alive.
+  - `free -h` with model resident: 10 GiB used / 15 GiB total / 5.4 GiB available; swap 321 MiB (essentially unchanged — **not paging**).
+- **Changes Applied:**
+  1. **`scripts/phase9_2_patch.py`**: `NEW_TAG` flipped `qwen3.5:27b` → `qwen3:14b`; `OLD_TAG` flipped `qwen3:8b` → `qwen3.5:27b` (so re-running idempotently rebinds the previous Phase-9.2 state). Catalog descriptions updated: qwen3.5:27b labeled "reserve — requires >15 GiB VPS RAM, dormant"; qwen3:14b labeled "active Haiku-tier — fits 15 GiB VPS, 19s cold load".
+  2. **15 per-agent `models.json`**: ollama provider catalog descriptions refreshed (no structural change — same four tags).
+  3. **`agents_config.json` + `config/agents_config.json`**: 22 agents rebound `qwen3.5:27b` → `qwen3:14b`. Both files in sync. Affected agent list identical to 2026-05-14-002 (browser_secondary, d2/d3/d4/d5/d6/d8/d9 pod agents + shared_knowledge_base).
+  4. **`openclaw.json`** (gitignored, local Windows) + **`deploy/hostinger/server-openclaw.json`** (VPS canon): active-models map flipped `ollama/qwen3.5:27b` → `ollama/qwen3:14b`. Catalog descriptions updated.
+  5. **`openclaw.json.last-good`**: resynced from corrected `openclaw.json`.
+- **Files Changed:** 21 (1 `scripts/phase9_2_patch.py` + 15 per-agent models.json + 2 agents_config.json + 2 openclaw.json variants + 1 REGGIE-STATE.md).
+- **Rollback Plan:** Revert: a single SHA-revert restores 2026-05-14-002's qwen3.5:27b binding. Would only be appropriate after VPS RAM upgrade — otherwise immediately reproduces the cron-storm condition.
+- **Rollback Tested:** N/A (revert target is the immediately-prior commit, well-understood).
+- **Doctrine Violations Discharged:**
+  - P5 (capacity validation missing — Phase 9.1-redo 2026-05-14-002 had been pushed without a `free -h` check; this hotfix retroactively performs that check and corrects the binding).
+- **Doctrine Violations Open:** None new.
+- **Forensic Notes:**
+  - The doctrinal-target ordering remains: `qwen3.6:latest` (36B MoE, requires ≥32 GiB VPS RAM, dormant) > `qwen3.5:27b` (requires >15 GiB, dormant) > `qwen3:14b` (active, fits current hardware) > `qwen3:8b` (no reasoning, reserve only). When VPS upgrades, agents can move up the chain by simple `NEW_TAG` flip + patch re-run.
+  - This is the second time today's session has used the `qwen3:14b` tag — the morning regression (2026-05-14-001) registered it with no backing runtime; this evening's hotfix registers it WITH a backing runtime that has been verified to work on actual hardware. Important distinction: the lesson from 2026-05-14-001 is "verify endpoint reachable before commit"; the lesson from 2026-05-14-003 is "verify model fits before commit". Both now codified in user memory.
+- **PR Link:** (local commit pending push)
+- **Phase Close Entry ID:** (immediate close — this entry IS the close)
+
+### Entry 2026-05-14-002 — Phase 9.1 REDO: Haiku-tier remapped to qwen3.5:27b (APPLIED, SUPERSEDED by 2026-05-14-003)
 - **Timestamp:** 2026-05-14T10:00:00-05:00
 - **Change Type:** CONFIG (phased cutover do-over)
 - **Status:** APPLIED ✅

@@ -30,7 +30,7 @@
         "claude-cli/claude-opus-4-7": {},
         "claude-cli/claude-sonnet-4-6": {},
         "claude-cli/claude-opus-4-6": {},
-        "ollama/qwen3.5:27b": {}
+        "ollama/qwen3:14b": {}
       },
       "sandbox": {
         "browser": {
@@ -906,7 +906,7 @@
           },
           {
             "id": "qwen3.5:27b",
-            "name": "Qwen 3.5 27B (interim Haiku-tier workhorse)",
+            "name": "Qwen 3.5 27B (reserve — requires >15 GiB VPS RAM, dormant)",
             "reasoning": true,
             "input": ["text"],
             "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
@@ -915,7 +915,7 @@
           },
           {
             "id": "qwen3:14b",
-            "name": "Qwen3 14B (mid-tier reasoner — catalog reserve)",
+            "name": "Qwen3 14B (active Haiku-tier — fits 15 GiB VPS, 19s cold load)",
             "reasoning": true,
             "input": ["text"],
             "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},

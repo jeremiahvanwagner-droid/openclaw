@@ -210,7 +210,7 @@
         "anthropic/claude-opus-4-5": {},
         "anthropic/claude-sonnet-4-5": {},
         "anthropic/claude-haiku-4-5": {},
-        "ollama/qwen3.5:27b": {}
+        "ollama/qwen3:14b": {}
       },
       "workspace": "/opt/openclaw/workspace",
       "timeFormat": "24",
@@ -1785,7 +1785,7 @@
           },
           {
             "id": "qwen3.5:27b",
-            "name": "Qwen 3.5 27B (interim Haiku-tier workhorse)",
+            "name": "Qwen 3.5 27B (reserve — requires >15 GiB VPS RAM, dormant)",
             "reasoning": true,
             "input": ["text"],
             "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
@@ -1794,7 +1794,7 @@
           },
           {
             "id": "qwen3:14b",
-            "name": "Qwen3 14B (mid-tier reasoner — catalog reserve)",
+            "name": "Qwen3 14B (active Haiku-tier — fits 15 GiB VPS, 19s cold load)",
             "reasoning": true,
             "input": ["text"],
             "cost": {"input": 0, "output": 0, "cacheRead": 0, "cacheWrite": 0},
