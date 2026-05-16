@@ -1,5 +1,5 @@
 # REGGIE — Sovereign Agent State File
-_Last Updated: 2026-05-14 11:30 CDT | Updated by: Claude Code (Opus 4.7) session_
+_Last Updated: 2026-05-16 13:00 CDT | Updated by: Claude Code (Opus 4.7) session_
 
 ---
 
@@ -151,6 +151,49 @@ All sub-agents held in standby until local model routing is confirmed operationa
 ---
 
 ## 📜 AUDIT LOG (Append-Only)
+
+### Entry 2026-05-16-001 — Local Windows openclaw gateway duplicate-cron diagnosis (RESOLVED)
+- **Timestamp:** 2026-05-16T13:00:00-05:00
+- **Change Type:** OPS (workstation cleanup; no repo changes)
+- **Status:** APPLIED ✅
+- **Initiative:** workstation-cron-failure-diagnosis
+- **Owner:** Claude Code (Opus 4.7) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Trigger:** Operator pasted cron-failure spam: `Agent cron job uses ollama/qwen3:14b but the local provider endpoint is not reachable at http://127.0.0.1:11434. ... Last error: TypeError: fetch failed` across ≥10 distinct cron IDs (074e3ed9, 0b3d3971, 04122194, 19922548, d229b99b, ghl-lead-scoring-6h, ghl-inbox-check-30m, agent-network-health-hourly, plus several UUID-keyed crons). Initial assumption: another VPS-side regression of the 2026-05-14-001 / 2026-05-14-003 class.
+- **Diagnostic Trail (initial misdirection corrected mid-session):**
+  1. Started on the local Windows workstation assuming the cron runtime was local. Found Windows Ollama not running; inadvertently side-started it via `ollama list`.
+  2. Operator corrected with "ollama is on Server" + provided `ssh root@177.7.32.224`. Repointed diagnostic to VPS srv1619751.
+  3. VPS check showed full health: `ollama.service` active 4 days (PID 130666), listening on `127.0.0.1:11434`, HTTP 200 in 11ms. All three models (qwen3.6:latest, qwen3.5:27b, qwen3:14b) pulled. RAM headroom: 1.3 GiB used / 14 GiB available.
+  4. `openclaw.service` confirmed active (PID 338432) and busy with embedded agent runs. Inspected `journalctl -u openclaw.service` for the cron-error text → **zero hits in the last hour**. The VPS production runtime was not emitting the failures.
+  5. Searched the Windows process tree → found `node ... openclaw/dist/index.js gateway --port 18789` running locally (PID 31928, started 2026-05-16T05:18:23-05:00, exe at `C:\Users\JeremiahVanWagner\AppData\Roaming\npm\node_modules\openclaw\dist\index.js`). This was a **second** openclaw runtime, separate from the VPS, with its own cron scheduler reading `C:\Users\JeremiahVanWagner\.openclaw\openclaw.json` and pointing at `127.0.0.1:11434` (Windows loopback, no local Ollama running by default).
+- **Root Cause:** A local Windows openclaw gateway was being auto-launched on Windows login via two Startup-folder shortcuts (`OpenClaw Gateway.cmd` v2026.5.7 + `OpenClaw Node.cmd` v2026.3.13). This duplicate runtime fired the same cron schedule as the VPS production service, but its preflight resolved against a Windows-loopback Ollama that does not run by default. Every preflight returned `TypeError: fetch failed` and aborted that cron tick. **The VPS-side production crons were unaffected and continued executing normally.**
+- **No config drift on either runtime.** Repo / VPS / local `openclaw.json` files all correctly point at `127.0.0.1:11434` with `ollama/qwen3:14b` in the active-models map. The 2026-05-14-001 root-cause class (port-bumped baseUrl, model not pulled) does NOT apply here. The model tag and endpoint are correct on both runtimes — the local runtime just had no Ollama on the other side of its loopback.
+- **Recovery Steps Performed (Windows-side only):**
+  1. `Stop-Process -Id 31928 -Force` — killed local Windows gateway. Verified absent via `Get-Process` and `Get-CimInstance Win32_Process`.
+  2. `Remove-Item C:\Users\JeremiahVanWagner\.openclaw\gateway-restart-intent.json` — stale restart marker (pointed at dead PID 25744 from an even earlier launch); safe to delete.
+  3. Renamed `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\OpenClaw Gateway.cmd` → `OpenClaw Gateway.cmd.disabled` (reversible disable).
+  4. Renamed `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\OpenClaw Node.cmd` → `OpenClaw Node.cmd.disabled` (reversible disable).
+  5. Left `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\Ollama.lnk` intact (harmless; Windows Ollama remains available for ad-hoc local use, no openclaw will autoreach it).
+- **Verification:**
+  - `Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -match 'openclaw.*gateway' }` → empty.
+  - `Get-ChildItem $env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup` shows both openclaw startup shortcuts as `.cmd.disabled`.
+  - VPS-side `openclaw.service` continues running normally (PID 338432, embedded agent runs at 14:54 UTC).
+  - VPS-side `ollama.service` continues responding HTTP 200 on `127.0.0.1:11434`.
+- **Files Changed (repo):** 1 (`REGGIE-STATE.md`, this entry). Zero changes to active-map / models.json / agents_config.json on either runtime — both were already correct.
+- **OS-level State Changes:**
+  - Local Windows machine: 2 Startup-folder shortcuts renamed `.disabled`; 1 stale JSON deleted; 1 node process killed. All reversible.
+  - VPS: untouched.
+- **Rollback Plan:** Drop `.disabled` suffix from `OpenClaw Gateway.cmd.disabled` and `OpenClaw Node.cmd.disabled`; log out/in (or run `gateway.cmd` manually). Restoring the deleted `gateway-restart-intent.json` is unnecessary — it was an ephemeral runtime marker.
+- **Rollback Tested:** NO. Restore path is trivial and self-documenting (filename rename).
+- **Doctrine Violations Discharged:** None — no config drift was present.
+- **Doctrine Violations Open:** Flag for Phase 10 reliability: **dev/control workstation runtime should not silently duplicate production cron schedules.** Either (a) the local Windows gateway should run in a "dev profile" that disables cron firing (or routes cron output to a local-only log), or (b) the `openclaw.json` it uses should be a divergent dev config rather than a near-copy of the VPS production active-map. Currently any operator who has the local gateway autostart enabled is paying for a second copy of every scheduled task. Not a Phase 9.x blocker.
+- **Forensic Notes:**
+  - Initial misdiagnosis cost ~10 minutes of VPS-side investigation that would have been unnecessary had the local Windows gateway been the first check. Captured the lesson in user memory at `feedback_local_windows_openclaw_duplicate.md` so future cron-failure-spam triages start at the Windows process tree.
+  - The operator's correction "ollama is on Server" was the key disambiguator. Without that pointer, the natural assumption was "127.0.0.1:11434 means the host I'm typing on," which is correct on the VPS but misleading from a Windows dev workstation.
+  - Mirror of the 2026-05-14-001 forensic lesson: openclaw's provider preflight aborts crons rather than degrading. That lesson held — the local runtime did not fall through to any backup model. Phase 10 reliability work (degrade-vs-abort scheduler) would have masked this entire incident.
+  - No PR; OS-level cleanup only. Doctrine note: workstation-state changes do not require a PR but DO require an audit-log entry (this one).
+- **PR Link:** N/A (workstation OS-level cleanup, no repo commits required).
+- **Phase Close Entry ID:** N/A (operational fix, no new phase).
 
 ### Entry 2026-05-14-004 — DEPLOYED FULLY OPERATIONAL (Phase 9.1-redo verified in production)
 - **Timestamp:** 2026-05-14T16:25:36+00:00 (verification end) / 2026-05-14T11:30:00-05:00 (entry written)
