@@ -3,12 +3,12 @@
   "lastGood": {},
   "usageStats": {
     "anthropic:claude-cli": {
-      "errorCount": 3,
+      "errorCount": 1,
       "failureCounts": {
-        "billing": 3
+        "billing": 1
       },
-      "lastFailureAt": 1778721908407,
-      "disabledUntil": 1778739498819,
+      "lastFailureAt": 1778873855049,
+      "disabledUntil": 1778891855049,
       "disabledReason": "billing"
     }
   }
