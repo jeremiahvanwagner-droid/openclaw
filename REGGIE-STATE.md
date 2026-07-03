@@ -70,18 +70,18 @@ REGGIE is the **Sovereign Agent** — the master orchestrator of the entire Open
 **Reclassified Diagnosis:** The pre-Phase-9.1-redo liveness warnings were a mix of plugin startup contention (now ruled out) and runtime model-resolution latency against Anthropic. The post-Phase-9.1-redo warnings are an EXPECTED cost of co-hosting Ollama inference and openclaw orchestration on a single 15 GiB / 1-CPU-core VPS. Not a bug; an architectural tradeoff.
 **Action (Phase 10 architectural):** Decide between (a) accepting the inference-time event-loop stall as a known cost (cheap, works), (b) moving Ollama to a separate host so openclaw event loop and inference CPU don't contend (more capital, isolates the failure modes), or (c) the 32 GiB VPS upgrade — buys more headroom but doesn't split the contention. Not a Phase-9.2 blocker.
 
-### Item 2: Security — Device Auth Disabled
-**Severity:** RED (SOUL.md constraint #2 violation)
+### Item 2: ~~Security — Device Auth Disabled~~ ✅ RESOLVED (audit 2026-07-03-002)
+**Severity:** ~~RED~~ DISCHARGED 2026-07-03 — flag flipped to `false` on live config, warning gone from journal. Operator must re-pair device on next control-UI use.
 **Evidence:** `[gateway] security warning: dangerous config flags enabled: gateway.controlUi.dangerouslyDisableDeviceAuth=true. Run 'openclaw security audit'.`
 **Action:** Anyone reaching 127.0.0.1:18789 has full control-UI access without device pairing. Has been this way pre-Phase 9.1 (not introduced today). Phase 9.2 entry: either re-enable device auth and re-pair an authorized device, or document an explicit SOUL.md override with justification. Run `openclaw security audit` for the full report.
 
-### Item 3: systemd Services NOT Persistent
-**Severity:** YELLOW (P9 — reliability)
+### Item 3: ~~systemd Services NOT Persistent~~ ✅ RESOLVED (found already enabled 2026-07-03; survived ~2026-06-11 reboot)
+**Severity:** ~~YELLOW~~ DISCHARGED
 **Evidence:** `openclaw.service` and `ollama.service` are both `Loaded: ...; disabled; preset: enabled`. They survive only because nothing has stopped them; a VPS reboot will NOT bring them back.
 **Action (operator, 1 command):** `systemctl enable openclaw ollama`
 
-### Item 4: Kimi VPS Drift
-**Severity:** YELLOW (state drift, repo vs VPS)
+### Item 4: ~~Kimi VPS Drift~~ ✅ RESOLVED (audit 2026-07-03-002 — `ollama rm kimi-k2.5:cloud` executed)
+**Severity:** ~~YELLOW~~ DISCHARGED
 **Evidence:** Repo references purged in Phase 9.1. VPS `ollama list` still shows `kimi-k2.5:cloud` installed.
 **Action:** CVO decision: `ollama rm kimi-k2.5:cloud` (clean state, recommended) OR keep installed and add explicit tier-router deny rule. NOT blocking Phase 9.2.
 
@@ -151,6 +151,41 @@ All sub-agents held in standby until local model routing is confirmed operationa
 ---
 
 ## 📜 AUDIT LOG (Append-Only)
+
+### Entry 2026-07-03-002 — Phase 0 Security Closure: device auth re-enabled, Kimi removed, config perms hardened (APPLIED)
+- **Timestamp:** 2026-07-03T13:52:00-05:00
+- **Change Type:** OPS + CONFIG
+- **Status:** APPLIED ✅
+- **Initiative:** advancement-program Phase 0 (partial discharge of `docs/advancements/04-advancement-security-persistence-closure.md`)
+- **Owner:** Claude Code (Fable 5) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving; explicit "Execute" authorization)
+- **Changes Applied:**
+  1. **Device auth re-enabled (Item 2, RED → discharged):** `/opt/openclaw/.openclaw/openclaw.json` `gateway.controlUi.dangerouslyDisableDeviceAuth` `true → false` via sed (single occurrence verified; JSON re-validated). Backup at `/opt/openclaw/.openclaw/openclaw.json.bak-phase0-20260703T1845`. `systemctl restart openclaw` → health `{"ok":true,"status":"live"}` within 15 s; fresh journal window contains **no** "dangerous config flags" warning (previously the standing RED evidence).
+  2. **Repo canon mirrored (P2):** `deploy/hostinger/server-openclaw.json` controlUi flag set `false` (this commit).
+  3. **Kimi drift cleared (Item 4):** `ollama rm kimi-k2.5:cloud` (benign "unable to stop model" warning — cloud-routed, no local process). `ollama list` now exactly: qwen3.6:latest, qwen3.5:27b, qwen3:14b, qwen3:8b.
+  4. **Config perms hardened:** `openclaw security audit` flagged CRITICAL `fs.config.perms_world_readable` (mode=644). Verified owner `openclaw` == unit `User=openclaw`, then `chmod 600`. Gateway unaffected.
+  5. **Item 3 (systemd persistence) found already discharged:** both units `enabled`+`active`; VPS rebooted ~2026-06-11 (uptime 21 d at check) and services survived — enable was run by operator sometime after 2026-05-16.
+- **Verification:** health OK post-restart; journal clean of dangerous-flag warning; `ollama list` clean; `ls -l` shows `-rw-------`; `systemctl is-active openclaw ollama` → active/active.
+- **Open Follow-ups:** (a) operator must re-pair the authorized device on next control-UI use — pairing flow untested from this session; if it blocks, rollback is one sed + restart. (b) `controlUi.allowInsecureAuth=true` remains set — semantics unverified, review during full A4 completion. (c) audit WARN `models.weak_tier` on local qwen tier = accepted Phase 9 tradeoff, no action. (d) enforcement-mode `warn → enforce` cutover still pending (A4 step 4 — requires 48 h warn-log triage first). (e) audit's "missing env var" warnings were artifacts of running outside the unit's `EnvironmentFile=/etc/openclaw/.env` — not config drift.
+- **Rollback Plan:** `cp /opt/openclaw/.openclaw/openclaw.json.bak-phase0-20260703T1845 /opt/openclaw/.openclaw/openclaw.json && systemctl restart openclaw`; `ollama pull kimi-k2.5:cloud`; `chmod 644` (not recommended). Repo side: revert this commit.
+- **Rollback Tested:** NO (backup verified present; restore path is one copy + restart inside SSH — never dependent on control UI).
+- **PR Link:** direct-to-main.
+
+### Entry 2026-07-03-001 — VPS repo sync repair (dedicated deploy key) + advancement program published (APPLIED)
+- **Timestamp:** 2026-07-03T13:45:00-05:00
+- **Change Type:** OPS (VPS git access) + DOCS
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Trigger:** Post-push VPS sync failed: `git@github.com` from the VPS authenticated as the **mvp-generation-engine** deploy key ("Hi jeremiahvanwagner-droid/mvp-generation-engine!"), so the private openclaw repo returned "Repository not found" — GitHub deploy keys are single-repo, and `/root/.ssh/id_ed25519` belongs to the other project.
+- **Changes Applied:**
+  1. Generated dedicated keypair `/root/.ssh/id_ed25519_openclaw` (no passphrase) + ssh alias `github.com-openclaw` in `/root/.ssh/config` (IdentitiesOnly).
+  2. Registered pubkey as **read-only** deploy key id `156286728` on `jeremiahvanwagner-droid/openclaw` via `gh repo deploy-key add`.
+  3. Repointed `origin` on BOTH clones — `/opt/openclaw` (runtime clone; was at efbc2bd) and `/root/openclaw` (secondary; was stale at 103416d ≈ 2026-05-13) — to `git@github.com-openclaw:jeremiahvanwagner-droid/openclaw.git`; fast-forward pulled both to `f6056cb`.
+  4. Published the seven-advancement program (`docs/advancements/00–10`, commit `f6056cb`).
+- **Discovery Notes (state-file corrections):** the runtime clone is **/opt/openclaw** (unit sets `HOME=/opt/openclaw`, `OPENCLAW_CONFIG_DIR=/opt/openclaw/.openclaw`), NOT /root/openclaw. The VPS is now co-tenant: Docker runs `ready-to-launch-my-business-*`, `mvp-generation-engine-*`, and a second Ollama container (`ollama-gfc1`) alongside `openclaw-redis` — model walk-up RAM math must account for these neighbors. Do NOT delete `/root/.ssh/id_ed25519` — it is the live deploy key for mvp-generation-engine.
+- **Rollback Plan:** `gh repo deploy-key delete 156286728 --repo jeremiahvanwagner-droid/openclaw`; remove alias block + keypair; restore origin URLs to `git@github.com:...`.
+- **PR Link:** direct-to-main (`f6056cb`).
 
 ### Entry 2026-05-16-001 — Local Windows openclaw gateway duplicate-cron diagnosis (RESOLVED)
 - **Timestamp:** 2026-05-16T13:00:00-05:00
