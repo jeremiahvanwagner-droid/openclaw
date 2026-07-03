@@ -152,6 +152,18 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-03-004 — EACCES regression from root-run pairing tooling (RESOLVED same session)
+- **Timestamp:** 2026-07-03T14:50:00-05:00
+- **Change Type:** HOTFIX (file ownership)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO operator session
+- **Trigger:** Dashboard showed `disconnected (1000): no reason` on every attempt. Journal root cause: `EACCES: permission denied, open '/opt/openclaw/.openclaw/devices/pending.json'` — the entry -003 bootstrap tooling ran as **root** and left `pending.json`/`paired.json` root-owned; the gateway runs as user `openclaw` and failed to read them on every WS connect (parse-error → close 1000) and every 10 s device-pair notify poll.
+- **Fix:** `chown -R openclaw:openclaw /opt/openclaw/.openclaw/devices /opt/openclaw/.openclaw/identity` + `chmod 600` on the JSON files. Verified 0 EACCES/JsonFileReadError entries in the next poll window. `identity/device.json` was already correctly owned.
+- **Hardening:** `/root/oc-approve.sh` now self-chowns `devices/*.json` back to `openclaw:openclaw` after every run — root-run approvals can no longer strand root-owned state files.
+- **Lesson (doctrine):** any root-run tooling that writes into `/opt/openclaw/.openclaw/**` must restore `openclaw:openclaw` ownership; the gateway has no privilege to recover from root-owned state files and fails closed with an unexplained 1000.
+- **Also observed:** one dashboard attempt rejected 1008 `token_missing` (`auth=none`) — operator reminder: the Gateway Token field must be populated when clicking Connect; pairing requests are only minted for token-authenticated attempts.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-03-003 — Device-pairing bootstrap after device-auth re-enable (APPLIED)
 - **Timestamp:** 2026-07-03T14:15:00-05:00
 - **Change Type:** OPS (device pairing bootstrap + operator tooling)
