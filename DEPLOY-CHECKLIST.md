@@ -9,6 +9,14 @@
 ## Pre-Deploy — Local Verification
 
 ```bash
+# 0. PROVIDER PREFLIGHT — endpoints + models + tokens. A red preflight blocks
+#    the deploy; this is the codified lesson of audits 2026-05-14-001 and
+#    2026-05-16-001 (openclaw aborts ALL crons on one bad provider).
+#    Run against the config you are about to ship:
+pnpm preflight                                        # local config
+node scripts/preflight-providers.mjs --config deploy/hostinger/server-openclaw.json   # VPS canon
+# On the VPS after pull: node scripts/preflight-providers.mjs --config /opt/openclaw/.openclaw/openclaw.json --env-file /etc/openclaw/.env
+
 # 1. TypeScript must compile with 0 errors
 npx tsc --noEmit
 

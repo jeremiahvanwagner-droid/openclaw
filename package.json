@@ -6,6 +6,7 @@
   "packageManager": "pnpm@10.32.1",
   "scripts": {
     "build": "node scripts/pnpm.mjs -r --if-present run build",
+    "preflight": "node scripts/preflight-providers.mjs",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
