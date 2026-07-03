@@ -152,6 +152,22 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-03-003 — Device-pairing bootstrap after device-auth re-enable (APPLIED)
+- **Timestamp:** 2026-07-03T14:15:00-05:00
+- **Change Type:** OPS (device pairing bootstrap + operator tooling)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Trigger:** After entry -002 re-enabled device auth, the control-UI dashboard (`wss://api.truthjblue.dev`) returned `device pairing required` and could not connect. Re-pairing hit a **bootstrap chicken-and-egg**: `openclaw devices approve <id>` connects to the gateway first and needs an *already-approved* operator device to authorize the approval — but no device was approved yet.
+- **Root cause / mechanism (traced in shipped dist `device-pairing-*.js`):** device auth stores pending requests at `/opt/openclaw/.openclaw/devices/pending.json` and approved devices at `devices/paired.json`. Device identity (keypair) lives in `/opt/openclaw/.openclaw/identity/` and is keyed to the config dir. The CLI has a local file-fallback approve (`approveDevicePairing`), but it only triggers when the gateway URL resolves to **local loopback** with no `--url`/`--token` override; the production config points at the **remote** `gateway.remote.url`, so the fallback never fired and the approve attempts died on the WS layer.
+- **Resolution:** invoked `approveDevicePairing(requestId, { callerScopes:['operator.admin'] }, '/opt/openclaw/.openclaw')` directly (ESM import of the dist module) — the exact function the sanctioned fallback uses, minus the gateway round-trip. Paired the production CLI operator identity `b279e1e2b9fe` (operator role + token). Confirmed the `device pairing required` (1008) error is gone (CLI remote now returns normal-closure; the browser path carries its own gateway token, populated in the UI).
+- **Operator tooling installed:** `/root/oc-approve.sh` (bootstrap-safe, update-proof — globs the dist module by name, file-based, no pre-approved device needed). Usage: `/root/oc-approve.sh` approves the most recent pending request; `/root/oc-approve.sh <requestId>` targets a specific one. Validated: module export resolves, node path runs, not-found + no-pending branches handled.
+- **Cleanup:** a throwaway `/root`-scoped identity (`54d943ed…`) minted during a failed shadow-config attempt was removed from `paired.json`; shadow dirs `/root/oc-bootstrap` + stray `/root/.openclaw` deleted. Final `paired.json` = one legit `cli` device.
+- **Standing operator procedure (device-auth is now ON):** to authorize any new device (browser or CLI): (1) click **Connect** in the dashboard to mint a fresh pairing request, (2) run `ssh root@srv1619751.hstgr.cloud /root/oc-approve.sh`, (3) the dashboard reconnects paired. Pairing requests expire, so approve promptly after clicking Connect.
+- **Rollback:** device auth can be disabled again (entry -002 rollback) if pairing ever becomes untenable; the helper + paired store are otherwise self-contained. Removing a device: `openclaw devices remove <deviceId>` (once an operator device is paired) or edit `devices/paired.json`.
+- **Follow-ups:** (a) the CLI-over-remote path returns 1000 normal-closure (separate `OPENCLAW_GATEWAY_AUTH_TOKEN` gateway-token layer not in the sourced env) — browser is unaffected since the UI supplies the token; verify if CLI-remote admin is ever needed. (b) Consider whether `openclaw devices approve` bootstrap friction warrants a documented runbook in `docs/`.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-03-002 — Phase 0 Security Closure: device auth re-enabled, Kimi removed, config perms hardened (APPLIED)
 - **Timestamp:** 2026-07-03T13:52:00-05:00
 - **Change Type:** OPS + CONFIG
