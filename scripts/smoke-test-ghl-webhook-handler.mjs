@@ -71,6 +71,20 @@ async function main() {
   const healthBody = await healthResponse.text();
   const webhookBody = await webhookResponse.text();
 
+  // --dup: re-send the identical delivery — the second POST must be
+  // acknowledged as a duplicate (idempotency, Advancement 3).
+  let duplicate = null;
+  if (opts.dup) {
+    const dupResponse = await fetch(endpoint, { method: 'POST', headers, body });
+    const dupBody = await dupResponse.text();
+    duplicate = {
+      status: dupResponse.status,
+      ok: dupResponse.ok,
+      body: dupBody,
+      deduped: /duplicate/i.test(dupBody),
+    };
+  }
+
   console.log(JSON.stringify({
     action: 'smoke-test-ghl-webhook-handler',
     endpoint,
@@ -86,7 +100,13 @@ async function main() {
       ok: webhookResponse.ok,
       body: webhookBody,
     },
+    ...(duplicate ? { duplicate } : {}),
   }, null, 2));
+
+  if (opts.dup && !duplicate.deduped) {
+    console.error('DUPLICATE DELIVERY WAS NOT DEDUPED — idempotency regression.');
+    process.exit(1);
+  }
 }
 
 main().catch(error => {

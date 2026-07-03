@@ -15,6 +15,7 @@ import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { listTenants } from '../lib/ghl-tenant-resolver.mjs';
 import { authenticateGhlWebhookRequest, normalizeGhlWebhookPayload } from '../lib/ghl-webhook.mjs';
+import { deliveryKey, claimEvent, settleEvent } from '../lib/ghl-event-ledger.mjs';
 import { openclawSend, openclawMessage } from '../lib/safe-exec.mjs';
 import { childLogger } from '../lib/logger.mjs';
 import { registry, eventProcessedTotal, eventProcessingDuration } from '../lib/metrics.mjs';
@@ -495,7 +496,7 @@ function collectRequestBody(req) {
   });
 }
 
-async function processEventAsync(eventType, payload, traceId, authStrategy) {
+async function processEventAsync(eventType, payload, traceId, authStrategy, ledgerKey = null) {
   const stopTimer = eventProcessingDuration.startTimer({ event_type: eventType });
   const handler = eventHandlers[eventType];
 
@@ -503,14 +504,17 @@ async function processEventAsync(eventType, payload, traceId, authStrategy) {
     if (!handler) {
       eventProcessedTotal.inc({ event_type: eventType, status: 'ignored' });
       log.info({ trace_id: traceId, eventType, authStrategy }, 'Webhook received for unsupported event type');
+      if (ledgerKey) await settleEvent(ledgerKey, true, 'no handler registered');
       return;
     }
 
     await handler(payload);
     eventProcessedTotal.inc({ event_type: eventType, status: 'success' });
+    if (ledgerKey) await settleEvent(ledgerKey, true);
   } catch (error) {
     eventProcessedTotal.inc({ event_type: eventType, status: 'error' });
     log.error({ trace_id: traceId, eventType, authStrategy, err: error.message }, 'Webhook handler failed after acknowledgement');
+    if (ledgerKey) await settleEvent(ledgerKey, false, error.message);
   } finally {
     stopTimer();
   }
@@ -672,6 +676,26 @@ const server = http.createServer(async (req, res) => {
       }, 'Webhook payload failed schema validation — processing with raw payload');
     }
 
+    // Idempotency (Advancement 3): claim this delivery BEFORE acknowledging.
+    // GHL can double-deliver even on 2xx; duplicates are acknowledged so the
+    // retry engine stops, but nothing dispatches twice. Claim rows live in
+    // agent_events (partial unique index on correlation_id for ghl-webhook).
+    const ledgerKey = deliveryKey(req.headers, rawBody, eventType, normalized.payload);
+    const firstDelivery = await claimEvent(ledgerKey, eventType, {
+      rawEventType: normalized.rawEventType,
+      locationId: normalized.payload.locationId || null,
+      contactId: normalized.payload.contact?.id || null,
+      authStrategy: auth.strategy,
+      traceId,
+    });
+    if (!firstDelivery) {
+      eventProcessedTotal.inc({ event_type: eventType, status: 'duplicate' });
+      log.info({ trace_id: traceId, eventType, ledgerKey }, 'Duplicate webhook delivery ignored');
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ ok: true, duplicate: true, eventType }));
+      return;
+    }
+
     const enrichedPayload = {
       ...normalized.payload,
       trace_id: traceId,
@@ -716,7 +740,7 @@ const server = http.createServer(async (req, res) => {
     }));
 
     setImmediate(() => {
-      processEventAsync(eventType, enrichedPayload, traceId, auth.strategy).catch(error => {
+      processEventAsync(eventType, enrichedPayload, traceId, auth.strategy, ledgerKey).catch(error => {
         log.error({ trace_id: traceId, eventType, err: error.message }, 'Unexpected webhook dispatch failure');
       });
     });
