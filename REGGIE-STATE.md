@@ -152,6 +152,26 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-03-007 — Advancement 3 IMPLEMENTED: GHL webhook idempotency ledger + signature hardening — agent_events data plane is LIVE
+- **Timestamp:** 2026-07-03T18:00:00-05:00
+- **Change Type:** CODE + SCHEMA + OPS (Advancement program, `docs/advancements/03-advancement-ghl-webhook-hardening.md`)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO operator session ("Continue Advancement 3")
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Discovery that reshaped the work:** the repo already carried a complete, correct verification layer — `lib/ghl-webhook.mjs` (`authenticateGhlWebhookRequest`: Ed25519 platform sig with the pinned HighLevel public key, workflow bearer, HMAC, shared secret; plus `normalizeGhlWebhookPayload`) — and a far more evolved TRACKED handler at `handlers/ghl-webhook-handler.mjs` (multi-tenant, human-approval callbacks, OAuth refresh, zod validation, ack-then-async dispatch). The root `ghl-webhook-handler.mjs` is a **gitignored stale runtime snapshot** with a naive HMAC check whose unguarded `timingSafeEqual` throws on real platform signatures. The pinned Ed25519 key was verified byte-identical to the official HighLevel Webhook Integration Guide (fetched 2026-07-03); HighLevel deprecated the legacy RSA `X-WH-Signature` on 2026-07-01, so Ed25519 `X-GHL-Signature` is now the only platform scheme.
+- **Changes Applied (commits 81eabc9 + this entry's commit):**
+  1. **Migration `20260703000013_ghl_webhook_dedupe.sql`** (applied to DB1): partial unique index `agent_events_ghl_dedupe_uniq` on `correlation_id` WHERE `metadata->>'source'='ghl-webhook'` — dedupe constraint without disturbing other writers' trace semantics.
+  2. **New `lib/ghl-event-ledger.mjs`**: `deliveryKey` (GHL webhook id header/body id, content-hash fallback) + `claimEvent` (insert-first idempotency claim, 23505 = duplicate) + `settleEvent` (pending → completed/failed lifecycle). In-memory LRU fallback when Supabase is down — webhooks are never dropped. 8 new tests.
+  3. **Canonical `handlers/ghl-webhook-handler.mjs`**: claim BEFORE the 200 ack; duplicates acknowledged (`{ok:true,duplicate:true}`) but never dispatched; settle wired through `processEventAsync`.
+  4. **Root runtime snapshot** also hardened in place (auth delegation, normalization, ledger, Windows `pathToFileURL` ESM fix) — but root-vs-`handlers/` consolidation is now formally part of Advancement 5's duplication axes.
+  5. **Smoke test `--dup` mode**: exits 1 if a duplicate delivery is not deduped.
+  6. **Preflight gained a Supabase probe** (real query with the service key) after the finding below.
+- **THIRD STALE VPS CREDENTIAL CAUGHT:** the VPS `SUPABASE_SERVICE_ROLE_KEY` in `/etc/openclaw/.env` was an **unregistered key** (hash-mismatched vs the working local one — same stale generation as the revoked Telegram token and dead Anthropic keys from audit -006). The ledger's in-memory fallback masked it exactly as designed until log inspection exposed `Unregistered API key`. **FIXED:** working `SUPABASE_SERVICE_ROLE_KEY` + `SUPABASE_ANON_KEY` synced to VPS env (backup `/etc/openclaw/.env.bak-a3-*`). `/etc/openclaw/.env` should be treated as systematically stale — every credential in it predates the local rotation; the Anthropic keys remain the last known-dead pair (CVO action).
+- **Live Verification:** three full lifecycles in `agent_events` on DB1 (2 local runs, 1 VPS run post-key-fix), all `status=completed` with `processed_at`; duplicate deliveries refused on every variant (`deduped: true`, smoke exit 0); malformed Ed25519 signature → clean 401 (previously an uncaught-exception path). VPS test ran on private port 127.0.0.1:8790 — **the public intake stays closed**.
+- **CVO DECISION OPEN — webhook service activation:** `openclaw-webhook.service` exists on the VPS but is `disabled/inactive`; nothing listens on 8788, so `webhook.truthjblue.dev` dead-ends at Caddy. The handler is now hardened and VPS-verified; starting the service turns on live GHL → agent processing (agent actions, alerts, spend). One command when ready: `systemctl enable --now openclaw-webhook` + a `--dup` smoke against the public URL.
+- **Rollback:** `git revert 81eabc9 <close-commit>`; index is additive (drop if desired); env restore from `.env.bak-a3-*`; ledger rows are inert history.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-03-006 — Advancement 2 IMPLEMENTED: provider preflight gate + cron guard — first run caught THREE live faults
 - **Timestamp:** 2026-07-03T15:40:00-05:00
 - **Change Type:** TOOLING + OPS (Advancement program, `docs/advancements/02-advancement-provider-preflight-degrade.md`)

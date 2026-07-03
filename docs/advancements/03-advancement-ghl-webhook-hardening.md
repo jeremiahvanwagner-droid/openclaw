@@ -1,5 +1,7 @@
 # Advancement 3 — GHL Webhook Idempotency, Ed25519 Verification & Event Ledger (Phase 10 Opener)
 
+> **STATUS: IMPLEMENTED 2026-07-03** (REGGIE-STATE audit 2026-07-03-007). The Ed25519/HMAC/bearer verification already existed in `lib/ghl-webhook.mjs` (pinned key matches the official HighLevel guide) — the ledger (`lib/ghl-event-ledger.mjs` + partial unique index) was built and wired into the canonical `handlers/` handler. `agent_events` is live on DB1 with full claim→settle lifecycles from both workstation and VPS runtimes. Third stale VPS credential (Supabase service key) caught and fixed; preflight now probes Supabase too. OPEN: `openclaw-webhook.service` on the VPS is disabled — activation is a CVO decision.
+
 ## Summary
 
 - **File Evidence:**

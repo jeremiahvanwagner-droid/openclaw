@@ -13,6 +13,8 @@
  *   2. Every model tag pinned in cron payloads is pulled.
  *   3. Telegram bot token(s) answer getMe.
  *   4. Anthropic API key(s) answer /v1/models (via probe-anthropic-key.mjs).
+ *   5. Supabase service key can actually query (caught "Unregistered API key"
+ *      on the VPS during Advancement 3 — stale env keys fail silently).
  *
  * Exit 0 = safe to ship. Exit 1 = at least one FAIL (block the deploy).
  * Unconfigured surfaces are SKIPped, never failed.
@@ -166,6 +168,24 @@ async function checkTelegram() {
   }
 }
 
+async function checkSupabase() {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    record("SKIP", "supabase", "SUPABASE_URL / SERVICE_ROLE_KEY not in environment");
+    return;
+  }
+  try {
+    const { createClient } = await import("@supabase/supabase-js");
+    const sb = createClient(url, key, { auth: { persistSession: false } });
+    const { error } = await sb.from("rate_governor_state").select("provider").limit(1);
+    if (error) record("FAIL", "supabase", `${url.replace(/^https?:\/\//, "").split(".")[0]}: ${error.message}`);
+    else record("PASS", "supabase", `service key valid against ${url.replace(/^https?:\/\//, "").split(".")[0]}`);
+  } catch (err) {
+    record("FAIL", "supabase", `query failed (${err.message})`);
+  }
+}
+
 function checkAnthropic() {
   if (skipAnthropic) {
     record("SKIP", "anthropic", "--skip-anthropic");
@@ -202,6 +222,7 @@ if (!existsSync(configPath)) {
     if (cronTags.size > 0) console.log(`Cron store: ${cronPath} (${cronTags.size} pinned model tag(s))`);
     await checkOllama(config, cronTags);
     await checkTelegram();
+    await checkSupabase();
     checkAnthropic();
   }
 }
