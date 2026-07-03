@@ -1,5 +1,7 @@
 # Advancement 1 — Supabase-Backed Rate Governor (Finish the Phase 6 Circuit Breaker)
 
+> **STATUS: IMPLEMENTED 2026-07-03** (REGGIE-STATE audit 2026-07-03-005). Migration applied to DB1; adapter `lib/rate-governor-supabase.ts` + wiring live; 27/27 tests green; live round-trip smoke verified from the workstation runtime. Remaining: first VPS-side rows appear when any lib-consuming process (webhook handler / inngest / scripts) runs with the updated code.
+
 ## Summary
 
 - **File Evidence:**

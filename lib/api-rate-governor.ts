@@ -23,6 +23,12 @@ import {
   budgetCeilingDollars,
   concurrencyActive,
 } from "./metrics";
+import {
+  isEnabled as supabaseSyncEnabled,
+  pushDeltas,
+  pullToday,
+  type GovernorStateDelta,
+} from "./rate-governor-supabase";
 
 const log = logger.child({ module: "rate-governor" });
 
@@ -258,7 +264,10 @@ function recordSuccess(provider: string): void {
   cb.failures = 0;
   cb.halfOpenAttempts = 0;
   circuitBreakerState.set({ provider }, 0);
-  if (wasOpen) persistState();
+  if (wasOpen) {
+    persistState();
+    queueSyncDelta(provider, {}, true); // circuit closed — cross-runtime signal
+  }
 }
 
 function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: boolean = false): void {
@@ -273,6 +282,7 @@ function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: bo
     // Auth-expired circuits stay open longer — no point retrying until token is refreshed
     log.error({ provider }, "Circuit OPEN — AUTH EXPIRED (401/403). All requests blocked until token refresh.");
     persistState();
+    queueSyncDelta(provider, {}, true); // circuit open — flush immediately
     return;
   }
 
@@ -282,6 +292,7 @@ function recordFailure(provider: string, isRateLimit: boolean, isAuthExpired: bo
     circuitBreakerState.set({ provider }, 2);
     log.warn({ provider, failures: cb.failures, isRateLimit }, "Circuit OPEN");
     persistState();
+    queueSyncDelta(provider, {}, true); // circuit open — flush immediately
   }
 }
 
@@ -447,6 +458,7 @@ function trackSpend(provider: string, costCents: number): void {
   }
 
   persistState();
+  queueSyncDelta(provider, { spentCents: costCents, requests: 1 });
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -663,6 +675,11 @@ export function __resetForTests(options: { deleteStateFile?: boolean } = {}): vo
   activeCounts.clear();
   budgets.clear();
   circuitBreakers.clear();
+  pendingSyncDeltas.clear();
+  if (syncTimer) {
+    clearTimeout(syncTimer);
+    syncTimer = null;
+  }
 
   if (options.deleteStateFile) {
     try {
@@ -721,7 +738,113 @@ export function isGhlTokenStale(tenant: string): boolean {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// SUPABASE CROSS-RUNTIME SYNC
+// ═══════════════════════════════════════════════════════════════════
+// Deltas accumulate in-process and flush on a debounce timer (or immediately
+// on circuit transitions — the one signal other runtimes need promptly).
+// Everything here is fire-and-forget: a Supabase outage must never slow or
+// fail a governed request; the local JSON file remains the always-on record.
+
+const SYNC_DEBOUNCE_MS = 5_000;
+const pendingSyncDeltas = new Map<string, GovernorStateDelta>();
+let syncTimer: NodeJS.Timeout | null = null;
+
+function queueSyncDelta(
+  provider: string,
+  changes: { spentCents?: number; requests?: number } = {},
+  immediate = false,
+): void {
+  if (!supabaseSyncEnabled()) return;
+  const day = todayKey();
+  const key = `${provider}:${day}`;
+  const cb = getCircuitBreaker(provider);
+  const budget = getBudget(provider);
+  const delta = pendingSyncDeltas.get(key) ?? {
+    provider,
+    day,
+    spentCentsDelta: 0,
+    requestCountDelta: 0,
+    warningEmitted: false,
+    circuitState: cb.state,
+    failures: cb.failures,
+    lastFailureAt: cb.lastFailureAt,
+    openedAt: cb.openedAt,
+  };
+  delta.spentCentsDelta += changes.spentCents ?? 0;
+  delta.requestCountDelta += changes.requests ?? 0;
+  delta.warningEmitted = budget.warningEmitted;
+  delta.circuitState = cb.state;
+  delta.failures = cb.failures;
+  delta.lastFailureAt = cb.lastFailureAt;
+  delta.openedAt = cb.openedAt;
+  pendingSyncDeltas.set(key, delta);
+
+  if (immediate) {
+    flushSyncDeltas();
+    return;
+  }
+  if (!syncTimer) {
+    syncTimer = setTimeout(flushSyncDeltas, SYNC_DEBOUNCE_MS);
+    // Never hold a short-lived script's process open for telemetry.
+    syncTimer.unref?.();
+  }
+}
+
+function flushSyncDeltas(): void {
+  if (syncTimer) {
+    clearTimeout(syncTimer);
+    syncTimer = null;
+  }
+  if (pendingSyncDeltas.size === 0) return;
+  const batch = [...pendingSyncDeltas.values()];
+  pendingSyncDeltas.clear();
+  void pushDeltas(batch).catch(() => {
+    /* adapter logs internally; never propagate */
+  });
+}
+
+export function __flushSyncForTests(): void {
+  flushSyncDeltas();
+}
+
+/**
+ * Merge today's global (all-runtime) spend into local budgets so ceilings
+ * govern total spend, not per-machine spend. Max() semantics: a restart can
+ * never move the day's accounting downward. Circuit state is deliberately
+ * NOT imported from other runtimes — a remote runtime's failures should not
+ * block this one; a genuinely down provider trips the local breaker fast.
+ */
+async function hydrateFromSupabase(): Promise<void> {
+  if (!supabaseSyncEnabled()) return;
+  try {
+    const remote = await pullToday();
+    if (remote.size === 0) return;
+    const today = todayKey();
+    for (const [provider, global] of remote) {
+      const key = `${provider}:${today}`;
+      const local = budgets.get(key) ?? {
+        day: today,
+        spentCents: 0,
+        requestCount: 0,
+        warningEmitted: false,
+      };
+      local.spentCents = Math.max(local.spentCents, global.spentCents);
+      local.requestCount = Math.max(local.requestCount, global.requestCount);
+      budgets.set(key, local);
+      budgetUsedDollars.set({ provider }, local.spentCents / 100);
+    }
+    log.info({ providers: remote.size }, "Rate governor merged global daily spend from Supabase");
+  } catch (err) {
+    log.warn({ err }, "Rate governor Supabase hydrate failed — continuing with local state");
+  }
+}
+
+// Short-lived scripts: flush pending deltas when the event loop drains.
+process.once("beforeExit", flushSyncDeltas);
+
+// ═══════════════════════════════════════════════════════════════════
 // INITIALIZATION — rehydrate persisted state on module load
 // ═══════════════════════════════════════════════════════════════════
 
 loadState();
+void hydrateFromSupabase();

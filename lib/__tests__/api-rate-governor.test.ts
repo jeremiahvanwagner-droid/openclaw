@@ -11,6 +11,19 @@ vi.mock("../metrics", () => ({
   llmTokensUsed: { inc: vi.fn() },
 }));
 
+// Mock the Supabase cross-runtime sync adapter — unit tests must never touch
+// the network, and the governor must behave identically when pushes no-op.
+const { mockPushDeltas, mockPullToday } = vi.hoisted(() => ({
+  mockPushDeltas: vi.fn(async (_deltas: unknown[]) => {}),
+  mockPullToday: vi.fn(async () => new Map()),
+}));
+vi.mock("../rate-governor-supabase", () => ({
+  isEnabled: () => true,
+  RUNTIME_ID: "test-runtime",
+  pushDeltas: (deltas: unknown[]) => mockPushDeltas(deltas),
+  pullToday: () => mockPullToday(),
+}));
+
 // We need to test the public exports in isolation. The module uses in-memory Maps
 // with per-import state, so a fresh dynamic import per test block keeps state clean.
 
@@ -19,6 +32,7 @@ vi.mock("../metrics", () => ({
 
 import {
   __resetForTests,
+  __flushSyncForTests,
   checkRequest,
   reportSuccess,
   reportFailure,
@@ -233,6 +247,68 @@ describe("api-rate-governor", () => {
         expect(s).toHaveProperty("dailyBudgetCents");
         expect(s).toHaveProperty("dailyRequestCount");
       }
+    });
+  });
+
+  // ─── Supabase cross-runtime sync ──────────────────────────────
+
+  describe("supabase cross-runtime sync", () => {
+    it("flushes a circuit-open delta immediately", () => {
+      mockPushDeltas.mockClear();
+      for (let i = 0; i < 5; i++) {
+        reportFailure("anthropic-executor", 500);
+      }
+      expect(mockPushDeltas).toHaveBeenCalled();
+      const batch = mockPushDeltas.mock.calls.at(-1)![0] as Array<{
+        provider: string;
+        circuitState: string;
+      }>;
+      expect(
+        batch.some((d) => d.provider === "anthropic-executor" && d.circuitState === "open"),
+      ).toBe(true);
+    });
+
+    it("accumulates spend deltas per provider and flushes them", () => {
+      mockPushDeltas.mockClear();
+      reportSuccess("anthropic-communicator", 40);
+      reportSuccess("anthropic-communicator", 60);
+      __flushSyncForTests();
+      expect(mockPushDeltas).toHaveBeenCalled();
+      const batch = mockPushDeltas.mock.calls.at(-1)![0] as Array<{
+        provider: string;
+        spentCentsDelta: number;
+        requestCountDelta: number;
+      }>;
+      const delta = batch.find((d) => d.provider === "anthropic-communicator");
+      expect(delta).toBeDefined();
+      expect(delta!.spentCentsDelta).toBe(100);
+      expect(delta!.requestCountDelta).toBe(2);
+    });
+
+    it("circuit-close after open pushes a closed-state delta", () => {
+      for (let i = 0; i < 5; i++) {
+        reportFailure("anthropic-strategist", 500);
+      }
+      mockPushDeltas.mockClear();
+      reportSuccess("anthropic-strategist", 0);
+      expect(mockPushDeltas).toHaveBeenCalled();
+      const batch = mockPushDeltas.mock.calls.at(-1)![0] as Array<{
+        provider: string;
+        circuitState: string;
+      }>;
+      expect(
+        batch.some((d) => d.provider === "anthropic-strategist" && d.circuitState === "closed"),
+      ).toBe(true);
+    });
+
+    it("adapter failures never propagate into governor calls", () => {
+      mockPushDeltas.mockImplementationOnce(async () => {
+        throw new Error("supabase down");
+      });
+      expect(() => {
+        reportSuccess("anthropic-analyst", 10);
+        __flushSyncForTests();
+      }).not.toThrow();
     });
   });
 });

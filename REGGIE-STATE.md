@@ -152,6 +152,23 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-03-005 — Advancement 1 IMPLEMENTED: Supabase-backed rate governor (cross-runtime ledger)
+- **Timestamp:** 2026-07-03T15:05:00-05:00
+- **Change Type:** CODE + SCHEMA (Advancement program, `docs/advancements/01-advancement-supabase-rate-governor.md`)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO operator session ("Continue Advancement 1" authorization)
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Changes Applied:**
+  1. **Migration `20260703000012_rate_governor_runtime_id.sql`** — applied to DB1 (`aagqvfwuixpxtdcrdxmv`) via MCP and committed to `supabase/migrations/`. Adds `runtime_id` column, widens PK to `(provider, state_day, runtime_id)`, rebuilds `upsert_rate_governor_state()` with `p_runtime_id` (old signature dropped). Table had 0 rows — PK change trivially safe.
+  2. **New `lib/rate-governor-supabase.ts`** — adapter using the shared `agent-memory` Supabase singleton (repo convention). `pushDeltas()` (additive RPC, per-runtime rows), `pullToday()` (sums across runtimes, ORs circuit-open), `RUNTIME_ID` = `OPENCLAW_RUNTIME_ID` env or hostname. Never throws into governor paths; missing env = silent disable.
+  3. **`lib/api-rate-governor.ts` wiring** — delta queue with 5 s debounced flush (unref'd timer + `beforeExit` flush for short-lived scripts); immediate flush on circuit open/close transitions; startup `hydrateFromSupabase()` merges global daily spend into local budgets with max() semantics (ceilings now govern total cross-runtime spend). Circuit state deliberately NOT imported from other runtimes (remote failures must not block this runtime). `__flushSyncForTests()` + reset-hook exposure.
+  4. **Tests** — 4 new sync tests in `api-rate-governor.test.ts` (mocked adapter) + new `rate-governor-supabase.test.ts` (6 tests). **27/27 green; `tsc --noEmit` clean.**
+  5. **`.env.example`** — documents optional `OPENCLAW_RUNTIME_ID`.
+- **Live Verification (workstation → DB1):** smoke script pushed 7¢ + 5¢ deltas through the RPC → row `(smoke-test, 2026-07-03, Empowerment-Center)` read back with `spent_cents=12, request_count=2` (additive semantics + runtime labeling confirmed), then deleted. Script itself removed after run.
+- **Deployment Note:** VPS clones synced with this commit. First VPS-side rows appear when any lib-consuming process (webhook handler, inngest functions, scripts) runs the updated code with `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` in env; the npm-dist openclaw gateway does not use this lib. `OPENCLAW_RUNTIME_ID` unset ⇒ rows label as hostname (`srv1619751` on VPS).
+- **Rollback:** `git revert <commit>`; migration is additive — full schema revert documented in the brief (drop column, restore 2-col PK, restore 008's function signature). Local JSON persistence untouched in either direction.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-03-004 — EACCES regression from root-run pairing tooling (RESOLVED same session)
 - **Timestamp:** 2026-07-03T14:50:00-05:00
 - **Change Type:** HOTFIX (file ownership)
