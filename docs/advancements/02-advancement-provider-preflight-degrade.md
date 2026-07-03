@@ -1,5 +1,7 @@
 # Advancement 2 — Provider Preflight: Degrade-Not-Abort + Dev-Profile Cron Guard
 
+> **STATUS: IMPLEMENTED 2026-07-03** (REGGIE-STATE audit 2026-07-03-006). Preflight gate + alert patcher + gateway guard shipped and verified. First VPS run caught three live faults: revoked VPS Telegram token (fixed), two dead Anthropic API keys (CVO must rotate), and the discovery that the VPS has no cron store and its live config contains no ollama references — see the audit entry's state-model correction.
+
 ## Summary
 
 - **File Evidence:**

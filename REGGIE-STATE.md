@@ -152,6 +152,26 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-03-006 — Advancement 2 IMPLEMENTED: provider preflight gate + cron guard — first run caught THREE live faults
+- **Timestamp:** 2026-07-03T15:40:00-05:00
+- **Change Type:** TOOLING + OPS (Advancement program, `docs/advancements/02-advancement-provider-preflight-degrade.md`)
+- **Status:** APPLIED ✅ (one finding requires CVO action — see Open Items)
+- **Owner:** Claude Code (Fable 5) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Tooling Shipped (commit 1a4189d):**
+  1. `scripts/preflight-providers.mjs` — deploy gate: verifies Ollama endpoint + every referenced model tag (config active-map, per-agent `model` strings, AND cron-pinned tags), Telegram `getMe`, Anthropic key probe. Exit 1 blocks the deploy. `pnpm preflight`; DEPLOY-CHECKLIST step 0.
+  2. `scripts/patch-cron-failure-alerts.mjs` — idempotent patcher adding standard `failureAlert` blocks (dry-run default, timestamped backup, chat id inferred from the file's own convention).
+  3. `gateway.cmd` guard (machine-local, untracked): refuses to start unless `OPENCLAW_RUNTIME_ROLE=production` or explicit `--allow-cron`. Verified: refusal message, exit 1, zero gateway processes spawned.
+  4. Workstation cron store: 24 `failureAlert` blocks applied (backup `cron/jobs.json.bak-2026-07-03T2033`).
+- **Local Verification:** preflight PASS against live workstation config (ollama 11434 serving qwen3:14b; `getMe` → @truthjblue_bot); negative test with port-11435 replica of audit 2026-05-14-001 → FAIL exit 1 naming the endpoint. The regression class is now mechanically catchable pre-ship.
+- **FIRST VPS RUN — THREE LIVE FAULTS CAUGHT:**
+  1. **VPS Telegram token was REVOKED (401).** `/etc/openclaw/.env` still held a pre-rotation token — the VPS gateway could not send Telegram at all. **FIXED this session:** getMe-verified good token (workstation `.env`, → @truthjblue_bot) written to `TELEGRAM_BOT_TOKEN` + `OPENCLAW_TELEGRAM_BOT_TOKEN` (backup `/etc/openclaw/.env.bak-a2-*`), `systemctl restart openclaw`, health OK, `getMe` from VPS OK, preflight telegram → PASS. Doctrine honored: token verified via getMe BEFORE enabling (March 2026 lesson).
+  2. **BOTH Anthropic API keys are DEAD:** `ANTHROPIC_API_KEY_SOVEREIGN` and `ANTHROPIC_API_KEY_SHARED` each return 401 from `/v1/models`. Any repo-process SDK call (llm-router, inngest, scripts) fails; `claude-cli/*` subscription-routed agents unaffected. **CVO ACTION REQUIRED:** mint replacement key(s) in the Anthropic Console and update `/etc/openclaw/.env` (+ local `.env`), then re-run `pnpm preflight`.
+  3. **STATE-MODEL CORRECTION — the VPS runs NO crons and its live config has NO ollama.** `/opt/openclaw/.openclaw/cron/` does not exist (searched to depth 3); the live `/opt/openclaw/.openclaw/openclaw.json` contains **zero** `ollama` references, diverging from repo canon `deploy/hostinger/server-openclaw.json`. The entire cron schedule (45 jobs) lives ONLY in the workstation store `~/.openclaw/cron/jobs.json` — meaning audit 2026-05-16-001's framing ("duplicate of VPS production crons") was inverted: the workstation gateway was the ONLY cron runtime, and **no crons have fired anywhere since it was disabled 2026-05-16 (~7 weeks of dormant scheduled ops)**. NOT silently "fixed" — live-config reconciliation is a deliberate deploy decision (recommend folding into Advancement 5 / Phase 10 scope: either deploy repo canon to the VPS config, or migrate the cron store to the VPS, or intentionally run crons on the workstation via `--allow-cron` + `OPENCLAW_RUNTIME_ROLE`).
+- **Deviations from brief (recorded):** (a) preflight NOT chained into `pnpm validate` — the ollama check is environment-dependent and would make CI flaky; it is a deploy gate (checklist step 0), not a code-quality gate. (b) `credential-health-check-daily` cron wiring deferred — that job is `inngestevent`-kind; wiring means touching Inngest function scope, and the VPS runs no crons anyway (see finding 3).
+- **Rollback:** tooling is additive (`git revert 1a4189d`); gateway.cmd guard removable by restoring the pre-guard file; cron store restorable from timestamped .bak; VPS env restorable from `/etc/openclaw/.env.bak-a2-*`.
+- **PR Link:** direct-to-main (1a4189d + this entry's commit).
+
 ### Entry 2026-07-03-005 — Advancement 1 IMPLEMENTED: Supabase-backed rate governor (cross-runtime ledger)
 - **Timestamp:** 2026-07-03T15:05:00-05:00
 - **Change Type:** CODE + SCHEMA (Advancement program, `docs/advancements/01-advancement-supabase-rate-governor.md`)
