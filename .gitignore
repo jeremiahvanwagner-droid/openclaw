@@ -55,6 +55,7 @@ tasks/*.sqlite
 tasks/*.sqlite-shm
 tasks/*.sqlite-wal
 /npm/
+tui/
 
 # ── Cron Run History ──────────────────────────────────────────
 cron/
