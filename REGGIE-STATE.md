@@ -152,6 +152,20 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-04-006 — A4 CLOSURE: allowInsecureAuth review + skill-registry closure + security audit green (APPLIED)
+- **Timestamp:** 2026-07-04T12:10:00-05:00
+- **Change Type:** CONFIG + governance data (A4 final review item + enforce-mode follow-through)
+- **Status:** APPLIED ✅ — `openclaw security audit` on VPS: **0 critical · 1 warn · 1 info**
+- **Owner:** Claude Code (Fable 5) — CVO: "Continue implementation. Observe changes made in IDE"
+- **allowInsecureAuth resolved:** dist semantics (2026.6.11): "DANGEROUS: Disable device identity checks for the Control UI (default: false)" — with it, a client that *looks local* (and via Caddy every internet client does) can skip device pairing using token/password alone. Findings: the live **VPS config does NOT set it** (defaults false — the 07-03 observation referred to a pre-migration config); the **local workstation config had `allowInsecureAuth: true`** — removed (backup `openclaw.json.bak-insecureauth-20260704T1148`; inert in remote-client topology but wrong class of flag to keep).
+- **Skill-registry closure (IDE change completed):** CVO registered `ghl-course-manager` in the IDE; cross-check found **4 more agent-referenced skills unregistered** (ghl-email-service, ghl-media-manager, ghl-saas-manager, ghl-social-planner) — each would throw SKILL_REGISTRY_MISSING under fail mode. Registered with the CVO's entry pattern (commit 0d91fd8, insert-only diff). Verified: zero agent-referenced skills unregistered; all five pass enforceSkillRegistry in fail mode; unknown ids still block. 7 on-disk skills remain unreferenced/unregistered (btv-discovery-call-prep, delivery-system, divine-path-walkers-welcome, ghl-speed-to-lead, test-cookie-persistence, traffic-coordinator, webinar-engine) — not blocking; register when an agent adopts them.
+- **Audit artifacts fixed:** VPS live config perms had regressed 600→644 (2026.6.11 migration side effect) — restored 600 openclaw:openclaw. The audit's "1 critical / gateway.auth.mode=none" from the first run was an env-resolution artifact (audit run without EnvironmentFile); with env loaded: 0 critical.
+- **Token literal reconciled:** local `openclaw.json` gateway.remote.token was a stale generation (masked until now by env-var precedence). Synced to the canonical VPS value from local .env (hash-verified 1a10c9b2, never echoed; backup kept). `openclaw health` exit 0, full 100+ agent roster. NOTE: shells inherited from long-running parents may carry a stale OPENCLAW_GATEWAY_AUTH_TOKEN; registry + .env + config are all correct now, so it self-heals on process restart.
+- **d6156bc verified in production use:** the generator (fixed by the CVO-initiated background session) now touches only AGENTS.md/TOOLS.md — confirmed during TOOLS.md regeneration.
+- **A4 remaining:** reboot test only (needs a CVO-scheduled window).
+- **Rollback:** local config backups (.bak-insecureauth-*, .bak-token-*); registry additions are a git revert.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-04-005 — ADVANCEMENT 5: canonical config single source of truth (APPLIED)
 - **Timestamp:** 2026-07-04T15:30:00-05:00
 - **Change Type:** CODE + CONFIG (dedup/config governance, brief: docs/advancements/05-*.md)
