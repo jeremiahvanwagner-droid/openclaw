@@ -152,6 +152,21 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-04-002 — Unplanned dist upgrade 2026.4.29 → 2026.6.11 (both hosts) + protocol-mismatch recovery (APPLIED)
+- **Timestamp:** 2026-07-04T09:15:00-05:00
+- **Change Type:** OPS (version upgrade recovery)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO operator session
+- **CVO:** Jeremiah Van Wagner (driving; ran `openclaw update` on both hosts)
+- **What happened:** CVO ran `openclaw update`. On the VPS it replaced `/usr/lib/node_modules/openclaw` with **2026.6.11** at 13:48 UTC — but the service had last started 13:11, so the RUNNING gateway kept executing old code from memory while new-protocol clients (hard-refreshed Control UI, updated CLI) were rejected with `protocol mismatch (1002)` — the dashboard rendered as "no plugins / no agents / no gateway," which read as total data loss but was pure client-server version skew. On Windows the update failed (`global-install-failed`, rolled back to 2026.5.7 intact).
+- **Recovery:** (1) verified config/agents untouched (they live in the config dirs, not the package); (2) local aligned via `npm install -g openclaw@2026.6.11`; (3) `systemctl restart openclaw` at 14:05 UTC so memory matches disk — **2026.6.11 first cold start ran clean state migrations** (tasks runs + flows registry + update-check → shared SQLite; legacy files archived as `*.migrated`) and reached `[gateway] ready`; (4) end-to-end verified: 2026.6.11 CLI lists all 108 agents, paired devices survived, health OK.
+- **Lessons (doctrine):**
+  1. `openclaw update` replaces disk but the gateway keeps old code in memory until restarted — ALWAYS `systemctl restart openclaw` immediately after an update, or clients updated to the new protocol are locked out while the "old" ones still work (deeply confusing symptom set).
+  2. "Dashboard shows nothing" after an update ≈ protocol mismatch, not data loss — check `journalctl` for `code=1002 reason=protocol mismatch` before assuming the worst.
+  3. Version pinning: both hosts now on **2026.6.11**. Future updates should be deliberate (pin exact version with `npm i -g openclaw@<ver>`, restart, verify) rather than `openclaw update` mid-session.
+- **Rollback:** `npm i -g openclaw@2026.4.29` + restart on VPS (note: would need the SQLite-migrated state reverted from the `*.migrated` archives).
+- **PR Link:** direct-to-main (this entry).
+
 ### Entry 2026-07-04-001 — FULLY OPERATIONAL: Anthropic keys restored, Caddy reconciled to DNS, workstation CLI paired as remote client (APPLIED)
 - **Timestamp:** 2026-07-04T09:30:00-05:00
 - **Change Type:** OPS (three-part recovery from CVO troubleshooting log)
