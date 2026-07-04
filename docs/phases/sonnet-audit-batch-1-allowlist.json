@@ -1,0 +1,19 @@
+{
+  "_comment": "Phase 9.2 batch-1 remap proposal (Advancement 6). DRAFT — pending CVO review of docs/phases/sonnet-audit-phase-9-2-results.md. scripts/phase9_2_patch.py --agents refuses to run while approved_by/approved_date are empty. Composition: both remap-clean agents + the 8 lowest-risk remap-guardrails agents (fewest surface-leaving/irreversible skills; every risky skill HITL-gated under enforce-mode fail).",
+  "approved_by": "",
+  "approved_date": "",
+  "from": "claude-sonnet-4.5",
+  "to": "qwen3:14b",
+  "agents": [
+    "d1_data_analyst",
+    "d1_ux_designer",
+    "d5_copywriter",
+    "d2_copywriter",
+    "d2_paid_ads",
+    "d3_client_relations",
+    "d3_thought_leadership",
+    "d4_curriculum_head",
+    "d5_pr_media",
+    "d1_customer_success"
+  ]
+}

@@ -1,0 +1,2341 @@
+{
+  "generated": "2026-07-04",
+  "sonnet_label": "claude-sonnet-4.5",
+  "counts": {
+    "remap-clean": 2,
+    "remap-guardrails": 12,
+    "manual-review": 2,
+    "stay-sonnet": 58
+  },
+  "agents": [
+    {
+      "agent_id": "d1_data_analyst",
+      "org_unit": "division_1_core_operations",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 21,
+      "verdict": "remap-clean"
+    },
+    {
+      "agent_id": "d1_ux_designer",
+      "org_unit": "division_1_core_operations",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 17,
+      "verdict": "remap-clean"
+    },
+    {
+      "agent_id": "d1_customer_success",
+      "org_unit": "division_1_core_operations",
+      "role_type": "manager",
+      "business_scope": [
+        "Support / Inbox"
+      ],
+      "surface_leaving": [
+        "abandoned-cart-recovery",
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration",
+        "csat-collector",
+        "subscription-dunning-manager",
+        "testimonial-collector"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 30,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d2_copywriter",
+      "org_unit": "division_2_ecommerce",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "email-broadcaster",
+        "email-sequence"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 29,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d2_paid_ads",
+      "org_unit": "division_2_ecommerce",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 25,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d3_client_relations",
+      "org_unit": "division_3_consulting",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "abandoned-cart-recovery",
+        "csat-collector",
+        "email-broadcaster",
+        "email-sequence",
+        "subscription-dunning-manager",
+        "testimonial-collector"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 20,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d3_thought_leadership",
+      "org_unit": "division_3_consulting",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 33,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d4_community_manager",
+      "org_unit": "division_4_coaching",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 31,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d4_curriculum_head",
+      "org_unit": "division_4_coaching",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "coaching-automated-accountability",
+        "coaching-intervention-triggering",
+        "membership-content-uploader"
+      ],
+      "irreversible": [
+        "course-builder",
+        "ghl-course-manager"
+      ],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 39,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d4_lead_coach",
+      "org_unit": "division_4_coaching",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "coaching-automated-accountability",
+        "coaching-intervention-triggering",
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration",
+        "membership-content-uploader"
+      ],
+      "irreversible": [
+        "course-builder"
+      ],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 30,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d4_social_creator",
+      "org_unit": "division_4_coaching",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "ghl-social-planner",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [
+        "ghl-media-manager"
+      ],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 34,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d5_copywriter",
+      "org_unit": "division_5_publishing",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 28,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d5_pr_media",
+      "org_unit": "division_5_publishing",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 28,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d6_communications",
+      "org_unit": "division_6_nonprofit",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "email-broadcaster",
+        "email-sequence",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 37,
+      "verdict": "remap-guardrails"
+    },
+    {
+      "agent_id": "d2_digital_marketing",
+      "org_unit": "division_2_ecommerce",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "email-broadcaster",
+        "email-sequence",
+        "ghl-email-service",
+        "ghl-social-planner",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [
+        "ghl-media-manager"
+      ],
+      "ungated": [],
+      "requires_reasoning": [
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 33,
+      "verdict": "manual-review"
+    },
+    {
+      "agent_id": "d3_marketing_brand",
+      "org_unit": "division_3_consulting",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 43,
+      "verdict": "manual-review"
+    },
+    {
+      "agent_id": "biz_01_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "brand-dm-qualification",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 47,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_02_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "coaching-automated-accountability",
+        "coaching-intervention-triggering",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "membership-content-uploader",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "course-builder",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 50,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_03_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 50,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_04_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ebook-buyer-automation",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 36,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_05_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "agency-automated-invoice-generation",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: agency-contract-risk-extraction, agency-custom-workflow-orchestration, cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 47,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_06_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 50,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_07_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "coupon-and-promo-creator",
+        "duplicate-contact-merger",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "ghl-browser-control",
+        "invoice-generator",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 52,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_08_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "abandoned-cart-recovery",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "subscription-dunning-manager",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 39,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_09_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 35,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "biz_10_pod_lead",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [
+        "Main Orchestrator"
+      ],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "finance-high-frequency-execution",
+        "finance-portfolio-rebalancing",
+        "finance-smart-contract-triggering",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "finance-smart-contract-triggering",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "finance-high-frequency-execution",
+        "finance-smart-contract-triggering",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: Orchestrat",
+        "skills: cross-business-scope-governor, finance-hierarchical-consensus-building, finance-regulatory-enforcement"
+      ],
+      "boundaries_deny_outbound": true,
+      "skill_count": 47,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "browser_primary",
+      "org_unit": "division_7_shared_services",
+      "role_type": "specialist",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "surface_leaving": [
+        "browser-automation",
+        "browser-controller",
+        "browser-core",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "browser-automation",
+        "browser-controller",
+        "browser-core",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 30,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d1_cmo",
+      "org_unit": "division_1_core_operations",
+      "role_type": "executive",
+      "business_scope": [
+        "Marketing / Lead Nurture"
+      ],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "email-broadcaster",
+        "email-sequence",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "role_type=executive",
+        "id/name: cmo",
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 55,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d1_devops",
+      "org_unit": "division_1_core_operations",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "aisaas-cicd-execution"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 28,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d1_fullstack_dev",
+      "org_unit": "division_1_core_operations",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "aisaas-cicd-execution",
+        "hubspot-contact-updater",
+        "salesforce-lead-creator"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "form-and-survey-builder",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 34,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d1_product_dev_manager",
+      "org_unit": "division_1_core_operations",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [],
+      "irreversible": [
+        "access-control-manager"
+      ],
+      "ungated": [
+        "access-control-manager"
+      ],
+      "requires_reasoning": [
+        "skills: approval-rubric"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 24,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d1_sales_manager",
+      "org_unit": "division_1_core_operations",
+      "role_type": "manager",
+      "business_scope": [
+        "Sales / Pipeline"
+      ],
+      "surface_leaving": [
+        "checkout-integrator",
+        "contact-synchronizer",
+        "deal-closer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "objection-handler",
+        "opportunity-mover",
+        "proposal-and-contract-sender",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "funnel-builder",
+        "funnel-cloner",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "landing-page-builder",
+        "page-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "scope text: strateg",
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 44,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d2_director",
+      "org_unit": "division_2_ecommerce",
+      "role_type": "executive",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "coupon-and-promo-creator",
+        "deal-closer",
+        "duplicate-contact-merger",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "ghl-browser-control",
+        "invoice-generator",
+        "objection-handler",
+        "opportunity-mover",
+        "proposal-and-contract-sender",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "role_type=executive",
+        "id/name: director",
+        "scope text: strateg",
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 59,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d2_seo_strategist",
+      "org_unit": "division_2_ecommerce",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "affiliate-seo-dynamic-link-injection",
+        "affiliate-seo-headless-browser-automation",
+        "affiliate-seo-programmatic-page-deployment",
+        "blog-post-publisher"
+      ],
+      "irreversible": [],
+      "ungated": [
+        "affiliate-seo-headless-browser-automation"
+      ],
+      "requires_reasoning": [
+        "id/name: strategist",
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 37,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d2_store_manager",
+      "org_unit": "division_2_ecommerce",
+      "role_type": "manager",
+      "business_scope": [
+        "Payment Monitor"
+      ],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "coupon-and-promo-creator",
+        "duplicate-contact-merger",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "ghl-browser-control",
+        "invoice-generator",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "scope text: pricing"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 39,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d2_web_dev",
+      "org_unit": "division_2_ecommerce",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "aisaas-cicd-execution",
+        "coupon-and-promo-creator",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "hubspot-contact-updater",
+        "invoice-generator",
+        "salesforce-lead-creator",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "form-and-survey-builder",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 41,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d3_biz_dev",
+      "org_unit": "division_3_consulting",
+      "role_type": "manager",
+      "business_scope": [
+        "Sales / Pipeline"
+      ],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "deal-closer",
+        "duplicate-contact-merger",
+        "email-broadcaster",
+        "email-sequence",
+        "ghl-browser-control",
+        "objection-handler",
+        "opportunity-mover",
+        "proposal-and-contract-sender",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 39,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d3_business_analyst",
+      "org_unit": "division_3_consulting",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "finance-high-frequency-execution",
+        "finance-portfolio-rebalancing",
+        "finance-smart-contract-triggering"
+      ],
+      "irreversible": [
+        "finance-smart-contract-triggering"
+      ],
+      "ungated": [
+        "finance-high-frequency-execution",
+        "finance-smart-contract-triggering"
+      ],
+      "requires_reasoning": [
+        "scope text: strateg",
+        "skills: finance-hierarchical-consensus-building, finance-regulatory-enforcement"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 25,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d3_ops_manager",
+      "org_unit": "division_3_consulting",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "agency-automated-invoice-generation"
+      ],
+      "irreversible": [
+        "access-control-manager"
+      ],
+      "ungated": [
+        "access-control-manager"
+      ],
+      "requires_reasoning": [
+        "skills: agency-contract-risk-extraction, agency-custom-workflow-orchestration"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 28,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d3_sales_closer",
+      "org_unit": "division_3_consulting",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "deal-closer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "objection-handler",
+        "opportunity-mover",
+        "proposal-and-contract-sender",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "scope text: legal",
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 34,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d4_cvo",
+      "org_unit": "division_4_coaching",
+      "role_type": "executive",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "coaching-automated-accountability",
+        "coaching-intervention-triggering",
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration",
+        "membership-content-uploader"
+      ],
+      "irreversible": [
+        "course-builder",
+        "ghl-course-manager"
+      ],
+      "ungated": [],
+      "requires_reasoning": [
+        "role_type=executive",
+        "id/name: cvo",
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 54,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d4_enrollment",
+      "org_unit": "division_4_coaching",
+      "role_type": "specialist",
+      "business_scope": [
+        "Sales / Pipeline"
+      ],
+      "surface_leaving": [
+        "checkout-integrator",
+        "coaching-automated-accountability",
+        "coaching-intervention-triggering",
+        "contact-synchronizer",
+        "deal-closer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "membership-content-uploader",
+        "objection-handler",
+        "opportunity-mover",
+        "proposal-and-contract-sender",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "course-builder",
+        "custom-value-manager",
+        "funnel-builder",
+        "funnel-cloner",
+        "ghl-course-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "landing-page-builder",
+        "page-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 53,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d4_funnel_strategist",
+      "org_unit": "division_4_coaching",
+      "role_type": "specialist",
+      "business_scope": [
+        "Marketing / Lead Nurture"
+      ],
+      "surface_leaving": [
+        "checkout-integrator",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "email-broadcaster",
+        "email-sequence",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "funnel-builder",
+        "funnel-cloner",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "landing-page-builder",
+        "page-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "id/name: strategist",
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 45,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d4_tech_automation",
+      "org_unit": "division_4_coaching",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "checkout-integrator",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "hubspot-contact-updater",
+        "opportunity-mover",
+        "salesforce-lead-creator",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "domain-connector",
+        "form-and-survey-builder",
+        "funnel-builder",
+        "funnel-cloner",
+        "ghl-course-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "landing-page-builder",
+        "page-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "domain-connector",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 39,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d5_acquisitions",
+      "org_unit": "division_5_publishing",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "agency-automated-invoice-generation"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "skills: agency-contract-risk-extraction, agency-custom-workflow-orchestration, approval-rubric"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 20,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d5_book_marketing",
+      "org_unit": "division_5_publishing",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "email-broadcaster",
+        "email-sequence",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "id/name: Director",
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 36,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d5_digital_distribution",
+      "org_unit": "division_5_publishing",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "coupon-and-promo-creator",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "invoice-generator",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "scope text: compliance"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 29,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d5_managing_editor",
+      "org_unit": "division_5_publishing",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "calendar-booking-bot"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "skills: approval-rubric"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 15,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d5_publisher",
+      "org_unit": "division_5_publishing",
+      "role_type": "executive",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "brand-dm-qualification",
+        "ebook-buyer-automation"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "role_type=executive",
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 31,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d5_sales_affiliate",
+      "org_unit": "division_5_publishing",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "affiliate-seo-dynamic-link-injection",
+        "affiliate-seo-headless-browser-automation",
+        "affiliate-seo-programmatic-page-deployment",
+        "coupon-and-promo-creator",
+        "deal-closer",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "invoice-generator",
+        "objection-handler",
+        "proposal-and-contract-sender",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "affiliate-seo-headless-browser-automation",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 50,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d6_coo",
+      "org_unit": "division_6_nonprofit",
+      "role_type": "executive",
+      "business_scope": [],
+      "surface_leaving": [],
+      "irreversible": [
+        "access-control-manager"
+      ],
+      "ungated": [
+        "access-control-manager"
+      ],
+      "requires_reasoning": [
+        "role_type=executive",
+        "id/name: coo",
+        "scope text: compliance",
+        "skills: approval-rubric"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 18,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d6_dev_director",
+      "org_unit": "division_6_nonprofit",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "email-broadcaster",
+        "email-sequence"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "id/name: director",
+        "scope text: strateg"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 18,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d6_executive_director",
+      "org_unit": "division_6_nonprofit",
+      "role_type": "executive",
+      "business_scope": [],
+      "surface_leaving": [
+        "brand-dm-qualification"
+      ],
+      "irreversible": [
+        "access-control-manager"
+      ],
+      "ungated": [
+        "access-control-manager"
+      ],
+      "requires_reasoning": [
+        "role_type=executive",
+        "id/name: director",
+        "scope text: strateg",
+        "skills: approval-rubric"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 30,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d6_finance",
+      "org_unit": "division_6_nonprofit",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "finance-high-frequency-execution",
+        "finance-portfolio-rebalancing",
+        "finance-smart-contract-triggering"
+      ],
+      "irreversible": [
+        "finance-smart-contract-triggering"
+      ],
+      "ungated": [
+        "finance-high-frequency-execution",
+        "finance-smart-contract-triggering"
+      ],
+      "requires_reasoning": [
+        "id/name: Compliance",
+        "scope text: compliance",
+        "skills: finance-hierarchical-consensus-building, finance-regulatory-enforcement"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 19,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d6_outreach",
+      "org_unit": "division_6_nonprofit",
+      "role_type": "coordinator",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration",
+        "email-broadcaster",
+        "email-sequence",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "id/name: Coo"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 36,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d6_program_director",
+      "org_unit": "division_6_nonprofit",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "community-billing-reconciliation",
+        "community-omnichannel-routing",
+        "community-reengagement-prompting",
+        "community-welcome-sequence-orchestration"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "id/name: director"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 34,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d8_automation_architect",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "surface_leaving": [
+        "checkout-integrator",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "funnel-builder",
+        "funnel-cloner",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-saas-manager",
+        "ghl-workflow-builder",
+        "landing-page-builder",
+        "page-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [
+        "id/name: architect"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 41,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d8_compliance_auditor",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "custom-value-manager",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [
+        "id/name: compliance",
+        "scope text: compliance",
+        "skills: approval-rubric"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 27,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d8_funnel_engineer",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "business_scope": [
+        "Marketing / Lead Nurture"
+      ],
+      "surface_leaving": [
+        "checkout-integrator",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "opportunity-mover",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "custom-value-manager",
+        "funnel-builder",
+        "funnel-cloner",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-workflow-builder",
+        "landing-page-builder",
+        "native-ghl-build-refactor",
+        "page-builder",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "ungated": [
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 41,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d8_platform_architect",
+      "org_unit": "division_8_saas_operations",
+      "role_type": "specialist",
+      "business_scope": [
+        "Operations / Reporting"
+      ],
+      "surface_leaving": [
+        "aisaas-cicd-execution",
+        "contact-synchronizer",
+        "duplicate-contact-merger",
+        "ghl-browser-control",
+        "hubspot-contact-updater",
+        "opportunity-mover",
+        "salesforce-lead-creator",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "tagging-engine"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "custom-value-manager",
+        "domain-connector",
+        "form-and-survey-builder",
+        "ghl-funnel-cloner",
+        "ghl-oauth-manager",
+        "ghl-offer-creator",
+        "ghl-saas-manager",
+        "ghl-workflow-builder",
+        "native-ghl-build-refactor",
+        "pipeline-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "ghl-browser-control",
+        "ghl-oauth-manager",
+        "snapshot-deployer",
+        "subaccount-provisioner",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [
+        "id/name: architect"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 51,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_analytics",
+      "org_unit": "division_9_online_store",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "coupon-and-promo-creator",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "invoice-generator",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "scope text: pricing"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 35,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_merchandiser",
+      "org_unit": "division_9_online_store",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "coupon-and-promo-creator",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "invoice-generator",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 28,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_offer_strategist",
+      "org_unit": "division_9_online_store",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "coupon-and-promo-creator",
+        "deal-closer",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "invoice-generator",
+        "objection-handler",
+        "proposal-and-contract-sender",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "id/name: strategist",
+        "scope text: pricing",
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 42,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_sales_copywriter",
+      "org_unit": "division_9_online_store",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "coupon-and-promo-creator",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "email-broadcaster",
+        "email-sequence",
+        "invoice-generator",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 38,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_seo_content",
+      "org_unit": "division_9_online_store",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "affiliate-seo-dynamic-link-injection",
+        "affiliate-seo-headless-browser-automation",
+        "affiliate-seo-programmatic-page-deployment",
+        "blog-post-publisher"
+      ],
+      "irreversible": [],
+      "ungated": [
+        "affiliate-seo-headless-browser-automation"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 37,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_social_promoter",
+      "org_unit": "division_9_online_store",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "blog-post-publisher",
+        "social-distributor",
+        "social-media-publisher",
+        "social-poster",
+        "youtube-manager"
+      ],
+      "irreversible": [],
+      "ungated": [],
+      "requires_reasoning": [
+        "id/name: Coo"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 31,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_store_director",
+      "org_unit": "division_9_online_store",
+      "role_type": "executive",
+      "business_scope": [],
+      "surface_leaving": [
+        "coupon-and-promo-creator",
+        "deal-closer",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "invoice-generator",
+        "objection-handler",
+        "proposal-and-contract-sender",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [
+        "role_type=executive",
+        "id/name: director",
+        "scope text: strateg",
+        "skills: guarantee-designer, offer-architect, offer-psychology-engine, pricing-strategist"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 45,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_web_designer",
+      "org_unit": "division_9_online_store",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "coupon-and-promo-creator",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "invoice-generator",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 26,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "d9_wp_developer",
+      "org_unit": "division_9_online_store",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "aisaas-cicd-execution",
+        "coupon-and-promo-creator",
+        "ecommerce-cart-abandonment-recovery",
+        "ecommerce-multilingual-support-resolution",
+        "ecommerce-return-refund-authorization",
+        "ecommerce-voice-commerce-processing",
+        "hubspot-contact-updater",
+        "invoice-generator",
+        "salesforce-lead-creator",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "irreversible": [
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "form-and-survey-builder",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "ungated": [
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "woocommerce-manager",
+        "wordpress-divi-manager"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 41,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "shared_api_gateway",
+      "org_unit": "division_7_shared_services",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [
+        "aisaas-cicd-execution",
+        "hubspot-contact-updater",
+        "salesforce-lead-creator"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "form-and-survey-builder",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "domain-connector",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 34,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "shared_data_analytics",
+      "org_unit": "division_7_shared_services",
+      "role_type": "specialist",
+      "business_scope": [],
+      "surface_leaving": [],
+      "irreversible": [
+        "access-control-manager"
+      ],
+      "ungated": [
+        "access-control-manager"
+      ],
+      "requires_reasoning": [],
+      "boundaries_deny_outbound": false,
+      "skill_count": 22,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "shared_data_control",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [],
+      "irreversible": [
+        "access-control-manager",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: orchestrat",
+        "skills: approval-rubric"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 17,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "shared_master_orchestrator",
+      "org_unit": "division_7_shared_services",
+      "role_type": "executive",
+      "business_scope": [],
+      "surface_leaving": [],
+      "irreversible": [
+        "access-control-manager",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [
+        "role_type=executive",
+        "id/name: orchestrator"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 22,
+      "verdict": "stay-sonnet"
+    },
+    {
+      "agent_id": "shared_runtime_ops",
+      "org_unit": "division_7_shared_services",
+      "role_type": "manager",
+      "business_scope": [],
+      "surface_leaving": [
+        "aisaas-cicd-execution"
+      ],
+      "irreversible": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "webhook-listener-config"
+      ],
+      "ungated": [
+        "access-control-manager",
+        "aisaas-cicd-execution",
+        "webhook-listener-config"
+      ],
+      "requires_reasoning": [
+        "agent_class=supervisor",
+        "criticality=critical",
+        "queue_class=P0",
+        "scope text: orchestrat"
+      ],
+      "boundaries_deny_outbound": false,
+      "skill_count": 28,
+      "verdict": "stay-sonnet"
+    }
+  ]
+}

@@ -152,6 +152,21 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-04-007 — ADVANCEMENT 6 / PHASE 9.2: Sonnet audit EXECUTED — classification at CVO gate (AUDIT COMPLETE, REMAP PENDING APPROVAL)
+- **Timestamp:** 2026-07-04T13:20:00-05:00
+- **Change Type:** TOOLING + ANALYSIS (no model bindings changed; brief: docs/advancements/06-*.md)
+- **Status:** Audit ✅ · Remap ⏸ at the brief's step-2 CVO review gate
+- **Owner:** Claude Code (Fable 5) — CVO: "continue Advancement 6"
+- **Classifier:** `scripts/phase9_2_audit.py` scores all 74 `claude-sonnet-4.5`-labeled agents on the three Tier-Router tests from declared skills[] + role metadata → `docs/phases/sonnet-audit-phase-9-2-results.{md,json}`.
+- **CALIBRATION INSIGHT (changes the rubric):** the 22 Phase-9.1 agents already local on qwen3:14b hold 198 distinct skills including the full risky vocabulary (email-broadcaster, checkout-integrator, snapshot-deployer, funnel-builder…) — skills[] are capability GRANTS, not activity profiles. A naive any-risky-skill⇒stay rule would keep ~all 74 and contradict the accepted 9.1 precedent. Since the A4 enforce cutover (audit -004), ghl_write/email_send/payment_action are mechanically HITL-gated regardless of model, so risk splits on gated vs UNGATED paths (browser control, CI/CD, deploys, auth/config mutation — those bypass the approval layer).
+- **Verdicts (74):** remap-clean **2** (d1_data_analyst, d1_ux_designer) · remap-guardrails **12** (all risky skills HITL-gated, no reasoning flags) · manual-review **2** (d2_digital_marketing, d3_marketing_brand — only flag is scope-prose "strateg", regex can't tell "sets" from "reports on") · stay-sonnet **58** (executives/supervisors/P0/critical/reasoning skills, or ungated risky capability).
+- **Patch tool:** `scripts/phase9_2_patch.py --agents <allowlist.json>` added — remaps ONLY listed agents in canonical config; **mechanically refuses empty approved_by/approved_date** (the CVO gate is tool-enforced). Verified: refusal on the draft, single-agent remap + idempotent rerun on a temp allowlist, config restored (74 bindings intact at HEAD).
+- **Capacity check (VPS, doctrine 2026-05-14-003):** single 50-token qwen3:14b generation 21s wall incl. cold load (bar <30s ✅); dual concurrent: 10.3s / 25.9s (bar <90s ✅ — single core serializes ~2.5×); RAM with model resident: 4.1 GiB available (bar ≥4 GiB ✅ **with zero slack** — co-tenant Docker stacks share it).
+- **Batch-1 PROPOSAL (pending approval):** `docs/phases/sonnet-audit-batch-1-allowlist.json` — the 2 clean + 8 lowest-footprint guardrails agents: d1_data_analyst, d1_ux_designer, d5_copywriter, d2_copywriter, d2_paid_ads, d3_client_relations, d3_thought_leadership, d4_curriculum_head, d5_pr_media, d1_customer_success.
+- **ROLLOUT PREREQUISITE (carried from A2 discovery):** live VPS gateway config has ZERO ollama provider refs — deployment = allowlist patch → mirror sync → add ollama provider block + per-agent model entries to `/opt/openclaw/.openclaw/openclaw.json` (timestamped backup) → `pnpm preflight` (verifies tags pulled) → restart → 48h observation (event-loop liveness, output spot-checks).
+- **Rollback:** none needed (no bindings changed). Post-remap rollback stays per-batch git revert + live-config restore from backup.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-04-006 — A4 CLOSURE: allowInsecureAuth review + skill-registry closure + security audit green (APPLIED)
 - **Timestamp:** 2026-07-04T12:10:00-05:00
 - **Change Type:** CONFIG + governance data (A4 final review item + enforce-mode follow-through)

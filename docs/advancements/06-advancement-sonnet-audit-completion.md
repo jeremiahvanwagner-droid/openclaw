@@ -1,5 +1,7 @@
 # Advancement 6 — Close Phase 9.2: Audit 74 Sonnet Bindings → Tier-Safe Local Remap
 
+> **STATUS: AUDIT EXECUTED 2026-07-04, REMAP AT CVO GATE** (audit 2026-07-04-007). Classifier `scripts/phase9_2_audit.py` + results table `docs/phases/sonnet-audit-phase-9-2-results.md` done. Verdicts: 2 remap-clean · 12 remap-guardrails (all risky skills HITL-gated under the A4 enforce cutover) · 2 manual-review · 58 stay-sonnet. Rubric calibrated against the 9.1 precedent: skills[] are capability grants, so the gating question is HITL-gated vs UNGATED paths (browser/deploy/auth bypass the approval layer). Patch tool gained `--agents <allowlist>` mode that mechanically refuses an unapproved list. Capacity check PASSED (21s single / 25.9s dual-concurrent / 4.1 GiB headroom — zero slack). Batch-1 proposal (10 agents) at `docs/phases/sonnet-audit-batch-1-allowlist.json` awaiting `approved_by`. Rollout prerequisite documented: live VPS config has no ollama provider yet.
+
 ## Summary
 
 - **File Evidence:**

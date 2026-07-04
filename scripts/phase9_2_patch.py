@@ -122,7 +122,80 @@ def patch_agents_config(path: Path):
     return remapped
 
 
+def run_allowlist_mode(allowlist_path: Path):
+    """Advancement 6 (Phase 9.2): remap ONLY the CVO-approved agents.
+
+    Allowlist shape (docs/phases/sonnet-audit-*-allowlist.json):
+      {
+        "approved_by": "<name — REQUIRED, patcher refuses if empty>",
+        "approved_date": "<YYYY-MM-DD — REQUIRED>",
+        "from": "claude-sonnet-4.5",
+        "to": "qwen3:14b",
+        "agents": ["agent_id", ...]
+      }
+
+    Writes ONLY config/agents_config.json (canonical, per A5); refresh the
+    tracked root mirror with `node scripts/sync-canonical-config.mjs --write`
+    afterwards. Idempotent: agents already on `to` are counted as no-ops.
+    """
+    spec = json.loads(allowlist_path.read_text(encoding="utf-8"))
+    if not spec.get("approved_by") or not spec.get("approved_date"):
+        sys.exit(
+            f"REFUSED: {allowlist_path} has empty approved_by/approved_date — "
+            "the CVO review gate (Advancement 6 brief step 2) has not been passed."
+        )
+    from_tag = spec.get("from", "claude-sonnet-4.5")
+    to_tag = spec.get("to", NEW_TAG)
+    wanted = list(dict.fromkeys(spec.get("agents", [])))
+    if not wanted:
+        sys.exit("REFUSED: allowlist has no agents.")
+
+    canon = REPO / "config" / "agents_config.json"
+    data = json.loads(canon.read_text(encoding="utf-8"))
+    by_id = {a.get("agent_id"): a for a in data.get("agents", [])}
+
+    missing = [aid for aid in wanted if aid not in by_id]
+    if missing:
+        sys.exit(f"REFUSED: allowlist agents not in config: {missing}")
+    wrong_tag = [
+        aid for aid in wanted
+        if by_id[aid].get("llm_model") not in (from_tag, to_tag)
+    ]
+    if wrong_tag:
+        sys.exit(
+            f"REFUSED: agents not on '{from_tag}' (or already '{to_tag}'): "
+            f"{ {aid: by_id[aid].get('llm_model') for aid in wrong_tag} }"
+        )
+
+    remapped, noop = [], []
+    for aid in wanted:
+        if by_id[aid]["llm_model"] == to_tag:
+            noop.append(aid)
+        else:
+            by_id[aid]["llm_model"] = to_tag
+            remapped.append(aid)
+
+    canon.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    print(json.dumps({
+        "mode": "allowlist",
+        "allowlist": str(allowlist_path),
+        "approved_by": spec["approved_by"],
+        "remapped": remapped,
+        "already_on_target": noop,
+        "next": "node scripts/sync-canonical-config.mjs --write  (refresh mirrors)",
+    }, indent=2))
+
+
 def main():
+    if "--agents" in sys.argv:
+        idx = sys.argv.index("--agents")
+        try:
+            allowlist = Path(sys.argv[idx + 1])
+        except IndexError:
+            sys.exit("usage: phase9_2_patch.py --agents <allowlist.json>")
+        run_allowlist_mode(allowlist)
+        return
+
     summary = {"agent_models_json": {}, "agents_config": {}}
 
     for ad in AGENT_DIRS:
