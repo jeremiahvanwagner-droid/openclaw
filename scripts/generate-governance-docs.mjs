@@ -14,10 +14,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, "..");
 
+// MEMORY.md and SOUL.md in the repo root are hand-written documents (operator
+// memory and the Phase 1 constitution) and must never be generated or
+// overwritten by this script. Only AGENTS.md and TOOLS.md are derived from config.
 const OUTPUTS = {
   agents: path.join(ROOT_DIR, "AGENTS.md"),
-  soul: path.join(ROOT_DIR, "SOUL.md"),
-  memory: path.join(ROOT_DIR, "MEMORY.md"),
   tools: path.join(ROOT_DIR, "TOOLS.md"),
 };
 
@@ -26,28 +27,6 @@ function renderTable(headers, rows) {
   const divider = `| ${headers.map(() => "---").join(" | ")} |`;
   const body = rows.map((row) => `| ${row.join(" | ")} |`).join("\n");
   return [headerRow, divider, body].filter(Boolean).join("\n");
-}
-
-export function renderSoulDoc({ config, registry }) {
-  const aliasAgents = Object.keys(config.security_policy?.alias_agents || {});
-  return `# SOUL
-
-Generated from [config/agents_config.json](./config/agents_config.json) and [config/skills-registry.json](./config/skills-registry.json). Do not edit manually.
-
-## Governance Posture
-
-- Authoritative runtime policy lives in \`config/agents_config.json\` and environment-backed runtime config.
-- Generated markdown in the repo root is derivative and must stay in sync with config.
-- Raw audit data is server-side only; dashboard access must flow through authenticated server routes.
-- Risky skills must declare a risk tier, side effects, idempotency strategy, and approval policy.
-
-## Enforcement Defaults
-
-- Capability policy mode: \`${config.security_policy?.enforcement_modes?.capabilities || "warn"}\`
-- Skill registry mode: \`${registry.enforcement_defaults?.mode || "warn"}\`
-- HITL action families: \`${(config.security_policy?.defaults?.requires_hitl_for || []).join(", ")}\`
-- Runtime alias agents: \`${aliasAgents.join(", ")}\`
-`;
 }
 
 export function renderAgentsDoc({ config, summary }) {
@@ -88,27 +67,6 @@ ${renderTable(
 )}
 
 Total configured agents: ${config.agents.length}
-`;
-}
-
-export function renderMemoryDoc({ config }) {
-  const memoryTypes = Array.from(
-    new Set((config.agents || []).map((agent) => agent.memory_type).filter(Boolean)),
-  ).sort();
-
-  return `# MEMORY
-
-Generated from [config/agents_config.json](./config/agents_config.json). Do not edit manually.
-
-## Memory Model
-
-- Primary operational state: Supabase tables for agents, events, approvals, metrics, and operation ledger.
-- Local memory stores remain in place for workspace-bound context and should be treated as node-local state.
-- Long-term governance and capability policy are version-controlled in config.
-
-## Declared Memory Types
-
-${memoryTypes.map((memoryType) => `- \`${memoryType}\``).join("\n")}
 `;
 }
 
@@ -156,9 +114,7 @@ export async function buildGovernanceDocs() {
   }
 
   return {
-    [OUTPUTS.soul]: renderSoulDoc({ config, registry }),
     [OUTPUTS.agents]: renderAgentsDoc({ config, summary }),
-    [OUTPUTS.memory]: renderMemoryDoc({ config }),
     [OUTPUTS.tools]: renderToolsDoc({ config, registry }),
   };
 }
