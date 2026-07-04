@@ -87,10 +87,15 @@ Generated from [config/agents_config.json](./config/agents_config.json) and [con
 | funnel-qa-checklist | write_safe |  | funnel-qa-checklist_id + timestamp |
 | ghl-api | write_safe | ghl | location_id + resource + action + entity_id |
 | ghl-browser-control | irreversible | browser | location_id + workflow_action + entity_id |
+| ghl-course-manager | write_safe |  | ghl-course-manager_id + timestamp |
+| ghl-email-service | write_safe |  | ghl-email-service_id + timestamp |
 | ghl-funnel-cloner | write_safe |  | ghl-funnel-cloner_id + timestamp |
+| ghl-media-manager | write_safe |  | ghl-media-manager_id + timestamp |
 | ghl-oauth-manager | write_safe |  | ghl-oauth-manager_id + timestamp |
 | ghl-offer-creator | write_safe |  | ghl-offer-creator_id + timestamp |
+| ghl-saas-manager | write_safe |  | ghl-saas-manager_id + timestamp |
 | ghl-setup-validator | write_safe |  | ghl-setup-validator_id + timestamp |
+| ghl-social-planner | write_safe |  | ghl-social-planner_id + timestamp |
 | ghl-workflow-builder | write_safe |  | ghl-workflow-builder_id + timestamp |
 | google-drive-manager | write_safe |  | google-drive-manager_id + timestamp |
 | hubspot-contact-updater | write_safe |  | hubspot-contact-updater_id + timestamp |

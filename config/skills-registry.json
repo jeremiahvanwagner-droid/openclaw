@@ -2603,6 +2603,36 @@
       ]
     },
     {
+      "skill_id": "ghl-course-manager",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-course-manager_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ghl-email-service",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-email-service_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "ghl-funnel-cloner",
       "owner": "ghl-ops",
       "risk_tier": "write_safe",
@@ -2611,6 +2641,21 @@
       ],
       "external_systems": [],
       "idempotency_key_strategy": "ghl-funnel-cloner_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ghl-media-manager",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-media-manager_id + timestamp",
       "approval_policy": "hitl for ghl_write",
       "replay_policy": "safe to replay",
       "required_tests": [
@@ -2648,6 +2693,21 @@
       ]
     },
     {
+      "skill_id": "ghl-saas-manager",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-saas-manager_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
       "skill_id": "ghl-setup-validator",
       "owner": "ghl-ops",
       "risk_tier": "write_safe",
@@ -2656,6 +2716,21 @@
       ],
       "external_systems": [],
       "idempotency_key_strategy": "ghl-setup-validator_id + timestamp",
+      "approval_policy": "hitl for ghl_write",
+      "replay_policy": "safe to replay",
+      "required_tests": [
+        "scope enforcement"
+      ]
+    },
+    {
+      "skill_id": "ghl-social-planner",
+      "owner": "ghl-ops",
+      "risk_tier": "write_safe",
+      "side_effects": [
+        "ghl_api_call"
+      ],
+      "external_systems": [],
+      "idempotency_key_strategy": "ghl-social-planner_id + timestamp",
       "approval_policy": "hitl for ghl_write",
       "replay_policy": "safe to replay",
       "required_tests": [
