@@ -20,7 +20,8 @@ const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, "..");
 
 // Paths
-const CONFIG_PATH = path.join(ROOT_DIR, "agents_config.json");
+// canonical config (A5) — the root agents_config.json is a generated mirror
+const CONFIG_PATH = path.join(ROOT_DIR, "config", "agents_config.json");
 const WORKSPACES_DIR = path.join(ROOT_DIR, "workspaces");
 const TEMPLATES_DIR = path.join(ROOT_DIR, "templates");
 

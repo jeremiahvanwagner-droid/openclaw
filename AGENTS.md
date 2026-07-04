@@ -2,6 +2,13 @@
 
 Generated from [config/agents_config.json](./config/agents_config.json). Do not edit manually.
 
+## Canonical Config Rule (Advancement 5)
+
+Hand-edit only `config/agents_config.json` and `skills/`. The root
+`agents_config.json` and `workspace/skills/` are **generated mirrors** — after
+canonical edits run `node scripts/sync-canonical-config.mjs --write`.
+`pnpm config:check` (part of `pnpm validate`) fails CI on drift.
+
 ## Divisions
 
 | Division | Name | Agent Count |

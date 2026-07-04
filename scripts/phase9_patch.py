@@ -13,6 +13,11 @@ What this script does, in order:
        b. Leave `claude-sonnet-4.5` and `claude-opus-4` bindings unchanged.
 
 This script is IDEMPOTENT — running it twice is a no-op the second time.
+
+CANONICAL NOTE (A5, 2026-07-04): config/agents_config.json is the canonical
+copy; the root agents_config.json is a generated mirror. This script writes
+both, which keeps them converged — but any future edit must treat config/ as
+the source of truth. Drift gate: node scripts/sync-canonical-config.mjs --check
 """
 import json
 import os

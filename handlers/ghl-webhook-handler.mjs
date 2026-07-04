@@ -43,8 +43,10 @@ const __dirname = path.dirname(__filename);
 
 const skillsSearchPaths = [
   process.env.OPENCLAW_SKILLS_DIR,
-  path.join(__dirname, 'workspace', 'skills'),
+  // canonical tree first (A5): repo skills/ is the only hand-edited source;
+  // workspace/skills is a generated mirror (scripts/sync-canonical-config.mjs)
   path.join(__dirname, '..', 'skills'),
+  path.join(__dirname, '..', 'workspace', 'skills'),
   path.join(process.cwd(), 'skills'),
   '/opt/openclaw/skills',
 ].filter(Boolean);

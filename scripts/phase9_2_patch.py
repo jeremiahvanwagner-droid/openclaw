@@ -25,6 +25,11 @@ What this script does, in order:
      are untouched (Phase 9.3+ scope).
 
 This script is IDEMPOTENT — running it twice is a no-op the second time.
+
+CANONICAL NOTE (A5, 2026-07-04): config/agents_config.json is the canonical
+copy; the root agents_config.json is a generated mirror. This script writes
+both, which keeps them converged — but any future edit must treat config/ as
+the source of truth. Drift gate: node scripts/sync-canonical-config.mjs --check
 """
 import json
 import sys

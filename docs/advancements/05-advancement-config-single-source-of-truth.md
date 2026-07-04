@@ -1,5 +1,7 @@
 # Advancement 5 — Single Source of Truth: Agent Config & Skills Tree Deduplication
 
+> **STATUS: IMPLEMENTED 2026-07-04** (REGGIE-STATE audit 2026-07-04-005). Canonical = `config/agents_config.json` + `skills/`; root config = tracked generated mirror, `workspace/skills/` = gitignored runtime mirror. `scripts/sync-canonical-config.mjs` (`--check`/`--write`) gates `pnpm validate` via `config:check`. Divergence adjudicated — canon was a strict superset; all 3 field conflicts resolved for canon (social-media-publisher was deliberately remapped; */15 throttle was deliberate). All 69 pre-existing workspace/skills modules were stale; 124 refreshed. Skills loading repointed to canon in both handler variants; legacy root-config readers retargeted. `skills/supabase*` moved to `plugin-skills/` (40 files); `state/` + `.env.bak*` gitignored. Rule embedded in the AGENTS.md generator. OPEN (folded here from A2): cron-placement decision + live-VPS-config vs repo-canon reconciliation remain CVO items.
+
 ## Summary
 
 - **File Evidence:**

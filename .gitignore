@@ -4,7 +4,7 @@
 
 # ── Secrets & Credentials ─────────────────────────────────────
 .env
-.env.bak.20260330-204741
+.env.bak*
 .env.local
 .env.prod
 .env.*.local
@@ -38,8 +38,11 @@ workspace/
 
 # ── OpenClaw Runtime Artifacts ────────────────────────────────
 /openclaw.json
-/agents_config.json
+# NOTE: /agents_config.json is intentionally NOT ignored — it is a tracked,
+# generated mirror of config/agents_config.json (scripts/sync-canonical-config.mjs)
 /ghl-webhook-handler.mjs
+# gateway 2026.6+ shared SQLite state (per-machine runtime data)
+state/
 openclaw.json.bak*
 openclaw.pre-safe-fix-*.json
 test-pool-*.mjs

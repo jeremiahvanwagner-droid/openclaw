@@ -152,6 +152,35 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-04-005 — ADVANCEMENT 5: canonical config single source of truth (APPLIED)
+- **Timestamp:** 2026-07-04T15:30:00-05:00
+- **Change Type:** CODE + CONFIG (dedup/config governance, brief: docs/advancements/05-*.md)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO said "Both" (A4 triage + A5)
+- **Canonical declared:** `config/agents_config.json` + `skills/` are the only hand-edited sources. Root `agents_config.json` = tracked generated mirror; `workspace/skills/` = gitignored runtime mirror. New tool `scripts/sync-canonical-config.mjs` (`--check` CI gate / `--write` refresh); `pnpm config:check` prepended to `pnpm validate`.
+- **Divergence adjudicated (no data loss):** canon was a strict superset (27 agents' business_scope/ghl_token_group/operational_boundaries, 101 agents' skills[], + security_policy). Three same-field conflicts all resolved for canon: browser_primary/secondary `skills` (root's social-media-publisher was deliberately remapped to 16 marketing agents by map-skills-to-agents.py) and shared_runtime_ops `cron_schedule` (canon's */15 came from throttle commit 2a3379c). Root overwritten; sha1 now identical.
+- **workspace/skills was 100% stale:** every one of the 69 pre-existing mirror modules differed from skills/ (unsynced since 2026-05-05); 124 modules refreshed.
+- **Skills loading repointed to canon:** `handlers/ghl-webhook-handler.mjs` search order now prefers repo `skills/` (the old #2 candidate `handlers/workspace/skills` never existed — vestige); root runtime snapshot `ghl-webhook-handler.mjs` skillsDir → `skills/`. Verified: all 3 Phase 3 modules resolve from `skills/` and import (4/6/5 exports). Legacy root-config readers retargeted to config/: `scripts/generate-workspaces.mjs`, `scripts/register-agents.mjs`.
+- **Hygiene:** `skills/supabase*` (Claude-Code-format skills, 40 files) moved to `plugin-skills/` via git mv; `.gitignore` gained `state/` (gateway 2026.6+ SQLite runtime state) and `.env.bak*`, and the misleading `/agents_config.json` ignore line replaced with a tracked-mirror note. Canonical rule embedded in the AGENTS.md generator template (AGENTS.md is generated — hand-edits would be overwritten) and phase9 patcher docstrings.
+- **VPS note:** live smoke of api.truthjblue.dev during this pass: /health 200, /webhook/ghl 404 — expected, `openclaw-webhook.service` remains disabled pending CVO activation decision. At activation, verify the service's snapshot/ExecStart picks up the repointed skillsDir.
+- **⚠️ HAZARD FOUND: `scripts/generate-governance-docs.mjs` overwrites hand-written files.** It regenerates AGENTS.md (legitimately generated) but ALSO clobbers `MEMORY.md` (MIKE operator memory) and `SOUL.md` (the constitution) with stub templates. Caught pre-commit this pass and restored from HEAD. Do NOT run it until it's scoped to AGENTS.md only — candidate for a small follow-up fix.
+- **Rollback:** `git revert` (single commit); root mirror recoverable from history.
+- **PR Link:** direct-to-main.
+
+### Entry 2026-07-04-004 — ADVANCEMENT 4 (part): governance enforce-mode cutover warn→fail, both hosts (APPLIED)
+- **Timestamp:** 2026-07-04T14:50:00-05:00
+- **Change Type:** CONFIG (security governance, brief: docs/advancements/04-*.md step 4)
+- **Status:** APPLIED ✅ — verified by live negative test
+- **Owner:** Claude Code (Fable 5) — CVO approved starting the triage ("Both")
+- **Day-0 triage — clean across all three sources, conclusively:** (1) VPS `journalctl -u openclaw` 7 days: zero capability/skill-registry entries; (2) local `logs/`: zero; (3) Supabase `agent_events` `security/*`: **zero rows ever** — including during A3 smoke tests that exercised enforcement paths. The forward 48h window could not add information: no governed consumer is live (webhook service disabled, crons dormant). Flipped immediately per the brief's "if triage is clean" condition; this also means the webhook service starts life ENFORCED when activated.
+- **LATENT FAULT FOUND:** `.env.example` documented `'enforce'` as the blocking value, but `lib/security-governance.mjs normalizeMode()` accepts only `off|warn|fail` and silently falls back to `warn` on anything else — the documented cutover would have been a no-op. Correct blocking value: **`fail`**. Docs fixed.
+- **Flipped (with timestamped backups):** local `.env` warn→fail (both vars); VPS `/etc/openclaw/.env` vars were ABSENT (running on code default warn) — appended both =fail (`.env.bak-enforce-20260704T1448`); config-level defaults also flipped (`config/skills-registry.json` enforcement_defaults.mode, `config/agents_config.json` security_policy.enforcement_modes.{capabilities,skill_registry}) so processes launched without env vars still enforce.
+- **Verification:** out-of-scope capability call (`stripe_dashboard` from a bogus agent) → thrown `CAPABILITY_POLICY_UNKNOWN_AGENT`, not warn-and-continue. Notably the test ran WITHOUT env vars loaded — proving the config-level default alone enforces.
+- **No restart needed:** the npm-dist gateway does not read these vars; repo-code processes pick them up at spawn.
+- **A4 remaining:** `controlUi.allowInsecureAuth=true` semantics review (do NOT flip blind — dashboard lockout risk).
+- **Rollback:** set both env vars + both config defaults back to `warn`; backups exist on both hosts.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-04-003 — MODEL REFRESH: Sonnet 4.5 → Sonnet 5, Opus 4/4.5 → Opus 4.8, platform-wide (APPLIED)
 - **Timestamp:** 2026-07-04T10:45:00-05:00
 - **Change Type:** CONFIG + CODE (model version migration, CVO-directed)
