@@ -152,6 +152,19 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-04-001 — FULLY OPERATIONAL: Anthropic keys restored, Caddy reconciled to DNS, workstation CLI paired as remote client (APPLIED)
+- **Timestamp:** 2026-07-04T09:30:00-05:00
+- **Change Type:** OPS (three-part recovery from CVO troubleshooting log)
+- **Status:** APPLIED ✅ — **VPS preflight fully green for the first time** (telegram PASS, supabase PASS, anthropic PASS)
+- **Owner:** Claude Code (Fable 5) — CVO operator session (CVO-supplied PowerShell troubleshooting log)
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Fault 1 — VPS agent 401 storm (the blocker):** every embedded agent run (biz_03_pod_lead, d5_book_marketing, marketing, d6_dev_director, …) died with `HTTP 401 invalid x-api-key` on `anthropic/claude-sonnet-4-5`, `next=none`. Root cause: the dead Anthropic keys from audit -006. **Workstation keys probed VALID (200/200)** — fourth and final member of the stale-VPS-credential family. Synced `ANTHROPIC_API_KEY` + `_SOVEREIGN` + `_SHARED` to `/etc/openclaw/.env` (backup `.env.bak-anthropic-*`), restarted gateway, VPS-side probe 200 on all three. **Embedded agent runs will now complete — API billing resumes; recommend an Anthropic Console monthly spend cap as the outer guardrail (the repo rate-governor does not govern the npm-dist gateway).**
+- **Fault 2 — Caddy cert-renewal failure loop (attempt 43):** VPS Caddyfile still declared `truthjblue.dev, www.truthjblue.dev → localhost:3001`, but DNS moved apex/www to Hostinger web hosting (216.150.1.1 / .193) per Path A — ACME challenges landed on Hostinger, renewal could never succeed (would have expired ~Jul 29). Removed the apex/www block (backup `Caddyfile.bak-*`, header comment documents why), `caddy validate` + reload. Verified: `https://api.truthjblue.dev` → 200 clean TLS; `https://webhook.truthjblue.dev` → 405 (Caddy's own non-POST response — correct; backend service remains intentionally disabled); 0 error lines in journal.
+- **Fault 3 — workstation CLI dead (`openclaw health` 1006 to loopback):** by design there is no local gateway (audit -006 guard), but the CLI kept targeting loopback. Three-layer fix: (a) `gateway.mode: "local" → "remote"` in local `openclaw.json` (backup kept) so the CLI honors `gateway.remote.url=https://api.truthjblue.dev`; (b) gateway token mismatch traced to a **stale Windows User-scope env var** `OPENCLAW_GATEWAY_AUTH_TOKEN` overriding `.env` — registry value + local `.env` synced to the VPS token (the browser dashboard already used the VPS value); (c) device pairing approved via `/root/oc-approve.sh` (device `487039a4`, client=gateway-client, operator). **`openclaw health` from the workstation now lists all 100+ agents from the production gateway.** Note: already-running apps keep the old env — new terminals inherit the corrected token.
+- **Cosmetic (no action):** local `openclaw gateway status` complaints ("Scheduled Task missing", "Service command does not include the gateway subcommand") are the status parser reading the audit -006 guard block in `gateway.cmd` — the local service is intentionally not installed; do NOT run `openclaw doctor --repair` against it (it would try to reinstate a local gateway service).
+- **Rollback:** all three fixes have timestamped backups (`/etc/openclaw/.env.bak-anthropic-*`, `/etc/caddy/Caddyfile.bak-*`, local `openclaw.json.bak-remote-mode-*`, `.env.bak-gwtoken-*`); device removable via `openclaw devices remove 487039a4…`.
+- **PR Link:** direct-to-main (this entry).
+
 ### Entry 2026-07-03-007 — Advancement 3 IMPLEMENTED: GHL webhook idempotency ledger + signature hardening — agent_events data plane is LIVE
 - **Timestamp:** 2026-07-03T18:00:00-05:00
 - **Change Type:** CODE + SCHEMA + OPS (Advancement program, `docs/advancements/03-advancement-ghl-webhook-hardening.md`)
