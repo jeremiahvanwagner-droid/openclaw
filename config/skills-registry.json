@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "enforcement_defaults": {
-    "mode": "warn"
+    "mode": "fail"
   },
   "skills": [
     {

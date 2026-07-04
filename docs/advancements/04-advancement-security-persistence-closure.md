@@ -1,5 +1,7 @@
 # Advancement 4 — Security & Persistence Closure (Discharge Phase 9.2 Entry Items 2–4)
 
+> **STATUS: ~95% COMPLETE 2026-07-04** (audits 2026-07-03-001/-002, 2026-07-04-004). Steps 1–3 done 2026-07-03 (services enabled, device auth re-enabled + all 3 devices paired, Kimi removed). Step 4 done 2026-07-04: Day-0 triage clean across VPS journal, local logs, AND Supabase `agent_events` (zero `security/*` rows ever) → enforcement flipped warn→**`fail`** on both hosts + config-level defaults (NOTE: the value is `fail`, not `enforce` — normalizeMode silently falls back to warn on unknown values; .env.example fixed). Verified by live negative test (CAPABILITY_POLICY_UNKNOWN_AGENT thrown). REMAINING: `controlUi.allowInsecureAuth=true` semantics review (don't flip blind — lockout risk); scheduled reboot test.
+
 ## Summary
 
 - **File Evidence:**

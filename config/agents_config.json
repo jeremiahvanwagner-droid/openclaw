@@ -8513,8 +8513,8 @@
     "version": "1.0.0",
     "effectiveDate": "2026-04-02",
     "enforcement_modes": {
-      "capabilities": "warn",
-      "skill_registry": "warn"
+      "capabilities": "fail",
+      "skill_registry": "fail"
     },
     "defaults": {
       "requires_hitl_for": [
