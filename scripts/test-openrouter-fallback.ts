@@ -15,7 +15,7 @@ function buildTestConfig(): ClawRouterConfig {
       "anthropic-strategist": {
         credential_env: "ANTHROPIC_API_KEY_SOVEREIGN",
         provider: "anthropic-strategist",
-        model: "claude-opus-4-latest",
+        model: "claude-opus-4-8",
         max_tokens: 16000,
         temperature_default: 0.7,
         queue_class: "P1",
@@ -24,7 +24,7 @@ function buildTestConfig(): ClawRouterConfig {
       "anthropic-executor": {
         credential_env: "ANTHROPIC_API_KEY_SHARED",
         provider: "anthropic-executor",
-        model: "claude-sonnet-4.5-latest",
+        model: "claude-sonnet-5",
         max_tokens: 8000,
         temperature_default: 0.5,
         queue_class: "P1",
@@ -33,7 +33,7 @@ function buildTestConfig(): ClawRouterConfig {
       "anthropic-communicator": {
         credential_env: "ANTHROPIC_API_KEY_SHARED",
         provider: "anthropic-communicator",
-        model: "claude-sonnet-4.5-latest",
+        model: "claude-sonnet-5",
         max_tokens: 6000,
         temperature_default: 0.8,
         queue_class: "P2",
@@ -42,7 +42,7 @@ function buildTestConfig(): ClawRouterConfig {
       "anthropic-analyst": {
         credential_env: "ANTHROPIC_API_KEY_SHARED",
         provider: "anthropic-analyst",
-        model: "claude-haiku-4.5-latest",
+        model: "claude-haiku-4-5",
         max_tokens: 4000,
         temperature_default: 0.3,
         queue_class: "P3",
@@ -51,7 +51,7 @@ function buildTestConfig(): ClawRouterConfig {
       "anthropic-guardian": {
         credential_env: "ANTHROPIC_API_KEY_SOVEREIGN",
         provider: "anthropic-guardian",
-        model: "claude-haiku-4.5-latest",
+        model: "claude-haiku-4-5",
         max_tokens: 4000,
         temperature_default: 0.1,
         queue_class: "P0",
@@ -139,7 +139,7 @@ async function main(): Promise<void> {
 
   const communicatorResponse = await routeWithFallback(
     "COMMUNICATOR",
-    buildPrimaryRequest("claude-sonnet-4.5-latest"),
+    buildPrimaryRequest("claude-sonnet-5"),
     config,
   );
 
@@ -151,7 +151,7 @@ async function main(): Promise<void> {
   try {
     await routeWithFallback(
       "STRATEGIST",
-      buildPrimaryRequest("claude-opus-4-latest"),
+      buildPrimaryRequest("claude-opus-4-8"),
       config,
     );
   } catch (error) {

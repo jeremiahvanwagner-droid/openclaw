@@ -15,6 +15,10 @@
  *   4. Anthropic API key(s) answer /v1/models (via probe-anthropic-key.mjs).
  *   5. Supabase service key can actually query (caught "Unregistered API key"
  *      on the VPS during Advancement 3 — stale env keys fail silently).
+ *   6. Every anthropic/* model id in the config exists on the account's
+ *      /v1/models list (a deprecated or typo'd id 404s at run time otherwise —
+ *      e.g. the claude-sonnet-4-5-20250514 typo found in the 2026-07-04
+ *      model refresh). claude-cli/* refs are subscription-routed and skipped.
  *
  * Exit 0 = safe to ship. Exit 1 = at least one FAIL (block the deploy).
  * Unconfigured surfaces are SKIPped, never failed.
@@ -168,6 +172,49 @@ async function checkTelegram() {
   }
 }
 
+async function checkAnthropicModelIds(config) {
+  const key =
+    process.env.ANTHROPIC_API_KEY ||
+    process.env.ANTHROPIC_API_KEY_SOVEREIGN ||
+    process.env.ANTHROPIC_API_KEY_SHARED;
+  const wanted = [...collectModelRefs(config)]
+    .filter((r) => r.startsWith("anthropic/"))
+    .map((r) => r.slice("anthropic/".length));
+  if (wanted.length === 0) {
+    record("SKIP", "anthropic model ids", "no anthropic/* models referenced by config");
+    return;
+  }
+  if (!key) {
+    record("SKIP", "anthropic model ids", "no API key in environment to query /v1/models");
+    return;
+  }
+  let available;
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/models?limit=100", {
+      headers: { "x-api-key": key, "anthropic-version": "2023-06-01" },
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    available = new Set(((await res.json()).data ?? []).map((m) => m.id));
+  } catch (err) {
+    record("FAIL", "anthropic model ids", `/v1/models unreachable (${err.message})`);
+    return;
+  }
+  const unique = [...new Set(wanted)];
+  const availableList = [...available];
+  let ok = true;
+  for (const id of unique) {
+    // Aliases (e.g. claude-haiku-4-5) resolve to dated ids on the list
+    // (claude-haiku-4-5-20251001) — accept exact match or dated variant.
+    const exists = available.has(id) || availableList.some((a) => a.startsWith(`${id}-2`));
+    if (!exists) {
+      ok = false;
+      record("FAIL", `anthropic model ${id}`, "referenced by config but not on the account's /v1/models list");
+    }
+  }
+  if (ok) record("PASS", "anthropic model ids", `all ${unique.length} referenced id(s) exist: ${unique.join(", ")}`);
+}
+
 async function checkSupabase() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -224,6 +271,7 @@ if (!existsSync(configPath)) {
     await checkTelegram();
     await checkSupabase();
     checkAnthropic();
+    await checkAnthropicModelIds(config);
   }
 }
 

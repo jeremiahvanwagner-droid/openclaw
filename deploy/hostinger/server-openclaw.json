@@ -199,16 +199,16 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "anthropic/claude-opus-4-5",
+        "primary": "anthropic/claude-opus-4-8",
         "fallbacks": [
-          "anthropic/claude-opus-4-5",
-          "anthropic/claude-sonnet-4-5",
+          "anthropic/claude-opus-4-8",
+          "anthropic/claude-sonnet-5",
           "anthropic/claude-haiku-4-5"
         ]
       },
       "models": {
-        "anthropic/claude-opus-4-5": {},
-        "anthropic/claude-sonnet-4-5": {},
+        "anthropic/claude-opus-4-8": {},
+        "anthropic/claude-sonnet-5": {},
         "anthropic/claude-haiku-4-5": {},
         "ollama/qwen3:14b": {}
       },
@@ -247,173 +247,173 @@
     "list": [
       {
         "id": "main",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "marketing",
         "name": "marketing",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-marketing",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\marketing\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "sales",
         "name": "sales",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-sales",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\sales\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "support",
         "name": "support",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspace-support",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\support\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_ceo",
         "name": "CEO",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ceo",
-        "model": "anthropic/claude-opus-4-5"
+        "model": "anthropic/claude-opus-4-8"
       },
       {
         "id": "d1_cto",
         "name": "CTO",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cto",
-        "model": "anthropic/claude-opus-4-5"
+        "model": "anthropic/claude-opus-4-8"
       },
       {
         "id": "d2_director",
         "name": "eCommerce Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_director",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_ceo",
         "name": "Consulting CEO",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ceo",
-        "model": "anthropic/claude-opus-4-5"
+        "model": "anthropic/claude-opus-4-8"
       },
       {
         "id": "d4_cvo",
         "name": "Chief Visionary Officer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_cvo",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d5_publisher",
         "name": "Publisher",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_publisher",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_executive_director",
         "name": "Nonprofit Executive Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_executive_director",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d8_saas_director",
         "name": "SaaS Operations Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_saas_director",
-        "model": "anthropic/claude-opus-4-5"
+        "model": "anthropic/claude-opus-4-8"
       },
       {
         "id": "d9_store_director",
         "name": "Online Store Director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_store_director",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "shared_master_orchestrator",
         "name": "Master Orchestrator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_master_orchestrator",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "shared_runtime_ops",
         "name": "Shared Runtime Ops",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_runtime_ops",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "shared_exec_orchestrator",
         "name": "Shared Executive Orchestrator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_exec_orchestrator",
-        "model": "anthropic/claude-opus-4-5"
+        "model": "anthropic/claude-opus-4-8"
       },
       {
         "id": "shared_data_control",
         "name": "Shared Data Control",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_control",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_01_pod_lead",
         "name": "Truth J Blue Core Brand Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_01_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_02_pod_lead",
         "name": "Beyond the Veil Mentorship Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_02_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_03_pod_lead",
         "name": "Divine Path Walkers Community Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_03_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_04_pod_lead",
         "name": "Truth J Blue Publishing Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_04_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_05_pod_lead",
         "name": "Truth J Blue Consulting Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_05_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_06_pod_lead",
         "name": "Inspire Build Motivate, Inc. Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_06_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_07_pod_lead",
         "name": "Truth J Blue Online Store Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_07_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_08_pod_lead",
         "name": "Truth J Blue Primary SaaS Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_08_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_09_pod_lead",
         "name": "Incubator Shared Brands Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_09_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "biz_10_pod_lead",
         "name": "Portfolio Control Pod Lead",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\biz_10_pod_lead",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "browser_primary",
         "name": "browser_primary",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\browser_primary",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\browser_primary\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "browser_secondary",
@@ -427,63 +427,63 @@
         "name": "d1_cmo",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_cmo",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_cmo\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_customer_success",
         "name": "d1_customer_success",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_customer_success",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_customer_success\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_data_analyst",
         "name": "d1_data_analyst",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_data_analyst",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_data_analyst\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_devops",
         "name": "d1_devops",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_devops",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_devops\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_fullstack_dev",
         "name": "d1_fullstack_dev",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_fullstack_dev",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_fullstack_dev\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_product_dev_manager",
         "name": "d1_product_dev_manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_product_dev_manager",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_product_dev_manager\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_sales_manager",
         "name": "d1_sales_manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_sales_manager",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_sales_manager\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d1_ux_designer",
         "name": "d1_ux_designer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d1_ux_designer",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d1_ux_designer\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d2_copywriter",
         "name": "d2_copywriter",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_copywriter",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_copywriter\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d2_customer_service",
@@ -497,7 +497,7 @@
         "name": "d2_digital_marketing",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_digital_marketing",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_digital_marketing\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d2_graphic_designer",
@@ -518,28 +518,28 @@
         "name": "d2_paid_ads",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_paid_ads",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_paid_ads\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d2_seo_strategist",
         "name": "d2_seo_strategist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_seo_strategist",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_seo_strategist\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d2_store_manager",
         "name": "d2_store_manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_store_manager",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_store_manager\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d2_web_dev",
         "name": "d2_web_dev",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d2_web_dev",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d2_web_dev\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_admin_coordinator",
@@ -553,56 +553,56 @@
         "name": "d3_biz_dev",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_biz_dev",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_biz_dev\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_business_analyst",
         "name": "d3_business_analyst",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_business_analyst",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_business_analyst\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_client_relations",
         "name": "d3_client_relations",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_client_relations",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_client_relations\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_lead_strategist",
         "name": "d3_lead_strategist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_lead_strategist",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_lead_strategist\\agent",
-        "model": "anthropic/claude-opus-4-5"
+        "model": "anthropic/claude-opus-4-8"
       },
       {
         "id": "d3_marketing_brand",
         "name": "d3_marketing_brand",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_marketing_brand",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_marketing_brand\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_ops_manager",
         "name": "d3_ops_manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_ops_manager",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_ops_manager\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_sales_closer",
         "name": "d3_sales_closer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_sales_closer",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_sales_closer\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d3_thought_leadership",
         "name": "d3_thought_leadership",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d3_thought_leadership",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d3_thought_leadership\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_client_experience",
@@ -616,49 +616,49 @@
         "name": "d4_community_manager",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_community_manager",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_community_manager\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_curriculum_head",
         "name": "d4_curriculum_head",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_curriculum_head",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_curriculum_head\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_enrollment",
         "name": "d4_enrollment",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_enrollment",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_enrollment\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_funnel_strategist",
         "name": "d4_funnel_strategist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_funnel_strategist",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_funnel_strategist\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_lead_coach",
         "name": "d4_lead_coach",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_lead_coach",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_lead_coach\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_social_creator",
         "name": "d4_social_creator",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_social_creator",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_social_creator\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_tech_automation",
         "name": "d4_tech_automation",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d4_tech_automation",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d4_tech_automation\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d4_video_production",
@@ -672,7 +672,7 @@
         "name": "d5_acquisitions",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_acquisitions",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_acquisitions\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d5_author_relations",
@@ -686,14 +686,14 @@
         "name": "d5_book_marketing",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_book_marketing",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_book_marketing\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d5_copywriter",
         "name": "d5_copywriter",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_copywriter",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_copywriter\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d5_cover_artist",
@@ -707,28 +707,28 @@
         "name": "d5_digital_distribution",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_digital_distribution",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_digital_distribution\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d5_managing_editor",
         "name": "d5_managing_editor",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_managing_editor",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_managing_editor\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d5_pr_media",
         "name": "d5_pr_media",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_pr_media",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_pr_media\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d5_sales_affiliate",
         "name": "d5_sales_affiliate",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d5_sales_affiliate",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d5_sales_affiliate\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_board_liaison",
@@ -742,28 +742,28 @@
         "name": "d6_communications",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_communications",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_communications\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_coo",
         "name": "d6_coo",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_coo",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_coo\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_dev_director",
         "name": "d6_dev_director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_dev_director",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_dev_director\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_finance",
         "name": "d6_finance",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_finance",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_finance\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_grant_writer",
@@ -777,14 +777,14 @@
         "name": "d6_outreach",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_outreach",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_outreach\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_program_director",
         "name": "d6_program_director",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d6_program_director",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d6_program_director\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d6_volunteer",
@@ -798,7 +798,7 @@
         "name": "d8_automation_architect",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_automation_architect",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_automation_architect\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d8_community_manager",
@@ -812,7 +812,7 @@
         "name": "d8_compliance_auditor",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_compliance_auditor",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_compliance_auditor\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d8_content_ops",
@@ -840,7 +840,7 @@
         "name": "d8_funnel_engineer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_funnel_engineer",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_funnel_engineer\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d8_integration_engineer",
@@ -868,7 +868,7 @@
         "name": "d8_platform_architect",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d8_platform_architect",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d8_platform_architect\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d8_revenue_ops",
@@ -882,7 +882,7 @@
         "name": "d9_analytics",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_analytics",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_analytics\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d9_customer_experience",
@@ -896,63 +896,63 @@
         "name": "d9_merchandiser",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_merchandiser",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_merchandiser\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d9_offer_strategist",
         "name": "d9_offer_strategist",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_offer_strategist",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_offer_strategist\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d9_sales_copywriter",
         "name": "d9_sales_copywriter",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_sales_copywriter",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_sales_copywriter\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d9_seo_content",
         "name": "d9_seo_content",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_seo_content",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_seo_content\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d9_social_promoter",
         "name": "d9_social_promoter",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_social_promoter",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_social_promoter\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d9_web_designer",
         "name": "d9_web_designer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_web_designer",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_web_designer\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "d9_wp_developer",
         "name": "d9_wp_developer",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\d9_wp_developer",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\d9_wp_developer\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "shared_api_gateway",
         "name": "shared_api_gateway",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_api_gateway",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\shared_api_gateway\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "shared_data_analytics",
         "name": "shared_data_analytics",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_data_analytics",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\shared_data_analytics\\agent",
-        "model": "anthropic/claude-sonnet-4-5"
+        "model": "anthropic/claude-sonnet-5"
       },
       {
         "id": "shared_knowledge_base",
@@ -966,7 +966,7 @@
         "name": "shared_legal_compliance",
         "workspace": "C:\\Users\\JeremiahVanWagner\\.openclaw\\workspaces\\shared_legal_compliance",
         "agentDir": "C:\\Users\\JeremiahVanWagner\\.openclaw\\agents\\shared_legal_compliance\\agent",
-        "model": "anthropic/claude-opus-4-5"
+        "model": "anthropic/claude-opus-4-8"
       }
     ]
   },

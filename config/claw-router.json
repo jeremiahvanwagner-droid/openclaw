@@ -12,7 +12,7 @@
       "description": "Executive strategy, complex reasoning, multi-step planning. Highest intelligence, selective sovereign access.",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
       "provider": "anthropic-strategist",
-      "model": "claude-opus-4-latest",
+      "model": "claude-opus-4-8",
       "model_aliases": ["claude-opus-4", "claude-opus", "opus"],
       "max_tokens": 16000,
       "temperature_default": 0.7,
@@ -32,7 +32,7 @@
       "description": "Code generation, workflow execution, integration handling. High-capability implementation agents.",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
       "provider": "anthropic-executor",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "model_aliases": ["claude-sonnet-4.5", "claude-sonnet", "sonnet"],
       "max_tokens": 8000,
       "temperature_default": 0.5,
@@ -52,7 +52,7 @@
       "description": "Customer support, content generation, messaging. High-volume customer-facing operations.",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
       "provider": "anthropic-communicator",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "model_aliases": ["claude-sonnet-4.5", "claude-sonnet", "sonnet"],
       "max_tokens": 6000,
       "temperature_default": 0.8,
@@ -72,7 +72,7 @@
       "description": "Data analysis, reporting, batch processing. Efficient high-volume data operations.",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
       "provider": "anthropic-analyst",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "model_aliases": ["claude-haiku-4.5", "claude-haiku", "haiku"],
       "max_tokens": 4000,
       "temperature_default": 0.3,
@@ -92,7 +92,7 @@
       "description": "Compliance checks, safety validation, audit logging. Exclusive sovereign isolation for governance.",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
       "provider": "anthropic-guardian",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "model_aliases": ["claude-haiku-4.5", "claude-haiku", "haiku"],
       "max_tokens": 4000,
       "temperature_default": 0.1,
@@ -113,85 +113,85 @@
     "d1_ceo": {
       "tier": "anthropic-strategist",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-      "model": "claude-opus-4-latest",
+      "model": "claude-opus-4-8",
       "description": "Executive decisions and strategic planning. EXCLUSIVE sovereign credential."
     },
     "d1_cto": {
       "tier": "anthropic-strategist",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-      "model": "claude-opus-4-latest",
+      "model": "claude-opus-4-8",
       "description": "Technical strategy and architecture decisions."
     },
     "d1_product_dev_manager": {
       "tier": "anthropic-strategist",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-      "model": "claude-opus-4-latest",
+      "model": "claude-opus-4-8",
       "description": "Product development strategy and planning."
     },
     "d1_fullstack_dev": {
       "tier": "anthropic-executor",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "description": "Code generation and implementation."
     },
     "d1_devops": {
       "tier": "anthropic-executor",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "description": "Infrastructure and deployment operations."
     },
     "d8_integration_engineer": {
       "tier": "anthropic-executor",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "description": "API integrations and workflow execution."
     },
     "d8_funnel_engineer": {
       "tier": "anthropic-executor",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "description": "Sales funnel and conversion optimization."
     },
     "d1_cmo": {
       "tier": "anthropic-communicator",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "description": "Marketing and communications content."
     },
     "d1_customer_success": {
       "tier": "anthropic-communicator",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "description": "Customer support and success operations."
     },
     "d1_data_analyst": {
       "tier": "anthropic-analyst",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "description": "Data analysis and reporting."
     },
     "d8_revenue_ops": {
       "tier": "anthropic-analyst",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "description": "Revenue operations and analytics."
     },
     "d8_crm_ops": {
       "tier": "anthropic-analyst",
       "credential_env": "ANTHROPIC_API_KEY_SHARED",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "description": "CRM data processing and enrichment."
     },
     "shared_runtime_ops": {
       "tier": "anthropic-guardian",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "description": "Runtime operations and compliance monitoring."
     },
     "d8_compliance_auditor": {
       "tier": "anthropic-guardian",
       "credential_env": "ANTHROPIC_API_KEY_SOVEREIGN",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "description": "Compliance checks and audit logging."
     }
   },

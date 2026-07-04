@@ -54,38 +54,38 @@ describe("5-Agent Anthropic Tier Routing System", () => {
       expect(tierNames).toHaveLength(5);
     });
 
-    it("should have strategist tier with claude-opus-4-latest", () => {
+    it("should have strategist tier with claude-opus-4-8", () => {
       const strategistTier = config.tiers["anthropic-strategist"];
       expect(strategistTier).toBeDefined();
-      expect(strategistTier.model).toBe("claude-opus-4-latest");
+      expect(strategistTier.model).toBe("claude-opus-4-8");
       expect(strategistTier.rate_limit_per_min).toBe(30);
     });
 
-    it("should have executor tier with claude-sonnet-4.5-latest", () => {
+    it("should have executor tier with claude-sonnet-5", () => {
       const executorTier = config.tiers["anthropic-executor"];
       expect(executorTier).toBeDefined();
-      expect(executorTier.model).toBe("claude-sonnet-4.5-latest");
+      expect(executorTier.model).toBe("claude-sonnet-5");
       expect(executorTier.rate_limit_per_min).toBe(60);
     });
 
-    it("should have communicator tier with claude-sonnet-4.5-latest", () => {
+    it("should have communicator tier with claude-sonnet-5", () => {
       const communicatorTier = config.tiers["anthropic-communicator"];
       expect(communicatorTier).toBeDefined();
-      expect(communicatorTier.model).toBe("claude-sonnet-4.5-latest");
+      expect(communicatorTier.model).toBe("claude-sonnet-5");
       expect(communicatorTier.rate_limit_per_min).toBe(90);
     });
 
-    it("should have analyst tier with claude-haiku-4.5-latest", () => {
+    it("should have analyst tier with claude-haiku-4-5", () => {
       const analystTier = config.tiers["anthropic-analyst"];
       expect(analystTier).toBeDefined();
-      expect(analystTier.model).toBe("claude-haiku-4.5-latest");
+      expect(analystTier.model).toBe("claude-haiku-4-5");
       expect(analystTier.rate_limit_per_min).toBe(120);
     });
 
-    it("should have guardian tier with claude-haiku-4.5-latest and sovereign isolation", () => {
+    it("should have guardian tier with claude-haiku-4-5 and sovereign isolation", () => {
       const guardianTier = config.tiers["anthropic-guardian"];
       expect(guardianTier).toBeDefined();
-      expect(guardianTier.model).toBe("claude-haiku-4.5-latest");
+      expect(guardianTier.model).toBe("claude-haiku-4-5");
       expect(guardianTier.rate_limit_per_min).toBe(40);
       expect(guardianTier.sovereign_isolation).toBe(true);
     });
@@ -193,9 +193,9 @@ describe("5-Agent Anthropic Tier Routing System", () => {
 
   describe("Model Compatibility", () => {
     const VALID_ANTHROPIC_MODELS = [
-      "claude-opus-4-latest",
-      "claude-sonnet-4.5-latest",
-      "claude-haiku-4.5-latest",
+      "claude-opus-4-8",
+      "claude-sonnet-5",
+      "claude-haiku-4-5",
     ];
 
     it("all tier models should be valid Anthropic models", () => {

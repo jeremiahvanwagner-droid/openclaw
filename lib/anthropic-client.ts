@@ -30,9 +30,9 @@ export function getAnthropicForTier(sovereign: boolean): Anthropic {
  * | OPERATOR   | High-volume, low-stakes, routine tasks             |
  */
 export const MODELS = {
-  SOVEREIGN:  "claude-opus-4-5",   // Tier 1: replaces openai/gpt-5.3-codex
-  STRATEGIST: "claude-sonnet-4-5", // Tier 2: replaces gpt-4o
-  OPERATOR:   "claude-haiku-4-5",  // Tier 3: replaces gpt-4o-mini
+  SOVEREIGN:  "claude-opus-4-8",  // Tier 1: current Opus (2026-07 refresh)
+  STRATEGIST: "claude-sonnet-5",  // Tier 2: current Sonnet (2026-07 refresh)
+  OPERATOR:   "claude-haiku-4-5", // Tier 3: current Haiku (unchanged)
 } as const;
 
 export type ModelTier = keyof typeof MODELS;

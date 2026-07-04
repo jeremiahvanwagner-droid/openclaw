@@ -8,7 +8,7 @@
   "tier_assignments": {
     "anthropic-strategist": {
       "tier_name": "Strategist",
-      "model": "claude-opus-4-latest",
+      "model": "claude-opus-4-8",
       "rate_limit_per_min": 30,
       "max_concurrent": 5,
       "queue_class": "P1",
@@ -63,7 +63,7 @@
 
     "anthropic-executor": {
       "tier_name": "Executor",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "rate_limit_per_min": 60,
       "max_concurrent": 10,
       "queue_class": "P1",
@@ -142,7 +142,7 @@
 
     "anthropic-communicator": {
       "tier_name": "Communicator",
-      "model": "claude-sonnet-4.5-latest",
+      "model": "claude-sonnet-5",
       "rate_limit_per_min": 90,
       "max_concurrent": 15,
       "queue_class": "P2",
@@ -227,7 +227,7 @@
 
     "anthropic-analyst": {
       "tier_name": "Analyst",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "rate_limit_per_min": 120,
       "max_concurrent": 20,
       "queue_class": "P3",
@@ -294,7 +294,7 @@
 
     "anthropic-guardian": {
       "tier_name": "Guardian",
-      "model": "claude-haiku-4.5-latest",
+      "model": "claude-haiku-4-5",
       "rate_limit_per_min": 40,
       "max_concurrent": 3,
       "queue_class": "P0",

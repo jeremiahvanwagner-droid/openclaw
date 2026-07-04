@@ -152,6 +152,24 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-04-003 — MODEL REFRESH: Sonnet 4.5 → Sonnet 5, Opus 4/4.5 → Opus 4.8, platform-wide (APPLIED)
+- **Timestamp:** 2026-07-04T10:45:00-05:00
+- **Change Type:** CONFIG + CODE (model version migration, CVO-directed)
+- **Status:** APPLIED ✅ — 231/231 tests green, tsc clean, both machines' preflight fully green
+- **Owner:** Claude Code (Fable 5) — CVO operator session ("update the models")
+- **CVO:** Jeremiah Van Wagner (driving)
+- **Mapping applied (verified against the live /v1/models list before any edit):**
+  - `claude-sonnet-4-5` → **`claude-sonnet-5`** (list $3/$15 per MTok; **intro $2/$10 through 2026-08-31 — cheaper than Sonnet 4.5**; new tokenizer ≈ +30% tokens for the same text; adaptive thinking on by default; rejects sampling params — **zero temperature/top_p keys exist in any config**, verified)
+  - `claude-opus-4-5` / `claude-opus-4-6` / `claude-opus-4-7` / `claude-opus-4` (deprecated) → **`claude-opus-4-8`** ($5/$25)
+  - `claude-haiku-4-5` → unchanged (current)
+  - Internal tier labels in agents_config (`claude-sonnet-4.5` ×93, `claude-opus-4` ×21) deliberately UNCHANGED — only the resolution layers were retargeted.
+- **Two latent 404 bugs fixed in passing:** `lib/llm-router.ts` MODEL_MAP held `claude-sonnet-4-5-20250514` — an id that never existed (sonnet-4's date on a 4-5 name) — and `config/claw-router.json`/`inngest/client.ts` passed pseudo-ids (`claude-opus-4-latest`, `claude-sonnet-4.5-latest`) as API model ids. Both would have 404'd on first real call; the dark data plane had hidden them. Also corrected stale Haiku pricing in TOKEN_PRICING ($0.25/$1.25 → $1/$5 per MTok).
+- **Surfaces updated:** lib/anthropic-client.ts MODELS; lib/runtime-model-policy.mjs (both maps); lib/llm-router.ts (MODEL_MAP + TOKEN_PRICING); lib/claw-router.ts VALID_ANTHROPIC_MODELS; inngest/client.ts LLM_MODELS values; config/{claw-router,anthropic-tier-assignment,openclaw.prod,openclaw,openclaw.prod.cleaned}.json; deploy/hostinger/server-openclaw.json; agents/*/agent/models.json (10 files); tier-routing test expectations. **Live configs:** VPS `/opt/openclaw/.openclaw/openclaw.json` (84× sonnet-5, 4× opus-4-8; backup `.bak-models-*`; restart, health OK) and local `openclaw.json` (78× sonnet-5, 7× opus-4-8; six stale `claude-cli/*` entries consolidated to sonnet-5/opus-4-8/haiku-4-5; backup kept).
+- **Live verification:** 1-token `/v1/messages` calls on `claude-sonnet-5` AND `claude-opus-4-8` from the VPS key → both 200 with matching model echo. Preflight extended with **anthropic model-id verification against /v1/models** (alias-aware) — a deprecated/typo'd model id is now a blocked deploy, same class as the qwen3:14b-not-pulled lesson.
+- **Operational notes:** (a) Sonnet 5's new tokenizer means ~30% higher token counts for equivalent text — cost dashboards should re-baseline, though intro pricing more than offsets it through Aug 31. (b) Adaptive thinking is on by default when `thinking` is omitted — embedded runs may show thinking blocks/spend where 4.5 had none. (c) The 7 Opus agents' internal label `claude-opus-4` now resolves to opus-4-8 — the underlying `claude-opus-4-20250514` was already past its June 15 2026 retirement flag.
+- **Rollback:** `git revert` for repo; `.bak-models-*` restore + restart for live configs. Sonnet 4.5 / Opus 4.5 remain Active (legacy) on the API, so rollback stays viable.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-04-002 — Unplanned dist upgrade 2026.4.29 → 2026.6.11 (both hosts) + protocol-mismatch recovery (APPLIED)
 - **Timestamp:** 2026-07-04T09:15:00-05:00
 - **Change Type:** OPS (version upgrade recovery)

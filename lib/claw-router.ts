@@ -21,12 +21,16 @@ const OPENROUTER_X_TITLE = "OpenClaw-TruthJBlue";
  * Known Anthropic models for validation - Pure Anthropic migration (Mar 2026)
  */
 const VALID_ANTHROPIC_MODELS = [
+  // Current real API ids (2026-07 refresh)
+  "claude-opus-4-8",
+  "claude-sonnet-5",
+  "claude-haiku-4-5",
+  // Legacy labels kept for config back-compat during transition
   "claude-opus-4-latest",
   "claude-opus-4",
   "claude-sonnet-4.5-latest",
   "claude-sonnet-4-5",
   "claude-haiku-4.5-latest",
-  "claude-haiku-4-5",
 ] as const;
 
 /**

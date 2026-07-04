@@ -1322,31 +1322,31 @@ export function getPodLead(podId: string): string | null {
 export const LLM_MODELS = {
   "claude-opus-4-latest": {
     provider: "anthropic",
-    model: "claude-opus-4-latest",
+    model: "claude-opus-4-8",
     tier: "strategist",
     queue_class: "P0",
   },
   "claude-sonnet-4.5-latest": {
     provider: "anthropic",
-    model: "claude-sonnet-4.5-latest",
+    model: "claude-sonnet-5",
     tier: "executor",
     queue_class: "P1",
   },
   "claude-sonnet-4.5-communicator": {
     provider: "anthropic",
-    model: "claude-sonnet-4.5-latest",
+    model: "claude-sonnet-5",
     tier: "communicator",
     queue_class: "P1",
   },
   "claude-haiku-4.5-latest": {
     provider: "anthropic",
-    model: "claude-haiku-4.5-latest",
+    model: "claude-haiku-4-5",
     tier: "analyst",
     queue_class: "P2",
   },
   "claude-haiku-4.5-guardian": {
     provider: "anthropic",
-    model: "claude-haiku-4.5-latest",
+    model: "claude-haiku-4-5",
     tier: "guardian",
     queue_class: "P0",
   },

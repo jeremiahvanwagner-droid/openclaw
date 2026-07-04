@@ -147,10 +147,12 @@ function getCostSupabase() {
 
 // Per-1K-token pricing (USD) — keep updated
 const TOKEN_PRICING: Record<string, { input: number; output: number }> = {
+  "claude-opus-4-8":            { input: 0.005,   output: 0.025 },
+  "claude-sonnet-5":            { input: 0.003,   output: 0.015 }, // list; intro $2/$10 per MTok through 2026-08-31
+  "claude-haiku-4-5":           { input: 0.001,   output: 0.005 },
+  // Legacy pricing retained for historical cost-log lookups only
   "claude-opus-4-20250514":     { input: 0.015,   output: 0.075 },
-  "claude-sonnet-4-5-20250514": { input: 0.003,   output: 0.015 },
-  "claude-haiku-4-5":           { input: 0.00025, output: 0.00125 },
-  // Legacy OpenAI pricing retained for historical cost-log lookups only
+  "claude-sonnet-4-5":          { input: 0.003,   output: 0.015 },
   "gpt-4o":                     { input: 0.0025,  output: 0.01 },
   "gpt-4o-mini":                { input: 0.00015, output: 0.0006 },
 };
@@ -192,17 +194,20 @@ async function logCost(
   }
 }
 
-// Model configuration — all tiers route to Anthropic
+// Model configuration — all tiers route to Anthropic.
+// 2026-07 refresh: opus-4-8 / sonnet-5 are current. The previous entries held
+// claude-sonnet-4-5-20250514 — an id that never existed (sonnet-4's date on a
+// 4-5 name) and would have 404'd on first real call.
 const MODEL_MAP = {
   "claude-opus-4": {
     provider: "anthropic" as const,
-    model: "claude-opus-4-20250514",
+    model: "claude-opus-4-8",
     tier: "strategic",
     maxTokens: 4096,
   },
   "claude-sonnet-4.5": {
     provider: "anthropic" as const,
-    model: "claude-sonnet-4-5-20250514",
+    model: "claude-sonnet-5",
     tier: "content",
     maxTokens: 4096,
   },
