@@ -152,6 +152,19 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-11-006 — RTL×GHL PHASE C: RTL engine deployed, webhook service LIVE in DRY_RUN (APPLIED)
+- **Timestamp:** 2026-07-11T14:20:00-05:00
+- **Change Type:** CODE + CONFIG + SERVICE (VPS production)
+- **Status:** APPLIED ✅ — `openclaw-webhook.service` enabled + active (first time in production), DRY_RUN=true
+- **Owner:** Claude Code (Fable 5) — CVO: "Continue Implementation"
+- **New code:** `skills/rtl-lead-engine.mjs` (RR-tenant-guarded router for rtl.* events: JSONL transcripts to `logs/rtl/`, pre-agent escalation detection for refund/anger/legal → operator alert with NO agent reply, agent briefing via openclawMessage with the prompt-set; **fail-safe DRY_RUN default — live only when env DRY_RUN=false**) · `prompts/rtl-sales-agent.md` (grounded solely in rtl marketing docs; compliance + escalation rules baked in) · handler patch (module load 4/4 + rtl.*/conversation.message.inbound routing; TJB↔RTL isolation per audit -004).
+- **VPS deploy:** backups `ghl-webhook-handler.mjs.bak-rtl-20260711T1417` + `.env.bak-dryrun-20260711T1417`; DRY_RUN=true appended; `systemctl enable --now openclaw-webhook`.
+- **Verified E2E (production path):** POST via `https://webhook.truthjblue.dev/webhook/ghl` with workflow-bearer auth → 200 handled:true; RR guard passed; transcript written (`/opt/openclaw/logs/rtl/`); refund text → escalation entry, agent NOT briefed (zero token spend). Boot log: tenants TJB+RR, modules 4/4, all 3 auth modes. NOTE: Caddy 405s non-POST publicly BY DESIGN (health checks are VPS-local — do not "fix").
+- **Cost posture:** event-driven only, zero idle burn; no crons added. Agent briefings occur only on rtl.* events; none exist until workflows publish.
+- **Open before LIVE:** (1) CVO DRY_RUN transcript review, (2) alert-channel verification (Telegram getMe per 2026-03 doctrine), (3) ghl_write HITL-gate allowlist decision for the reply path, (4) workflows C1–C5 published, (5) RTL ingestion branch merged/deployed.
+- **Rollback:** `systemctl disable --now openclaw-webhook` + restore the two backups.
+- **PR Link:** pending — commit follows.
+
 ### Entry 2026-07-11-005 — RTL×GHL PHASE B: ingestion code complete (RTL repo, branch — NOT deployed)
 - **Timestamp:** 2026-07-11T15:10:00-05:00
 - **Change Type:** CODE (separate repo: rtl-biz-pkg-mvp-v3, branch `feature/ghl-ingestion`, commit 22471d3, pushed)

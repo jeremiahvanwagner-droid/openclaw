@@ -100,6 +100,11 @@ All sends "from" the Ready-to-Launch brand identity. No income claims, no invent
 - **Trigger:** Opportunity stage changed → `Delivered`
 - **Steps:** Wait 48h → **Email:** Subject `One small favor` · `You've had the package for two days. If it did what we said it would, a screenshot of your favorite piece plus two honest sentences would mean a lot — real proof from real builds is the only kind we use. Reply with it here. If something's off instead, reply and we'll fix it — that's what the revisions are for.` → move stage to `Testimonial Asked` → **Custom Webhook** (`type: rtl.testimonial_asked`). (MARKETING_PLAN §3: screenshot + quote; never invented.)
 
+#### C5 · `RTL — Reply Router` (added in Phase C — REGGIE's inbound ear)
+- **Trigger:** Customer Replied · filters: Tag includes `rtl-starter-guide` (add OR-triggers for `rtl-landing`, `rtl-customer`)
+- **Steps:** single **Custom Webhook** action → `POST https://webhook.truthjblue.dev/webhook/ghl` · Bearer header as above · Body must include: `type` = `rtl.inbound_message` (literal), `locationId` (literal `0PFDiGrgne4sbE4dJEC6`), contact id/first_name/email/phone merge fields, and `message` = `{{message.body}}` merge field.
+- This is how lead replies reach REGGIE (PIT can't subscribe platform InboundMessage). Publish gate: same as the others — after DRY_RUN sign-off; the engine itself is DRY_RUN-gated server-side regardless.
+
 #### C4 · `RTL — Day-7 Re-engage`
 - **Trigger:** Contact Tag Added = `rtl-starter-guide`
 - **Steps:** Wait 7 days → If/Else: has tag `rtl-customer` OR stage ≥ `Purchased` → **exit**. Else **Email:** Subject `Still almost launching?` · `A week ago you grabbed the Starter Guide. If the build list is still the wall — course, eBook, emails, site, plan — that's exactly the five things the package builds from one form. $497 once, delivered same day — most orders within the hour. When you're ready, the form takes ten minutes: [link]` → **Custom Webhook** (`type: rtl.dormant7`).

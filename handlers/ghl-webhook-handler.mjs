@@ -79,17 +79,21 @@ async function importSkill(fileName, label) {
 let assessmentHandler = null;
 let ebookAutomation = null;
 let cartRecovery = null;
+let rtlLeadEngine = null;
 
 async function loadPhase3Modules() {
   assessmentHandler = await importSkill('assessment-handler.mjs', 'assessment handler');
   ebookAutomation = await importSkill('ebook-buyer-automation.mjs', 'ebook automation');
   cartRecovery = await importSkill('abandoned-cart-recovery.mjs', 'abandoned cart recovery');
+  // RTL revenue loop (Phase C) — routes rtl.* events from the Royal Results
+  // tenant; DRY_RUN-gated inside the module (fail-safe default: dry-run).
+  rtlLeadEngine = await importSkill('rtl-lead-engine.mjs', 'rtl lead engine');
 
-  const loaded = [assessmentHandler, ebookAutomation, cartRecovery].filter(Boolean).length;
-  if (loaded === 3) {
-    log.info('Phase 3 modules loaded (3/3)');
+  const loaded = [assessmentHandler, ebookAutomation, cartRecovery, rtlLeadEngine].filter(Boolean).length;
+  if (loaded === 4) {
+    log.info('Business modules loaded (4/4)');
   } else {
-    log.warn({ loaded }, 'Phase 3 modules partially loaded');
+    log.warn({ loaded }, 'Business modules partially loaded');
   }
 }
 
@@ -116,7 +120,27 @@ if (configuredTenants.length === 0) {
   process.exit(1);
 }
 
+// RTL revenue loop (Phase C): rtl.* events come from the Royal Results
+// workflow Custom Webhooks; conversation.message.inbound covers replies. All
+// of them route to the RTL engine, which enforces its own RR tenant guard —
+// RTL leads must never hit the legacy TJB handlers below, and TJB events
+// never reach the RTL engine (audit 2026-07-11-004).
+async function handleRtl(data) {
+  if (!rtlLeadEngine) {
+    log.error({ eventType: data.eventType }, 'rtl event received but rtl-lead-engine is not loaded');
+    await sendAlert(`RTL event ${data.eventType} arrived with no engine loaded — investigate.`);
+    return;
+  }
+  await rtlLeadEngine.handleRtlEvent(data.eventType, data, { sendAlert });
+}
+
 const eventHandlers = {
+  'rtl.optin': handleRtl,
+  'rtl.inbound_message': handleRtl,
+  'rtl.checkout_abandoned': handleRtl,
+  'rtl.testimonial_asked': handleRtl,
+  'rtl.dormant7': handleRtl,
+  'conversation.message.inbound': handleRtl,
   'contact.created': handleNewContact,
   'contact.updated': handleContactUpdate,
   'contact.tag.added': handleTagAdded,
