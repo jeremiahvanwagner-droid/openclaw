@@ -96,13 +96,29 @@ export function appendTranscript(entry) {
   }
 }
 
+// GHL workflow Custom Webhooks place configured key-values either at the top
+// level or under customData depending on builder version (see the handler's
+// PHASE8-DEBUG shape logging) — read both.
+function field(payload, ...keys) {
+  const custom = payload.customData || {};
+  for (const key of keys) {
+    if (payload[key]) return payload[key];
+    if (custom[key]) return custom[key];
+  }
+  return null;
+}
+
+export function eventLocationId(payload) {
+  return field(payload, 'locationId', 'location_id');
+}
+
 function contactSummary(payload) {
   const contact = payload.contact || {};
   return {
-    id: contact.id || payload.contactId || null,
-    name: contact.firstName || contact.name || payload.first_name || null,
-    email: contact.email || payload.email || null,
-    phone: contact.phone || payload.phone || null,
+    id: contact.id || field(payload, 'contactId', 'contact_id', 'id'),
+    name: contact.firstName || contact.name || field(payload, 'first_name', 'firstName'),
+    email: contact.email || field(payload, 'email'),
+    phone: contact.phone || field(payload, 'phone'),
     tags: contact.tags || payload.tags || null,
   };
 }
@@ -151,13 +167,15 @@ function agentInstruction(eventType, payload, transcriptFile) {
 export async function handleRtlEvent(eventType, payload, helpers = {}) {
   const sendAlert = helpers.sendAlert || (async () => {});
 
-  if (!isRtlLocation(payload.locationId)) {
-    log.warn({ eventType, locationId: payload.locationId || null }, 'rtl event from non-RR location ignored');
+  const locationId = eventLocationId(payload);
+  if (!isRtlLocation(locationId)) {
+    log.warn({ eventType, locationId: locationId || null }, 'rtl event from non-RR location ignored');
     return { handled: false, reason: 'not-rr-location' };
   }
 
   const contact = contactSummary(payload);
-  const inboundText = payload.message?.body || payload.messageBody || payload.body || '';
+  const inboundText = payload.message?.body || payload.messageBody
+    || field(payload, 'message', 'body') || '';
   const transcriptFile = appendTranscript({
     role: 'event',
     event: eventType,
