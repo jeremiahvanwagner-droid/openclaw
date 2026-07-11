@@ -152,6 +152,42 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-11-003 — RTL×GHL PHASE B: Launch Consult calendar created in Royal Results (APPLIED)
+- **Timestamp:** 2026-07-11T13:25:00-05:00
+- **Change Type:** EXTERNAL PRODUCTION DATA (client CRM — Royal Results, tenant RR)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO unblocked by adding himself to the location (Jeremiah Van Wagner, Account Admin, user `wRSsxg7QtbtDH7QrG2C3`, Jeremiah@inspirebuildmotivate.com)
+- **Summary:** Created calendar **"Launch Consult (15 min)"** via API (HTTP 201, verified active by re-fetch): id `FxvoiD98eoUnV5yzqJyc`, slug `rtl-launch-consult`, round-robin with Jeremiah as sole/primary member. Tight defaults per handoff ("used sparingly"): Tue+Thu 13:00–16:00, 15-min slots, 5-min buffer, max 4/day, 4h notice, 2-week window, auto-confirm. Booking widget `https://api.leadconnectorhq.com/widget/booking/FxvoiD98eoUnV5yzqJyc`.
+- **API quirk recorded:** `POST /calendars/` rejects multi-day `openHours` entries — each `openHours[]` element must carry exactly one `daysOfTheWeek` value (422 otherwise).
+- **Rollback Plan:** `DELETE /calendars/FxvoiD98eoUnV5yzqJyc` (no bookings exist).
+- **PR Link:** pending — commit with Phase B batch.
+
+### Entry 2026-07-11-002 — RTL×GHL PHASE B (batch 1): RTL objects created in Royal Results CRM (APPLIED)
+- **Timestamp:** 2026-07-11T13:05:00-05:00
+- **Change Type:** EXTERNAL PRODUCTION DATA (client CRM — Royal Results location, tenant RR) + docs
+- **Status:** APPLIED ✅ (API-creatable subset) · UI subset handed to CVO as build sheet
+- **Owner:** Claude Code (Fable 5) — CVO: "Execute Phase B"
+- **Summary:** First write operations into the Royal Results sub-account, strictly additive + namespaced. Created **8 contact custom fields** (`contact.rtl_niche/.rtl_audience/.rtl_transformation/.rtl_urgency/.utm_source/.utm_medium/.utm_campaign/.utm_content` — all HTTP 201, keys verified by re-fetch) and **3 tags** (`rtl-starter-guide`, `rtl-landing`, `rtl-customer` — HTTP 201, verified). Zero edits to existing client objects. Full spec + UI build sheet (pipeline `RTL Launch Day`, 4 DRAFT workflows with compliance-checked copy, co-tenancy trigger audit of the client's 6 published workflows, ingestion spec I1–I6) at `docs/phases/rtl-ghl-loop-phase-B-build.md`.
+- **Deferred:** calendar creation (location has a single user — Rahiem Holman, admin — owner decision with CVO); workflow trigger audit not possible via API (v2 exposes no trigger config) — moved to UI checklist.
+- **Ops lesson:** GHL API's Cloudflare blocks Python-urllib default UA → **403 error 1010 on every route, indistinguishable from scope failure**. Fixed with curl-like User-Agent. Recorded in the phase doc.
+- **Rollback Plan:** `DELETE /locations/{RR}/customFields/{id}` ×8 + `DELETE /locations/{RR}/tags/{id}` ×3 (IDs resolvable by key/name; no contact references exist yet — loss-free).
+- **Rollback Tested:** not executed (would consume the build); delete endpoints are documented GHL v2 API.
+- **PR Link:** pending — commit with Phase B batch.
+
+### Entry 2026-07-11-001 — RTL×GHL LOOP: Royal Results tenant registered, workstation + VPS (APPLIED)
+- **Timestamp:** 2026-07-11T12:50:00-05:00
+- **Change Type:** CONFIG (.env both hosts) + CODE (`lib/ghl-tenant-resolver.mjs`)
+- **Status:** APPLIED ✅
+- **Owner:** Claude Code (Fable 5) — CVO: "We're going to ship the RTL Business to Royal Results sub-account"
+- **Summary:** CVO resolved Phase A Open Decisions 1–2 (`docs/phases/rtl-ghl-loop-phase-A-audit.md`): the RTL Business Package ships from the **Royal Results** client sub-account (co-owned by CVO; royalresults.pro), NOT from a new location and NOT from Truth j Blue. CVO provided a fresh PIT for that location. Wired as tenant alias **RR**: `GHL_PRIVATE_INTEGRATION_TOKEN_RR` + `GHL_LOCATION_ID_RR` appended to workstation `.env` (backup `.env.bak-rr-tenant-20260711T1248`) and `/etc/openclaw/.env` (backup `.env.bak-rr-tenant-20260711T1749`, root:root 600 preserved). Resolver registers RR after TJB/MSL — **TJB remains the default tenant**; deployed to VPS (backup `lib/ghl-tenant-resolver.mjs.bak-rr-20260711T1250`).
+- **Verified:** PIT → HTTP 200 on `GET /locations/{RR}` from BOTH hosts (per token-verification doctrine, feedback 2026-03 Telegram incident); `listTenants()` → `["TJB","RR"]` on both hosts; read scopes confirmed for pipelines/customFields/calendars/tags/workflows.
+- **RR location inventory (read-only):** ACTIVE client CRM — 6 pipelines (Automotive/Counseling/Digital/Events/General/Mentorship), 24 custom fields, 9 calendars, 33 tags, 7 workflows (6 published incl. "New Lead Welcome Sequence"). ⚠️ **Co-tenancy hazard:** RTL build must be strictly additive and namespaced (`RTL Launch Day` pipeline, `rtl_*` fields, `rtl-*` tags); before any RTL traffic flows, existing published workflows' triggers must be filter-checked so RTL contacts don't enter the client's generic nurture sequences (double-messaging risk).
+- **Note:** VPS TJB token remains invalid (401 — Phase A P0). Pre-existing, now NON-blocking for RTL (RTL uses RR). Tracked as separate cleanup.
+- **Files Changed:** 2 (`.env` ×2 hosts) + 1 (`lib/ghl-tenant-resolver.mjs`, local + deployed)
+- **Rollback Plan:** restore the three timestamped backups (one `cp` each); resolver rollback also = `git checkout -- lib/ghl-tenant-resolver.mjs`.
+- **Rollback Tested:** backups verified present on both hosts.
+- **PR Link:** pending — working-tree change; commit with the Phase B batch.
+
 ### Entry 2026-07-04-007 — ADVANCEMENT 6 / PHASE 9.2: Sonnet audit EXECUTED — classification at CVO gate (AUDIT COMPLETE, REMAP PENDING APPROVAL)
 - **Timestamp:** 2026-07-04T13:20:00-05:00
 - **Change Type:** TOOLING + ANALYSIS (no model bindings changed; brief: docs/advancements/06-*.md)
