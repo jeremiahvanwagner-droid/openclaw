@@ -44,12 +44,21 @@ CVO added himself to the location (Jeremiah Van Wagner, Account Admin, user `wRS
 
 > ⚠️ **Build every workflow as DRAFT.** Nothing gets published until Phase C's DRY_RUN transcripts are approved (handoff Phase C §3). Publishing order is defined in §4 below.
 
-### A. Pipeline — `RTL Launch Day` (~3 min)
-Settings → Pipelines → **+ Create Pipeline** → name `RTL Launch Day` → stages, in order:
-1. `New Lead` 2. `Engaged` 3. `Qualified` 4. `Checkout Sent` 5. `Purchased` 6. `Delivered` 7. `Testimonial Asked`
-Leave "visible in funnel/pie chart" defaults. Do not touch the 6 existing pipelines.
+### A. Pipeline — `RTL Launch Day` — ✅ built by CVO 2026-07-11, IDs captured via API
+Pipeline id `PyJjxP442Bpwv5BUi8MS`. Stage IDs (needed by ingestion I2/I3/I6 and workflows C2/C3):
+| Stage | ID |
+|---|---|
+| New Lead | `77a50701-c743-4f72-a938-f5b70d502a94` |
+| Engaged | `0c114c72-4676-4e93-87ec-f8e66a54b897` |
+| Qualified | `73ea92f7-01bd-4000-844f-374680d7a278` |
+| Checkout Sent | ⚠️ **MISSING as of capture — CVO to add between Qualified and Purchased**, then re-pull ID |
+| Purchased | `8a3b673b-67da-40e8-a009-bb35e40a01e4` |
+| Delivered | `80faf7c6-2925-4b3e-8277-aac5350d9457` |
+| Testimonial Asked | `2b20f8e7-2a84-4378-8a5b-cbc2cd202fba` |
 
 ### B. Co-tenancy trigger audit (~5 min — REQUIRED before any RTL traffic)
+**Mechanism (settled 2026-07-11):** exclusion filters on the client workflows' triggers, keyed on **tags** — NOT on RTL custom fields (field "Intent type" filters are AI content-classification and unreliable for this; client leads don't carry the fields at all). Tags are applied in the same API call that creates each RTL contact, so they're present when triggers evaluate. Recipe per location-wide trigger: add three filter rows `Tags → Doesn't include → rtl-starter-guide / rtl-landing / rtl-customer` (rows AND — contact passes only with none). **Form Submitted triggers need NO filter** (RTL leads arrive via REST API, never via a GHL form). Triggers needing the exclusions: Contact Created, generic Contact Tag Added, Customer Replied, un-scoped Opportunity triggers. Fallback where a trigger lacks a Tags filter: first workflow step = If/Else "Tags includes any rtl-*" → End.
+
 Automation → Workflows → open each **published** workflow → check its **trigger**:
 | Workflow | Risk to check |
 |---|---|
@@ -112,7 +121,7 @@ New env for the RTL backend: `GHL_PRIVATE_INTEGRATION_TOKEN_RR`, `GHL_LOCATION_I
 ## 5. Phase B close checklist
 - [x] Custom fields ×8 (API, verified)
 - [x] Tags ×3 (API, verified)
-- [ ] Pipeline `RTL Launch Day` (UI — §2A)
+- [x] Pipeline `RTL Launch Day` (CVO via UI; id `PyJjxP442Bpwv5BUi8MS`) — ⚠️ minus `Checkout Sent` stage, pending
 - [ ] Trigger audit of 6 published client workflows (UI — §2B)
 - [ ] 4 workflow drafts (UI — §2C)
 - [x] Calendar `Launch Consult (15 min)` (API, verified — id `FxvoiD98eoUnV5yzqJyc`)
