@@ -51,7 +51,7 @@ Pipeline id `PyJjxP442Bpwv5BUi8MS`. Stage IDs (needed by ingestion I2/I3/I6 and 
 | New Lead | `77a50701-c743-4f72-a938-f5b70d502a94` |
 | Engaged | `0c114c72-4676-4e93-87ec-f8e66a54b897` |
 | Qualified | `73ea92f7-01bd-4000-844f-374680d7a278` |
-| Checkout Sent | ⚠️ **MISSING as of capture — CVO to add between Qualified and Purchased**, then re-pull ID |
+| Checkout Sent | `4b02b1ad-ff4d-4ca9-9b61-c42fa0040216` (added by CVO, captured 2026-07-11) |
 | Purchased | `8a3b673b-67da-40e8-a009-bb35e40a01e4` |
 | Delivered | `80faf7c6-2925-4b3e-8277-aac5350d9457` |
 | Testimonial Asked | `2b20f8e7-2a84-4378-8a5b-cbc2cd202fba` |
@@ -59,17 +59,22 @@ Pipeline id `PyJjxP442Bpwv5BUi8MS`. Stage IDs (needed by ingestion I2/I3/I6 and 
 ### B. Co-tenancy trigger audit (~5 min — REQUIRED before any RTL traffic)
 **Mechanism (settled 2026-07-11):** exclusion filters on the client workflows' triggers, keyed on **tags** — NOT on RTL custom fields (field "Intent type" filters are AI content-classification and unreliable for this; client leads don't carry the fields at all). Tags are applied in the same API call that creates each RTL contact, so they're present when triggers evaluate. Recipe per location-wide trigger: add three filter rows `Tags → Doesn't include → rtl-starter-guide / rtl-landing / rtl-customer` (rows AND — contact passes only with none). **Form Submitted triggers need NO filter** (RTL leads arrive via REST API, never via a GHL form). Triggers needing the exclusions: Contact Created, generic Contact Tag Added, Customer Replied, un-scoped Opportunity triggers. Fallback where a trigger lacks a Tags filter: first workflow step = If/Else "Tags includes any rtl-*" → End.
 
-Automation → Workflows → open each **published** workflow → check its **trigger**:
-| Workflow | Risk to check |
-|---|---|
-| New Lead Welcome Sequence | If trigger is location-wide (Contact Created, or any-form-submitted): add trigger filter **"Tag → Doesn't include → rtl-starter-guide"** + same for `rtl-landing`, `rtl-customer` |
-| Lead Nurture Drip Sequence | same check |
-| Unresponsive Lead Re-Engagement | same check |
-| Appointment Confirmation & Reminder | OK if calendar-scoped to the client's 9 calendars; verify it's not "any calendar" (the future Launch Consult calendar must not trigger it) |
-| Post-Appointment Follow-Up | same calendar-scope check |
-| Review Request Workflow | check trigger; exclude `rtl-*` tags if location-wide |
+**AUDITED 2026-07-11 via browser (read-only — no client workflows were modified).** All 6 published workflows show 0 total enrollments ever. Verdicts:
+
+| Workflow | Trigger (observed) | Verdict |
+|---|---|---|
+| New Lead Welcome Sequence | Form Submitted — no filters | ✅ **SAFE** — RTL leads arrive via API, never a GHL form. (CVO's experimental "RTL Audience / Intent type" filter was never saved — nothing to clean.) |
+| Lead Nurture Drip Sequence | Tag Added includes `new-lead` | ✅ **SAFE** — RTL applies only `rtl-*` tags. Ingestion rule: NEVER apply the literal tags `new-lead` / `cold-lead`. |
+| Unresponsive Lead Re-Engagement | Tag Added includes `cold-lead` | ✅ **SAFE** — same reasoning |
+| Appointment Confirmation & Reminder | Customer Booked Appointment — Contact Mode "contact", **no calendar filter** | ⚠️ **FIX** — fires on Launch Consult bookings |
+| Post-Appointment Follow-Up | Appointment Status — Event "Normal", **no calendar filter** | ⚠️ **FIX** — same |
+| Review Request Workflow | Appointment Status — Event "Normal", **no calendar filter** | ⚠️ **FIX** — same |
+
+**The one fix, ×3 (CVO, ~1 min each; must land before the consult link is ever sent to a lead):** open the workflow → click the trigger card → **Add filters** → field **In Calendar** (or "Calendar") → operator **is any of** → select the client's 9 calendars (everything EXCEPT `Launch Consult (15 min)`) → **Save trigger**. This scopes each appointment workflow to the client's own calendars; tag exclusions are unnecessary for these three because the discriminator is the calendar itself.
 
 Goal: an RTL lead must never receive the client's generic sequences (two voices messaging one lead).
+
+> Note on automation feasibility: the workflow builder is a cross-origin iframe (`client-app-automation-workflows.leadconnectorhq.com`) with heavy renderer freezes; browser automation handled read-only auditing fine but precision form edits inside live published client workflows proved unsafe (coordinate drift, Delete adjacent to targets) — deliberately backed out without saving anything.
 
 ### C. Workflow drafts (4) — copy is pre-checked against MARKETING_PLAN.md §6 + CAMPAIGN_KIT voice
 All sends "from" the Ready-to-Launch brand identity. No income claims, no invented proof, same-day promise quoted exactly as **"delivered same day — most orders within the hour."**
@@ -121,8 +126,8 @@ New env for the RTL backend: `GHL_PRIVATE_INTEGRATION_TOKEN_RR`, `GHL_LOCATION_I
 ## 5. Phase B close checklist
 - [x] Custom fields ×8 (API, verified)
 - [x] Tags ×3 (API, verified)
-- [x] Pipeline `RTL Launch Day` (CVO via UI; id `PyJjxP442Bpwv5BUi8MS`) — ⚠️ minus `Checkout Sent` stage, pending
-- [ ] Trigger audit of 6 published client workflows (UI — §2B)
+- [x] Pipeline `RTL Launch Day` (CVO via UI; id `PyJjxP442Bpwv5BUi8MS`) — all 7 stages live, IDs captured
+- [x] Trigger audit of 6 published client workflows (browser, read-only) — 3 safe · 3 need the §2B calendar filter (CVO, ~3 min total)
 - [ ] 4 workflow drafts (UI — §2C)
 - [x] Calendar `Launch Consult (15 min)` (API, verified — id `FxvoiD98eoUnV5yzqJyc`)
 - [ ] Ingestion I1–I6 (RTL repo)

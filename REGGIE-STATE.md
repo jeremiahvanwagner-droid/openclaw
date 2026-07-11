@@ -152,6 +152,18 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-11-004 — RTL×GHL PHASE B: co-tenancy trigger audit of Royal Results workflows (READ-ONLY, COMPLETE)
+- **Timestamp:** 2026-07-11T14:15:00-05:00
+- **Change Type:** ANALYSIS (browser session in CVO's Chrome; **zero modifications** to client workflows — one trigger panel opened and closed via Escape without saving)
+- **Status:** AUDIT COMPLETE ✅ · 3 fixes handed to CVO
+- **Owner:** Claude Code (Fable 5) — CVO: "Spawn to Browser and close out Phase B"
+- **Method:** direct URL navigation to each published workflow (IDs via API), trigger read from builder canvas. Builder is a cross-origin iframe (client-app-automation-workflows.leadconnectorhq.com) with chronic renderer freezes; precision form edits were deliberately abandoned after repeated coordinate-drift misses — wrong risk profile against LIVE published client automations (Delete button adjacent to targets).
+- **Verdicts:** SAFE: New Lead Welcome (Form Submitted — unreachable by API-created contacts), Lead Nurture Drip (tag `new-lead`), Unresponsive Re-Engagement (tag `cold-lead`). NEEDS FIX (×3): Appointment Confirmation & Reminder (Customer Booked Appointment), Post-Appointment Follow-Up + Review Request (Appointment Status) — **all three lack calendar scoping** and would fire on RTL `Launch Consult (15 min)` bookings. Fix = one "In Calendar → is any of → [client's 9 calendars]" trigger filter each (~1 min each, spec in phase-B doc §2B). Gate: before the consult link is ever exposed to a lead.
+- **Also observed:** CVO built pipeline incl. `Checkout Sent` stage (ID pending re-pull); all client workflows have 0 enrollments ever; CVO's experimental "RTL Audience / Intent type" filter on New Lead Welcome was never saved.
+- **Ingestion rule added:** RTL code must never apply literal tags `new-lead` / `cold-lead` (they trigger client nurture flows).
+- **Rollback:** n/a (no changes made).
+- **PR Link:** pending — commit with Phase B batch.
+
 ### Entry 2026-07-11-003 — RTL×GHL PHASE B: Launch Consult calendar created in Royal Results (APPLIED)
 - **Timestamp:** 2026-07-11T13:25:00-05:00
 - **Change Type:** EXTERNAL PRODUCTION DATA (client CRM — Royal Results, tenant RR)
