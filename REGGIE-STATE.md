@@ -152,6 +152,17 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-11-005 — RTL×GHL PHASE B: ingestion code complete (RTL repo, branch — NOT deployed)
+- **Timestamp:** 2026-07-11T15:10:00-05:00
+- **Change Type:** CODE (separate repo: rtl-biz-pkg-mvp-v3, branch `feature/ghl-ingestion`, commit 22471d3, pushed)
+- **Status:** CODE COMPLETE ✅ · merge + deploy pending CVO (needs RR env pair on the RTL production host)
+- **Owner:** Claude Code (Fable 5) — CVO: "Execute Phase B" / "close out Phase B"
+- **Summary:** The RTL funnel now has lead capture end-to-end in code. New fail-soft `backend/ghl.py` (mirrors emailer.py; custom UA per Cloudflare 1010 lesson). Wired: `/lead-magnet` → contact + `rtl-starter-guide` + New Lead stage + UTM fields + optional phone (I1+I2); Stripe `checkout.session.completed` → `rtl-customer` + Purchased (I3); `checkout.session.expired` → `rtl-checkout-expired` (I5); intake → `rtl_niche/audience/transformation` custom fields (I4). Landing page gains the Starter Guide opt-in form with UTM persistence — **the funnel captured zero leads before this**. I6 deferred to Phase C by design (anonymous checkout click has no contact identity; REGGIE sets Checkout Sent when it sends the link in-conversation).
+- **Co-tenancy guard enforced in code + test:** only `rtl-*` tags can ship; a dedicated test asserts `new-lead`/`cold-lead` never appear (they enroll the client's own nurtures — audit -004).
+- **Verified:** full RTL backend suite 190 passed; frontend `tsc --noEmit` clean. NOT verified live (not deployed).
+- **Rollback:** branch delete / don't merge.
+- **PR Link:** branch `feature/ghl-ingestion` pushed; PR at CVO's discretion.
+
 ### Entry 2026-07-11-004 — RTL×GHL PHASE B: co-tenancy trigger audit of Royal Results workflows (READ-ONLY, COMPLETE)
 - **Timestamp:** 2026-07-11T14:15:00-05:00
 - **Change Type:** ANALYSIS (browser session in CVO's Chrome; **zero modifications** to client workflows — one trigger panel opened and closed via Escape without saving)

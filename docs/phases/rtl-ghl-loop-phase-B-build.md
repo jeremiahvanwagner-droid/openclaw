@@ -130,4 +130,5 @@ New env for the RTL backend: `GHL_PRIVATE_INTEGRATION_TOKEN_RR`, `GHL_LOCATION_I
 - [x] Trigger audit of 6 published client workflows (browser, read-only) — 3 safe · 3 need the §2B calendar filter (CVO, ~3 min total)
 - [ ] 4 workflow drafts (UI — §2C)
 - [x] Calendar `Launch Consult (15 min)` (API, verified — id `FxvoiD98eoUnV5yzqJyc`)
-- [ ] Ingestion I1–I6 (RTL repo)
+- [x] Ingestion I1–I5 code complete (RTL repo branch `feature/ghl-ingestion`, commit 22471d3; 190 tests pass) — **not yet merged/deployed**; deploy needs `GHL_PRIVATE_INTEGRATION_TOKEN_RR` + `GHL_LOCATION_ID_RR` in the RTL production env
+- [~] I6 (move stage to `Checkout Sent` when the link is issued) — deliberately deferred to Phase C: the pricing-page checkout click is anonymous (no contact identity to move); the true "Checkout Sent" moment is REGGIE sending the link inside a conversation
