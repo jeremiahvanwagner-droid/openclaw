@@ -152,6 +152,16 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-011 — R4 TOKEN ROTATION: gateway/webhook auth token rotated (server side APPLIED; GHL headers = CVO in progress)
+- **Timestamp:** 2026-07-12T16:15:00-05:00
+- **Change Type:** PRODUCTION SECRETS (/etc/openclaw/.env, bak-rotate-*)
+- **Status:** SERVER SIDE ✅ — old rejected (401), new accepted (200), both services active. GHL webhook headers (6) being re-pasted by CVO; until then GHL deliveries 401 (accepted risk at current traffic).
+- **Owner:** Claude Code (server swap, value generated on-box via openssl and NEVER displayed) + CVO (GHL header paste)
+- **Why:** the prior value was echoed into an operator session transcript by a CLI error hint (flagged in audit -003).
+- **Scope decision (CVO-confirmed):** rotate gateway token (this) + RR PIT (CVO's GHL UI flow, 7-day dual-token grace, three env locations) — NOT TJB PIT (already dead 401; replace at Wave 2), NOT MSL/IBM PIT (never exposed), NOT Telegram/Anthropic/Resend/Supabase (never exposed).
+- **E2E verification pending:** CVO's real email reply → C5 → webhook 200 with new Bearer.
+- **Rollback:** restore bak-rotate-* + restart both services (old GHL headers would work again).
+
 ### Entry 2026-07-12-010 — TELEGRAM INBOUND REPAIRED: channels.telegram.enabled=true — REGGIE answers the CVO directly (DEPLOYED)
 - **Timestamp:** 2026-07-12T15:55:00-05:00
 - **Change Type:** PRODUCTION GATEWAY CONFIG (openclaw.json, bak-tgenable-*)
