@@ -69,16 +69,19 @@ describe("business-registry", () => {
     expect(summary.coverage).toBeCloseTo(2 / 3, 5);
   });
 
-  it("loads the seeded 10-business portfolio and returns a TJB/MSL shared summary", () => {
+  // Counts pin the dashboard truth (Supabase business_registry), reconciled
+  // 2026-07-12: +biz_11 MVP Cashflow, +biz_12 Royal Results (dedicated RR),
+  // membership/community = 3/3 per the scope-map header. Audits -004/-006.
+  it("loads the 12-business portfolio and returns the scope-map summary", () => {
     const registry = loadBusinessRegistry();
     const summary = buildPortfolioSummary(registry);
 
-    expect(registry.businesses).toHaveLength(10);
-    expect(summary.total_businesses).toBe(10);
-    expect(summary.dedicated_scopes).toBe(0);
-    expect(summary.shared_scopes).toBe(10);
+    expect(registry.businesses).toHaveLength(12);
+    expect(summary.total_businesses).toBe(12);
+    expect(summary.dedicated_scopes).toBe(1);
+    expect(summary.shared_scopes).toBe(11);
     expect(summary.internal_scopes).toBe(0);
-    expect(summary.businesses_with_memberships).toBe(4);
-    expect(summary.businesses_with_communities).toBe(2);
+    expect(summary.businesses_with_memberships).toBe(3);
+    expect(summary.businesses_with_communities).toBe(3);
   });
 });

@@ -134,7 +134,7 @@
    ],
    "membership": {
     "enabled": true,
-    "community": false,
+    "community": true,
     "client_portal": true
    },
    "approval_policy": {
@@ -493,7 +493,7 @@
    "membership": {
     "enabled": true,
     "community": true,
-    "client_portal": true
+    "client_portal": false
    },
    "approval_policy": {
     "human_review_required": [
@@ -671,7 +671,7 @@
     "expansion"
    ],
    "membership": {
-    "enabled": true,
+    "enabled": false,
     "community": false,
     "client_portal": true
    },
@@ -852,7 +852,7 @@
    "membership": {
     "enabled": false,
     "community": false,
-    "client_portal": true
+    "client_portal": false
    },
    "approval_policy": {
     "human_review_required": [
@@ -913,17 +913,25 @@
    "pod_id": "pod_mvp_cashflow",
    "business_name": "MVP Cashflow",
    "brand_name": "MVP Cashflow",
-   "legal_entity": null,
-   "domain": null,
+   "legal_entity": "MVP Cashflow",
+   "domain": "mvp.ebook.university",
    "status": "active",
    "vertical": "digital_products",
-   "offer_model": null,
+   "offer_model": "digital_products",
    "ghl_scope_type": "shared_incubator_subaccount",
    "ghl_location_selector": null,
    "tenancy_inputs": {},
-   "payment_provider": null,
-   "calendar_model": null,
-   "pipeline_set": [],
+   "payment_provider": "stripe",
+   "calendar_model": "standard",
+   "pipeline_set": [
+    "new_lead",
+    "engaged",
+    "qualified",
+    "checkout_sent",
+    "purchased",
+    "delivered",
+    "testimonial_asked"
+   ],
    "membership": {},
    "approval_policy": {},
    "kpi_targets": {},
