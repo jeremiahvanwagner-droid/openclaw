@@ -152,6 +152,28 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-003 — RTL AGENT TURN REPAIRED + ANTHROPIC RESTORED (CVO-approved): REGGIE's first draft landed (DEPLOYED)
+- **Timestamp:** 2026-07-12T11:10:00-05:00
+- **Change Type:** PRODUCTION PLATFORM CONFIG + CODE (VPS gateway config, systemd drop-in, env file, handler libs)
+- **Status:** DEPLOYED ✅ — E2E verified: rtl.optin → clean claude-sonnet-5 draft in DRY_RUN transcript
+- **Owner:** Claude Code (Fable 5) — CVO decision: "return to Anthropic laddered until server/VPS upgrade" (GO given after /Consider)
+- **Findings (why REGGIE never drafted):**
+  1. `openclawMessage` used a CLI syntax that doesn't exist (`openclaw message --agent`); correct is `openclaw agent --agent <id> --message` (and channel sends are `openclaw message send --channel --target`). The agent-brief leg had NEVER worked; Phase C E2E only proved transcript+escalation.
+  2. The June `2026.6.11` upgrade left ALL 109 gateway agents bound to Anthropic models with EMPTY per-agent auth stores — no agent could run ANY model. Config drift also erased the Phase 9 ollama providers from main/marketing models.json.
+  3. Local-model path is HARDWARE-BLOCKED: VPS has 15GiB RAM/CPU-only; qwen3.6:latest needs 24.3GiB (won't load), qwen3.5:27b swap-thrashes, qwen3:14b runs but agent turns take minutes of CPU prompt-eval (~35K-token bootstrap) → idle timeouts. Same wall that aborted Phase 9.
+  4. `openclaw-webhook.service` lacked HOME/OPENCLAW_CONFIG_DIR (spawned CLI read wrong state) and its `ProtectSystem=strict` sandbox blocked CLI/agent state writes.
+- **Changes (all with backups):**
+  - `/etc/openclaw/.env`: + `OPENCLAW_GATEWAY_TOKEN` (same value as OPENCLAW_GATEWAY_AUTH_TOKEN — CLI needs this exact name; bak-gwtoken-*).
+  - `openclaw.json` (bak-rtl-ollama-*, bak-anthropic-restore-*): `models.providers.anthropic.apiKey=${ANTHROPIC_API_KEY}` (env ref); full `models.providers.ollama` block (127.0.0.1:11434, timeoutSeconds 600 — kept as Phase 9.3 head start); `agents.defaults.timeoutSeconds=900`; main+marketing bindings net UNCHANGED (ollama experiment reverted to anthropic/claude-sonnet-5).
+  - Auth profiles `anthropic:manual` + `ollama:manual` created for marketing+main via `openclaw models auth paste-api-key` (key piped from server env, output masked).
+  - Drop-in `/etc/systemd/system/openclaw-webhook.service.d/10-openclaw-state.conf`: HOME + OPENCLAW_CONFIG_DIR + ReadWritePaths for `.openclaw` and `agents`.
+  - CLI device b279e1e2b9fe approved (operator) via /root/oc-approve.sh.
+  - Code (this repo): `lib/safe-exec.mjs` — correct CLI verbs, `--json` parse of payloads[].text; `skills/rtl-lead-engine.mjs` — engine owns transcript writes (agent returns text only), RTL_AGENT default 'marketing'.
+- **Cost guardrails verified BEFORE enabling spend:** `openclaw cron list` → **No cron jobs**; heartbeat still throttled (168h); DRY_RUN=true; only spend path = RTL events (~35K prompt tokens/turn, prompt-cached; ≈3–11¢/event on sonnet-5).
+- **Verification:** POST rtl.optin → transcript `reggie-draft` (dry_run=true): "Hey Jeremiah — thanks for checking out Ready-to-Launch. Quick question so I point you at the right thing: what's the business or niche you're building this for?" — on-voice, compliant, qualification-first.
+- **⚠️ SECURITY FOLLOW-UP:** the CLI's error hint echoed OPENCLAW_GATEWAY_AUTH_TOKEN into the operator session transcript. ROTATE after the Part 3 rehearsal: new value in /etc/openclaw/.env (both names) + re-paste Authorization in all 6 GHL webhook actions + restart both services.
+- **Rollback:** restore openclaw.json from bak-anthropic-restore-*, delete drop-in + daemon-reload, remove OPENCLAW_GATEWAY_TOKEN line (bak-gwtoken-*), `git checkout` prior safe-exec/rtl-lead-engine, restart openclaw + openclaw-webhook.
+
 ### Entry 2026-07-12-002 — RTL LEAD MAGNET: Starter Guide PDF re-skinned + attached to opt-in email (DEPLOYED)
 - **Timestamp:** 2026-07-12T09:45:00-05:00
 - **Change Type:** PRODUCTION CODE DEPLOY (RTL repo `ready-to-launch-my-business`, VPS backend+worker rebuild)

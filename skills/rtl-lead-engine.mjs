@@ -129,7 +129,7 @@ function detectEscalation(text) {
   return hit ? hit.source : null;
 }
 
-function agentInstruction(eventType, payload, transcriptFile) {
+function agentInstruction(eventType, payload) {
   const prompt = loadPrompt();
   const contact = contactSummary(payload);
   const message = payload.message?.body || payload.messageBody || payload.body || payload.message || '';
@@ -143,13 +143,13 @@ function agentInstruction(eventType, payload, transcriptFile) {
 
   const mode = DRY_RUN
     ? [
-      'MODE: DRY_RUN — do NOT send any message to the lead by any channel.',
-      `Draft your reply, then append it as a JSON line {"role":"reggie-draft","event":"${eventType}","contact":${JSON.stringify(contact.email || contact.id)},"draft":"<your reply>"} to: ${transcriptFile}`,
-      'The CVO reviews these transcripts before anything goes live.',
+      'MODE: DRY_RUN — do NOT send any message to the lead by any channel, and do not write any files.',
+      'Respond with ONLY the exact message you would send to this lead — no preamble, no commentary, no markdown fences.',
+      'The runtime records your response in the transcript; the CVO reviews it before anything goes live.',
     ].join('\n')
     : [
       'MODE: LIVE — send your reply through the GHL conversations API (ghl-api skill, tenant RR) so the thread lives in the CRM.',
-      `Also append what you sent to: ${transcriptFile}`,
+      'After sending, respond with ONLY the exact message text you sent — the runtime records it in the transcript.',
     ].join('\n');
 
   return `${prompt}\n\n---\n${context}\n\n${mode}`;
@@ -176,7 +176,7 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
   const contact = contactSummary(payload);
   const inboundText = payload.message?.body || payload.messageBody
     || field(payload, 'message', 'body') || '';
-  const transcriptFile = appendTranscript({
+  appendTranscript({
     role: 'event',
     event: eventType,
     contact,
@@ -201,9 +201,16 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
   }
 
   try {
-    await openclawMessage({
+    const reply = await openclawMessage({
       agent: RTL_AGENT,
-      message: agentInstruction(eventType, payload, transcriptFile),
+      message: agentInstruction(eventType, payload),
+    });
+    // The engine owns the transcript write — the agent only returns text.
+    appendTranscript({
+      role: 'reggie-draft',
+      event: eventType,
+      contact: contact.email || contact.id,
+      draft: String(reply || '').trim(),
     });
     log.info({ eventType, agent: RTL_AGENT, dryRun: DRY_RUN, contact: contact.email || contact.id }, 'RTL agent briefed');
     return { handled: true, escalated: false };
