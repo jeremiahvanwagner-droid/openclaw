@@ -159,8 +159,17 @@ All sub-agents held in standby until local model routing is confirmed operationa
 - **Owner:** Claude Code (server swap, value generated on-box via openssl and NEVER displayed) + CVO (GHL header paste)
 - **Why:** the prior value was echoed into an operator session transcript by a CLI error hint (flagged in audit -003).
 - **Scope decision (CVO-confirmed):** rotate gateway token (this) + RR PIT (CVO's GHL UI flow, 7-day dual-token grace, three env locations) — NOT TJB PIT (already dead 401; replace at Wave 2), NOT MSL/IBM PIT (never exposed), NOT Telegram/Anthropic/Resend/Supabase (never exposed).
-- **E2E verification pending:** CVO's real email reply → C5 → webhook 200 with new Bearer.
+- **E2E VERIFIED 2026-07-12T16:30:** gateway token — synthetic rtl.inbound_message → webhook 200, zero 401s in webhook-access.log since rotation (6 GHL headers took correctly). RR PIT — see -012.
 - **Rollback:** restore bak-rotate-* + restart both services (old GHL headers would work again).
+
+### Entry 2026-07-12-012 — RR PIT double-paste repaired: live sends restored (APPLIED)
+- **Timestamp:** 2026-07-12T16:32:00-05:00
+- **Change Type:** PRODUCTION SECRETS (RR PIT in /etc/openclaw/.env + /root/ready-to-launch-my-business/.env, bak-rrdedupe-*)
+- **Status:** APPLIED ✅ — RR PIT 200, live send delivered
+- **Diagnosis:** after CVO rotated RR PIT in GHL, the new token was pasted TWICE into the env (80 chars = `pit-54a48652-…-badab6a528de` ×2) → GHL 401 → live email sends + backend CRM capture broken. Both env files carried the identical doubled value. Detected by len=80 vs backups' len=40; confirmed halves identical.
+- **Fix:** de-duped to the first 40 chars (a pure string op on the existing file value — never printed to chat; single copy tested → 200 BEFORE writing), both env files repaired, openclaw-webhook + docker backend/worker restarted.
+- **E2E VERIFIED:** live rtl.inbound_message → REGGIE delivered via RR PIT (msg fsfWFQdXMS6zXvELDRge), and it correctly used the NEW ownership fact: "Yes — you own everything, completely… no licensing, no revenue share, no strings." Breadcrumb idempotent. **Full rotation (both tokens) now clean and proven end-to-end.**
+- **Rollback:** restore bak-rrdedupe-* (would reintroduce the 401).
 
 ### Entry 2026-07-12-010 — TELEGRAM INBOUND REPAIRED: channels.telegram.enabled=true — REGGIE answers the CVO directly (DEPLOYED)
 - **Timestamp:** 2026-07-12T15:55:00-05:00
