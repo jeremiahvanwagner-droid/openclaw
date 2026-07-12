@@ -152,6 +152,16 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-009 — BRANDED SENDER LIVE: dedicated sending domain lc.readytolaunchmybusiness.com + hello@ From (DEPLOYED)
+- **Timestamp:** 2026-07-12T15:40:00-05:00
+- **Change Type:** DNS (CVO via GHL flow) + env + engine code (emailFrom support)
+- **Status:** DEPLOYED ✅ — live send verified with branded sender accepted by GHL
+- **Owner:** CVO (GHL dedicated-domain flow + DNS) + Claude Code (engine/env/verification)
+- **DNS verified via Hostinger API:** `lc` SPF (leadconnectorhq+mailgun) · `lc` MX (mailgun) · `k1._domainkey.lc` DKIM · `_dmarc.lc` · `email.lc` CNAME→mailgun.org. **Sacred records untouched:** `@` A=76.76.21.21 (Vercel — CVO correctly REFUSED GHL's funnel-flow A-record request), Resend (`send`/`resend._domainkey`), Hostinger mailbox (MX/DKIM). No conflicts.
+- **Engine:** `sendLiveEmailReply` honors `RTL_EMAIL_FROM`/`RTL_EMAIL_FROM_NAME` (unset = location default). Env set: `Royal Results <hello@readytolaunchmybusiness.com>` (bak-sender-*). Live test msg WhMp9LhEQgWCtGnRm04E delivered, no errors, breadcrumb idempotent.
+- **⚠️ OBSERVED (needs CVO):** asked an ownership/IP question NOT in the prompt-set facts, REGGIE correctly refused to invent and sent a holding reply ("let me confirm and get back to you") — but no operator alert fires for unknown-fact commitments, so the promise could dangle. Fix: CVO supplies the ownership answer → added to prompt-set facts; consider a commitment-alert pattern later.
+- **Rollback:** remove RTL_EMAIL_FROM* lines (bak-sender-*) + restart → location default sender.
+
 ### Entry 2026-07-12-008 — LIVE-LOOP HARDENING from CVO's Gmail readout: C5 real-wire PROVEN, empty-payload leak fixed, NO_REPLY convention (DEPLOYED)
 - **Timestamp:** 2026-07-12T15:00:00-05:00
 - **Change Type:** PRODUCTION CODE (safe-exec + rtl-lead-engine, VPS + repo)

@@ -167,15 +167,21 @@ function escapeHtml(text) {
 }
 
 async function sendLiveEmailReply(contactId, text) {
-  return ghlRequest('/conversations/messages', {
-    method: 'POST',
-    body: {
-      type: 'Email',
-      contactId,
-      subject: 'Re: Ready to Launch',
-      html: `<p>${escapeHtml(text).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
-    },
-  });
+  const body = {
+    type: 'Email',
+    contactId,
+    subject: 'Re: Ready to Launch',
+    html: `<p>${escapeHtml(text).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
+  };
+  // Branded sender — set RTL_EMAIL_FROM only after the dedicated sending
+  // domain is verified in the RR location (unverified senders get rejected
+  // or rewritten). Unset = location default.
+  if (process.env.RTL_EMAIL_FROM) {
+    body.emailFrom = process.env.RTL_EMAIL_FROM_NAME
+      ? `${process.env.RTL_EMAIL_FROM_NAME} <${process.env.RTL_EMAIL_FROM}>`
+      : process.env.RTL_EMAIL_FROM;
+  }
+  return ghlRequest('/conversations/messages', { method: 'POST', body });
 }
 
 // Breadcrumbs (CVO-approved autonomous writes): when a lead replies, tag them
