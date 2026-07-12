@@ -152,6 +152,16 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-008 — LIVE-LOOP HARDENING from CVO's Gmail readout: C5 real-wire PROVEN, empty-payload leak fixed, NO_REPLY convention (DEPLOYED)
+- **Timestamp:** 2026-07-12T15:00:00-05:00
+- **Change Type:** PRODUCTION CODE (safe-exec + rtl-lead-engine, VPS + repo)
+- **Status:** DEPLOYED ✅ — regression-tested live
+- **Owner:** Claude Code (Fable 5) — CVO supplied Gmail thread PDF of the live conversation
+- **PROOF from the thread:** the CVO's real Gmail reply ("Cool.") fired GHL's Customer Replied trigger → C5 → webhook → REGGIE — the ONE leg simulated tests couldn't cover (real GHL trigger wiring) verified in production. Full loop: form → guide → C1 → real reply → C5 → REGGIE live answer.
+- **Bug found via the thread:** on a courtesy message the agent returned an envelope with EMPTY payloads (visible text "NO_REPLY"); the parser only fell back to raw stdout on parse FAILURE, so the raw JSON envelope was emailed to the lead (CVO's own inbox; 2nd garbled email). Fixes: (1) safe-exec — once the envelope parses, payloads are the whole answer; empty → '' — raw stdout only when parse fails; (2) engine — formal NO_REPLY sentinel (added to both mode briefings; regex-guarded, transcripted as reggie-no-reply, never delivered); empty replies never send.
+- **Regression tests (live):** "awesome thanks!" → NO email, event+empty-draft transcripted ✅ · buying-intent message → clean close delivered (msg VHsPAdYGGj2A5yy1N6rQ) pointing to checkout with all three intake answers ✅.
+- **⚠️ FLAGGED for CVO (pre-R5):** live emails send as "Royal Results <Rahiem+inspirebuildmotivate.com@send.lcmsgsndr.org>" — the RR location's default LeadConnector sender. Before paid traffic: configure a branded verified sender + dedicated sending domain in RR GHL settings (deliverability + brand trust).
+
 ### Entry 2026-07-12-007 — R3 GO-LIVE GATES EXECUTED: DRY_RUN=false — RTL LOOP IS LIVE (DEPLOYED)
 - **Timestamp:** 2026-07-12T14:35:00-05:00
 - **Change Type:** PRODUCTION — env flip, alert wiring, engine live-delivery code (VPS + repo)

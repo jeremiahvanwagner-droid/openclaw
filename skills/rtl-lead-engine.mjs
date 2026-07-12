@@ -217,11 +217,13 @@ function agentInstruction(eventType, payload) {
     ? [
       'MODE: DRY_RUN — do NOT send any message to the lead by any channel, and do not write any files.',
       'Respond with ONLY the exact message you would send to this lead — no preamble, no commentary, no markdown fences.',
+      'If the message warrants no reply (a courtesy or acknowledgment like "thanks" or "cool"), respond with exactly: NO_REPLY',
       'The runtime records your response in the transcript; the CVO reviews it before anything goes live.',
     ].join('\n')
     : [
       'MODE: LIVE — your reply WILL BE SENT to this lead by email. Do not send anything yourself and do not write files.',
       'Respond with ONLY the exact message to deliver — no preamble, no commentary, no markdown fences.',
+      'If the message warrants no reply (a courtesy or acknowledgment like "thanks" or "cool"), respond with exactly: NO_REPLY',
       'The runtime delivers it through the GHL conversations API (tenant RR) and records it in the transcript.',
     ].join('\n');
 
@@ -283,6 +285,18 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
     log.error({ eventType, err: error.message }, 'Failed to brief RTL agent');
     appendTranscript({ role: 'error', event: eventType, error: error.message });
     return { handled: false, reason: 'agent-brief-failed' };
+  }
+
+  // NO_REPLY is the agreed sentinel for "this message needs no answer"
+  // (courtesies, acknowledgments). Never deliver it.
+  if (/^NO_?REPLY[.!]?$/i.test(reply)) {
+    appendTranscript({
+      role: 'reggie-no-reply',
+      event: eventType,
+      contact: contact.email || contact.id,
+    });
+    log.info({ eventType, contact: contact.email || contact.id }, 'RTL agent chose not to reply');
+    return { handled: true, escalated: false };
   }
 
   // The engine owns the transcript write — the agent only returns text.
