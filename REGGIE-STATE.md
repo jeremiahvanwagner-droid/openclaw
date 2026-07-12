@@ -152,6 +152,15 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-005 — pod_growth_by_choice AGENT CREATED (dark by design) — workstream #1 closed (APPLIED)
+- **Timestamp:** 2026-07-12T12:35:00-05:00
+- **Change Type:** PRODUCTION GATEWAY CONFIG (VPS openclaw.json + new workspace)
+- **Status:** APPLIED ✅ — `openclaw agents list` shows 🚀 Growth by Choice Pod Lead; gateway restarted clean
+- **Owner:** Claude Code (Fable 5) — CVO: "create the pod_growth_by_choice"
+- **What:** owner pod for biz_11 MVP Cashflow + biz_12 Royal Results. Workspace `/opt/openclaw/workspaces/pod_growth_by_choice` seeded from the biz_01 stock set, PLUS (unlike the other 10 pods) a pre-filled IDENTITY.md and a **Pod Mission** section in AGENTS.md: owns biz_11/biz_12, RTL engine + transcript pointers, DRY_RUN standing order, RR additive-only rule, hard gates (money/legal/destructive/live-messaging), compliance voice + exact delivery quote. Agent entry: sonnet-5 binding, 24 skills (GHL ops + digital-funnel/checkout + sms-compliance + analytics; no brand-* set).
+- **Cost posture:** DARK — no auth profile, so any turn fails `missing-provider-auth` until the CVO lights it (masked `openclaw models auth paste-api-key --agent pod_growth_by_choice --provider anthropic`, ~1 min).
+- **Backups/rollback:** `openclaw.json.bak-gbcpod-*`; remove agent entry + `rm -rf /opt/openclaw/workspaces/pod_growth_by_choice` + restart.
+
 ### Entry 2026-07-12-004 — BUSINESS SCOPE MAP: registry reconciled to dashboard truth + Royal Results pod created (APPLIED)
 - **Timestamp:** 2026-07-12T12:15:00-05:00
 - **Change Type:** DATA PLANE (Supabase DB1 `business_registry`) + repo/VPS registry mirrors
