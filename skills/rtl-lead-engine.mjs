@@ -21,7 +21,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { resolve as resolveTenant } from '../lib/ghl-tenant-resolver.mjs';
+import { resolve as resolveTenant, GHL_BASE, API_VERSION } from '../lib/ghl-tenant-resolver.mjs';
 import { openclawMessage } from '../lib/safe-exec.mjs';
 import { childLogger } from '../lib/logger.mjs';
 
@@ -34,6 +34,12 @@ export const DRY_RUN = (process.env.DRY_RUN || 'true').toLowerCase() !== 'false'
 const RTL_AGENT = process.env.RTL_AGENT_ID || 'marketing';
 const TRANSCRIPT_DIR = process.env.RTL_TRANSCRIPT_DIR
   || path.join(process.cwd(), 'logs', 'rtl');
+
+// RTL Launch Day pipeline in Royal Results — IDs captured in
+// docs/phases/rtl-ghl-loop-phase-B-build.md §2A.
+const RTL_PIPELINE_ID = 'PyJjxP442Bpwv5BUi8MS';
+const RTL_STAGE_NEW_LEAD = '77a50701-c743-4f72-a938-f5b70d502a94';
+const RTL_STAGE_ENGAGED = '0c114c72-4676-4e93-87ec-f8e66a54b897';
 
 const PROMPT_CANDIDATES = [
   process.env.RTL_PROMPT_PATH,
@@ -129,6 +135,72 @@ function detectEscalation(text) {
   return hit ? hit.source : null;
 }
 
+// ── LIVE delivery (CVO decision 2026-07-12: the ENGINE sends; the agent only
+// writes text). All writes are RR-tenant, rtl-namespaced, and fail LOUD:
+// a failed send appends an error line and alerts the operator. ─────────────
+
+async function ghlRequest(pathname, { method = 'GET', body } = {}) {
+  const { token } = resolveTenant('RR');
+  const response = await fetch(`${GHL_BASE}${pathname}`, {
+    method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      // Conversations endpoints use their own API version.
+      Version: pathname.startsWith('/conversations') ? '2021-04-15' : API_VERSION,
+      'Content-Type': 'application/json',
+      // GHL's Cloudflare blocks some default UAs (error 1010).
+      'User-Agent': 'curl/8.9.1',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const text = await response.text();
+  if (!response.ok) {
+    throw new Error(`GHL ${method} ${pathname} -> ${response.status}: ${text.slice(0, 200)}`);
+  }
+  return text ? JSON.parse(text) : {};
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+async function sendLiveEmailReply(contactId, text) {
+  return ghlRequest('/conversations/messages', {
+    method: 'POST',
+    body: {
+      type: 'Email',
+      contactId,
+      subject: 'Re: Ready to Launch',
+      html: `<p>${escapeHtml(text).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>')}</p>`,
+    },
+  });
+}
+
+// Breadcrumbs (CVO-approved autonomous writes): when a lead replies, tag them
+// rtl-engaged and advance their RTL Launch Day opportunity New Lead → Engaged.
+async function applyReplyBreadcrumbs(contactId) {
+  const { locationId } = resolveTenant('RR');
+  await ghlRequest(`/contacts/${contactId}/tags`, {
+    method: 'POST',
+    body: { tags: ['rtl-engaged'] },
+  });
+  const search = await ghlRequest(
+    `/opportunities/search?location_id=${locationId}&contact_id=${contactId}`,
+  );
+  const opp = (search.opportunities || []).find(
+    o => o.pipelineId === RTL_PIPELINE_ID && o.pipelineStageId === RTL_STAGE_NEW_LEAD,
+  );
+  if (opp) {
+    await ghlRequest(`/opportunities/${opp.id}`, {
+      method: 'PUT',
+      body: { pipelineStageId: RTL_STAGE_ENGAGED },
+    });
+  }
+  return { tagged: true, stageAdvanced: Boolean(opp) };
+}
+
 function agentInstruction(eventType, payload) {
   const prompt = loadPrompt();
   const contact = contactSummary(payload);
@@ -148,8 +220,9 @@ function agentInstruction(eventType, payload) {
       'The runtime records your response in the transcript; the CVO reviews it before anything goes live.',
     ].join('\n')
     : [
-      'MODE: LIVE — send your reply through the GHL conversations API (ghl-api skill, tenant RR) so the thread lives in the CRM.',
-      'After sending, respond with ONLY the exact message text you sent — the runtime records it in the transcript.',
+      'MODE: LIVE — your reply WILL BE SENT to this lead by email. Do not send anything yourself and do not write files.',
+      'Respond with ONLY the exact message to deliver — no preamble, no commentary, no markdown fences.',
+      'The runtime delivers it through the GHL conversations API (tenant RR) and records it in the transcript.',
     ].join('\n');
 
   return `${prompt}\n\n---\n${context}\n\n${mode}`;
@@ -200,25 +273,65 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
     return { handled: false, reason: 'prompt-missing' };
   }
 
+  let reply;
   try {
-    const reply = await openclawMessage({
+    reply = String(await openclawMessage({
       agent: RTL_AGENT,
       message: agentInstruction(eventType, payload),
-    });
-    // The engine owns the transcript write — the agent only returns text.
-    appendTranscript({
-      role: 'reggie-draft',
-      event: eventType,
-      contact: contact.email || contact.id,
-      draft: String(reply || '').trim(),
-    });
-    log.info({ eventType, agent: RTL_AGENT, dryRun: DRY_RUN, contact: contact.email || contact.id }, 'RTL agent briefed');
-    return { handled: true, escalated: false };
+    }) || '').trim();
   } catch (error) {
     log.error({ eventType, err: error.message }, 'Failed to brief RTL agent');
     appendTranscript({ role: 'error', event: eventType, error: error.message });
     return { handled: false, reason: 'agent-brief-failed' };
   }
+
+  // The engine owns the transcript write — the agent only returns text.
+  if (DRY_RUN || !reply) {
+    appendTranscript({
+      role: 'reggie-draft',
+      event: eventType,
+      contact: contact.email || contact.id,
+      draft: reply,
+    });
+    log.info({ eventType, agent: RTL_AGENT, dryRun: DRY_RUN, contact: contact.email || contact.id }, 'RTL agent briefed');
+    return { handled: true, escalated: false };
+  }
+
+  // LIVE: deliver via GHL, then leave the CVO-approved breadcrumbs.
+  const contactId = contact.id;
+  try {
+    const delivery = await sendLiveEmailReply(contactId, reply);
+    appendTranscript({
+      role: 'reggie-sent',
+      event: eventType,
+      contact: contact.email || contactId,
+      message_id: delivery?.messageId || delivery?.id || null,
+      sent: reply,
+    });
+    log.info({ eventType, contact: contact.email || contactId }, 'RTL live reply delivered');
+  } catch (error) {
+    log.error({ eventType, err: error.message }, 'RTL live send FAILED');
+    appendTranscript({ role: 'error', event: eventType, error: `live-send: ${error.message}` });
+    await sendAlert(
+      `RTL LIVE SEND FAILED\nContact: ${contact.name || contact.email || contactId}\n` +
+      `Event: ${eventType}\nError: ${error.message.slice(0, 300)}\n` +
+      'The reply was NOT delivered — follow up manually.',
+    );
+    return { handled: false, reason: 'live-send-failed' };
+  }
+
+  if (eventType === 'rtl.inbound_message') {
+    try {
+      const crumbs = await applyReplyBreadcrumbs(contactId);
+      appendTranscript({ role: 'crm-breadcrumb', event: eventType, contact: contact.email || contactId, ...crumbs });
+    } catch (error) {
+      // Breadcrumbs are best-effort — the reply already went out.
+      log.warn({ eventType, err: error.message }, 'RTL breadcrumbs failed');
+      appendTranscript({ role: 'error', event: eventType, error: `breadcrumbs: ${error.message}` });
+    }
+  }
+
+  return { handled: true, escalated: false };
 }
 
 export const RTL_EVENT_TYPES = [

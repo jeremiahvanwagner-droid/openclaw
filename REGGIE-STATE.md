@@ -152,6 +152,20 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-007 — R3 GO-LIVE GATES EXECUTED: DRY_RUN=false — RTL LOOP IS LIVE (DEPLOYED)
+- **Timestamp:** 2026-07-12T14:35:00-05:00
+- **Change Type:** PRODUCTION — env flip, alert wiring, engine live-delivery code (VPS + repo)
+- **Status:** DEPLOYED ✅ — REGGIE's first live replies delivered to a real contact via GHL
+- **Owner:** Claude Code (Fable 5) — CVO: "R2 - transcripts approved / Run R3"
+- **Gate 1 (Telegram getMe):** PASS — @truthjblue_bot "REGGIE", ok:true. No 401-storm risk (March incident protocol honored).
+- **Gate 2 (alerts):** handler reads OPENCLAW_ALERT_TELEGRAM_CHAT_ID (was empty) — wired from TELEGRAM_ALERT_CHAT_ID (bak-alertwire-*). CLI device scope approved (oc-approve). Verified: escalation alert + direct send both delivered to CVO Telegram (msg 1599).
+- **Gate 3 (CVO decisions via AskUserQuestion):** live sends = **ENGINE delivers** (agent writes text only; marketing agent has zero skills — no ghl-api needed); autonomous writes = **email replies + breadcrumbs** (rtl-engaged tag + RTL Launch Day New Lead→Engaged on lead reply). Everything else stays workflow/human.
+- **Gate 4 (flip):** DRY_RUN=false in /etc/openclaw/.env (bak-golive-*), engine LIVE path deployed: `sendLiveEmailReply` (GHL /conversations/messages, Version 2021-04-15, curl UA), `applyReplyBreadcrumbs`, transcript roles reggie-sent / crm-breadcrumb, live-send failures alert the operator and log loud.
+- **Exit test:** two live rtl.inbound_message fires → real emails delivered (msg ids oNIJgCy3tdHKKgJLrc7C, rGHjDgSWVltFpa7NNaZe), tag + stage-advance verified, second breadcrumb correctly idempotent (stageAdvanced=false).
+- **Bug found+fixed in flight:** gateway --json sometimes wraps output as {runId,status,result:{payloads}} vs {payloads} — first live email carried raw JSON (CVO's own inbox only); safe-exec parser now accepts both envelopes; second send clean.
+- **Scope note:** live segment is de facto lead-magnet (C1/C5 tags); C2/C3 events would also go live but have zero traffic until checkout flow runs.
+- **Rollback:** restore /etc/openclaw/.env.bak-golive-* (DRY_RUN=true) + restart openclaw-webhook — one command, instant.
+
 ### Entry 2026-07-12-006 — FULL-SCOPE PLAN "today's sequence" EXECUTED: P1 template + P2 IBM pod + R1 verified already-live (APPLIED)
 - **Timestamp:** 2026-07-12T13:05:00-05:00
 - **Change Type:** repo docs + VPS workspace (biz_06_pod_lead) + Supabase blueprint correction
