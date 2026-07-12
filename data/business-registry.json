@@ -1005,7 +1005,7 @@
     "nurture_workflows": true,
     "billing_and_dunning": false,
     "onboarding_workflows": true,
-    "forms_surveys_quizzes": false,
+    "forms_surveys_quizzes": true,
     "review_request_workflow": true,
     "fulfillment_access_rules": true
    },
