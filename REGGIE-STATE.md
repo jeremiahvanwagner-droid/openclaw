@@ -152,6 +152,22 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-001 — RTL×GHL WORKFLOW QA SWEEP: all 5 workflows repaired via browser session (APPLIED)
+- **Timestamp:** 2026-07-12T03:50:00-05:00
+- **Change Type:** EXTERNAL PRODUCTION CONFIG (client CRM — Royal Results workflows, via CVO's Chrome session)
+- **Status:** APPLIED ✅ — every RTL workflow now structurally correct and saved
+- **Owner:** Claude Code (Fable 5) — CVO: "Double-check all five new workflows"
+- **Findings & fixes (all verified on canvas after save):**
+  - **C4 Day-7 Re-engage** (prior turn): webhook had no URL and body lacked type/locationId; customer-check sat BELOW the email (buyers would get re-engage email). Fixed: config + moved email+webhook into the None branch. Still Draft.
+  - **C5 Reply Router:** PUBLISHED with dead webhook (no URL, no type/locationId/message keys) AND trigger had 3 AND'ed Has-tag rows (fires only if a contact has ALL rtl tags = never). Fixed: split into 3 OR trigger cards, webhook configured with message={{message.body}}.
+  - **C2 Abandoned Checkout:** PUBLISHED; webhook URL contained the STRIPE PAYMENT LINK (contact JSON would POST to buy.stripe.com); logic fully inverted (abandoners ENDed, buyers got Email 2 + false rtl.checkout_abandoned webhook); Email 1 ungated. Fixed: URL/body corrected; Email1+Wait23h+SecondCheck subtree moved into still-in-checkout branch; Email2+webhook moved into still-in-checkout branch of second check. Structure now exactly per spec.
+  - **C3 Testimonial Ask:** PUBLISHED; trigger filter invalid (pipeline field empty); FOUR stray unconfigured webhook actions appended (3 deleted; 4th corrupted — GHL threw forEach/keyValueData errors — deleted and re-created fresh with type rtl.testimonial_asked). Trigger fixed: In pipeline=RTL Launch Day + Pipeline stage=Delivered.
+  - **C1 Instant Touch:** PUBLISHED; SMS branch contained an entire duplicated sub-tree (2nd phone-check If/Else + strays #3/#4/#5); TWO sends per branch (AI-slop 'Thank you for connecting with us!' SMS with NO STOP line vs the real runbook copy); both webhooks unconfigured (one corrupted, re-created). Trigger had 2 AND'ed tag rows (needed both tags). Fixed: strays/dupes deleted, real copy kept (SMS has STOP line; email verified), webhooks configured (type rtl.optin), trigger split into 2 OR cards.
+- **Publish-state note:** C1/C2/C3/C5 were published at 2026-07-12 02:41 (0 enrolled; broken webhooks meant REGGIE would never have heard events). Left AS-IS per CVO's apparent Part-3 start — but C2/C3 are beyond the runbook gate (first-clean-week). Server-side DRY_RUN still gates all REGGIE sends.
+- **Still CVO-only:** Authorization header on all 6 webhook actions (I do not enter tokens); rename test contact 'dry run'; A2P/quiet-hours check before real SMS traffic.
+- **Rollback:** each workflow is individually editable; no client workflows touched in this sweep.
+- **PR Link:** direct-to-main.
+
 ### Entry 2026-07-11-007 — RTL×GHL PART 2 DEPLOY: ingestion live in production + VPS deploy-path surgery (APPLIED)
 - **Timestamp:** 2026-07-11T17:55:00-05:00
 - **Change Type:** PRODUCTION DEPLOY (RTL app) + INFRA (Caddy, compose projects)
