@@ -152,6 +152,16 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-010 — TELEGRAM INBOUND REPAIRED: channels.telegram.enabled=true — REGGIE answers the CVO directly (DEPLOYED)
+- **Timestamp:** 2026-07-12T15:55:00-05:00
+- **Change Type:** PRODUCTION GATEWAY CONFIG (openclaw.json, bak-tgenable-*)
+- **Status:** DEPLOYED ✅ — inbound processed, REGGIE replied (msg 1605)
+- **Owner:** Claude Code (Fable 5) — CVO: "Diagnose and repair connection with Telegram @truthjblue_bot"
+- **Diagnosis:** outbound alerts worked, inbound dead. getWebhookInfo: no webhook hijack, but pending_update_count=4 (CVO's greeting + 3 /status queued at Telegram). Root cause: `channels.telegram.enabled: false` — disabled (March incident recovery era); the send path works without the channel, the polling ingress does not. Token verified via getMe TODAY (audit -007 gate) → enabling sanctioned per the March protocol. dmPolicy=allowlist with CVO's chat id already allowlisted.
+- **Fix:** enabled=true, gateway restart. Logs: provider started (@truthjblue_bot), polling ingress up (spool /opt/openclaw/.openclaw/telegram/ingress-spool-default), inbound 33-char greeting processed, outbound reply 1605 delivered ~20s later.
+- **Cost note:** each CVO Telegram DM = one main-agent turn (sonnet-5, auth-profiled) — CVO-initiated usage, allowlist keeps strangers out. This is now the CVO's direct line to REGGIE (morning-command channel candidate for H5).
+- **Rollback:** restore bak-tgenable-* + restart openclaw (outbound alerts unaffected).
+
 ### Entry 2026-07-12-009 — BRANDED SENDER LIVE: dedicated sending domain lc.readytolaunchmybusiness.com + hello@ From (DEPLOYED)
 - **Timestamp:** 2026-07-12T15:40:00-05:00
 - **Change Type:** DNS (CVO via GHL flow) + env + engine code (emailFrom support)
