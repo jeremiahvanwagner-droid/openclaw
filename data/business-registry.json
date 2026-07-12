@@ -931,6 +931,85 @@
    "owner_lane_map": {},
    "automation_blueprint": {},
    "rollout_wave": 0
+  },
+  {
+   "business_id": "biz_12_royal_results",
+   "pod_id": "pod_royal_results",
+   "business_name": "Royal Results",
+   "brand_name": "Ready to Launch My Business",
+   "legal_entity": "Royal Results (co-owned client)",
+   "domain": "readytolaunchmybusiness.com",
+   "status": "active",
+   "vertical": "digital_products",
+   "offer_model": "$497 one-time Ready-to-Launch Business Package (MVP-Cashflow): self-serve Stripe checkout, five deliverables delivered same day - most orders within the hour; REGGIE conversational lead engine (DRY_RUN)",
+   "ghl_scope_type": "dedicated_subaccount",
+   "ghl_location_selector": "RR",
+   "tenancy_inputs": {
+    "distinct_legal_entity": true,
+    "distinct_billing_stack": true,
+    "distinct_brand_domain": true,
+    "distinct_support_team": false,
+    "compliance_sensitive": false,
+    "distinct_fulfillment_model": true,
+    "incubator_shared_candidate": false,
+    "internal_operations_scope": false
+   },
+   "payment_provider": "stripe",
+   "calendar_model": "self_serve_primary_consult_secondary",
+   "pipeline_set": [
+    "new_lead",
+    "engaged",
+    "qualified",
+    "checkout_sent",
+    "purchased",
+    "delivered",
+    "testimonial_asked"
+   ],
+   "membership": {
+    "enabled": false,
+    "community": false,
+    "client_portal": true
+   },
+   "approval_policy": {
+    "human_review_required": [
+     "money",
+     "legal_compliance",
+     "destructive_actions",
+     "live_messaging_until_dry_run_lift"
+    ],
+    "autonomous_domains": [
+     "crm_updates",
+     "lead_capture",
+     "scheduling",
+     "draft_messaging"
+    ]
+   },
+   "kpi_targets": {
+    "automation_target_rate": 0.9,
+    "first_response_seconds": 60,
+    "delivery_within_minutes": 60
+   },
+   "owner_pod": "pod_growth_by_choice",
+   "owner_lane_map": {
+    "sales_conversations": "marketing"
+   },
+   "automation_blueprint": {
+    "calendars": true,
+    "pipelines": true,
+    "custom_values": true,
+    "snapshot_pack": false,
+    "exception_rules": true,
+    "support_routing": false,
+    "no_show_recovery": false,
+    "dashboard_widgets": false,
+    "nurture_workflows": true,
+    "billing_and_dunning": false,
+    "onboarding_workflows": true,
+    "forms_surveys_quizzes": false,
+    "review_request_workflow": true,
+    "fulfillment_access_rules": true
+   },
+   "rollout_wave": 0
   }
  ]
 }
