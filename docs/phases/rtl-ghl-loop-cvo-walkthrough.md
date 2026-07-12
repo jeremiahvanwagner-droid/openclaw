@@ -120,8 +120,16 @@ Start your build: https://readytolaunchmybusiness.com/pricing
 
 ---
 
-## PART 2 — Merge + deploy ingestion (~15 min)
-RTL production runs on the same VPS (`/root/mvp-generation-engine`, prod compose stack, API at api-mvp.truthjblue.dev).
+## PART 2 — Merge + deploy ingestion — ✅ COMPLETE 2026-07-11 (audit 2026-07-11-007)
+> Executed with corrections. Original draft had three errors, all fixed live: the deploy directory is **`/root/ready-to-launch-my-business`** (NOT `/root/mvp-generation-engine` — that was a v2 relic with a dead-remote clone, now retired via `compose down`); prod services are **`backend worker`** (no `frontend`); Caddy `api-mvp` now proxies **127.0.0.1:8001** (v3's port). Verified: `POST /lead-magnet` → `{"ok":true,"emailed":true,"crm":true}`; GHL shows tag + `RTL Launch Day → New Lead` + utm_source=test.
+>
+> **Canonical redeploy command from now on:**
+> ```bash
+> ssh root@srv1619751.hstgr.cloud
+> cd /root/ready-to-launch-my-business && git pull && docker compose -f docker-compose.prod.yml up -d --build backend worker
+> ```
+
+<details><summary>Original (superseded) steps — kept for the record</summary>
 
 - [ ] **Merge** (or PR first if you want the diff view):
 ```powershell
@@ -146,6 +154,8 @@ curl -s -X POST https://api-mvp.truthjblue.dev/lead-magnet -H 'Content-Type: app
 ```
 Expect `{"ok":true,"emailed":true,"crm":true}` — then confirm in GHL: contact exists · tag `rtl-starter-guide` · `RTL Launch Day → New Lead` · UTM Source = test.
 ⚠️ Note: once deployed, the landing page captures **real** leads into the CRM (that's the point) — but nothing messages them until workflows publish.
+
+</details>
 
 ## PART 3 — DRY_RUN rehearsal (~15 min, with me)
 1. Publish **C1 + C5 only** (the lead-magnet segment). GHL's static touches in C1 go live for real opt-ins — the copy is compliant and that's the funnel working. **REGGIE's replies stay locked server-side** (DRY_RUN=true).

@@ -152,6 +152,18 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-11-007 — RTL×GHL PART 2 DEPLOY: ingestion live in production + VPS deploy-path surgery (APPLIED)
+- **Timestamp:** 2026-07-11T17:55:00-05:00
+- **Change Type:** PRODUCTION DEPLOY (RTL app) + INFRA (Caddy, compose projects)
+- **Status:** APPLIED ✅ — verified end-to-end
+- **Owner:** Claude Code (Fable 5) — CVO was executing the walkthrough Part 2 and hit failures; root causes found and fixed live.
+- **Root causes:** (1) TWO clones of the RTL app on the VPS — `/root/mvp-generation-engine` (v2 relic, origin still `mvp-generation-engine.git`, its stale backend held Caddy's target port 8000) and `/root/ready-to-launch-my-business` (real production, up 43h, pre-ingestion, no RR env). `git pull` in the relic said "Already up to date" against the dead remote. (2) Walkthrough's deploy block named a nonexistent `frontend` service (dev-compose names) — `docker compose up` aborts ALL services on one unknown name. (3) Caddy `api-mvp` pointed at 8000 (v2); v3 binds 127.0.0.1:8001 by design.
+- **Actions:** old project `docker compose down` (retired; directory kept as archive) · live clone pulled to `22471d3` (ingestion I1–I5) · RR env pair added to its `.env` (backup `.env.bak-ghl-*`; a duplicate token line traced to a duplicate in the workstation `.env` — deduped BOTH, backups kept) · backend+worker rebuilt · Caddyfile `api-mvp` 8000→8001 (backup `Caddyfile.bak-rtl8001-*`, `caddy validate`, reload).
+- **Verified:** `POST https://api-mvp.truthjblue.dev/lead-magnet` → `{"ok":true,"emailed":true,"crm":true}`; GHL contact `CxGi4pXB2MutOVZNkR0X` carries tag `rtl-starter-guide`, utm_source=test, opportunity "RTL - Dry Run" in `RTL Launch Day → New Lead`. Observed: GHL upsert dedupes by email/phone — CVO's own pre-existing contact absorbed the test (renamed "dry run"; client-pipeline opportunity untouched).
+- **Doctrine note:** the two-clone drift was a live P2-class orphan (deployed reality ≠ repo). Discharged by retiring the relic. **Canonical RTL deploy path from now on: `/root/ready-to-launch-my-business`, services `backend worker`, API on 127.0.0.1:8001.**
+- **Rollback:** Caddyfile backup (one cp + reload); compose `down` in the live clone + restore old project (documented, unattractive — old state was broken).
+- **PR Link:** direct-to-main (walkthrough doc correction in same commit).
+
 ### Entry 2026-07-11-006 — RTL×GHL PHASE C: RTL engine deployed, webhook service LIVE in DRY_RUN (APPLIED)
 - **Timestamp:** 2026-07-11T14:20:00-05:00
 - **Change Type:** CODE + CONFIG + SERVICE (VPS production)
