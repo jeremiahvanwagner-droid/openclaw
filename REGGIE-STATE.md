@@ -152,6 +152,17 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-004 — BUSINESS SCOPE MAP: registry reconciled to dashboard truth + Royal Results pod created (APPLIED)
+- **Timestamp:** 2026-07-12T12:15:00-05:00
+- **Change Type:** DATA PLANE (Supabase DB1 `business_registry`) + repo/VPS registry mirrors
+- **Status:** APPLIED ✅ — all three copies agree (12 businesses)
+- **Owner:** Claude Code (Fable 5) — CVO: "expectation that [dashboard] matches the build"; AskUserQuestion: keep both cards, owner pod_growth_by_choice
+- **Findings:** the dashboard reads Supabase `business_registry` (via `dashboard/app/api/portfolio`), NOT the JSON files. Repo JSON had stale waves on 9/10 businesses; VPS JSON had NO waves. `pod_mvp_cashflow` (biz_11, Wave 0 shell, owner `pod_growth_by_choice`, domain mvp.ebook.university) existed ONLY in Supabase.
+- **Changes:** repo+VPS JSON synced to Supabase waves (commit 52b1ba1, VPS bak-wavesync-*); new Supabase row **biz_12_royal_results / pod_royal_results, Wave 0, dedicated_subaccount, selector RR** configured to v3 reality (blueprint 8/14 true; forms/snapshot/dunning/no-show/support-routing/widgets false; KPIs 90%/60s/60min; DRY_RUN gate encoded in approval_policy), mirrored to repo+VPS (commit 0d2e55c).
+- **Schema notes:** `ghl_scope_type` CHECK allows only dedicated_subaccount|shared_subaccount|shared_incubator_subaccount|internal_operations_subaccount; `legal_entity` NOT NULL.
+- **Open:** `pod_growth_by_choice` agent does not exist on the gateway (owner of biz_11+biz_12) — creation pending, dark until CVO lights it.
+- **Rollback:** `DELETE FROM business_registry WHERE business_id='biz_12_royal_results';` + git revert 0d2e55c 52b1ba1 + restore VPS bak-wavesync-*.
+
 ### Entry 2026-07-12-003 — RTL AGENT TURN REPAIRED + ANTHROPIC RESTORED (CVO-approved): REGGIE's first draft landed (DEPLOYED)
 - **Timestamp:** 2026-07-12T11:10:00-05:00
 - **Change Type:** PRODUCTION PLATFORM CONFIG + CODE (VPS gateway config, systemd drop-in, env file, handler libs)
