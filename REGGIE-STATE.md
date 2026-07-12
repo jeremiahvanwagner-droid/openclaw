@@ -152,6 +152,21 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-002 — RTL LEAD MAGNET: Starter Guide PDF re-skinned + attached to opt-in email (DEPLOYED)
+- **Timestamp:** 2026-07-12T09:45:00-05:00
+- **Change Type:** PRODUCTION CODE DEPLOY (RTL repo `ready-to-launch-my-business`, VPS backend+worker rebuild)
+- **Status:** DEPLOYED ✅ — verified live
+- **Owner:** Claude Code (Fable 5) — CVO: "Design and Develop the free Ready to Launch Starter Guide PDF and attach it to the email"
+- **Why:** the /lead-magnet email linked `readytolaunchmybusiness.com/ready-to-launch-starter-guide.pdf`, which **404s in production** (PDF was never in frontend/public). Every opt-in to date received a dead download link.
+- **What shipped (commit c985fcb, prev 22471d3):**
+  - `docs/ready-to-launch-starter-guide.html` re-skinned to the Launchpad Navy / Velocity Orange brand system per `docs/brand-guidelines.md` (full-bleed navy cover + Launch Box mark, Plus Jakarta Sans/Inter/Lora, Blueprint Gray callouts, mint checklist, navy CTA cards); rendered via headless Chrome → 9-page, 475KB PDF. Content unchanged (already compliance-clean: builder voice, no income claims, exact same-day promise wording).
+  - PDF now **attached** to the opt-in email (Resend base64 attachment, cached per process, fail-soft if asset missing); email copy rewritten (branded, compliant, orange CTA to /pricing).
+  - New `GET /starter-guide.pdf` on the API serves a hosted copy; email fallback link points there via `settings.api_base_url` (= `https://api.readytolaunchmybusiness.com`, Caddy → :8001, verified routing).
+  - PDF also shipped in `frontend/public/` so the original pretty URL heals on the next frontend deploy.
+- **Tests:** backend suite 192 passed (was 190; +attachment passthrough, +route test; endpoint test extended).
+- **Verification:** `GET https://api.readytolaunchmybusiness.com/starter-guide.pdf` → 200, 475,102 bytes, `%PDF` magic. Attachment path exercised by test; live E2E lands with the Part 3 rehearsal opt-in.
+- **Rollback:** `cd /root/ready-to-launch-my-business && git checkout 22471d3 && docker compose -f docker-compose.prod.yml up -d --build backend worker` (no .env changes in this deploy).
+
 ### Entry 2026-07-12-001 — RTL×GHL WORKFLOW QA SWEEP: all 5 workflows repaired via browser session (APPLIED)
 - **Timestamp:** 2026-07-12T03:50:00-05:00
 - **Change Type:** EXTERNAL PRODUCTION CONFIG (client CRM — Royal Results workflows, via CVO's Chrome session)
