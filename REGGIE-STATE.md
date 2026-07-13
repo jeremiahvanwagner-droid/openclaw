@@ -152,6 +152,18 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-13-001 — GHL PIT reconciliation: TJB + RR tokens in live env repaired (DEPLOYED)
+- **Timestamp:** 2026-07-13T23:13:00-05:00
+- **Change Type:** PRODUCTION SECRETS (`/etc/openclaw/.env`; bak-tjbpit-20260713T230749 + bak-rrpit-20260713T231247)
+- **Status:** DEPLOYED ✅ — both tenants verify 200 from the live file; `openclaw-webhook` active.
+- **Owner:** Claude Code (Opus 4.8) — CVO: "go".
+- **Why:** CVO rotated the GHL PITs and updated several env files, but `/etc/openclaw/.env` — the systemd `EnvironmentFile` the `openclaw-webhook` service actually reads — never received the working values. TJB was 401 (blocked all AAMA/TJB GHL); RR was 401 (REGGIE's live RTL conversational replies broken, though the RTL Python backend's own env held a valid RR token = 200).
+- **Root causes:** (1) wrong file — edits went to `/root/openclaw/.env` (repo working copy), `/root/.env`, and app envs, not the live `/etc/openclaw/.env`; (2) Windows CRLF — the TJB token in those files was 41 chars (trailing `\r`) → GHL 401; stripped to 40 → 200.
+- **Fix (tokens never printed; on-box file→file):** TJB pulled from `/root/openclaw/.env` (cleaned to [A-Za-z0-9-]=40) → wrote `GHL_PRIVATE_INTEGRATION_TOKEN_TJB` + base; RR pulled from `/root/ready-to-launch-my-business/.env` (200-verified pre-write) → wrote `GHL_PRIVATE_INTEGRATION_TOKEN_RR`; `systemctl restart openclaw-webhook`.
+- **Verified:** GET /locations/TW8JsPW5NMnA3tfK2XLn → 200; GET /locations/0PFDiGrgne4sbE4dJEC6 → 200; service active. MSL/IBM not wired in this env (expected). BASE = TJB token.
+- **Follow-ups (same session, done):** Vercel AAMA LMS `GHL_PRIVATE_INTEGRATION_TOKEN` + redeploy — CVO confirmed redeployed. Stale copies `/root/openclaw/.env`, `/root/.env`, `/root/mvp-generation-engine/.env` (each carried a whitespace/CRLF-corrupted 41-char TJB token; RR was clean) scrubbed + rewritten to valid 40-char tokens, verified 200 (backups `*.bak-clean-20260713T232102`).
+- **Rollback:** restore `/etc/openclaw/.env.bak-rrpit-20260713T231247` (and/or `bak-tjbpit-20260713T230749`) + `systemctl restart openclaw-webhook`.
+
 ### Entry 2026-07-12-017 — AAMA LMS DEPLOYED LIVE (text-first launch + eBook homepage now on production)
 - **Timestamp:** 2026-07-12T19:45:00-05:00
 - **Change Type:** PRODUCTION DEPLOY (Vercel) — CVO-authorized ("run it").
