@@ -60,6 +60,12 @@ tasks/*.sqlite-wal
 /npm/
 tui/
 
+# ── Flows registry + migration artifacts (per-machine runtime) ──
+flows/registry.sqlite
+flows/registry.sqlite-shm
+flows/registry.sqlite-wal
+*.migrated
+
 # ── Cron Run History ──────────────────────────────────────────
 cron/
 telegram/
