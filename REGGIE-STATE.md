@@ -152,6 +152,24 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-017 — AAMA LMS DEPLOYED LIVE (text-first launch + eBook homepage now on production)
+- **Timestamp:** 2026-07-12T19:45:00-05:00
+- **Change Type:** PRODUCTION DEPLOY (Vercel) — CVO-authorized ("run it").
+- **Owner:** Claude Code (Opus 4.8). Vercel CLI updated 54.14.0 → 55.0.0, then `vercel deploy --prod --scope truth-j-blues-projects --yes` from `apps/web`.
+- **Result:** deployment `dpl_8MQdgkHadEFYx52iar1gNKRR84iC`, readyState READY, target production, **aliased to ai.agenticmastery.academy**. Build 34s, zero errors (prod build is stricter than dev — all routes compiled). Commit 8468ff2 now live.
+- **Live-verified:** `/` = eBook front door (200), `/course` = $297 course (200), `/preview/m1l1` = free lesson (200), `/blueprint` → 307 → `/`. Everything from this session (preview route, softened video copy, slide fix, eBook front door + optional $27 bump, $297 upsell on `/checkout/success`) is now live.
+- **STILL PENDING (config, not code) before driving traffic:** Supabase SMTP paste (buyer login/invite emails), fresh GHL PIT (buyer→GHL nurture/drip is dead), admin account, Mailgun key rotation. **Stripe is LIVE → real charges.**
+- **Rollback:** Vercel dashboard → Deployments → Instant Rollback to `dpl_7up3grjjwmQrHagSaNktSQzX8yQL` (prev prod, commit 8f43379).
+
+### Entry 2026-07-12-016 — AAMA LMS: eBook promoted to homepage + deploy mechanics discovered (CODE pushed, NOT deployed)
+- **Timestamp:** 2026-07-12T19:20:00-05:00
+- **Change Type:** LMS APP CODE (pushed to GitHub `main` = 8468ff2) + `.openclaw` gitignore (b83a7af). **Neither deployed to prod.**
+- **Owner:** Claude Code (Opus 4.8) — CVO: "gitignore the registry files" + "implement the next block" (read as: make the eBook the homepage).
+- **Homepage swap:** eBook front door moved `/blueprint` → `/` (homepage); `$297` course sales page → `/course`; `/blueprint` → 307 redirect to `/`; nav adds "Full Course" (`/course`) + "Get the Blueprint" (`/#get`). Dev-verified: `/` (eBook) 200, `/course` 200, `/blueprint` 307→/, `/preview/m1l1` 200, zero errors.
+- **.openclaw cleanup:** gitignored `flows/registry.sqlite*` + `*.migrated`, `git rm --cached` the registry sqlite files (commit b83a7af). Working tree now clean.
+- **DEPLOY TRUTH (corrects a CVO assumption):** the LMS Vercel project `agentic-mastery-academy` does **NOT auto-deploy on git push**. Prod alias is pinned to `dpl_7up3grjjwmQrHagSaNktSQzX8yQL` = commit `8f43379` (pre-2026-07-12). ALL my commits (9de4c45 launch-prep+eBook, 8468ff2 homepage swap) are on GitHub but **NOT live**. Ship via `vercel deploy --prod --scope truth-j-blues-projects` (CLI) — outward-facing, awaiting CVO go. Vercel IDs: projectId `prj_Wn5Yk7tNJGdiavSs6SXWjEcTIHpx`, teamId `team_kx8EiJUtqB3O5xFQwWtLWLK6`.
+- **Rollback:** revert 8468ff2 (course back to `/`, eBook back to `/blueprint`). Nothing deployed.
+
 ### Entry 2026-07-12-015 — AAMA LMS: eBook self-liquidating front door built (CODE; working tree only, dev-verified)
 - **Timestamp:** 2026-07-12T18:40:00-05:00
 - **Change Type:** LMS APP CODE (`ai-agentic-mastery-academy` working tree — not committed/deployed).
