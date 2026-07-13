@@ -152,6 +152,38 @@ All sub-agents held in standby until local model routing is confirmed operationa
 
 ## 📜 AUDIT LOG (Append-Only)
 
+### Entry 2026-07-12-015 — AAMA LMS: eBook self-liquidating front door built (CODE; working tree only, dev-verified)
+- **Timestamp:** 2026-07-12T18:40:00-05:00
+- **Change Type:** LMS APP CODE (`ai-agentic-mastery-academy` working tree — not committed/deployed).
+- **Owner:** Claude Code (Opus 4.8) — CVO chose the "eBook as the lead-magnet front door" block.
+- **Built (all dev-verified 200, zero compile errors):** NEW `app/(public)/blueprint/page.tsx` (eBook front-door landing — $9.95, value stack $148→$9.95, 7 chapters, who-it's-for, 30-day guarantee); NEW `components/course/ebook-offer.tsx` (optional **+$27 Prompt Vault order bump** checkbox → `/api/checkout` `ebook`[+`prompt_vault`]); rebuilt `app/checkout/success/page.tsx` into a **product-aware post-purchase page** — eBook buyers get a one-time **$297 upsell** + **$67 Lite downsell** + decline→dashboard; all other buyers get the standard confirmation. Kept `/` (the $297 course page) intact (additive/reversible).
+- **Funnel now:** ads → `/blueprint` ($9.95 [+$27 bump]) → success upsell $297 (or $67 Lite) → buyer invited + `aama-ebook` GHL tag → nurture. ⚠️ ascension nurture + the module drip still depend on the GHL token (**dead — see -014**); until it's replaced in Vercel + REGGIE, GHL-side nurture no-ops (the Stripe checkout + account + downloads all work regardless).
+- **Structural note for CVO:** `/blueprint` is a standalone tripwire LP for paid traffic; `/` still leads with the $297 course. CVO decides whether to point ads at `/blueprint` and/or promote it to the homepage.
+- **Rollback:** delete `app/(public)/blueprint/` + `components/course/ebook-offer.tsx`; `git checkout app/checkout/success/page.tsx`. Nothing deployed.
+
+### Entry 2026-07-12-014 — AAMA LMS: text-first launch prep (CODE in ai-agentic-mastery-academy repo; working tree only, NOT deployed)
+- **Timestamp:** 2026-07-12T18:05:00-05:00
+- **Change Type:** LMS APP CODE — `C:\Users\JeremiahVanWagner\ai-agentic-mastery-academy` (GitHub `jeremiahvanwagner-droid/ai-agentic-mastery-academy`). Working tree only — **not committed, not deployed** (Vercel deploys from CLI upload → live only when CVO runs `vercel deploy --prod`).
+- **Owner:** Claude Code (Opus 4.8) — CVO redirect mid-Phase-A: "the eBook is the lead magnet; complete the build of the LMS; DFY upsells $999 + $497setup/$197mo; I updated the pit tokens."
+- **Discovery:** AAMA's real fulfillment system is a **Next.js 15 + Supabase + Stripe(live) + Mux + GHL** monorepo — **code-complete** per its `LAUNCH_CHECKLIST.md`. Not GHL-hosted; GHL is only marketing/drip + buyer-sync. DB seed **verified healthy**: 1 published course, 25 lessons all with full script + 8 slides + objectives, 122 quizzes, 20-Q exam, 13 downloads. **The course is deliverable as a read-along today** (lesson page degrades gracefully to objectives+script+slides+quiz when no video).
+- **CVO decisions captured:** text-first launch (video rolling out later); eBook = lead-magnet front door (currently a bottom-page downsell — restructure later); backend rungs = **DFY $999** and **DFY+Management $497 setup + $197/mo**.
+- **Changes (4 files, dev-verified):** NEW public `app/(public)/preview/[lessonSlug]/page.tsx` (RLS-safe; `/preview/m1l1` → 200 with real data); "Free Lesson" nav link; **bug fix** in the lesson page slide render (`slide.beat`→`slide.title`, seeded data uses `title` so headers were blank); softened 3 sales-page video claims ("full video training"→"written lesson guides, slides"; "25 video lessons"→"25 lessons (video rolling out)"; FAQ "hour of video"→"hour of material"). Verified: Next 15 dev booted, preview route 200, new homepage copy present, old strings gone.
+- **PIT re-confirmed DEAD:** `/etc/openclaw/.env` TJB token unchanged + still 401 (CVO's update did NOT land there; workstation `.openclaw/.env` has no TJB token). The LMS buyer→GHL sync uses Vercel `GHL_PRIVATE_INTEGRATION_TOKEN` — likely the same dead token → **the 6-week drip (GHL-owned) silently no-ops until replaced in BOTH Vercel + REGGIE env.**
+- **Deliverable:** `docs/LAUNCH-READY-STATUS-2026-07-12.md` (in the LMS repo).
+- **Rollback:** `git checkout` the 3 edited files + delete the new preview route dir. Nothing deployed.
+
+### Entry 2026-07-12-013 — TJB × AAMA Phase A audit (READ-ONLY; P0 confirmed; deliverable shipped)
+- **Timestamp:** 2026-07-12T17:10:00-05:00
+- **Change Type:** NONE (read-only audit) — no secrets, config, or production state touched. Mission: `HANDOFF-TJB-AAMA-20260712.md`, Phase A.
+- **Owner:** Claude Code (Opus 4.8) — CVO: "Read the handoff fully and execute it. Start with Phase A."
+- **Deliverable:** `docs/phases/tjb-aama-phase-A-audit.md`.
+- **P0 CONFIRMED LIVE:** `GHL_PRIVATE_INTEGRATION_TOKEN_TJB` in `/etc/openclaw/.env` = 40 chars (correct format, NOT a double-paste), loc `TW8JsPW5NMnA3tfK2XLn`, `GET /locations/{id}` → **HTTP 401** (server-side revoked). Verified via masked SSH probe (printed only token_len + http code, never the value). `/opt/openclaw/.env` does not exist → `/etc/openclaw/.env` is the sole update target for the webhook service. TJB inventory + product reconciliation BLOCKED until CVO issues a fresh PIT.
+- **AAMA reality (in-browser, live):** custom **Next.js 14 / Vercel** app (route groups `(public)` + `(student)`), NOT Kajabi/GHL. Enroll → **hosted Stripe Checkout `cs_live_…`** under the shared **"Truth j Blue"** Stripe account. **No GHL touch.** Offer: $297 (compare $997) + **$9.95 eBook presented as a DOWNSELL, not an order-bump** → self-liquidating front door must be *built*. Fulfillment completeness (25 lessons/videos) UNVERIFIED behind `/login`; CVO says course incomplete.
+- **IBM HUB classified:** Next.js name-your-price **donation-gated content-bundle portal** (`/auth`, `/bundles/[series]`, `/donate`), subdomain of the 501(c)(3); compliance-sensitive traffic, not a commercial funnel.
+- **Scope Map:** AAMA absent from `business-registry.json` — proposed `biz_13` entry (owner `pod_growth_by_choice`, TJB tenant); NOT written (registry CI guardrail + needs TJB inventory first).
+- **Next (gated on CVO):** issue fresh TJB PIT (scopes = RR set, §7 of the doc) → I update env masked (bak + verify 200) → run TJB inventory → finalize reconciliation. CVO also answers 3 Open Decisions (front-door shape / fulfillment truth / next rung).
+- **Rollback:** n/a (no change made).
+
 ### Entry 2026-07-12-011 — R4 TOKEN ROTATION: gateway/webhook auth token rotated (server side APPLIED; GHL headers = CVO in progress)
 - **Timestamp:** 2026-07-12T16:15:00-05:00
 - **Change Type:** PRODUCTION SECRETS (/etc/openclaw/.env, bak-rotate-*)
