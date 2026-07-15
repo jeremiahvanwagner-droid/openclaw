@@ -78,8 +78,15 @@ describe('resolveFbAccountId', () => {
   it('handles the {accounts:[...]} envelope', () => {
     expect(resolveFbAccountId({ accounts: [{ platform: 'facebook', _id: 'FB2' }] })).toBe('FB2');
   });
-  it('returns null when no facebook account is connected', () => {
+  it('handles the live GHL envelope {results:{accounts:[...]}}', () => {
+    expect(resolveFbAccountId({
+      success: true, statusCode: 200,
+      results: { accounts: [{ platform: 'facebook', id: 'FB3' }], groups: [] },
+    })).toBe('FB3');
+  });
+  it('returns null when no facebook account is connected (incl. empty live envelope)', () => {
     expect(resolveFbAccountId([{ platform: 'instagram', id: 'IG1' }])).toBeNull();
     expect(resolveFbAccountId({})).toBeNull();
+    expect(resolveFbAccountId({ results: { accounts: [], groups: [] } })).toBeNull();
   });
 });

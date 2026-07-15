@@ -75,9 +75,14 @@ export function buildCreatePostBody(item, accountIds, { status = POST_STATUS, me
 }
 
 export function resolveFbAccountId(accountsResponse) {
-  const accts = Array.isArray(accountsResponse)
-    ? accountsResponse
-    : accountsResponse?.accounts || accountsResponse?.results || [];
+  // GHL wraps the list: { results: { accounts: [...], groups: [...] } }
+  // (verified against the live RR endpoint 2026-07-15); older shapes kept as fallbacks.
+  const r = accountsResponse;
+  const accts = Array.isArray(r) ? r
+    : Array.isArray(r?.accounts) ? r.accounts
+    : Array.isArray(r?.results?.accounts) ? r.results.accounts
+    : Array.isArray(r?.results) ? r.results
+    : [];
   const fb = accts.find(a => /facebook/i.test(a.platform || a.type || a.provider || ''));
   return fb ? (fb.id || fb._id || fb.accountId || null) : null;
 }
