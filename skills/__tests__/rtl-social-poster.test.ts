@@ -49,21 +49,23 @@ describe('mediaFor', () => {
 
 describe('buildCreatePostBody', () => {
   const item = { n: 1, date: '2026-07-20', time: '11:00 AM', caption: 'hi', graphic: 'a/post-01.png', carousel: false };
-  it('maps to a Social Planner body: accountIds, summary, draft status, ISO schedule, rtl tag', () => {
-    const b = buildCreatePostBody(item, ['ACC1'], { status: 'draft', mediaBase: '' });
+  it('maps to a Social Planner body: accountIds, summary, draft status, ISO schedule, userId', () => {
+    const b = buildCreatePostBody(item, ['ACC1'], { status: 'draft', mediaBase: '', userId: 'USR1' });
     expect(b).toMatchObject({
       accountIds: ['ACC1'],
       summary: 'hi',
       status: 'draft',
       scheduleDate: '2026-07-20T16:00:00.000Z',
       type: 'post',
-      tags: ['rtl-fb-60day'],
+      userId: 'USR1',
     });
+    expect(b.tags).toBeUndefined(); // live 422: tags need Tag ObjectIds — dropped
     expect(b.media).toBeUndefined(); // no media base -> no image
   });
-  it('attaches media when a media base is set', () => {
+  it('omits userId when not provided (dry-run path) and attaches media when a base is set', () => {
     const b = buildCreatePostBody(item, ['ACC1'], { status: 'scheduled', mediaBase: 'https://x/s' });
     expect(b.status).toBe('scheduled');
+    expect(b.userId).toBeUndefined();
     expect(b.media).toEqual([{ url: 'https://x/s/post-01.png', type: 'image/png' }]);
   });
 });

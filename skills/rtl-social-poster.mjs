@@ -29,7 +29,8 @@ export const SOCIAL_DRY_RUN = (process.env.RTL_SOCIAL_DRY_RUN || 'true').toLower
 const POST_STATUS = process.env.RTL_SOCIAL_STATUS || 'draft';       // draft | scheduled
 const MEDIA_BASE = process.env.RTL_SOCIAL_MEDIA_BASE || '';         // e.g. https://readytolaunchmybusiness.com/social
 const UA = 'curl/8.9.1';                                           // GHL Cloudflare blocks some default UAs (1010)
-const RTL_TAG = 'rtl-fb-60day';
+// Post owner (GHL user id) — required by createPost. Default: Jeremiah's RR user.
+const SOCIAL_USER_ID = process.env.RTL_SOCIAL_USER_ID || '';
 const DEFAULT_PLAN = path.join(__dirname, '..', 'data', 'rtl', 'fb-posting-plan.json');
 // The Jul 20 – Sep 16, 2026 window is entirely US Central Daylight Time (UTC-5).
 const CT_OFFSET = '-05:00';
@@ -60,15 +61,18 @@ export function mediaFor(item, mediaBase = MEDIA_BASE) {
   return [{ url: `${mediaBase.replace(/\/$/, '')}/${file}`, type: 'image/png' }];
 }
 
-export function buildCreatePostBody(item, accountIds, { status = POST_STATUS, mediaBase = MEDIA_BASE } = {}) {
+export function buildCreatePostBody(item, accountIds, { status = POST_STATUS, mediaBase = MEDIA_BASE, userId } = {}) {
+  // Live 422 lessons (2026-07-15): `tags` requires Tag ObjectIds (a separate
+  // social-planner tags API) — dropped, not worth the round-trip; `userId`
+  // (the owning GHL user) is REQUIRED.
   const body = {
     accountIds,
     summary: item.caption,
     status,
     scheduleDate: toScheduleISO(item.date, item.time),
     type: 'post',
-    tags: [RTL_TAG],
   };
+  if (userId) body.userId = userId;
   const media = mediaFor(item, mediaBase);
   if (media.length) body.media = media;
   return body;
@@ -128,10 +132,17 @@ export async function schedulePlan(plan, { dryRun = SOCIAL_DRY_RUN, status = POS
       note: 'Connect the FB Page to RR Social Planner (F0-B) and ensure the RR PIT holds socialplanner scopes.',
     };
   }
+  if (!dryRun && !SOCIAL_USER_ID) {
+    return {
+      ok: false,
+      reason: 'missing-user-id',
+      note: 'createPost requires an owning GHL user — set RTL_SOCIAL_USER_ID (Jeremiah\'s RR user).',
+    };
+  }
 
   const results = [];
   for (const item of items) {
-    const body = buildCreatePostBody(item, [effectiveId], { status, mediaBase });
+    const body = buildCreatePostBody(item, [effectiveId], { status, mediaBase, userId: SOCIAL_USER_ID });
     if (dryRun) {
       results.push({ n: item.n, dryRun: true, scheduleDate: body.scheduleDate, hasMedia: Boolean(body.media) });
       continue;
