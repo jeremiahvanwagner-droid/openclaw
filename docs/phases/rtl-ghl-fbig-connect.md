@@ -109,23 +109,16 @@ touch existing client workflows, and keep any new workflow **DRAFT** until F3 si
 - **Not yet deployed to the VPS** — safe to deploy anytime (email-identical, DRY_RUN default);
   ships with the F2/F3 rollout.
 
-## F2 — GHL inbound workflow (YOU · GHL UI · keep DRAFT)
+## F2 — GHL inbound workflow (YOU · GHL UI · keep DRAFT) — ✅ SPEC READY
 
-Goal: when a lead DMs the Page/IG, GHL fires a Custom Webhook to REGGIE carrying the channel.
-**Fastest path: duplicate the existing RTL inbound-message workflow** (the one that already
-posts `rtl.inbound_message` for email) twice — once per channel:
-
-1. Royal Results GHL → Automation → Workflows → duplicate the RTL inbound workflow → name it
-   **"RTL Inbound — Facebook (DRAFT)"**.
-2. **Trigger:** *Customer Replied* → filter **Reply Channel = Facebook** (add the trigger if the
-   duplicate lost it). Repeat in a second copy with **Reply Channel = Instagram**.
-3. **Action:** the existing **Custom Webhook** (POST, Bearer auth) to the same REGGIE endpoint the
-   email workflow uses (`webhook.truthjblue.dev`, existing Authorization header). Add/confirm the
-   payload fields:
-   - `type` = `rtl.inbound_message`  *(reuse — keeps breadcrumbs + inbound handling)*
-   - `channel` = `FB`  *(hardcode; `IG` in the Instagram copy — the engine reads this first)*
-   - `locationId` = `{{location.id}}`  ·  `contactId` = `{{contact.id}}`  ·  `message` = `{{message.body}}`
-4. **Leave both workflows DRAFT.** Do not publish until F3.
+Full build sheet: **[rtl-fbig-F2-workflow-spec.md](rtl-fbig-F2-workflow-spec.md)**. In short — it's a
+channel-scoped clone of the live **C5 "RTL — Reply Router"**, with two non-obvious safety steps:
+- **Step 0:** confirm the RTL page is the *only* FB page on RR (else REGGIE would answer the client's DMs).
+- **Step 1 (guard C5):** add `Reply Channel = Email` to the existing C5 — today it fires on *any*
+  channel, so an FB reply from a tagged lead would misroute to an **email** send.
+- **Step 2:** new `RTL — Reply Router · Facebook` — trigger *Customer Replied* / Reply Channel = Facebook
+  (no tag filter — the dedicated page *is* the scope), one Custom Webhook stamping
+  `type=rtl.inbound_message`, **`channel=FB`**, `contactId`, `message`. DRAFT until F3. IG clones later.
 
 > Comments (FB/IG comment replies) are a *separate* GHL mechanism from Conversations DMs — out of
 > scope for F2/F3, which cover DMs. Comment auto-reply is a clean follow-on once DMs are proven.
