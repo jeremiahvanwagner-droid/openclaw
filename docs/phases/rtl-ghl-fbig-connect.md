@@ -162,13 +162,15 @@ Preview it anytime (offline): `node skills/rtl-social-poster.mjs 10`
 
 ## F4b — Media hosting (so scheduled posts carry the image)
 
-Social Planner needs a **public URL** per image. Simplest: host the graphics on the RTL
-Vercel frontend.
-1. Copy `marketing/facebook/assets/posts/*.png` (RTL repo) → `frontend/public/social/` → deploy.
-   They resolve at `https://readytolaunchmybusiness.com/social/<file>.png`.
+Social Planner needs a **public URL** per image. Hosted on the RTL Vercel frontend.
+1. ✅ **Staged** — the 43 post images (+ 20 carousel slides) are committed to
+   `frontend/public/social/` in the RTL repo (commit `63d1010`). All 40 single-image posts'
+   plan basenames resolve to a hosted file. **Remaining: deploy the frontend** (Vercel auto-deploys
+   from the RTL repo main branch) → they resolve at `https://readytolaunchmybusiness.com/social/<file>.png`.
 2. Set `RTL_SOCIAL_MEDIA_BASE=https://readytolaunchmybusiness.com/social` in the RTL/openclaw env.
    The poster then attaches each post's image automatically by filename.
-3. Carousels (posts 3, 22, 41) need multi-slide handling — a small follow-on (F4c).
+3. Carousels (posts 3, 22, 41) need multi-slide handling — a small follow-on (F4c);
+   their slides are already hosted under `social/carousels/post-XX/`.
 
 ## F5 — Posting go-live (gated)
 
