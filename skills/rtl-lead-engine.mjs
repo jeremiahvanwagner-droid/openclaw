@@ -166,7 +166,29 @@ function escapeHtml(text) {
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
-async function sendLiveEmailReply(contactId, text) {
+// Map inbound channel signals to the outbound GHL conversations `type`.
+// The F2 FB/IG workflow sets a `channel` field ('FB'/'IG'); native GHL
+// InboundMessage carries `messageType` (e.g. TYPE_FACEBOOK/TYPE_INSTAGRAM).
+// Anything unrecognized — including the email loop, which carries neither —
+// falls back to 'Email', the proven path. (RR has no SMS, so SMS→Email is a
+// safe fail-safe rather than a silent mis-send.)
+export function resolveChannel(payload = {}) {
+  const raw = String(
+    field(payload, 'channel', 'messageType', 'message_type', 'lastMessageType') || '',
+  ).toUpperCase();
+  if (/INSTAGRAM|(^|[^A-Z])IG([^A-Z]|$)/.test(raw)) return 'IG';
+  if (/FACEBOOK|MESSENGER|(^|[^A-Z])FB([^A-Z]|$)/.test(raw)) return 'FB';
+  return 'Email';
+}
+
+// Build the POST /conversations/messages body for a channel. The 'Email'
+// branch is byte-identical to the original sendLiveEmailReply; FB/IG are
+// plain-text DMs (no subject/html). Factored out so channel routing is
+// unit-testable without touching the network.
+export function buildReplyBody(contactId, text, channel) {
+  if (channel === 'FB' || channel === 'IG') {
+    return { type: channel, contactId, message: text };
+  }
   const body = {
     type: 'Email',
     contactId,
@@ -181,7 +203,14 @@ async function sendLiveEmailReply(contactId, text) {
       ? `${process.env.RTL_EMAIL_FROM_NAME} <${process.env.RTL_EMAIL_FROM}>`
       : process.env.RTL_EMAIL_FROM;
   }
-  return ghlRequest('/conversations/messages', { method: 'POST', body });
+  return body;
+}
+
+async function sendLiveReply(contactId, text, channel) {
+  return ghlRequest('/conversations/messages', {
+    method: 'POST',
+    body: buildReplyBody(contactId, text, channel),
+  });
 }
 
 // Breadcrumbs (CVO-approved autonomous writes): when a lead replies, tag them
@@ -207,17 +236,30 @@ async function applyReplyBreadcrumbs(contactId) {
   return { tagged: true, stageAdvanced: Boolean(opp) };
 }
 
-function agentInstruction(eventType, payload) {
+function channelLabel(channel) {
+  return channel === 'FB' ? 'Facebook Messenger'
+    : channel === 'IG' ? 'an Instagram DM'
+    : 'email';
+}
+
+function agentInstruction(eventType, payload, channel = 'Email') {
   const prompt = loadPrompt();
   const contact = contactSummary(payload);
   const message = payload.message?.body || payload.messageBody || payload.body || payload.message || '';
+  const channelName = channelLabel(channel);
 
   const context = [
     `EVENT: ${eventType}`,
+    `CHANNEL: ${channelName}`,
     `CONTACT: ${JSON.stringify(contact)}`,
     message ? `LEAD'S MESSAGE: ${message}` : null,
     payload.stage ? `PIPELINE STAGE: ${payload.stage}` : null,
   ].filter(Boolean).join('\n');
+
+  // Social DMs are short and personal — strip the email scaffolding.
+  const dmHint = (channel === 'FB' || channel === 'IG')
+    ? '\nThis is a direct message: keep it short, warm, and conversational — no subject line, no "Hi [name]," opener, no signature.'
+    : '';
 
   const mode = DRY_RUN
     ? [
@@ -225,13 +267,13 @@ function agentInstruction(eventType, payload) {
       'Respond with ONLY the exact message you would send to this lead — no preamble, no commentary, no markdown fences.',
       'If the message warrants no reply (a courtesy or acknowledgment like "thanks" or "cool"), respond with exactly: NO_REPLY',
       'The runtime records your response in the transcript; the CVO reviews it before anything goes live.',
-    ].join('\n')
+    ].join('\n') + dmHint
     : [
-      'MODE: LIVE — your reply WILL BE SENT to this lead by email. Do not send anything yourself and do not write files.',
+      `MODE: LIVE — your reply WILL BE SENT to this lead on ${channelName}. Do not send anything yourself and do not write files.`,
       'Respond with ONLY the exact message to deliver — no preamble, no commentary, no markdown fences.',
       'If the message warrants no reply (a courtesy or acknowledgment like "thanks" or "cool"), respond with exactly: NO_REPLY',
       'The runtime delivers it through the GHL conversations API (tenant RR) and records it in the transcript.',
-    ].join('\n');
+    ].join('\n') + dmHint;
 
   return `${prompt}\n\n---\n${context}\n\n${mode}`;
 }
@@ -255,11 +297,13 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
   }
 
   const contact = contactSummary(payload);
+  const channel = resolveChannel(payload);
   const inboundText = payload.message?.body || payload.messageBody
     || field(payload, 'message', 'body') || '';
   appendTranscript({
     role: 'event',
     event: eventType,
+    channel,
     contact,
     message: inboundText || undefined,
   });
@@ -285,7 +329,7 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
   try {
     reply = String(await openclawMessage({
       agent: RTL_AGENT,
-      message: agentInstruction(eventType, payload),
+      message: agentInstruction(eventType, payload, channel),
     }) || '').trim();
   } catch (error) {
     log.error({ eventType, err: error.message }, 'Failed to brief RTL agent');
@@ -310,31 +354,38 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
     appendTranscript({
       role: 'reggie-draft',
       event: eventType,
+      channel,
       contact: contact.email || contact.id,
       draft: reply,
     });
-    log.info({ eventType, agent: RTL_AGENT, dryRun: DRY_RUN, contact: contact.email || contact.id }, 'RTL agent briefed');
+    log.info({ eventType, channel, agent: RTL_AGENT, dryRun: DRY_RUN, contact: contact.email || contact.id }, 'RTL agent briefed');
     return { handled: true, escalated: false };
   }
 
   // LIVE: deliver via GHL, then leave the CVO-approved breadcrumbs.
   const contactId = contact.id;
   try {
-    const delivery = await sendLiveEmailReply(contactId, reply);
+    const delivery = await sendLiveReply(contactId, reply, channel);
     appendTranscript({
       role: 'reggie-sent',
       event: eventType,
+      channel,
       contact: contact.email || contactId,
       message_id: delivery?.messageId || delivery?.id || null,
       sent: reply,
     });
-    log.info({ eventType, contact: contact.email || contactId }, 'RTL live reply delivered');
+    log.info({ eventType, channel, contact: contact.email || contactId }, 'RTL live reply delivered');
   } catch (error) {
-    log.error({ eventType, err: error.message }, 'RTL live send FAILED');
-    appendTranscript({ role: 'error', event: eventType, error: `live-send: ${error.message}` });
+    log.error({ eventType, channel, err: error.message }, 'RTL live send FAILED');
+    appendTranscript({ role: 'error', event: eventType, channel, error: `live-send: ${error.message}` });
+    // FB/IG only allow free-form replies inside Meta's 24h customer-care
+    // window; outside it GHL/Meta reject the send. Flag that in the alert.
+    const windowHint = (channel === 'FB' || channel === 'IG')
+      ? "\n(FB/IG allow free-form replies only within 24h of the lead's last message — this may be outside that window.)"
+      : '';
     await sendAlert(
-      `RTL LIVE SEND FAILED\nContact: ${contact.name || contact.email || contactId}\n` +
-      `Event: ${eventType}\nError: ${error.message.slice(0, 300)}\n` +
+      `RTL LIVE SEND FAILED (${channel})\nContact: ${contact.name || contact.email || contactId}\n` +
+      `Event: ${eventType}\nError: ${error.message.slice(0, 300)}${windowHint}\n` +
       'The reply was NOT delivered — follow up manually.',
     );
     return { handled: false, reason: 'live-send-failed' };
