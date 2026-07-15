@@ -37,8 +37,9 @@ Facts that shape the build:
 | **F1** | ✅ **DONE** — channel-aware sender + inbound-channel capture in `rtl-lead-engine.mjs` | REGGIE-code | Shipped DRY_RUN; email byte-identical; 265/265 tests |
 | **F2** | GHL workflow: FB/IG inbound → Custom Webhook → REGGIE | **You** (GHL UI) | Stays **DRAFT** until F3 |
 | **F3** | Conversations go-live | Gated | Transcript review · DRY_RUN lift (FB/IG only) · `ghl_write` HITL · real-DM test |
-| **F4** | Posting: map the 43-post calendar → Social Planner `createPost` | REGGIE-code | Preview/DRY_RUN first; needs F0-B + socialplanner scope |
-| **F5** | Posting go-live + measurement | Gated | Schedule the real 60-day calendar |
+| **F4** | ✅ **DONE (code)** — map the 43-post calendar → Social Planner `createPost` | REGGIE-code | Ships DRY_RUN + `draft` status; 12 tests |
+| **F4b** | Host the post graphics (public URLs) so scheduled posts carry images | You / REGGIE-code | Set `RTL_SOCIAL_MEDIA_BASE` |
+| **F5** | Posting go-live + measurement | Gated | Connect FB to Social Planner (F0-B) → live schedule |
 
 ---
 
@@ -137,3 +138,44 @@ posts `rtl.inbound_message` for email) twice — once per channel:
    channel-appropriate reply in the transcript (role `reggie-draft`, `channel: FB|IG`). Review voice.
 4. Lift `DRY_RUN=false` for the RTL webhook service, keep the `ghl_write` HITL allowlist on.
 5. Real-DM test end-to-end (within the 24h window) → verify delivery + `rtl-engaged`/stage breadcrumb.
+
+## F4 — Posting engine ✅ DONE (code)
+
+`skills/rtl-social-poster.mjs` schedules the 60-day calendar to the FB Page (IG-ready)
+via GHL Social Planner (tenant RR). Content bridge: the RTL repo's `build_calendar.py`
+now emits `RTL-Facebook-60Day-posting-plan.json`; a snapshot lives at
+`data/rtl/fb-posting-plan.json` (43 posts) for REGGIE on the VPS.
+
+- `to24h` / `toScheduleISO` — Central-time calendar slots → UTC ISO (`11:00 AM` CDT →
+  `…T16:00:00Z`; the whole Jul 20–Sep 16 window is CDT/UTC-5).
+- `buildCreatePostBody(item, accountIds)` — `{ accountIds, summary, status, scheduleDate,
+  type:'post', tags:['rtl-fb-60day'] }`; attaches `media` when a media base is set.
+- `resolveFbAccountId(accounts)` — picks the connected FB account from `GET
+  /social-media-posting/{loc}/accounts`.
+- `previewPlan` (offline, no writes) and `schedulePlan({dryRun})` (live, gated).
+- **DRY_RUN by default** (`RTL_SOCIAL_DRY_RUN !== 'false'`) and posts created as **`draft`**
+  (`RTL_SOCIAL_STATUS`) until you flip to `scheduled`. Tests: 12; full suite **277/277**.
+- IG: RTL has FB only today. When IG connects to RR, add its account id to `accountIds`
+  (a `resolveIgAccountId` mirror) — no other change.
+
+Preview it anytime (offline): `node skills/rtl-social-poster.mjs 10`
+
+## F4b — Media hosting (so scheduled posts carry the image)
+
+Social Planner needs a **public URL** per image. Simplest: host the graphics on the RTL
+Vercel frontend.
+1. Copy `marketing/facebook/assets/posts/*.png` (RTL repo) → `frontend/public/social/` → deploy.
+   They resolve at `https://readytolaunchmybusiness.com/social/<file>.png`.
+2. Set `RTL_SOCIAL_MEDIA_BASE=https://readytolaunchmybusiness.com/social` in the RTL/openclaw env.
+   The poster then attaches each post's image automatically by filename.
+3. Carousels (posts 3, 22, 41) need multi-slide handling — a small follow-on (F4c).
+
+## F5 — Posting go-live (gated)
+
+1. **F0-B**: connect the FB Page to RR **Social Planner** (separate OAuth from Conversations)
+   and confirm the RR PIT holds `socialplanner/post.write` + `socialplanner/oauth.readonly`.
+2. `node -e "import('./skills/rtl-social-poster.mjs').then(m=>m.schedulePlan(m.loadPlan(),{limit:3}))"`
+   with DRY_RUN on → confirm it resolves the real FB account id and previews 3 bodies.
+3. Flip `RTL_SOCIAL_DRY_RUN=false` (status still `draft`) → run the batch → review the drafts
+   in Social Planner → publish/schedule from the UI, **or** set `RTL_SOCIAL_STATUS=scheduled`
+   and re-run to schedule directly. Measure with the calendar's UTM links.
