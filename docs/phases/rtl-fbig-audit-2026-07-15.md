@@ -17,11 +17,8 @@
 replied on Messenger end-to-end (2026-07-15). The live legs are now **email + FB Messenger**.
 Posts and Comments remain staged/unbuilt.
 
-> ⚠️ **Open risk (Step 0):** the FB workflow fires on **any** FB DM to RR (no page filter). Confirm
-> the RTL page is the **only** FB page connected to Royal Results, or REGGIE will also answer a
-> client's DMs. Not yet confirmed.
-> ⚠️ **Verify `DRY_RUN=false`** on the box — if a dry-run test flipped it to `true`, the live email
-> loop is stuck draft-only until flipped back.
+> ✅ **Step 0 CONFIRMED (2026-07-15):** the RTL page is the **only** FB page connected to Royal
+> Results — no client-DM misrouting. `DRY_RUN=false` verified on the box (email + FB both live).
 
 ## Phase status (from `rtl-ghl-fbig-connect.md`)
 
@@ -66,8 +63,8 @@ swap** (`git show origin/main:…rtl-lead-engine.mjs` → file, backup `…bak-p
 `/opt/openclaw` deploys must use the same surgical pattern until the box is properly reconciled to `main`.
 
 ## Make-it-live checklist (the real remaining work, in order)
-1. ~~**F3 — Messenger live**~~ ✅ **DONE 2026-07-15.** Remaining: confirm the RTL page is the
-   only FB page on RR (Step 0), and verify `DRY_RUN=false` on the box.
+1. ~~**F3 — Messenger live**~~ ✅ **DONE + VERIFIED 2026-07-15** — Step 0 clean (RTL is the only
+   FB page on RR), `DRY_RUN=false` confirmed.
 2. **F5 — Posts live:** confirm RR PIT `socialplanner/post.write` → set
    `RTL_SOCIAL_MEDIA_BASE=https://readytolaunchmybusiness.com/social` → dry-run
    `schedulePlan` (resolves the real FB account id) → `RTL_SOCIAL_DRY_RUN=false`
