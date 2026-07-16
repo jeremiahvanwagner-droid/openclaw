@@ -54,11 +54,21 @@ export function toScheduleISO(date, time, offset = CT_OFFSET) {
 }
 
 export function mediaFor(item, mediaBase = MEDIA_BASE) {
-  // Carousels need multi-slide handling (F4b) — skip for single-image v1.
-  if (item.carousel || !mediaBase || !item.graphic) return [];
+  if (!mediaBase || !item.graphic) return [];
+  const base = mediaBase.replace(/\/$/, '');
+  if (item.carousel) {
+    // Slides hosted at {base}/carousels/post-NN/slide-i.png; the plan's graphic
+    // string carries the slide count ("… N slides …"). FB accepts multi-image.
+    const m = String(item.graphic).match(/(\d+)\s+slides/);
+    const count = m ? Number(m[1]) : 0;
+    const folder = `carousels/post-${String(item.n).padStart(2, '0')}`;
+    return Array.from({ length: count }, (_, i) => ({
+      url: `${base}/${folder}/slide-${i + 1}.png`, type: 'image/png',
+    }));
+  }
   const file = String(item.graphic).split('/').pop();
   if (!/\.(png|jpe?g)$/i.test(file)) return [];
-  return [{ url: `${mediaBase.replace(/\/$/, '')}/${file}`, type: 'image/png' }];
+  return [{ url: `${base}/${file}`, type: 'image/png' }];
 }
 
 export function buildCreatePostBody(item, accountIds, { status = POST_STATUS, mediaBase = MEDIA_BASE, userId } = {}) {
@@ -73,8 +83,8 @@ export function buildCreatePostBody(item, accountIds, { status = POST_STATUS, me
     type: 'post',
   };
   if (userId) body.userId = userId;
-  const media = mediaFor(item, mediaBase);
-  if (media.length) body.media = media;
+  // GHL 422s if `media` is absent — it must be an array (empty is fine).
+  body.media = mediaFor(item, mediaBase);
   return body;
 }
 

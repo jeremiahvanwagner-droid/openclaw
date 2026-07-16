@@ -42,8 +42,16 @@ describe('mediaFor', () => {
   it('is empty when no media base is configured', () => {
     expect(mediaFor(item, '')).toEqual([]);
   });
-  it('skips carousels (multi-slide handled later)', () => {
-    expect(mediaFor({ graphic: 'assets/carousels/post-03/', carousel: true }, 'https://x/s')).toEqual([]);
+  it('expands carousels into one media object per hosted slide', () => {
+    const item = { n: 3, graphic: 'assets/carousels/post-03/ — 7 slides (slide-1…7.png)', carousel: true };
+    const media = mediaFor(item, 'https://x/s');
+    expect(media).toHaveLength(7);
+    expect(media[0]).toEqual({ url: 'https://x/s/carousels/post-03/slide-1.png', type: 'image/png' });
+    expect(media[6].url).toBe('https://x/s/carousels/post-03/slide-7.png');
+  });
+  it('carousel with no slide count or no base yields empty array', () => {
+    expect(mediaFor({ n: 3, graphic: 'assets/carousels/post-03/', carousel: true }, 'https://x/s')).toEqual([]);
+    expect(mediaFor({ n: 3, graphic: 'x — 7 slides', carousel: true }, '')).toEqual([]);
   });
 });
 
@@ -60,7 +68,7 @@ describe('buildCreatePostBody', () => {
       userId: 'USR1',
     });
     expect(b.tags).toBeUndefined(); // live 422: tags need Tag ObjectIds — dropped
-    expect(b.media).toBeUndefined(); // no media base -> no image
+    expect(b.media).toEqual([]); // GHL requires media as an array — empty when no base
   });
   it('omits userId when not provided (dry-run path) and attaches media when a base is set', () => {
     const b = buildCreatePostBody(item, ['ACC1'], { status: 'scheduled', mediaBase: 'https://x/s' });
