@@ -92,3 +92,16 @@ describe('resolveFbAccountId', () => {
     expect(resolveFbAccountId({ results: { accounts: [], groups: [] } })).toBeNull();
   });
 });
+
+describe('extractPostId', () => {
+  it('reads the live 201 shape {results:{post:{_id}}}', async () => {
+    const { extractPostId } = await import('../rtl-social-poster.mjs');
+    expect(extractPostId({ results: { post: { _id: 'P1' } } })).toBe('P1');
+  });
+  it('keeps flat fallbacks and returns null when absent', async () => {
+    const { extractPostId } = await import('../rtl-social-poster.mjs');
+    expect(extractPostId({ post: { id: 'P2' } })).toBe('P2');
+    expect(extractPostId({ _id: 'P3' })).toBe('P3');
+    expect(extractPostId({})).toBeNull();
+  });
+});

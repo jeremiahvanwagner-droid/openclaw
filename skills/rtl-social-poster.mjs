@@ -107,11 +107,31 @@ export function previewPlan(plan, { accountIds = ['<FB_ACCOUNT_ID>'], mediaBase 
   });
 }
 
+// createPost 201 nests the id: { results: { post: { _id } } } — proven on the
+// live RR run 2026-07-15 (the flat fallbacks returned null and made a
+// successful batch look failed). Keep fallbacks for older shapes.
+export function extractPostId(res) {
+  return res?.results?.post?._id || res?.results?.post?.id
+    || res?.post?._id || res?.post?.id || res?._id || res?.id || null;
+}
+
 // ── live (gated) ───────────────────────────────────────────────────────────
 export async function listRrSocialAccounts() {
   const client = createGhlClient('RR');
   const { locationId } = resolveTenant('RR');
   return client.request('GET', `/social-media-posting/${locationId}/accounts`, { headers: { 'User-Agent': UA } });
+}
+
+// Planner inventory. GHL gotcha (live 422, 2026-07-15): skip/limit must be
+// NUMERIC STRINGS. Returns the raw posts array.
+export async function listPlannerPosts({ skip = 0, limit = 100 } = {}) {
+  const client = createGhlClient('RR');
+  const { locationId } = resolveTenant('RR');
+  const res = await client.request('POST', `/social-media-posting/${locationId}/posts/list`, {
+    body: { skip: String(skip), limit: String(limit) },
+    headers: { 'User-Agent': UA },
+  });
+  return res?.results?.posts || res?.posts || [];
 }
 
 export async function schedulePlan(plan, { dryRun = SOCIAL_DRY_RUN, status = POST_STATUS, mediaBase = MEDIA_BASE, limit } = {}) {
@@ -149,7 +169,7 @@ export async function schedulePlan(plan, { dryRun = SOCIAL_DRY_RUN, status = POS
     }
     try {
       const res = await client.request('POST', `/social-media-posting/${locationId}/posts`, { body, headers: { 'User-Agent': UA } });
-      results.push({ n: item.n, ok: true, id: res?.id || res?._id || res?.post?.id || null, scheduleDate: body.scheduleDate });
+      results.push({ n: item.n, ok: true, id: extractPostId(res), scheduleDate: body.scheduleDate });
     } catch (error) {
       log.error({ n: item.n, err: error.message }, 'createPost failed');
       results.push({ n: item.n, ok: false, error: error.message });
