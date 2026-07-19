@@ -173,6 +173,17 @@ export async function schedulePlan(plan, { dryRun = SOCIAL_DRY_RUN, status = POS
   const results = [];
   for (const item of items) {
     const body = buildCreatePostBody(item, [effectiveId], { status, mediaBase, userId: SOCIAL_USER_ID });
+    // Conversion-leak guard (lesson 2026-07-19: an SG week published offer
+    // posts with no destination): a caption that pitches the guide/free offer
+    // must carry a link, unless the plan marks it an intentional no-link CTA.
+    const linkless = /starter guide|free guide|download it free|start free/i.test(body.summary)
+      && !/https?:\/\//.test(body.summary)
+      && !['COMMENT', 'COMMUNITY', 'SAVE'].includes(item.cta_type || '');
+    if (linkless) {
+      log.warn({ n: item.n, date: item.date }, 'OFFER POST WITHOUT LINK — add a CTA link or mark the CTA type intentional');
+      results.push({ n: item.n, ok: false, reason: 'offer-post-without-link', scheduleDate: body.scheduleDate });
+      continue;
+    }
     if (dryRun) {
       results.push({ n: item.n, dryRun: true, scheduleDate: body.scheduleDate, hasMedia: Boolean(body.media) });
       continue;
