@@ -62,3 +62,31 @@ describe('buildReplyBody', () => {
     expect(buildReplyBody('c', '<b>&', 'FB').message).toBe('<b>&');
   });
 });
+
+describe('F6 comment concierge helpers', () => {
+  it('bare T1 keywords are trivial (the comment->DM workflow owns them)', async () => {
+    const { isTrivialComment } = await import('../rtl-lead-engine.mjs');
+    expect(isTrivialComment('LAUNCH')).toBe(true);
+    expect(isTrivialComment('launch!!')).toBe(true);
+    expect(isTrivialComment('  List ')).toBe(true);
+  });
+  it('emoji/short/courtesy comments are trivial', async () => {
+    const { isTrivialComment } = await import('../rtl-lead-engine.mjs');
+    expect(isTrivialComment('🔥🔥🔥')).toBe(true);
+    expect(isTrivialComment('')).toBe(true);
+    expect(isTrivialComment('ok')).toBe(true);
+    expect(isTrivialComment('Thanks!')).toBe(true);
+    expect(isTrivialComment('love it')).toBe(true);
+  });
+  it('substantive comments are NOT trivial', async () => {
+    const { isTrivialComment } = await import('../rtl-lead-engine.mjs');
+    expect(isTrivialComment('How long does delivery actually take?')).toBe(false);
+    expect(isTrivialComment('LAUNCH? this looks like a scam')).toBe(false);
+    expect(isTrivialComment('does this work for coaches')).toBe(false);
+  });
+  it('rtl.comment is a registered event type and the lane defaults dark', async () => {
+    const m = await import('../rtl-lead-engine.mjs');
+    expect(m.RTL_EVENT_TYPES).toContain('rtl.comment');
+    expect(m.COMMENTS_ENABLED).toBe(false); // RTL_COMMENTS_ENABLED unset in tests
+  });
+});

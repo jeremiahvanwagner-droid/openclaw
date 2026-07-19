@@ -47,6 +47,32 @@ const PROMPT_CANDIDATES = [
   path.join(process.cwd(), 'prompts', 'rtl-sales-agent.md'),
 ].filter(Boolean);
 
+// ── F6 comment concierge (docs/phases/rtl-fbig-F6-comments-spec.md §3) ──
+// There is NO GHL API path to post a public comment reply — this lane only
+// DRAFTS replies and Telegrams them to the CVO for manual paste. Own flag,
+// isolated from DRY_RUN (F3's gate): dark-until-lit, default OFF.
+export const COMMENTS_ENABLED = (process.env.RTL_COMMENTS_ENABLED || 'false').toLowerCase() === 'true';
+const COMMENTS_DAILY_CAP = Number(process.env.RTL_COMMENTS_DAILY_CAP || 20);
+// Keywords the T1 comment->DM workflows already fulfill — the concierge
+// stays quiet on bare-keyword comments instead of double-touching them.
+const T1_KEYWORDS = ['LAUNCH', 'LIST', 'REAL', 'VOICE', 'SPEC', 'SWAP'];
+
+export function isTrivialComment(text) {
+  const t = String(text || '').trim();
+  if (!t) return true;
+  const bare = t.replace(/[^\p{L}\p{N}\s]/gu, '').trim().toUpperCase();
+  if (T1_KEYWORDS.includes(bare)) return true;
+  const letters = t.replace(/[^\p{L}\p{N}]/gu, '');
+  if (letters.length < 3) return true; // emoji/punctuation-only
+  return /^(thanks|thank you|thx|nice|cool|awesome|great|amazing|love (it|this)|yes+|ok(ay)?)\W*$/i.test(t);
+}
+
+// Daily agent-call ceiling — storms of small calls are the cost failure mode
+// (March 2026 doctrine). Resets at UTC midnight; alerts once per day.
+let _commentDay = '';
+let _commentCount = 0;
+let _capAlerted = false;
+
 // Refunds, anger, and out-of-scope asks go to a human, not the agent
 // (handoff Phase C §2). Checked on raw inbound text before anything else.
 const ESCALATION_PATTERNS = [
@@ -278,6 +304,78 @@ function agentInstruction(eventType, payload, channel = 'Email') {
   return `${prompt}\n\n---\n${context}\n\n${mode}`;
 }
 
+// Concierge: drafts a suggested PUBLIC reply and alerts the operator.
+// Never sends anything anywhere — there is no API path, by design.
+async function handleCommentConcierge({ payload, contact, inboundText, sendAlert }) {
+  const post = field(payload, 'post') || 'unknown-post';
+  const keyword = field(payload, 'keyword') || null;
+
+  if (!COMMENTS_ENABLED) {
+    appendTranscript({ role: 'comment-logged', post, keyword, contact: contact.id, message: inboundText });
+    log.info({ post, contact: contact.id }, 'rtl.comment logged (concierge disabled)');
+    return { handled: true, concierge: false };
+  }
+  if (isTrivialComment(inboundText)) {
+    appendTranscript({ role: 'comment-trivial', post, contact: contact.id, message: inboundText });
+    return { handled: true, trivial: true };
+  }
+
+  const today = new Date().toISOString().slice(0, 10);
+  if (today !== _commentDay) { _commentDay = today; _commentCount = 0; _capAlerted = false; }
+  if (_commentCount >= COMMENTS_DAILY_CAP) {
+    appendTranscript({ role: 'comment-capped', post, contact: contact.id, message: inboundText });
+    if (!_capAlerted) {
+      _capAlerted = true;
+      await sendAlert(
+        `RTL comment concierge hit its daily cap (${COMMENTS_DAILY_CAP}). ` +
+        'Further comments today are transcript-only — review the page manually if volume is real.',
+      );
+    }
+    return { handled: true, capped: true };
+  }
+  _commentCount += 1;
+
+  if (!loadPrompt()) {
+    await sendAlert('RTL comment arrived but the prompt-set is missing — concierge draft skipped.');
+    return { handled: false, reason: 'prompt-missing' };
+  }
+
+  const instruction = `${loadPrompt()}\n\n---\n` + [
+    'EVENT: rtl.comment — a PUBLIC comment on the RTL Facebook Page.',
+    `POST: ${post}`,
+    keyword ? `KEYWORD CONTEXT: the comment-to-DM automation may already have DM'd them (keyword ${keyword}).` : null,
+    `COMMENTER: ${JSON.stringify(contact)}`,
+    `COMMENT: ${inboundText}`,
+  ].filter(Boolean).join('\n') + '\n\n' + [
+    'MODE: COMMENT CONCIERGE — you CANNOT send anything. The runtime forwards your text to the operator,',
+    'who may paste it as the Page\'s public reply. Respond with ONLY the suggested public reply —',
+    '1-2 short sentences, warm, on-voice, no raw URLs (say "check your DMs" or "link on our page" instead).',
+    'If no reply is warranted, respond with exactly: NO_REPLY',
+  ].join('\n');
+
+  let draft;
+  try {
+    draft = String(await openclawMessage({ agent: RTL_AGENT, message: instruction }) || '').trim();
+  } catch (error) {
+    log.error({ err: error.message }, 'comment concierge agent brief failed');
+    appendTranscript({ role: 'error', event: 'rtl.comment', error: error.message });
+    return { handled: false, reason: 'agent-brief-failed' };
+  }
+
+  if (/^NO_?REPLY[.!]?$/i.test(draft)) {
+    appendTranscript({ role: 'comment-no-reply', post, contact: contact.id, message: inboundText });
+    return { handled: true, trivial: false };
+  }
+
+  appendTranscript({ role: 'comment-concierge-draft', post, keyword, contact: contact.id, message: inboundText, draft });
+  await sendAlert(
+    `💬 FB COMMENT on ${post}\n` +
+    `${contact.name || contact.id}: "${String(inboundText).slice(0, 200)}"\n\n` +
+    `Suggested reply (paste from the Page if good — REGGIE has NOT posted anything):\n${draft}`,
+  );
+  return { handled: true, concierge: true };
+}
+
 /**
  * Single entry point, called by the webhook handler for every rtl.* event
  * (and RR-located conversation.message.inbound).
@@ -318,6 +416,12 @@ export async function handleRtlEvent(eventType, payload, helpers = {}) {
       'REGGIE has NOT replied. Handle this thread personally.',
     );
     return { handled: true, escalated: true };
+  }
+
+  // F6: comments branch off AFTER the escalation screen (a hostile comment
+  // still alerts as an escalation) and never reach the DM/email send path.
+  if (eventType === 'rtl.comment') {
+    return handleCommentConcierge({ payload, contact, inboundText, sendAlert });
   }
 
   if (!loadPrompt()) {
@@ -411,4 +515,5 @@ export const RTL_EVENT_TYPES = [
   'rtl.checkout_abandoned',
   'rtl.testimonial_asked',
   'rtl.dormant7',
+  'rtl.comment',
 ];

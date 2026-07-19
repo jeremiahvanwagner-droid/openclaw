@@ -140,6 +140,7 @@ const eventHandlers = {
   'rtl.checkout_abandoned': handleRtl,
   'rtl.testimonial_asked': handleRtl,
   'rtl.dormant7': handleRtl,
+  'rtl.comment': handleRtl,
   'conversation.message.inbound': handleRtl,
   'contact.created': handleNewContact,
   'contact.updated': handleContactUpdate,
