@@ -27,6 +27,17 @@ import {
 } from '../lib/human-approval.mjs';
 import { initAutoRefresh } from '../skills/ghl-oauth-manager.mjs';
 import { validateGhlWebhookPayload } from '../lib/schemas/ghl-webhook.schema.mjs';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+
+// Toolkit entitlement writer — lazy admin client. Service role bypasses RLS
+// for the server-side write. Null-safe: if the env vars are absent the
+// entitlement write is skipped rather than crashing the handler.
+const supaAdmin =
+  process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY
+    ? createSupabaseClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+        auth: { persistSession: false },
+      })
+    : null;
 
 const log = childLogger({ module: 'webhook-handler' });
 
@@ -335,6 +346,47 @@ async function handlePayment(data) {
     } catch {
       // Missing cart state is not fatal.
     }
+  }
+
+  // Toolkit entitlement — writes public.entitlements so the Toolkit app unlocks
+  // the paid module routes for this buyer's email. Idempotent via the unique
+  // (email, product_id) key. Non-fatal: any failure is logged, never thrown.
+  try {
+    const paymentLinkId =
+      data.paymentLinkId ||
+      data.payment?.paymentLinkId ||
+      data.payment?.paymentLink ||
+      data.payment_link_id ||
+      '';
+    const buyerEmail =
+      data.contact?.email ||
+      data.email ||
+      data.customer?.email ||
+      data.payment?.customer?.email;
+    const isToolkit =
+      product.toLowerCase().includes('purpose activation toolkit') ||
+      paymentLinkId === '696ec80453f21b434dfae38d';
+
+    if (isToolkit && buyerEmail && supaAdmin) {
+      const { error } = await supaAdmin.from('entitlements').upsert(
+        {
+          email: String(buyerEmail).toLowerCase().trim(),
+          product_id: 'purpose-activation-toolkit',
+          source: `ghl:${paymentLinkId || 'unknown-link'}`,
+          gross_amount: Number(amount) || null,
+          contact_id: contact.id || null,
+          raw: data,
+        },
+        { onConflict: 'email,product_id' },
+      );
+      if (error) {
+        log.error({ err: error.message, email: buyerEmail }, 'Toolkit entitlement write failed');
+      } else {
+        log.info({ email: buyerEmail }, 'Toolkit entitlement granted');
+      }
+    }
+  } catch (err) {
+    log.error({ err: err.message }, 'Toolkit entitlement exception');
   }
 
   if (amount >= 7 && amount <= 67 && ebookAutomation && contact.id) {
